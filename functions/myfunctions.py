@@ -89,9 +89,8 @@ def sendLeavesData(employee_id:int):
 
 def initial_date(employee_id:int)->dict:
     '''return initial data for WorkEvidenceForm'''
-    worker = Employee.objects.get(id=employee_id)
     if date.today().isoweekday() == 1:
-        if str(worker) == 'Walczak Krzysztof':
+        if employee_id == 10:
             start_date = date.today() - timedelta(days=3)
             start_date = datetime(start_date.year, start_date.month,start_date.day,22,0,0)
             end_date = date.today() - timedelta(days=2)
@@ -102,7 +101,7 @@ def initial_date(employee_id:int)->dict:
             end_date = date.today() - timedelta(days=3)
             end_date = datetime(end_date.year, end_date.month, end_date.day,14,0,0)
     else:
-        if str(worker) == 'Walczak Krzysztof':
+        if employee_id == 10:
             start_date = date.today() - timedelta(days=1)
             start_date = datetime(start_date.year, start_date.month,start_date.day,22,0,0)
             end_date = date.today()
