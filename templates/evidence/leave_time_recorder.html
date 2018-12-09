@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load utility_tags %}
+
+{% block title %}Add leave time{% endblock %}
+
+{% block head %}
+    {% include 'blocks/header.html' %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="col-sm-4">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
+        <table class="table table-sm table-hover">
+            <tbody>
+            {% for employee in employees %}
+                <tr>
+                    <td width="5%" class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-sm-8">
+        {% if worker.status %}
+            <p class="text-center text-danger lead font-weight-normal bg-warning">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
+            <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-4 ml-4">
+                        {% bootstrap_field form.leave_date size='medium' label_class='text-primary font-weight-bold' %}
+                    </div>
+                    <div class="col-7">
+                        {% bootstrap_field form.leave_flag form_group_class='form-check ml-4' size='medium' label_class='text-primary font-weight-bold' %}
+                    </div>
+                </div>
+                <div class="btn-sm mb-2">
+                    <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
+                </div>
+            </form>
+
+            {% if flag_work or flag_leave %}
+                <p class="text-justify text-danger lead font-weight-normal">Work or leave data exist on datebase - <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }})</em></p>
+            {% elif name_holiday %}
+                <p class="text-justify text-danger lead font-weight-normal">Selected date - <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> is a holiday <em class="font-weight-bold">({{ name_holiday }})</em></p>
+            {% elif flag_weekend %}
+                <p class="text-justify text-danger lead font-weight-normal">You've been trying add leave day on <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em>! You haven't to do it!</p>
+            {% else %}
+                {% if leave_flag == 'unpaid_leave' %}
+                    <p class="text-justify text-danger lead font-weight-normal">CAUTION: You've been adding <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em> one day of unpaid leave!</p>
+                    <div class="btn-sm mb-2">
+                        <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block">Erase</a>
+                    </div>
+                {% elif leave_flag == 'paid_leave' %}
+                    <p class="text-justify text-danger lead font-weight-normal">CAUTION: You've been adding <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em> one day of paid leave!</p>
+                    <div class="btn-sm mb-2">
+                        <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block">Erase</a>
+                    </div>
+                {% elif leave_flag == 'maternity_leave' %}
+                    <p class="text-justify text-danger lead font-weight-normal">CAUTION: You've been adding <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em> one day of maternity leave!</p>
+                    <div class="btn-sm mb-2">
+                        <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block">Erase</a>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <table class="table table-hover table-sm">
+                <thead class="bg-info">
+                <tr><th class="text-center text-white">TOTAL LEAVES INFO FOR {{ worker|upper }}</th></tr>
+                </thead>
+            </table>
+            <table class="table table-hover table-sm">
+                <tbody>
+                <tr><td width="30%">Total leave:</td><td class="text-danger font-weight-bold">{{ total_leaves|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
+                    {% if remaining_leave < 0 %}
+                        <td width="20%">Days of leave exceeded by:</td><td class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
+                    {% elif remaining_leave < 26 %}
+                        <td>Remaining leave:</td><td class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td></tr>
+                    {% endif %}
+                {% if leaves_pl %}
+                    <tr><td>Date of paid leave:</td><td class="text-danger font-italic"  colspan="3">
+                        {% for date in leaves_pl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
+                {% endif %}
+                {% if leaves_ml %}
+                    <tr><td>Date of maternity leave:</td><td class="text-danger font-italic"  colspan="3">
+                        {% for date in leaves_ml %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
+                {% endif %}
+                {% if leaves_upl %}
+                    <tr><td>Date of unpaid leave:</td><td class="text-danger font-italic"  colspan="3">
+                        {% for date in leaves_upl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
+                {% endif %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-center text-danger lead font-weight-normal bg-warning">LEAVE EVIDENCE</p>
+            <p class="text-justify text-danger lead font-weight-normal">You can't add any leave day for <em class="font-weight-bold">{{ worker }}</em> because the employee is no longer employed.</p>
+        {% endif %}
+        <div class="btn-sm btn-group mb-2 float-right">
+            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
+            <a href="{% url 'evidence:leaves_data_print' employee_id %}" class="btn btn-outline-primary">Print employee leaves data</a>
+            <a href="{% url 'evidence:leaves_data_pdf' employee_id %}" class="btn btn-outline-success">Send employee leaves data</a>
+            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load utility_tags %}
+{% load staticfiles %}
+
+{% block title %}Monthly payroll{% endblock %}
+
+{% block data %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-2 text-center">
+                <div class="btn btn-group-lg btn-group-vertical mt-3" role="group">
+                    <a class="btn btn-outline-dark d-print-none" href="{% url 'account:admin_site' %}">Dashboard</a>
+                    <a class="btn btn-outline-primary d-print-none" href="{% url 'evidence:working_time_recorder_add' employee_id %}">Work time recorder</a>
+                    <a class="btn btn-outline-success d-print-none" href="{% url 'evidence:leave_time_recorder_add' employee_id %}">Leave time recorder</a>
+                    <a class="btn btn-outline-secondary d-print-none" href="{% url 'evidence:account_payment' employee_id %}">Payment on account</a>
+                    <a class="btn btn-outline-info d-print-none" href="{% url 'evidence:monthly_payroll_print' choice_date %}">Print</a>
+                    <a class="btn btn-outline-warning d-print-none" href="{% url 'evidence:monthly_payroll_pdf' choice_date %}">Send PDF</a>
+                    <a class="btn btn-outline-danger d-print-none" href="{% url 'account:exit' %}">Exit</a>
+                </div>
+                <hr class="small">
+                <form action="{% url 'evidence:monthly_payroll_view' %}" method="POST">
+                        {% csrf_token %}
+                        {% bootstrap_field form.choice_date label_class='text-primary font-weight-bold' %}
+                        <div class="btn-sm">
+                            <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
+                        </div>
+                </form>
+            </div>
+            <div class="col-10">
+                {% if brutto %}
+                    <p class="text-center text-primary lead font-weight-bold bg-warning mt-lg-4">Monthly rollpay for {{ choice_date|date:'F Y' }}. Total work hours: {{ total_work_hours }} hours. Total payment: {{ brutto|money_format }}</p>
+
+                    <div class="input-group">
+                        <input class="form-control" id="myInput" type="text" placeholder="Search employee..." aria-label="Filtering table" aria-describedby="basic-addon">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px"></span>
+                        </div>
+                    </div>
+
+                    <table class="table table-sm table-bordered table-striped table-hover">
+                        <thead class="text-center bg-info">
+                            <tr>
+                                {% for head in heads %}<th>{{ head }}</th>{% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTable">
+                            {% for name, data in payroll.items %}
+                                <tr>
+                                    <td class="text-primary font-weight-bold font-italic"><a href="{{ name.employee_complex_data }}">{{ name }}</a></td>
+                                    <td class="text-right text-dark">{{ data.brutto|money_format }}</td>
+                                    <td class="text-right text-dark">{{ data.basicpay|money_format }}</td>
+                                    <td class="text-right text-dark">{{ data.leavepay|money_format }}</td>
+                                    <td class="text-right text-dark">{{ data.overhourspay|money_format }}</td>
+                                    <td class="text-right text-dark">{{ data.satpay|money_format }}</td>
+                                    <td class="text-right text-dark">{{ data.sunpay|money_format }}</td>
+                                    <td class="text-right text-dark">{{ data.accountpay|money_format }}</td>
+                                    <td class="text-right text-dark">{{ data.salary|money_format }}</td>
+                                </tr>
+                            {% endfor %}
+                                <tr class="bg-info"><td class="text-right text-white font-weight-bold">TOTAL:</td>
+                            {% for amount in amount_pay %}
+                                <td class="text-right text-white font-weight-bold">{{ amount|money_format }}</td>
+                            {% endfor %}
+                                </tr>
+                        </tbody>
+                    </table>
+                    <p class="footer text-secondary text-sm-left"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
+                {% else %}
+                    <div class="jumbotron bg-warning mt-lg-5">
+                        <p class="text-center text-danger lead font-weight-bold font-italic">Your choice: {{ choice_date|date:'F Y' }}. Total work hours: {{ total_work_hours }} hours. Total payment: {{ brutto|money_format }}.<br>For {{ choice_date|date:'m/Y' }} no data available in database!</p>
+                    </div>
+                    <p class="footer text-secondary text-sm-left"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

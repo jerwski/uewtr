@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load utility_tags %}
+
+{% block title %}Add working time{% endblock %}
+
+{% block head %}
+    {% include 'blocks/header.html' %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="col-sm-4">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
+        <table class="table table-hover table-sm">
+            <tbody>
+            {% for employee in employees %}
+                <tr>
+                    <td width="5%" class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+        <div class="col-sm-8">
+            {% if worker.status %}
+                <p class="text-center text-danger lead font-weight-normal bg-warning">WORK EVIDENCE FOR: {{ worker|upper }}</p>
+                <form action="{% url 'evidence:working_time_recorder_add' employee_id %}" method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-5 ml-4">
+                            {% bootstrap_field form.start_work size='medium' label_class='text-primary font-weight-bold' %}
+                        </div>
+                        <div class="col-1"></div>
+                        <div class="col-5">
+                            {% bootstrap_field form.end_work size='medium' label_class='text-primary font-weight-bold' %}
+                        </div>
+                    </div>
+                    <div class="btn-sm mb-2">
+                        <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
+                    </div>
+                </form>
+
+                {% if start_work > end_work %}
+                    <p class="text-danger lead font-weight-normal mt-3">The start date is later than the end date! Please correct it!</p>
+                {% else %}
+                    {% if flag_work or flag_leave %}
+                        <p class="text-danger lead font-weight-normal mt-3">Record for this day ({{ start_work|date:'l, d F Y' }}) is existing in database! Please check it or correct!</p>
+                    {% else %}
+                        {% if jobhours %}
+                            <p class="text-center text-danger lead font-weight-normal mt-3">For <em class="font-weight-bold">{{ worker }}</em> adding <em class="font-weight-bold">{{ jobhours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</em> on <em class="font-weight-bold">{{ start_work|date:'d F Y' }}</em></p>
+                            <div class="btn-sm mb-lg-4">
+                                <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block">Erase</a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                <table class="table table-hover table-sm">
+                    <thead class="bg-info">
+                        <tr><th>TOTAL PAYMENT FOR:</th><th class="text-white">{{ worker }}</th><th class="text-right" width="8%">RATE:</th><th class="text-white" width="15%">{{ rate|floatformat:2 }} PLN/h</th><th width="10%">HOURS:</th><th class="text-white" width="8%">{{ total_hours|floatformat:2 }}</th></tr>
+                    </thead>
+                </table>
+                <table class="table table-hover table-sm">
+                    <tbody>
+                        <tr><td class="text-right">Total hours:</td><td class="text-danger font-weight-bold">{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</td><td class="text-right">Brutto income:</td><td class="text-danger font-weight-bold">{{ brutto_income|money_format }}</td></tr>
+                        <tr><td class="text-right">Basic payment (100%):</td><td class="text-danger font-weight-bold">{{ basicpay|money_format }}</td><td class="text-right">Leave payment (100%):</td><td class="text-danger font-weight-bold">{{ leavepay|money_format }}</td></tr>
+                        <tr><td class="text-right">Saturday payment (100%):</td><td class="text-danger font-weight-bold">{{ satpay|money_format }}</td><td class="text-right">Sunday payment (200%):</td><td class="text-danger font-weight-bold">{{ sunpay|money_format }}</td></tr>
+                        {% if overhours %}
+                            <tr><td class="text-right">Overhours (50%):</td><td class="text-danger font-weight-bold">{{ overhourspay|money_format }}</td><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td></tr>
+                        {% else %}
+                            <tr><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td></tr>
+                        {% endif %}
+                        <tr class="text-white font-weight-bold bg-info"><td>&nbsp;</td><td class="text-right">NETTO INCOME:</td><td>{{ salary|money_format }}</td><td>&nbsp;</td></tr>
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-center text-danger lead font-weight-normal bg-warning">{{ worker|upper }} IS DEACTIVE</p>
+                <p class="text-center text-danger lead font-weight-bold">{{ worker|upper }} isn't employee or is deactive. You can't add any evidence.</p>
+            {% endif %}
+            <div class="btn-sm mb-2">
+                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
+            </div>
+        </div>
+
+{% endblock %}

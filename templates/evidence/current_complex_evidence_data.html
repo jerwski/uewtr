@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load utility_tags %}
+
+{% block title %}Current data of employee{% endblock %}
+
+{% block head %}
+    {% include 'blocks/header.html' %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="col-sm-4">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
+
+        <table class="table table-sm table-hover">
+            <tbody>
+            {% for employee in employees %}
+                <tr>
+                    <td width="5%" class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_complex_data }}">{{ employee }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="btn btn-group" role="group">
+            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
+            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="col-sm-8">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">CURRENT DATA: {{ worker|upper }}</p>
+
+        {% if worker.status %}
+
+            <form action="." method="POST">
+                {% csrf_token %}
+                <div class="row">
+
+                    <div class="col-7 mt-1">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text bg-info">Select date</div>
+                            </div>
+                            {% bootstrap_field form.choice_date  form_group_class='form-inline' show_label=False %}
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-outline-success">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-5">
+                        <div class="btn-sm" role="group">
+                            <button id="btnGroupDrop1" type="button" class="btn btn-outline-danger btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Holidays in the {{ choice_date|date:'Y' }} year </button>
+                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <table class="table table-sm table-hover">
+                                    <tbody>
+                                    {% for key, value in holidays.items %}
+                                                    <tr class="font-weight-light font-italic"><td class="text-right text-danger" width="55%">{{ key }}:</td><td class="text-left text-dark">{{ value|date:'d-m-Y (D)' }}</td></tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+
+            {% if rate %}
+                <p class="text-center lead font-weight-normal bg-info">Kind of leave in {{ choice_date|date:'F Y' }}</p>
+                <table class="table table-sm">
+                    <tbody>
+                    <tr>
+                        {% for key,value in month_leaves.items %}
+                            <td class="text-right">{{ key|capfirst }}:</td><td class="text-danger font-weight-bold">{{ value|floatformat:0 }} day{{ value|pluralize:'s' }}</td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="text-center lead font-weight-normal bg-info">All of leave in {{ choice_date|date:'Y' }} year</p>
+                <table class="table table-sm">
+                    <tbody>
+                    <tr>
+                        {% for key,value in year_leaves.items %}
+                            <td class="text-right">{{ key|capfirst }}</td><td class="text-danger font-weight-bold">{{ value|floatformat:0 }} day{{ value|pluralize:'s' }}</td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+
+                <p class="text-center lead font-weight-normal bg-info">Total payment data for {{ choice_date|date:'F Y' }}&nbsp;&nbsp;&nbsp;RATE: <em class="text-white font-weight-bold">{{ rate|floatformat:2 }} PLN/h</em></p>
+
+                <table class="table table-hover table-sm">
+                    <tbody>
+                        <tr><td class="text-right">Total hours:</td><td class="text-danger font-weight-bold">{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</td><td class="text-right">Brutto income:</td><td class="text-danger font-weight-bold">{{ brutto_income|money_format }}</td></tr>
+                        <tr><td class="text-right">Basic payment (100%):</td><td class="text-danger font-weight-bold">{{ basicpay|money_format }}</td><td class="text-right">Leave payment (100%):</td><td class="text-danger font-weight-bold">{{ leavepay|money_format }}</td></tr>
+                        <tr><td class="text-right">Saturday payment (100%):</td><td class="text-danger font-weight-bold">{{ satpay|money_format }}</td><td class="text-right">Sunday payment (200%):</td><td class="text-danger font-weight-bold">{{ sunpay|money_format }}</td></tr>
+                        {% if overhourspay > 0 %}
+                            <tr><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td><td class="text-right">Overhours payment (50%):</td><td class="text-danger font-weight-bold">{{ overhourspay|money_format }}</td></tr>
+                        {% else %}
+                            <tr><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td></tr>
+                        {% endif %}
+                        </tbody>
+                </table>
+                <p class="text-center text-white lead font-weight-bold bg-info">NETTO INCOME: {{ salary|money_format }}</p>
+            {% else %}
+                <p class="text-center lead font-weight-normal">No data is available!</p>
+            {% endif %}
+        {% else %}
+            <p class="text-center lead font-weight-normal">No data for {{ worker }} available because the employee is no longer employed.</p>
+        {% endif %}
+    </div>
+
+{% endblock %}

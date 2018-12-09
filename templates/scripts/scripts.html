@@ -1,0 +1,51 @@
+<!-- search table-->
+    <script>
+        $(document).ready(function(){
+            $("#myInput").on("keyup", function() {var value =
+                $(this).val().toLowerCase();
+            $("#employeeTable").find("tr").filter(function() {
+                $(this).toggle(
+                    $(this).text().toLowerCase().indexOf(value) > -1)})
+            ;})
+            ;});
+    </script>
+
+<!-- open Modal-->
+    <script>
+        $(document).ready(function(){
+            $("#myBtn").click(function(){
+                $("#myModal").modal()
+                ;})
+            ;});
+    </script>
+
+<!-- open tooltip with HTML context-->
+    <script>
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip({
+                title: "<p><strong>Caution!</strong><br><em>You have to<br>login first.</em></p>", html: true, placement: "right"})
+            ;});
+    </script>
+
+<!-- open mysend with info about absence e-mails-->
+    <script>
+        $(document).ready(function(){
+            $('#mysend').tooltip({
+                title: "<p><em>Nothing to send...</em></p>", html: true, placement: "right"})
+            ;});
+    </script>
+
+<!-- hide message after hideTime: seconds-->
+    <script>
+        function hideAfterSomeTime(hideTime) {
+	        // 10000 = 10 seconds
+	        window.setTimeout("document.getElementById('short-time-msg').style.display='none'", (hideTime)?hideTime:2000);
+        }
+    </script>
+
+<!-- show message after hideTime: seconds-->
+    <script>
+        $(document).ready(function showAfterTime() {
+            $("#after-time-msg").delay(2000).fadeIn(500);
+        });
+    </script>

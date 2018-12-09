@@ -1,0 +1,76 @@
+{% load staticfiles %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <title>WTR-{% block title %}{% endblock %}</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+    <link rel="shortcut icon" type="image/x-icon" href="{% static '/images/mainboard/logo_UNIKOLOR.ico' %}" />
+
+    <style>
+        .footer {
+                    font-size: 0.6rem;
+                }
+    </style>
+
+    {% include 'scripts/scripts.html' %}
+    {{ form.media }}
+</head>
+
+<body>
+
+    {% block header %}
+    {% endblock %}
+
+    {% block section %}
+
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-lg-6 offset-lg-3">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div id="short-time-msg" class="alert alert-danger" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <small>{{ message }}<script>hideAfterSomeTime()</script></small>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    {% endblock %}
+
+    <div class="container">
+        <div class="row m-3" style="background-color: bisque">
+            {% block head %}
+            {% endblock %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    {% block data %}
+    {% endblock %}
+
+    {% block footer %}
+    {% endblock %}
+
+</body>
+</html>

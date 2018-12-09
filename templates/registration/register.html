@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Create new user{% endblock %}
+
+
+{% block data %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 offset-sm-2" style="background-color: bisque">
+                <pre class="text-center text-danger lead mt-2">C R E A T E   U S E R   F O R M</pre>
+                <form class="small" method="POST">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-control" style="background-color: bisque">
+                                {% bootstrap_field form.username size='medium' %}
+                                {% bootstrap_field form.first_name size='medium' %}
+                                {% bootstrap_field form.last_name size='medium' %}
+                                {% bootstrap_field form.email size='medium' %}
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-control" style="background-color: bisque">
+                                {% bootstrap_field form.password1 size='medium' %}
+                                {% bootstrap_field form.password2 size='medium' %}
+                                {% bootstrap_field form.is_staff size='medium' %}
+                                {% bootstrap_field form.is_superuser size='medium' %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="footer text-secondary text-left justify-content-sm-end"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
+                        </div>
+                        <div class="col-6">
+                            <div class="btn-group btn-sm mb-2 ml-2">
+                                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                                <a href="{% url 'login' %}" class="btn btn-outline-dark">Back to Login</a>
+                                <a href="/admin/" class="btn btn-outline-primary">Admin</a>
+                                <button type="submit" class="btn btn-outline-success">Register</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

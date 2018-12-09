@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load utility_tags %}
+{% load staticfiles %}
+
+{% block title %}Monthly payroll{% endblock %}
+
+{% block data %}
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-sm-12">
+                <p class="text-center text-primary lead font-weight-bold bg-warning mt-4">List of annual employee holidays for {{ worker }}</p>
+            </div>
+            <table class="table table-sm table-bordered">
+                <thead class="text-center bg-info">
+                    <tr>{% for month in month_name %}<th>{{ month }}</th>{% endfor %}</tr>
+                </thead>
+            {%  if leave_data %}
+                <tbody>
+                {% for name, data in leave_data.items %}
+                    <tr>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 1  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 2  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 3  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 4  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 5  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 6  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 7  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 8  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 9  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 10  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 11  %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                        <td class="text-left text-dark">{% for item in data %}{% if item.month == 12 %}{{ item|date:'D, j/m' }}<br>{% endif %}{% endfor %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p class="footer text-secondary text-sm-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
