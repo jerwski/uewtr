@@ -29,7 +29,6 @@ def mkfixture():
             print('\nSerialization error: {}'.format(err))
 
 
-# loading fixtures in json format
 def readfixture():
     '''reading fixtures'''
     for model, path in settings.FIXTURE_DIRS.items():
