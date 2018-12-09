@@ -20,6 +20,7 @@ from functions.myfunctions import holiday
 # Create your payment functions here
 
 
+# return amount of working days in selected year and month
 def workingdays(year:int, month:int):
     '''return quanity of working days in a given year and month'''
     t = calendar.monthrange(year, month)
