@@ -27,6 +27,7 @@ def workingdays(year:int, month:int):
     stop = date(start.year, start.month, t[1])
     while start <= stop:
         if start.weekday() < 5 and start not in holiday(year).values():
+            # return generator
             yield start
         start += timedelta(1)
 
