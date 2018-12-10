@@ -27,7 +27,6 @@ def workingdays(year:int, month:int):
     stop = date(start.year, start.month, t[1])
     while start <= stop:
         if start.weekday() < 5 and start not in holiday(year).values():
-            # return a generator
             yield start
         start += timedelta(1)
 
@@ -46,7 +45,7 @@ def saturday_payment(employee_id:int, year:int, month:int)->float:
     query = Q(worker=employee) & Q(start_work__year=year) & Q(start_work__month=month) & Q(start_work__week_day=7) & (Q(end_work__week_day=7) | Q(end_work__week_day=1))
     saturday_hours = WorkEvidence.objects.filter(query).aggregate(sh=Sum('jobhours'))
     if saturday_hours['sh']:
-        # satpay = wynagrodzenie za pracę w niedzielę
+        # satpay => remuneration for work on Saturday
         satpay = saturday_hours['sh'] * rate
         return satpay
     else:
@@ -67,7 +66,7 @@ def sunday_payment(employee_id:int, year:int, month:int)->float:
     query = Q(worker=employee) & Q(start_work__year=year) & Q(start_work__month=month) & Q(start_work__week_day=1) & Q(end_work__week_day=1)
     sunday_hours = WorkEvidence.objects.filter(query).aggregate(sh=Sum('jobhours'))
     if sunday_hours['sh']:
-        # sunpay = wynagrodzenie za pracę w niedzielę
+        # sunpay => remuneration for work on Sunday
         sunpay = sunday_hours['sh'] * rate * 2
         return sunpay
     else:
