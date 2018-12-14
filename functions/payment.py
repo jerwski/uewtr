@@ -216,7 +216,7 @@ def amount_pay(year:int, month:int)->tuple:
 
     brutto = basic_amount + leave_amount + overhours_amount + saturday_amount + sunday_amount
     salary_amount = brutto - account_amount
-
+    # TODO: set return as namedtuple
     return brutto, basic_amount, leave_amount, overhours_amount, saturday_amount, sunday_amount, account_amount, salary_amount
 
 
@@ -251,8 +251,7 @@ def employee_total_data(work_date:date, employee_id:int, context:dict)->dict:
 
 def payrollhtml2pdf(choice_date:date):
     '''convert html file (evidence/monthly_payroll_pdf.html) to pdf file'''
-    heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota',
-                 'Niedziela', 'Zaliczka', 'Do wypłaty', 'Data i podpis']
+    heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota', 'Niedziela', 'Zaliczka', 'Do wypłaty', 'Data i podpis']
     total_work_hours = len(list(workingdays(choice_date.year, choice_date.month))) * 8
     query = Q(end_contract__year__gte=choice_date.year) & Q(end_contract__month__gte=choice_date.month) | Q(name__status=True) & Q(start_contract__year__lte=choice_date.year) & Q(start_contract__month__lte=choice_date.month)
     employees = EmployeeData.objects.filter(query).order_by('name')
@@ -260,6 +259,8 @@ def payrollhtml2pdf(choice_date:date):
     brutto = ampay[0]
     # create data for payroll as associative arrays for every active employee
     payroll = {employee.name: total_payment(employee.id,choice_date.year, choice_date.month) for employee in employees}
+
+    # TODO: set a reduced sum of advances with zero payout for a given employee
     context = {'heads': heads, 'payroll': payroll, 'choice_date': choice_date,
                'amount_pay': ampay, 'total_work_hours': total_work_hours, 'brutto': brutto}
 
