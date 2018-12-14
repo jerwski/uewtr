@@ -16,7 +16,11 @@
             <tbody>
             {% for employee in employees %}
                 <tr>
-                    <td width="5%" class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
+                    {% if employee_id == employee.id %}
+                        <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td class=" bg-info"><a class="font-weight-bold text-white" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
+                    {% else %}
+                        <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>
