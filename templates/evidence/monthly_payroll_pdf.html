@@ -8,7 +8,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <p class="text-primary lead text-center font-weight-bold bg-warning">Lista płac za miesiąc: {{ choice_date|date:'m/Y' }}r.  Ilość godzin: {{ total_work_hours }}. Wypłaty razem: {{ brutto|money_format }}</p>
+                <p class="text-primary lead text-center font-weight-bold bg-warning">Lista płac za miesiąc: {{ choice_date|date:'m/Y' }}r.  Ilość godzin: {{ total_work_hours }}. Wypłaty razem: {{ amountpay.brutto|money_format }}</p>
 
                 <table class="table table-bordered table-striped font-weight-light">
                     <thead class="text-center bg-info">
@@ -34,8 +34,8 @@
                             {% endif %}
                         {% endfor %}
                         <tr><td class="text-success text-right font-weight-bold font-italic">TOTAL:</td>
-                        {% for amount in amount_pay %}
-                            <td class="text-success text-right font-italic">{{ amount|money_format }}</td>
+                        {% for value in amountpay.values %}
+                            <td class="text-success text-right font-italic font-weight-bold">{{ value|money_format }}</td>
                         {% endfor %}
                         </tr>
                     </tbody>
