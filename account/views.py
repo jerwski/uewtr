@@ -18,7 +18,7 @@ from account.forms import UserCreateForm
 from employee.models import Employee
 
 # my function
-from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, get_archives
+from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, get_archives, check_internet_connection
 
 
 # Create your views here.
@@ -37,7 +37,7 @@ class AdminView(View):
         if request.user.is_superuser or request.user.is_staff:
             user = request.user.username
             if socket.gethostname() == 'HOMELAPTOP':
-                get_archives()
+                get_archives(request)
 
             employee = Employee.objects.filter(status=True).first()
             if employee:
@@ -48,8 +48,9 @@ class AdminView(View):
             return render(request, 'account/admin.html', {'user': user, 'employee_id': employee_id})
         else:
             messages.warning(request, r'User ({}) has not permission to the dashboard...'.format(request.user.username))
+            return HttpResponseRedirect('/login/')
 
-        return HttpResponseRedirect('/login/')
+
 
 
 def exit(request):
@@ -61,7 +62,7 @@ def exit(request):
             backup()
             mkfixture()
             make_archives()
-            args = (pathlib.Path(r'backup_json/zip/wtr_archive.zip'),
+            args = (request, pathlib.Path(r'backup_json/zip/wtr_archive.zip'),
                     settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
             uploadFileFTP(*args)
 
@@ -73,4 +74,7 @@ def exit(request):
             file.unlink()
         logout(request)
 
-    return HttpResponseRedirect(r'https://www.google.pl/')
+    if check_internet_connection():
+        return HttpResponseRedirect(r'https://www.google.pl/')
+    else:
+        return render(request, '500.html', {'error': ConnectionError.filename})
