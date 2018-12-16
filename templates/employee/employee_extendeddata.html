@@ -15,16 +15,15 @@
             <tbody>
             {% for employee in employees %}
                 <tr>
-                    <td width="5%" class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
+                    {% if employee_id == employee.id %}
+                        <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
+                    {% else %}
+                        <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-        <div class="btn btn-group" role="group">
-            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
-            <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Back to add/change basic data</a>
-        </div>
     </div>
 
     <div class="col-sm-7">
@@ -55,10 +54,16 @@
             <div class="row">
                 {% bootstrap_field form.overtime form_group_class='form-check-inline ml-5' size='large' show_label=Flase %}
             </div>
-            <div class="btn-sm mb-2">
-                <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
+            <div class="btn btn-sm btn-group ml-2" role="group">
+                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
+                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+                <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Back to add/change basic data</a>
+                <button type="submit" class="btn btn-outline-success">Confirm</button>
             </div>
+
         </form>
+
     </div>
 
 {% endblock %}

@@ -17,17 +17,15 @@
             <tbody>
             {% for employee in employees %}
                 <tr>
-                    <td width="5%" class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.hurly_rate_employee_id }}">{{ employee }}</a></td>
+                    {% if employee_id == employee.id %}
+                        <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.hurly_rate_employee_id }}">{{ employee }}</a></td>
+                    {% else %}
+                        <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.hurly_rate_employee_id }}">{{ employee }}</a></td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-        <div class="btn-sm btn-group mb-1 float-left" role="group">
-            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-            <a href="{% url 'logout' %}" class="btn btn-outline-dark">Logout</a>
-            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-success">Dashboard</a>
-            <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
-        </div>
     </div>
 
     <div class="col-sm-7">
@@ -67,6 +65,12 @@
             <p class="text-primary mt-3">For employee <em class="text-danger font-weight-bold">{{ employee }}</em> is today ({{ today|date:'d-m-Y' }}) new rate <em class="text-danger font-weight-bold">({{ hourly_rate|floatformat:2 }} PLN/h)</em> on database adding.<br><br><em class="text-danger font-weight-bold">Would you like to erase this record???</em></p>
             <a href="{% url 'employee:employee_hourly_rate_erase' employee_id %}" class="btn btn-outline-danger btn-block mt-3">Erase</a>
         {% endif %}
+        <div class="offset-1 btn-sm btn-group mb-1" role="group">
+            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
+            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the Dashboard</a>
+            <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
+        </div>
     </div>
 
 {% endblock %}
