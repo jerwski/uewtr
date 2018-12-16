@@ -1,5 +1,6 @@
 # standard library
 import calendar
+from collections import defaultdict
 from datetime import date, timedelta
 
 # pdfkit library
@@ -194,30 +195,10 @@ def total_payment(employee_id:int, year:int, month:int)->dict:
     # returns the total wage for a given employee in a given year and month
     brutto = basicpay + leavepay + overhourspay + satpay + sunpay
     salary = brutto - accountpay
-    context = {'salary': salary, 'basicpay': basicpay, 'leavepay': leavepay, 'satpay': satpay,
-               'overhourspay': overhourspay, 'sunpay': sunpay, 'accountpay': accountpay, 'brutto': brutto}
+    context = {'brutto': brutto, 'basicpay': basicpay, 'leavepay': leavepay, 'overhourspay': overhourspay,
+               'satpay': satpay, 'sunpay': sunpay, 'accountpay': accountpay, 'salary': salary}
 
     return context
-
-
-def amount_pay(year:int, month:int)->tuple:
-    '''returns the sum of partial payments to all employees in a given year and month'''
-    basic_amount, leave_amount, overhours_amount, saturday_amount, sunday_amount, account_amount = 0,0,0,0,0,0
-    query = Q(end_contract__isnull=True) & Q(start_contract__month__lte=month) & Q(start_contract__year__lte=year) | Q(end_contract__month__gte=month) & Q(end_contract__year__gte=year)
-    employees = EmployeeData.objects.filter(query).order_by('name')
-
-    for employee in employees:
-        basic_amount += basic_payment(employee.name_id, year, month)
-        leave_amount += leave_payment(employee.name_id, year, month)
-        overhours_amount += overhours_payment(employee.name_id, year, month)
-        saturday_amount += saturday_payment(employee.name_id, year, month)
-        sunday_amount += sunday_payment(employee.name_id, year, month)
-        account_amount += account_payment(employee.name_id, year, month)
-
-    brutto = basic_amount + leave_amount + overhours_amount + saturday_amount + sunday_amount
-    salary_amount = brutto - account_amount
-    # TODO: set return as namedtuple
-    return brutto, basic_amount, leave_amount, overhours_amount, saturday_amount, sunday_amount, account_amount, salary_amount
 
 
 def employee_total_data(work_date:date, employee_id:int, context:dict)->dict:
@@ -242,9 +223,9 @@ def employee_total_data(work_date:date, employee_id:int, context:dict)->dict:
 
     context.__setitem__('total_hours', total_hours)
     context.__setitem__('rate', rate)
-    paydict = total_payment(employee_id, work_date.year, work_date.month)
-    context.update(paydict)
-    brutto_income = paydict['salary'] + paydict['accountpay']
+    payroll = total_payment(employee_id, work_date.year, work_date.month)
+    context.update(payroll)
+    brutto_income = payroll['salary'] + payroll['accountpay']
     context.__setitem__('brutto_income', brutto_income)
     return context
 
@@ -255,14 +236,17 @@ def payrollhtml2pdf(choice_date:date):
     total_work_hours = len(list(workingdays(choice_date.year, choice_date.month))) * 8
     query = Q(end_contract__year__gte=choice_date.year) & Q(end_contract__month__gte=choice_date.month) | Q(name__status=True) & Q(start_contract__year__lte=choice_date.year) & Q(start_contract__month__lte=choice_date.month)
     employees = EmployeeData.objects.filter(query).order_by('name')
-    ampay = amount_pay(choice_date.year, choice_date.month)
-    brutto = ampay[0]
     # create data for payroll as associative arrays for every active employee
-    payroll = {employee.name: total_payment(employee.id,choice_date.year, choice_date.month) for employee in employees}
+    payroll = {employee.name: total_payment(employee.id, choice_date.year, choice_date.month) for employee in employees}
+    # create defaultdict with summary payment
+    amountpay = defaultdict(float)
+    for item in payroll.values():
+        if item['accountpay'] != item['brutto']:
+            for k,v in item.items():
+                amountpay[k] += v
 
-    # TODO: set a reduced sum of advances with zero payout for a given employee
-    context = {'heads': heads, 'payroll': payroll, 'choice_date': choice_date,
-               'amount_pay': ampay, 'total_work_hours': total_work_hours, 'brutto': brutto}
+    context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay),
+               'choice_date': choice_date, 'total_work_hours': total_work_hours}
 
     html = render_to_string('evidence/monthly_payroll_pdf.html', context)
     # create pdf file and save on templates/pdf/payroll_{}_{}.pdf.format(choice_date.month, choice_date.year)

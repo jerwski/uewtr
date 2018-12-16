@@ -1,6 +1,7 @@
 # standard library
 import os
 import pathlib
+from collections import defaultdict
 from datetime import date, datetime
 
 # django core
@@ -18,7 +19,7 @@ from employee.models import Employee, EmployeeData
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # my function
-from functions.payment import total_payment, workingdays, amount_pay, employee_total_data, payrollhtml2pdf, leavehtml2pdf
+from functions.payment import total_payment, workingdays, employee_total_data, payrollhtml2pdf, leavehtml2pdf
 from functions.myfunctions import sendPayroll, sendLeavesData, holiday, initial_date, initial_accountdate, initial_leave_flag
 
 
@@ -242,14 +243,19 @@ class MonthlyPayrollView(View):
         total_work_hours = len(list(workingdays(date.today().year, date.today().month))) * 8
         query = Q(end_contract__year=date.today().year) & Q(end_contract__month__lt=date.today().month)
         employees = EmployeeData.objects.exclude(query).order_by('name')
-        ampay = amount_pay(date.today().year, date.today().month)
-        brutto = ampay[0]
+
         # create data for payroll as associative arrays for every engaged employee
         for employee in employees:
             payroll.__setitem__(employee.name, total_payment(employee.id, date.today().year, date.today().month))
+        # create defaultdict with summary payment
+        amountpay = defaultdict(float)
+        for item in payroll.values():
+            if item['accountpay'] != item['brutto']:
+                for k,v in item.items():
+                    amountpay[k] += v
 
-        context = {'heads': heads, 'payroll': payroll, 'choice_date': date.today(), 'brutto': brutto,
-                   'employee_id': employee_id, 'total_work_hours': total_work_hours, 'amount_pay': ampay, 'form': form}
+        context = {'form': form, 'heads': heads, 'payroll': payroll, 'choice_date': date.today(),
+                   'total_work_hours': total_work_hours, 'amountpay': dict(amountpay), 'employee_id': employee_id}
 
         return render(request, 'evidence/monthly_payroll.html', context)
 
@@ -271,18 +277,20 @@ class MonthlyPayrollView(View):
                     Q(end_contract__year__gte=choice_date.year)
             employees = EmployeeData.objects.filter(query).order_by('name')
             total_work_hours = len(list(workingdays(choice_date.year, choice_date.month))) * 8
-            ampay = amount_pay(choice_date.year, choice_date.month)
-            brutto = ampay[0]
 
             # create data for payroll as associative arrays for every engaged employee
             for employee in employees:
                 payroll.__setitem__(employee.name, total_payment(employee.id, choice_date.year, choice_date.month))
+            # create defaultdict with summary payment
+            amountpay = defaultdict(float)
+            for item in payroll.values():
+                for k,v in item.items():
+                    amountpay[k] += v
 
             context.__setitem__('payroll', payroll)
             context.__setitem__('choice_date', choice_date)
             context.__setitem__('total_work_hours', total_work_hours)
-            context.__setitem__('amount_pay', ampay)
-            context.__setitem__('brutto', brutto)
+            context.__setitem__('amountpay', dict(amountpay))
 
         return render(request, 'evidence/monthly_payroll.html', context)
 
