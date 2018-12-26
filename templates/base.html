@@ -3,29 +3,32 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>WTR-{% block title %}{% endblock %}</title>
+    <title>{% block title %}Movies DataBase{% endblock %}</title>
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
-    <!-- jQuery library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
 
-    <!-- Popper JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-
-    <!-- Latest compiled JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <!-- FontAwesome; required for icon display -->
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
 
     <link rel="shortcut icon" type="image/x-icon" href="{% static '/images/mainboard/logo_UNIKOLOR.ico' %}" />
 
     <style>
         .footer {
-                    font-size: 0.6rem;
-                }
+                    font-size: 0.5rem;
+        }
+        .bgbisque {
+                    background-color: bisque;
+        }
     </style>
 
     {% include 'scripts/scripts.html' %}
@@ -38,35 +41,9 @@
     {% endblock %}
 
     {% block section %}
-
-        <div class="container text-center">
-            <div class="row">
-                <div class="col-lg-6 offset-lg-3">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div id="short-time-msg" class="alert alert-danger" role="alert">
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <small>{{ message }}<script>hideAfterSomeTime()</script></small>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
     {% endblock %}
 
-    <div class="container">
-        <div class="row m-3" style="background-color: bisque">
-            {% block head %}
-            {% endblock %}
-
-            {% block content %}
-            {% endblock %}
-        </div>
-    </div>
-
-    {% block data %}
+    {% block content %}
     {% endblock %}
 
     {% block footer %}

@@ -6,21 +6,23 @@ from datetime import date, datetime
 
 # django core
 from django.urls import reverse
-from django.db.models import Sum, Q
 from django.contrib import messages
+from django.db.models import Sum, Q
 from django.views.generic import View
 from django.shortcuts import render, HttpResponseRedirect
 
 # my forms
-from evidence.forms import WorkEvidenceForm, EmployeeLeaveForm, ChoiceDateForm, AccountPaymentForm
+from evidence.forms import (WorkEvidenceForm, EmployeeLeaveForm, AccountPaymentForm,
+                            PeriodCurrentComplexDataForm, PeriodMonthlyPayrollForm)
 
 # my models
 from employee.models import Employee, EmployeeData
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # my function
+from functions.myfunctions import (sendPayroll, sendLeavesData, initial_leave_form,
+                                   holiday, initial_worktime_form, initial_accountdate_form)
 from functions.payment import total_payment, workingdays, employee_total_data, payrollhtml2pdf, leavehtml2pdf
-from functions.myfunctions import sendPayroll, sendLeavesData, holiday, initial_date, initial_accountdate, initial_leave_flag
 
 
 # Create your views here.
@@ -28,23 +30,32 @@ from functions.myfunctions import sendPayroll, sendLeavesData, holiday, initial_
 
 class WorkingTimeRecorderView(View):
     '''class implementing the method of adding working time for specific employee'''
-    def get(self, request, employee_id:int)->render:
-        form = WorkEvidenceForm(initial=initial_date(employee_id))
+    def get(self, request, employee_id:int, default_work:int=0)->render:
         worker = Employee.objects.get(pk=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
-        query = Q(name=worker) & (Q(overtime=1)|Q(overtime=2))
+        query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
         overhours = EmployeeData.objects.filter(query).exists()
-        context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees, 'overhours': overhours}
-        work_date = date.today()
-        employee_total_data(work_date, employee_id, context)
+        context = {'worker': worker, 'employee_id': employee_id, 'employees': employees, 'overhours': overhours}
+        employee_total_data(date.today().month, date.today().year, employee_id, context)
+
+        if default_work:
+            initial = initial_worktime_form(employee_id)
+            form = WorkEvidenceForm(initial=initial)
+            context.__setitem__('form', form)
+            context.__setitem__('default_work', True)
+        else:
+            form = WorkEvidenceForm()
+            context.__setitem__('form', form)
+            context.__setitem__('default_work', False)
 
         return render(request, 'evidence/working_time_recorder.html', context)
+
 
     def post(self, request, employee_id:int)->render:
         form = WorkEvidenceForm(data=request.POST)
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
-        query = Q(name=worker) & (Q(overtime=1)|Q(overtime=2))
+        query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
         overhours = EmployeeData.objects.filter(query).exists()
         context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees, 'overhours': overhours}
 
@@ -56,12 +67,13 @@ class WorkingTimeRecorderView(View):
             context.__setitem__('start_work', data['start_work'])
             context.__setitem__('end_work', data['end_work'])
             context.__setitem__('jobhours', jobhours)
-            work_date = data['start_work']
+            year = data['start_work'].year
+            month = data['start_work'].month
 
             # check or data exisiting in WorkEvidence and EmployeeLeave table
             check_leave = {'worker': worker, 'leave_date': data['start_work'].date(),}
             flag_leave = EmployeeLeave.objects.filter(**check_leave).exists()
-            query = Q(worker=worker) & Q(start_work__year=data['start_work'].year) & Q(start_work__month=data['start_work'].month) & Q(start_work__day=data['start_work'].day) & Q(end_work__day=data['end_work'].day)
+            query = Q(worker=worker) & Q(start_work__year=year) & Q(start_work__month=month) & Q(start_work__day=data['start_work'].day) & Q(end_work__day=data['end_work'].day)
             flag_work = WorkEvidence.objects.filter(query).exists()
 
             if data['start_work'] < data['end_work']:
@@ -76,12 +88,12 @@ class WorkingTimeRecorderView(View):
                     WorkEvidence.objects.create(**data)
                     msg = r'Succesful register new time working for {}'
                     messages.success(request, msg.format(data['worker']))
-                    employee_total_data(work_date, employee_id, context)
+                    employee_total_data(month, year, employee_id, context)
             else:
                 msg = r'Start working ({}) is later than end working ({}). Please correct it...'
                 messages.error(request, msg.format(data['start_work'], data['end_work']))
 
-            employee_total_data(work_date, employee_id, context)
+            employee_total_data(month, year, employee_id, context)
 
         return render(request, 'evidence/working_time_recorder.html', context)
 
@@ -90,13 +102,11 @@ class WorkingTimeRecorderEraseView(View):
     '''class implementing the method of erase last added working time record for specific employee'''
     def get(self, request, employee_id:int, start_work:str, end_work:str)->HttpResponseRedirect:
         worker = Employee.objects.get(id=employee_id)
-        start_work = datetime.strptime(start_work, "%Y-%m-%d %H:%M:%S")
-        end_work = datetime.strptime(end_work, "%Y-%m-%d %H:%M:%S")
         check = WorkEvidence.objects.filter(worker=worker, start_work=start_work, end_work=end_work)
         if check.exists():
             check.delete()
-            msg = r'Succesful erase last record for {}'
-            messages.success(request, msg.format(worker))
+            msg = f'Succesful erase last record for {worker}'
+            messages.success(request, msg)
 
         kwargs = {'employee_id': employee_id}
 
@@ -106,7 +116,7 @@ class WorkingTimeRecorderEraseView(View):
 class LeaveTimeRecorderView(View):
     '''class implementing the method of adding leave time for specific employee'''
     def get(self, request, employee_id:int)->render:
-        form = EmployeeLeaveForm(initial=initial_leave_flag(employee_id))
+        form = EmployeeLeaveForm(initial=initial_leave_form(employee_id))
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
         values = {'worker':worker, 'leave_date__year': date.today().year}
@@ -149,25 +159,25 @@ class LeaveTimeRecorderView(View):
             flag_work = WorkEvidence.objects.filter(query).exists()
 
             if flag_leave or flag_work:
-                msg = r'For worker {} this date ({}) is existing in database...'
-                messages.error(request, msg.format(worker, leave_date))
+                msg = f'For worker {worker} this date ({leave_date}) is existing in database...'
+                messages.error(request, msg)
                 context.__setitem__('flag_leave', flag_leave)
                 context.__setitem__('flag_work', flag_work)
 
             elif flag_weekend:
-                msg = r'Selectet date {} is Saturday or Sunday. You can not set this as leave day'
-                messages.error(request, msg.format(leave_date))
+                msg = f'Selectet date {leave_date} is Saturday or Sunday. You can not set this as leave day'
+                messages.error(request, msg)
                 context.__setitem__('flag_weekend', flag_weekend)
 
             elif leave_date in holiday(leave_date.year).values():
-                msg = r'Selectet date {} is holiday ({}). You can not set this as leave day'
-                messages.error(request, msg.format(leave_date, name_holiday))
+                msg = f'Selectet date {leave_date} is holiday ({name_holiday}). You can not set this as leave day'
+                messages.error(request, msg)
                 context.__setitem__('name_holiday', name_holiday)
 
             else:
                 EmployeeLeave.objects.create(**data)
-                msg = r'Succesful register new leave time for {}'
-                messages.success(request, msg.format(worker))
+                msg = f'Succesful register new leave time for {worker}'
+                messages.success(request, msg)
                 context.__setitem__('leave_flag', leave_flag)
 
             values = {'worker':worker, 'leave_date__year': date.today().year}
@@ -185,14 +195,13 @@ class LeaveTimeRecorderView(View):
 
 class LeaveTimeRecorderEraseView(View):
     '''class implementing the method of erase last added leave time record for specific employee'''
-    def get(self, request, employee_id:int, leave_date:str)->HttpResponseRedirect:
+    def get(self, request, employee_id:int, leave_date:date)->HttpResponseRedirect:
         worker = Employee.objects.get(id=employee_id)
-        leave_date = datetime.strptime(leave_date, "%Y-%m-%d")
         check = EmployeeLeave.objects.filter(worker=worker, leave_date=leave_date)
         if check.exists():
             check.delete()
-            msg = r'Succesful erase last record for {}'
-            messages.success(request, msg.format(worker))
+            msg = f'Succesful erase last record for {worker}'
+            messages.success(request, msg)
         else:
             messages.info(request, r'Nothing to erase...')
 
@@ -206,9 +215,9 @@ class LeavesDataPrintView(View):
     def get(self, request, employee_id:int)->HttpResponseRedirect:
         # convert html file (evidence/leaves_data.html) to pdf file
         leavehtml2pdf(employee_id)
-        file = pathlib.Path(r'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/leaves_data_{}.pdf'.format(employee_id))
+        file = pathlib.Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/leaves_data_{employee_id}.pdf')
         try:
-            os.popen('explorer.exe "file:///{}"'.format(file))
+            os.popen(f'explorer.exe "file:///{file}"')
             messages.info(request, r'File leaves_data.pdf file was sending to browser....')
         except WindowsError as err:
             print(err)
@@ -235,18 +244,19 @@ class LeavesDataPdf(View):
 class MonthlyPayrollView(View):
     '''class representing the view of monthly payroll'''
     def get(self, request)->render:
-        payroll = {}
+        now = date.today()
+        month, year = now.month, now.year
         heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours', 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
-        form = ChoiceDateForm()
+        form = PeriodMonthlyPayrollForm(initial={'choice_date': now})
         employee_id = Employee.objects.filter(employeedata__end_contract__isnull=True).first()
         employee_id = employee_id.id
-        total_work_hours = len(list(workingdays(date.today().year, date.today().month))) * 8
-        query = Q(end_contract__year=date.today().year) & Q(end_contract__month__lt=date.today().month)
-        employees = EmployeeData.objects.exclude(query).order_by('name')
+        total_work_hours = len(list(workingdays(year, month))) * 8
+        query = Q(end_contract__year=year) & Q(end_contract__month__lt=month)
+        employees = EmployeeData.objects.exclude(query).order_by('worker')
 
         # create data for payroll as associative arrays for every engaged employee
-        for employee in employees:
-            payroll.__setitem__(employee.name, total_payment(employee.id, date.today().year, date.today().month))
+        payroll = {employee.worker: total_payment(employee.worker_id, year, month) for employee in employees}
+
         # create defaultdict with summary payment
         amountpay = defaultdict(float)
         for item in payroll.values():
@@ -254,33 +264,32 @@ class MonthlyPayrollView(View):
                 for k,v in item.items():
                     amountpay[k] += v
 
-        context = {'form': form, 'heads': heads, 'payroll': payroll, 'choice_date': date.today(),
+        context = {'form': form, 'heads': heads, 'payroll': payroll, 'month': month, 'year': year,
                    'total_work_hours': total_work_hours, 'amountpay': dict(amountpay), 'employee_id': employee_id}
 
         return render(request, 'evidence/monthly_payroll.html', context)
 
     def post(self, request)->render:
-        payroll = {}
         heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours', 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
-        form = ChoiceDateForm(data=request.POST)
+        choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
+        month, year = choice_date.month, choice_date.year
+        form = PeriodMonthlyPayrollForm(data={'choice_date':choice_date})
         employee_id = Employee.objects.filter(status=True).first()
         employee_id = employee_id.id
         context = {'form': form, 'heads': heads, 'employee_id': employee_id,}
 
         if form.is_valid():
-            data = form.cleaned_data
-            choice_date = data['choice_date']
             query = Q(end_contract__isnull=True) &\
-                    Q(start_contract__month__lte=choice_date.month) &\
-                    Q(start_contract__year__lte=choice_date.year) |\
-                    Q(end_contract__month__gte=choice_date.month) &\
-                    Q(end_contract__year__gte=choice_date.year)
-            employees = EmployeeData.objects.filter(query).order_by('name')
-            total_work_hours = len(list(workingdays(choice_date.year, choice_date.month))) * 8
+                    Q(start_contract__month__lte=month) &\
+                    Q(start_contract__year__lte=year) |\
+                    Q(end_contract__month__gte=month) &\
+                    Q(end_contract__year__gte=year)
+            employees = EmployeeData.objects.filter(query).order_by('worker')
+            total_work_hours = len(list(workingdays(year, month))) * 8
 
             # create data for payroll as associative arrays for every engaged employee
-            for employee in employees:
-                payroll.__setitem__(employee.name, total_payment(employee.id, choice_date.year, choice_date.month))
+            payroll = {employee.worker: total_payment(employee.worker_id, year, month) for employee in employees}
+
             # create defaultdict with summary payment
             amountpay = defaultdict(float)
             for item in payroll.values():
@@ -288,7 +297,8 @@ class MonthlyPayrollView(View):
                     amountpay[k] += v
 
             context.__setitem__('payroll', payroll)
-            context.__setitem__('choice_date', choice_date)
+            context.__setitem__('month', month)
+            context.__setitem__('year', year)
             context.__setitem__('total_work_hours', total_work_hours)
             context.__setitem__('amountpay', dict(amountpay))
 
@@ -297,16 +307,13 @@ class MonthlyPayrollView(View):
 
 class MonthlyPayrollPrintView(View):
     '''class representing the view of monthly payroll print'''
-    def get(self, request, choice_date:str)->HttpResponseRedirect:
-        choice_date = datetime.strptime(choice_date, "%Y-%m-%d")
-        choice_date = choice_date.date()
+    def get(self, request, month:int, year:int)->HttpResponseRedirect:
         # convert html file (evidence/monthly_payroll_pdf.html) to .pdf file
-        payrollhtml2pdf(choice_date)
-        frm = (choice_date.month, choice_date.year)
-        file = pathlib.Path(r'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/payroll_{}_{}.pdf'.format(*frm))
+        payrollhtml2pdf(month, year)
+        file = pathlib.Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/payroll_{month}_{year}.pdf')
         try:
-            os.popen('explorer.exe "file:///{}"'.format(file))
-            messages.info(request, r'File payroll_{}_{}.pdf file was sending to browser....'.format(*frm))
+            os.popen(f'explorer.exe "file:///{file}"')
+            messages.info(request, f'File payroll_{month}_{year}.pdf file was sending to browser....')
         except WindowsError as err:
             print(err)
 
@@ -315,13 +322,11 @@ class MonthlyPayrollPrintView(View):
 
 class PayrollPdf(View):
     '''class representing the view for sending monthly payroll as pdf file'''
-    def get(self, request, choice_date:str)->HttpResponseRedirect:
-        choice_date = datetime.strptime(choice_date, "%Y-%m-%d")
-        choice_date = choice_date.date()
+    def get(self, request, month:int, year:int)->HttpResponseRedirect:
         # convert html file (evidence/monthly_payroll_pdf.html) to pdf file
-        payrollhtml2pdf(choice_date)
+        payrollhtml2pdf(month, year)
         # send e-mail with attached payroll in pdf format
-        sendPayroll(choice_date)
+        sendPayroll(month, year)
         messages.info(request, r'The pdf file was sending....')
 
         return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
@@ -330,11 +335,12 @@ class PayrollPdf(View):
 class AccountPaymentView(View):
     '''class representing the view of payment on account'''
     def get(self, request, employee_id:int)->render:
-        form = AccountPaymentForm(initial=initial_accountdate())
+        month, year = date.today().month, date.today().year
+        form = AccountPaymentForm(initial=initial_accountdate_form())
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
-        salary = total_payment(employee_id, date.today().year, date.today().month)
-        salary = salary['salary'] + salary['accountpay']
+        salary = total_payment(employee_id, year, month)
+        salary = salary['brutto']
         context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees, 'salary': salary}
         query = Q(worker=worker) & Q(account_date__year=date.today().year) & Q(account_date__month=date.today().month)
         total_account = AccountPayment.objects.filter(query)
@@ -350,7 +356,7 @@ class AccountPaymentView(View):
         return render(request, 'evidence/account_payment.html', context)
 
     def post(self, request, employee_id:int)->render:
-        form = AccountPaymentForm(request.POST)
+        form = AccountPaymentForm(data=request.POST)
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
 
@@ -364,7 +370,7 @@ class AccountPaymentView(View):
 
             # check if the total of advances is not greater than the income earned
             salary = total_payment(employee_id, data['account_date'].year, data['account_date'].month)
-            salary = salary['salary'] + salary['accountpay']
+            salary = salary['brutto']
             context.__setitem__('salary', salary)
             query = Q(worker=worker) & Q(account_date__year=data['account_date'].year) & Q(account_date__month=data['account_date'].month)
             advances = AccountPayment.objects.filter(query).aggregate(ap=Sum('account_value'))
@@ -380,8 +386,8 @@ class AccountPaymentView(View):
                 msg = r'Employee {} has become an account {:,.2f} PLN on {}'
                 messages.success(request, msg.format(worker, data['account_value'], data['account_date']))
             else:
-                msg = r'The sum of advances ({:,.2f} PLN) is greater than the income earned so far ({:,.2f} PLN). The advance can not be paid...'
-                messages.error(request, msg.format(advances, salary))
+                msg = f'The sum of advances ({advances:,.2f} PLN) is greater than the income earned so far ({salary:,.2f} PLN). The advance can not be paid...'
+                messages.error(request, msg)
 
             return render(request, 'evidence/account_payment.html', context)
 
@@ -390,13 +396,12 @@ class AccountPaymentEraseView(View):
     '''class implementing the method of erase last added working time record for specific employee'''
     def get(self, request, employee_id:int, account_date:str, account_value:float)->HttpResponseRedirect:
         worker = Employee.objects.get(id=employee_id)
-        account_date = datetime.strptime(account_date, "%Y-%m-%d")
         account_value = float(account_value)
         check = AccountPayment.objects.filter(worker=worker, account_date=account_date, account_value=account_value)
         if check.exists():
             check.delete()
-            msg = r'Succesful erase last record for {}'
-            messages.success(request, msg.format(worker))
+            msg = f'Succesful erase last record for {worker}'
+            messages.success(request, msg)
         else:
             messages.info(request, r'Nothing to erase...')
 
@@ -408,16 +413,17 @@ class AccountPaymentEraseView(View):
 class EmployeeCurrentComplexDataView(View):
     '''class representing employee complex data view'''
     def get(self, request, employee_id:int)->render:
-        form = ChoiceDateForm()
+        choice_date = date.today()
+        month, year = choice_date.month, choice_date.year
+        form = PeriodCurrentComplexDataForm(initial={'choice_date': choice_date})
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
         active_worker = employees.first()
         active_worker = active_worker.id
-        choice_date = date.today()
-        holidays = holiday(choice_date.year)
+        holidays = holiday(year)
         leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
-        month_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=choice_date.year, leave_date__month=choice_date.month)
-        year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=choice_date.year)
+        month_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year, leave_date__month=month)
+        year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
         month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
         year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 
@@ -425,12 +431,14 @@ class EmployeeCurrentComplexDataView(View):
                    'employee_id': employee_id, 'employees': employees, 'choice_date': choice_date,
                    'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays}
 
-        employee_total_data(date.today(), employee_id, context)
+        employee_total_data(month, year, employee_id, context)
 
         return render(request, r'evidence/current_complex_evidence_data.html', context)
 
     def post(self, request, employee_id:int)->render:
-        form = ChoiceDateForm(data=request.POST)
+        choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
+        form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
+        # form = PeriodCurrentComplexDataForm(data=request.POST)
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
         active_worker = employees.first()
@@ -439,10 +447,11 @@ class EmployeeCurrentComplexDataView(View):
         if form.is_valid():
             data = form.cleaned_data
             choice_date = data['choice_date']
+            month, year = choice_date.month, choice_date.year
             leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
-            holidays = holiday(choice_date.year)
-            month_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=choice_date.year, leave_date__month=choice_date.month)
-            year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=choice_date.year)
+            holidays = holiday(year)
+            month_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year, leave_date__month=month)
+            year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
             month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
             year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 
@@ -450,7 +459,7 @@ class EmployeeCurrentComplexDataView(View):
                        'employee_id': employee_id, 'employees': employees, 'choice_date': choice_date,
                        'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays}
 
-            employee_total_data(choice_date, employee_id, context)
+            employee_total_data(month, year, employee_id, context)
 
             return render(request, r'evidence/current_complex_evidence_data.html', context)
 

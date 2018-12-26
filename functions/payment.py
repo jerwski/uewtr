@@ -36,9 +36,9 @@ def saturday_payment(employee_id:int, year:int, month:int)->float:
     '''returns the employee's income for worked Saturdays in a given year and month'''
     satpay = 0
     employee = Employee.objects.get(id=employee_id)
-    rate = EmployeeHourlyRate.objects.filter(name=employee, update__year__lte=year, update__month__lt=month).last()
+    rate = EmployeeHourlyRate.objects.filter(worker=employee, update__year__lte=year, update__month__lt=month).last()
     if rate is None:
-        rate=EmployeeHourlyRate.objects.filter(name=employee).earliest('hourly_rate')
+        rate=EmployeeHourlyRate.objects.filter(worker=employee).earliest('hourly_rate')
         rate = rate.hourly_rate
     else:
         rate = rate.hourly_rate
@@ -57,9 +57,9 @@ def sunday_payment(employee_id:int, year:int, month:int)->float:
     '''returns the employee's income for worked Sundays in a given year and month'''
     sunpay = 0
     employee = Employee.objects.get(id=employee_id)
-    rate = EmployeeHourlyRate.objects.filter(name=employee, update__year__lte=year, update__month__lt=month).last()
+    rate = EmployeeHourlyRate.objects.filter(worker=employee, update__year__lte=year, update__month__lt=month).last()
     if rate is None:
-        rate=EmployeeHourlyRate.objects.filter(name=employee).earliest('hourly_rate')
+        rate=EmployeeHourlyRate.objects.filter(worker=employee).earliest('hourly_rate')
         rate = rate.hourly_rate
     else:
         rate = rate.hourly_rate
@@ -78,10 +78,10 @@ def overhours_payment(employee_id:int, year:int, month:int)->float:
     '''returns the employee's income for overtimes in a given year and month'''
     overhourspay, basic_work_hours = 0, 0
     employee = Employee.objects.get(id=employee_id)
-    worker = EmployeeData.objects.get(name=employee)
-    rate = EmployeeHourlyRate.objects.filter(name=employee, update__year__lte=year, update__month__lt=month).last()
+    worker = EmployeeData.objects.get(worker=employee)
+    rate = EmployeeHourlyRate.objects.filter(worker=employee, update__year__lte=year, update__month__lt=month).last()
     if rate is None:
-        rate=EmployeeHourlyRate.objects.filter(name=employee).earliest('hourly_rate')
+        rate=EmployeeHourlyRate.objects.filter(worker=employee).earliest('hourly_rate')
         rate = rate.hourly_rate
     else:
         rate = rate.hourly_rate
@@ -126,9 +126,9 @@ def basic_payment(employee_id:int, year:int, month:int)->float:
     '''returns the employee's basic income (without Saturdays, Sundays, holidays) in a given year and month'''
     basicpay = 0
     employee = Employee.objects.get(id=employee_id)
-    rate = EmployeeHourlyRate.objects.filter(name=employee, update__year__lte=year, update__month__lt=month).last()
+    rate = EmployeeHourlyRate.objects.filter(worker=employee, update__year__lte=year, update__month__lt=month).last()
     if rate is None:
-        rate=EmployeeHourlyRate.objects.filter(name=employee).earliest('hourly_rate')
+        rate=EmployeeHourlyRate.objects.filter(worker=employee).last()
         rate = rate.hourly_rate
     else:
         rate = rate.hourly_rate
@@ -150,9 +150,9 @@ def leave_payment(employee_id:int, year:int, month:int)->float:
     '''returns the employee's income for paid vacation in a given year and month'''
     leavepay = 0
     employee = Employee.objects.get(id=employee_id)
-    rate = EmployeeHourlyRate.objects.filter(name=employee, update__year__lte=year, update__month__lt=month).last()
+    rate = EmployeeHourlyRate.objects.filter(worker=employee, update__year__lte=year, update__month__lt=month).last()
     if rate is None:
-        rate=EmployeeHourlyRate.objects.filter(name=employee).earliest('hourly_rate')
+        rate=EmployeeHourlyRate.objects.filter(worker=employee).earliest('hourly_rate')
         rate = rate.hourly_rate
     else:
         rate = rate.hourly_rate
@@ -192,7 +192,7 @@ def total_payment(employee_id:int, year:int, month:int)->dict:
     satpay = saturday_payment(employee_id, year, month)
     sunpay = sunday_payment(employee_id, year, month)
     accountpay = account_payment(employee_id, year, month)
-    # returns the total wage for a given employee in a given year and month
+    # returns the total wage for a given employee in selected year and month
     brutto = basicpay + leavepay + overhourspay + satpay + sunpay
     salary = brutto - accountpay
     context = {'brutto': brutto, 'basicpay': basicpay, 'leavepay': leavepay, 'overhourspay': overhourspay,
@@ -201,10 +201,10 @@ def total_payment(employee_id:int, year:int, month:int)->dict:
     return context
 
 
-def employee_total_data(work_date:date, employee_id:int, context:dict)->dict:
+def employee_total_data(month:int, year:int, employee_id:int, context:dict)->dict:
     '''returns complete data on the employee's wokrhours, rate, income in a given date'''
     employee = Employee.objects.get(id=employee_id)
-    query = Q(worker=employee) & Q(start_work__year=work_date.year) & Q(start_work__month=work_date.month)
+    query = Q(worker=employee) & Q(start_work__year=year) & Q(start_work__month=month)
     total_hours = WorkEvidence.objects.filter(query)
 
     if total_hours.exists():
@@ -213,31 +213,29 @@ def employee_total_data(work_date:date, employee_id:int, context:dict)->dict:
     else:
         total_hours = 0
 
-    query = Q(name=employee) & Q(update__year__lte=work_date.year) & Q(update__month__lt=work_date.month)
+    query = Q(worker=employee) & Q(update__year__lte=year) & Q(update__month__lt=month)
     rate = EmployeeHourlyRate.objects.filter(query).last()
     if rate is None:
-        rate=EmployeeHourlyRate.objects.filter(name=employee).earliest('hourly_rate')
+        rate=EmployeeHourlyRate.objects.filter(worker=employee).earliest('hourly_rate')
         rate = rate.hourly_rate
     else:
         rate = rate.hourly_rate
 
     context.__setitem__('total_hours', total_hours)
     context.__setitem__('rate', rate)
-    payroll = total_payment(employee_id, work_date.year, work_date.month)
+    payroll = total_payment(employee_id, year, month)
     context.update(payroll)
-    brutto_income = payroll['salary'] + payroll['accountpay']
-    context.__setitem__('brutto_income', brutto_income)
     return context
 
 
-def payrollhtml2pdf(choice_date:date):
+def payrollhtml2pdf(month:int, year:int):
     '''convert html file (evidence/monthly_payroll_pdf.html) to pdf file'''
     heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota', 'Niedziela', 'Zaliczka', 'Do wypłaty', 'Data i podpis']
-    total_work_hours = len(list(workingdays(choice_date.year, choice_date.month))) * 8
-    query = Q(end_contract__year__gte=choice_date.year) & Q(end_contract__month__gte=choice_date.month) | Q(name__status=True) & Q(start_contract__year__lte=choice_date.year) & Q(start_contract__month__lte=choice_date.month)
-    employees = EmployeeData.objects.filter(query).order_by('name')
+    total_work_hours = len(list(workingdays(year, month))) * 8
+    query = Q(end_contract__year__gte=year) & Q(end_contract__month__gte=month) | Q(worker__status=True) & Q(start_contract__year__lte=year) & Q(start_contract__month__lte=month)
+    employees = EmployeeData.objects.filter(query).order_by('worker')
     # create data for payroll as associative arrays for every active employee
-    payroll = {employee.name: total_payment(employee.id, choice_date.year, choice_date.month) for employee in employees}
+    payroll = {employee.worker: total_payment(employee.worker_id, year, month) for employee in employees}
     # create defaultdict with summary payment
     amountpay = defaultdict(float)
     for item in payroll.values():
@@ -246,7 +244,7 @@ def payrollhtml2pdf(choice_date:date):
                 amountpay[k] += v
 
     context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay),
-               'choice_date': choice_date, 'total_work_hours': total_work_hours}
+               'year': year, 'month': month, 'total_work_hours': total_work_hours}
 
     html = render_to_string('evidence/monthly_payroll_pdf.html', context)
     # create pdf file and save on templates/pdf/payroll_{}_{}.pdf.format(choice_date.month, choice_date.year)
@@ -254,7 +252,7 @@ def payrollhtml2pdf(choice_date:date):
                'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
                'orientation': 'landscape','no-outline': None, 'quiet': '', }
 
-    pdfkit.from_string(html, r'templates/pdf/payroll_{}_{}.pdf'.format(choice_date.month, choice_date.year), options=options)
+    pdfkit.from_string(html, f'templates/pdf/payroll_{month}_{year}.pdf', options=options)
 
 
 def leavehtml2pdf(employee_id:int):
@@ -273,4 +271,4 @@ def leavehtml2pdf(employee_id:int):
                'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
                'orientation': 'landscape','no-outline': None, 'quiet': '', }
 
-    pdfkit.from_string(html, r'templates/pdf/leaves_data_{}.pdf'.format(employee_id), options=options)
+    pdfkit.from_string(html, f'templates/pdf/leaves_data_{employee_id}.pdf', options=options)

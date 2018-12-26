@@ -18,7 +18,7 @@ def day_since(value):
 
     diff = today - val
     if diff.days > 1:
-        return '{} dni temu'.format(diff.days)
+        return f'{diff.days} dni temu'
     elif diff.days == 1:
         return 'wczoraj'
     elif diff.days == 0:
@@ -36,7 +36,7 @@ def money_format(value):
     elif isinstance(value, str):
         value = float(value)
 
-    return '{:,.2f} PLN'.format(value)
+    return f'{value:,.2f} PLN'
 
 ###FILTRY###
 # usuwa polskie znaki diakrytyczne

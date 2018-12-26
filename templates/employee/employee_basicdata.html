@@ -3,114 +3,127 @@
 
 {% block title %}Add basic data of employee{% endblock %}
 
-{% block head %}
-    {% include 'blocks/header.html' %}
-{% endblock %}
-
-
 {% block content %}
+<div class="container">
+    <div class="row m-3 bgbisque">
+        {% include 'blocks/header.html' %}
+        <div class="col-md-4">
+            <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
+            <table class="table table-hover table-sm">
+                <tbody>
+                {% for employee in employees_st %}
+                    <tr>
+                        {% if request.path == '/employee/add_change/basicdata/' %}
+                            <td width="5%" class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                        {% else %}
+                            {% if employee_id == employee.id %}
+                                <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                            {% else %}
+                                <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                            {% endif %}
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <div class="col-sm-4">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
-        <table class="table table-hover table-sm">
-            <tbody>
-            {% for employee in employees_st %}
-                <tr>
-                    {% if request.path == '/employee/add_change/basicdata/' %}
-                        <td width="5%" class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
-                    {% else %}
+        <div class="col-md-4">
+            <p class="text-center text-danger lead font-weight-normal bg-warning">DEACTIVE EMPLOYEES</p>
+            <table class="table table-hover table-sm">
+                <tbody>
+                {% for employee in employees_sf %}
+                    <tr>
                         {% if employee_id == employee.id %}
                             <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
                         {% else %}
                             <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
                         {% endif %}
-                    {% endif %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="btn btn-group float-sm-right mr-2" role="group">
+                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+                {% if not no_id %}
+                    <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
+                {% endif %}
+            </div>
+        </div>
 
-    <div class="col-sm-4">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">DEACTIVE EMPLOYEES</p>
-        <table class="table table-hover table-sm">
-            <tbody>
-            {% for employee in employees_sf %}
-                <tr>
-                    {% if employee_id == employee.id %}
-                        <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
-                    {% else %}
-                        <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <div class="btn btn-group float-sm-right mr-2" role="group">
-            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
-            {% if not no_id %}
-                <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
-            {% endif %}
+        <div class="col-md-4">
+            <p class="text-center text-danger lead font-weight-normal bg-warning">{% if new_employee %}ADD EMPLOYEE BASIC DATA{% else %}CHANGE EMPLOYEE BASIC DATA{% endif %}</p>
+
+            <form action="." method="POST">{% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="input-group mb-3 ml-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-info">Forename</span>
+                            </div>
+                            {% bootstrap_field form.forename form_group_class='form-inline' show_label=False placeholder='Type forename...' %}
+                        </div>
+                        <div class="input-group mb-3 ml-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-info">Surname&nbsp;&nbsp;</span>
+                            </div>
+                            {% bootstrap_field form.surname form_group_class='form-inline' show_label=False placeholder='Type surname...' %}
+                        </div>
+                        <div class="input-group mb-3 ml-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-info">Pesel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            </div>
+                            {% bootstrap_field form.pesel form_group_class='form-inline' show_label=False placeholder='Type pesel...' %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="ml-3 mt-3">Leads:</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check-inline">
+                            {% bootstrap_field form.leave size='small' show_label=False %}
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="form-check-inline mt-3">
+                            {% bootstrap_field form.status size='small' %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        {% if new_employee %}
+                            <button type="submit" class="btn btn-outline-success btn-block mt-2">Confirm</button>
+                        {% else %}
+                            {% if employee.status %}
+                                <div class="btn-sm btn-group btn-group-sm mt-1" role="group">
+                                    <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
+                                    <a href="{% url 'employee:employee_hourly_rate' employee_id %}" class="btn btn-outline-primary">Update rate</a>
+                                    <button type="submit" class="btn btn-outline-success">Confirm</button>
+                                </div>
+                                <div class="text-center">
+                                    {% include 'blocks/erase_modal.html' %}
+                                </div>
+                            {% else %}
+                                <div class="btn btn-group mt-1" role="group">
+                                    <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
+                                    <button type="submit" class="btn btn-outline-success">Confirm changes</button>
+                                </div>
+                                <div class="text-center">
+                                    {% include 'blocks/erase_modal.html' %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-
-    <div class="col-sm-4">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">{% if new_employee %}ADD EMPLOYEE BASIC DATA{% else %}CHANGE EMPLOYEE BASIC DATA{% endif %}</p>
-
-        <form action="." method="POST">
-            {% csrf_token %}
-
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="input-group mb-3 ml-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text bg-info">Forename</span>
-                        </div>
-                        {% bootstrap_field form.forename form_group_class='form-inline' show_label=False %}
-                    </div>
-                    <div class="input-group mb-3 ml-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text bg-info">Surname&nbsp;&nbsp;</span>
-                        </div>
-                        {% bootstrap_field form.surname form_group_class='form-inline' show_label=False %}
-                    </div>
-                    <div class="input-group mb-3 ml-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text bg-info">Pesel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                        </div>
-                        {% bootstrap_field form.pesel form_group_class='form-inline' show_label=False %}
-                    </div>
-                </div>
-            </div>
-            <div class="row align-items-center">
-                <div class="col-sm-6">
-                    {% bootstrap_field form.status form_group_class='form-check ml-4' size='small' %}
-                </div>
-                <div class="col-sm-6">
-                    {% bootstrap_field form.leave form_group_class='form-check-inline' size='small' %}
-                </div>
-            </div>
-
-            {% if new_employee %}
-                <button type="submit" class="btn btn-outline-success btn-block mb-1">Confirm</button>
-            {% else %}
-                {% if employee.status %}
-                    <div class="btn-sm btn-group btn-group-sm mb-1 ml-2" role="group">
-                        <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
-                        <a href="{% url 'employee:employee_hourly_rate' employee_id %}" class="btn btn-outline-primary">Update rate</a>
-                        <button type="submit" class="btn btn-outline-success">Confirm</button>
-                    </div>
-                {% else %}
-                    <div class="btn btn-group mb-1" role="group">
-                        <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
-                        <button type="submit" class="btn btn-outline-success">Confirm changes</button>
-                    </div>
-                {% endif %}
-            {% endif %}
-        </form>
-
-    </div>
-
+</div>
 {% endblock %}
-

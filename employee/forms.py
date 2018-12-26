@@ -2,16 +2,16 @@
 from django import forms
 
 # datetime widget
-from datetimewidget.widgets import DateWidget
+from tempus_dominus.widgets import DatePicker
 
 # my models
 from employee.models import Employee, EmployeeData, EmployeeHourlyRate
 
+# bootstrap4 widget
+from bootstrap4.widgets import RadioSelectButtonGroup
+
 
 # Create your forms here.
-
-
-dateOptions = {'format': 'yyyy-mm-dd', 'autoclose': 'true', 'showMeridian': 'false', 'weekStart': 1, 'todayBtn': 'true'}
 
 
 class EmployeeBasicDataForm(forms.ModelForm):
@@ -22,21 +22,32 @@ class EmployeeBasicDataForm(forms.ModelForm):
     class Meta:
         model = Employee
         fields = ('forename', 'surname', 'pesel', 'status', 'leave')
-        widgets = {'leave': forms.RadioSelect(attrs={'class':"form-check-input"})}
+        widgets = {'leave': forms.RadioSelect()}
 
 
 class EmployeeExtendedDataForm(forms.ModelForm):
     '''class representing a form to create/change and save the extented data of employee'''
-    name = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=Employee.objects.all())
+    NO_OVERTIME = 0
+    WEEKLY_OVERTIME = 1
+    SATURDAT_OVERTIME = 2
+    RATINGS = [(NO_OVERTIME, 'Clear contract'), (WEEKLY_OVERTIME, 'Weekly overtime'), (SATURDAT_OVERTIME, 'Saturday overtime')]
+    options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True,
+               'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
+    attrs={'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+
+    worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=Employee.objects.all())
+    birthday = forms.DateField(label='Date of birthday', widget=DatePicker(options=options, attrs=attrs))
+    start_contract = forms.DateField(label='Date of start contract', widget=DatePicker(options=options, attrs=attrs))
+    end_contract = forms.DateField(required=False, label='Date of end contract', widget=DatePicker(options=options, attrs=attrs))
+    overtime = forms.ChoiceField(label="Select the contract type...", required=True,
+                                 widget=RadioSelectButtonGroup, choices=RATINGS, initial=0)
+
 
     class Meta:
         model = EmployeeData
-        fields = ('name', 'birthday', 'postal', 'city', 'street', 'house', 'flat',
+        fields = ('worker', 'birthday', 'postal', 'city', 'street', 'house', 'flat',
                   'phone', 'workplace', 'start_contract', 'end_contract', 'overtime')
-        widgets = {'birthday': DateWidget(options=dateOptions, bootstrap_version=3),
-                   'start_contract': DateWidget(options=dateOptions, bootstrap_version=3),
-                   'end_contract': DateWidget(options=dateOptions, bootstrap_version=3),
-                   'overtime': forms.RadioSelect(attrs={'class':"form-check-input"})}
+        widgets = {'city': forms.TextInput(attrs={'id':'cities'}),}
 
 
 class EmployeeHourlyRateForm(forms.ModelForm):

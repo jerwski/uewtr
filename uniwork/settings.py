@@ -22,7 +22,6 @@ from pytz import country_timezones
 from django.core.exceptions import ImproperlyConfigured
 
 
-
 # read enviroment settings
 def get_setting(setting):
     try:
@@ -30,12 +29,11 @@ def get_setting(setting):
             data = json.loads(file.read())
         return data[setting]
     except KeyError:
-        error_msg = '{} - set as an environment variable'.format(setting)
+        error_msg = f'{setting} - set as an environment variable'
         raise ImproperlyConfigured(error_msg)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -67,7 +65,7 @@ INSTALLED_APPS = [
     'employee.apps.EmployeeConfig',
     'evidence.apps.EvidenceConfig',
     'bootstrap4',
-    'datetimewidget',
+    'tempus_dominus',
 ]
 
 MIDDLEWARE = [
@@ -99,7 +97,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'uniwork.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -147,7 +144,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 LANGUAGE_CODE = get_setting('LANGUAGE_CODE')
@@ -156,7 +152,6 @@ USE_I18N = get_setting('USE_I18N')
 USE_L10N = get_setting('USE_L10N')
 USE_TZ = get_setting('USE_TZ')
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = get_setting('STATIC_URL')
@@ -164,7 +159,6 @@ STATICFILES_DIRS = [pathlib.Path('static')]
 LOGIN_URL = get_setting('LOGIN_URL')
 LOGIN_REDIRECT_URL = 'account:admin_site'
 LOGOUT_REDIRECT_URL = 'login'
-
 
 # e-mail settings
 DEFAULT_FROM_EMAIL = get_setting('DEFAULT_FROM_EMAIL')
@@ -175,7 +169,6 @@ EMAIL_USE_TLS = get_setting('EMAIL_USE_TLS')
 EMAIL_PORT = get_setting('EMAIL_PORT')
 ADMIN_EMAIL = get_setting('ADMIN_EMAIL')
 
-
 # fixture directory
 FIXTURE_DIRS = {'employee.Employee': pathlib.Path(get_setting('employee')),
                 'employee.EmployeeData': pathlib.Path(get_setting('employee_extend')),
@@ -183,7 +176,6 @@ FIXTURE_DIRS = {'employee.Employee': pathlib.Path(get_setting('employee')),
                 'evidence.EmployeeLeave': pathlib.Path(get_setting('employee_leave')),
                 'evidence.AccountPayment': pathlib.Path(get_setting('account')),
                 'employee.EmployeeHourlyRate': pathlib.Path(get_setting('employee_hourly_rate'))}
-
 
 # FTP
 FTP = get_setting('FTP')

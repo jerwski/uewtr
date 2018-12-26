@@ -47,7 +47,7 @@ class AdminView(View):
 
             return render(request, 'account/admin.html', {'user': user, 'employee_id': employee_id})
         else:
-            messages.warning(request, r'User ({}) has not permission to the dashboard...'.format(request.user.username))
+            messages.warning(request, f'User ({request.user.username}) has not permission to the dashboard...')
             return HttpResponseRedirect('/login/')
 
 
@@ -67,7 +67,7 @@ def exit(request):
             uploadFileFTP(*args)
 
         except ConnectionError as ce:
-            print('Connection error => Error code: {}'.format(ce))
+            print(f'Connection error => Error code: {ce}')
 
     if request.user.is_authenticated:
         for file in pathlib.Path.iterdir(pdfdir):

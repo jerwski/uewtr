@@ -4,73 +4,71 @@
 
 {% block title %}Change employee hourly rate{% endblock %}
 
-{% block head %}
-    {% include 'blocks/header.html' %}
-{% endblock %}
-
 
 {% block content %}
+<div class="container">
+    <div class="row m-3 bgbisque">
+        {% include 'blocks/header.html' %}
+        <div class="col-sm-5">
+            <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEE</p>
+            <table class="table table-hover table-sm">
+                <tbody>
+                {% for employee in employees %}
+                    <tr>
+                        {% if employee_id == employee.id %}
+                            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.hurly_rate_employee_id }}">{{ employee }}</a></td>
+                        {% else %}
+                            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.hurly_rate_employee_id }}">{{ employee }}</a></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    <div class="col-sm-5">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEE</p>
-        <table class="table table-hover table-sm">
-            <tbody>
-            {% for employee in employees %}
-                <tr>
-                    {% if employee_id == employee.id %}
-                        <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.hurly_rate_employee_id }}">{{ employee }}</a></td>
-                    {% else %}
-                        <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.hurly_rate_employee_id }}">{{ employee }}</a></td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <div class="col-sm-7">
+            <p class="text-center text-danger lead font-weight-normal bg-warning">CHANGE RATE FOR {{ employee|upper }}</p>
+            {% if last_hourly_rate %}
+                <p class="offset-1">Last hourly rate: <em class="text-danger font-weight-bold">{{ last_hourly_rate }}</em></p>
+            {% endif %}
+            <form action="{% url 'employee:employee_hourly_rate' employee_id %}" method="POST">
+                {% csrf_token %}
 
-    <div class="col-sm-7">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">CHANGE RATE FOR {{ employee|upper }}</p>
-        {% if last_hourly_rate %}
-            <p class="offset-1">Last hourly rate: <em class="text-danger font-weight-bold">{{ last_hourly_rate }}</em></p>
-        {% endif %}
-        <form action="{% url 'employee:employee_hourly_rate' employee_id %}" method="POST">
-            {% csrf_token %}
-
-            <div class="input-group mb-3 offset-1">
-                <div class="input-group-prepend">
-                    <div class="input-group-text bg-info">New value of hourly rate:</div>
+                <div class="input-group mb-3 offset-1">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text bg-info">New value of hourly rate:</div>
+                    </div>
+                    {% bootstrap_field form.hourly_rate  form_group_class='form-inline' show_label=False %}
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-success">Confirm</button>
+                    </div>
                 </div>
-                {% bootstrap_field form.hourly_rate  form_group_class='form-inline' show_label=False %}
-                <div class="input-group-append">
-                    <button type="submit" class="btn btn-outline-success">Confirm</button>
+            </form>
+            {% if all_hourly_rate %}
+                <p class="text-primary font-weight-bold font-italic offset-1">All hourly rates:</p>
+                {% for rate in all_hourly_rate %}
+                    <ul>
+                        <p class="text-info font-weight-bold font-italic offset-1">{{ forloop.counter }}) {{ rate.hourly_rate|money_format }}/h : {{ rate.update|date:'l, F Y d' }}</p>
+                    </ul>
+                {% endfor %}
+            {% endif %}
+            {% if check_rate %}
+                <button type="button" class="btn btn-block btn-outline-danger" data-toggle="collapse" data-target="#rate">Hourly rate has not been adding => click me</button>
+                <div id="rate" class="collapse">
+                    <p class="text-primary mt-3">For employee <em class="font-weight-bold"> {{ employee }}</em> you can't change hourly rate on this month ({{ update|date:'M/Y' }}).</p>
                 </div>
+            {% endif %}
+            {% if hourly_rate %}
+                <p class="text-primary mt-3">For employee <em class="text-danger font-weight-bold">{{ employee }}</em> is today ({{ today|date:'d-m-Y' }}) new rate <em class="text-danger font-weight-bold">({{ hourly_rate|floatformat:2 }} PLN/h)</em> on database adding.<br><br><em class="text-danger font-weight-bold">Would you like to erase this record???</em></p>
+                <a href="{% url 'employee:employee_hourly_rate_erase' employee_id %}" class="btn btn-danger btn-block mt-3">Erase</a>
+            {% endif %}
+            <div class="offset-1 btn-sm btn-group mt-2" role="group">
+                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
+                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the Dashboard</a>
+                <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
             </div>
-
-        </form>
-        {% if all_hourly_rate %}
-            <p class="text-primary font-weight-bold font-italic offset-1">All hourly rates:</p>
-            {% for rate in all_hourly_rate %}
-                <ul>
-                    <p class="text-info font-weight-bold font-italic offset-1">{{ forloop.counter }}) {{ rate.hourly_rate|money_format }}/h : {{ rate.update|date:'l, F Y d' }}</p>
-                </ul>
-            {% endfor %}
-        {% endif %}
-        {% if check_rate %}
-            <button type="button" class="btn btn-block btn-outline-danger" data-toggle="collapse" data-target="#rate">Hourly rate has not been adding => click me</button>
-            <div id="rate" class="collapse">
-                <p class="text-primary mt-3">For employee <em class="font-weight-bold"> {{ employee }}</em> you can't change hourly rate on this month ({{ update|date:'M/Y' }}).</p>
-            </div>
-        {% endif %}
-        {% if hourly_rate %}
-            <p class="text-primary mt-3">For employee <em class="text-danger font-weight-bold">{{ employee }}</em> is today ({{ today|date:'d-m-Y' }}) new rate <em class="text-danger font-weight-bold">({{ hourly_rate|floatformat:2 }} PLN/h)</em> on database adding.<br><br><em class="text-danger font-weight-bold">Would you like to erase this record???</em></p>
-            <a href="{% url 'employee:employee_hourly_rate_erase' employee_id %}" class="btn btn-outline-danger btn-block mt-3">Erase</a>
-        {% endif %}
-        <div class="offset-1 btn-sm btn-group mb-1" role="group">
-            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-            <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
-            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the Dashboard</a>
-            <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
         </div>
     </div>
-
+</div>
 {% endblock %}

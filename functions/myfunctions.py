@@ -1,27 +1,18 @@
 # standard library
 import pathlib
-import unicodedata
-from datetime import date, timedelta, datetime
+from datetime import date, datetime, timedelta
 
 # django library
 from django.conf import settings
 from django.core.mail import EmailMessage
+from django.db.models import Sum, Case, When, Value, IntegerField
 
 # my models
-from employee.models import Employee
+from employee.models import Employee, EmployeeData, EmployeeHourlyRate
+from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 
 # Create your functions here
-
-
-def diacritical_remover(text:str)->str:
-    '''replace polish diacritical chars on latin and return as lowercase'''
-    result = [char for char in unicodedata.normalize('NFD', text.lower()) if not unicodedata.combining(char)]
-
-    for i in range(len(text)):
-        if result[i] == 'ł':
-            result[i] = 'l'
-    return ''.join(result)
 
 
 def holiday(year:int)->dict:
@@ -60,12 +51,12 @@ def holiday(year:int)->dict:
     return holidays
 
 
-def sendPayroll(choice_date:date):
+def sendPayroll(month:int, year:int):
     '''send e-mail with attached payroll in pdf format'''
     try:
-        file = pathlib.Path(r'templates/pdf/payroll_{}_{}.pdf'.format(choice_date.month, choice_date.year))
-        subject = 'lista płac dla {}/{} r.'.format(choice_date.month, choice_date.year)
-        message = 'W załączniku lista płac za {}-{}...'.format(choice_date.month, choice_date.year)
+        file = pathlib.Path(f'templates/pdf/payroll_{month}_{year}.pdf')
+        subject = f'lista płac dla {month}/{year} r.'
+        message = f'W załączniku lista płac za {month}-{year}...'
         email = EmailMessage(subject,message,settings.EMAIL_HOST_USER,['projekt@unikolor.com'])
         email.attach_file(file)
         email.send(fail_silently=True)
@@ -76,10 +67,10 @@ def sendPayroll(choice_date:date):
 def sendLeavesData(employee_id:int):
     '''send e-mail with attached leave data in pdf format for specific employee'''
     try:
-        file = pathlib.Path(r'templates/pdf/leaves_data_{}.pdf'.format(employee_id))
+        file = pathlib.Path(f'templates/pdf/leaves_data_{employee_id}.pdf')
         employee = Employee.objects.get(pk=employee_id)
-        subject = 'zestawienie urlopów dla {} ({})r.'.format(employee, date.today().year)
-        message = 'W załączniku zestawienie urlopów dla {} za {}r.'.format(employee, date.today().year)
+        subject = f'zestawienie urlopów dla {employee} ({date.today().year})r.'
+        message = f'W załączniku zestawienie urlopów dla {employee} za {date.today().year}r.'
         email = EmailMessage(subject,message,settings.EMAIL_HOST_USER,['projekt@unikolor.com'])
         email.attach_file(file)
         email.send(fail_silently=True)
@@ -87,37 +78,37 @@ def sendLeavesData(employee_id:int):
         print(err)
 
 
-def initial_date(employee_id:int)->dict:
+def initial_worktime_form(employee_id:int)->dict:
     '''return initial data for WorkEvidenceForm'''
     if date.today().isoweekday() == 1:
         if employee_id == 10:
             start_date = date.today() - timedelta(days=3)
-            start_date = datetime(start_date.year, start_date.month,start_date.day,22,0,0)
+            start_date = datetime(start_date.year, start_date.month,start_date.day,22,0)
             end_date = date.today() - timedelta(days=2)
-            end_date = datetime(end_date.year, end_date.month, end_date.day,6,0,0)
+            end_date = datetime(end_date.year, end_date.month, end_date.day,6,0)
         else:
             start_date = date.today() - timedelta(days=3)
-            start_date = datetime(start_date.year, start_date.month,start_date.day,6,0,0)
+            start_date = datetime(start_date.year, start_date.month,start_date.day,6,0)
             end_date = date.today() - timedelta(days=3)
-            end_date = datetime(end_date.year, end_date.month, end_date.day,14,0,0)
+            end_date = datetime(end_date.year, end_date.month, end_date.day,14,0)
     else:
         if employee_id == 10:
             start_date = date.today() - timedelta(days=1)
-            start_date = datetime(start_date.year, start_date.month,start_date.day,22,0,0)
+            start_date = datetime(start_date.year, start_date.month,start_date.day,22,0)
             end_date = date.today()
-            end_date = datetime(end_date.year, end_date.month, end_date.day,6,0,0)
+            end_date = datetime(end_date.year, end_date.month, end_date.day,6,0)
         else:
             start_date = date.today() - timedelta(days=1)
-            start_date = datetime(start_date.year, start_date.month,start_date.day,6,0,0)
+            start_date = datetime(start_date.year, start_date.month,start_date.day,6,0)
             end_date = date.today() - timedelta(days=1)
-            end_date = datetime(end_date.year, end_date.month, end_date.day,14,0,0)
+            end_date = datetime(end_date.year, end_date.month, end_date.day,14,0)
 
-    context = {'start_work': start_date, 'end_work': end_date}
+    context = {'start_work': start_date.strftime('%Y-%m-%d %H:%M'), 'end_work': end_date.strftime('%Y-%m-%d %H:%M')}
 
     return context
 
 
-def initial_accountdate()->dict:
+def initial_accountdate_form()->dict:
     '''return initial date for AccountPaymentForm'''
     account_date = date.today() - timedelta(days=int(date.today().day))
     context = {'account_date':account_date}
@@ -125,7 +116,7 @@ def initial_accountdate()->dict:
     return context
 
 
-def initial_leave_flag(employee_id:int)->dict:
+def initial_leave_form(employee_id:int)->dict:
     '''return initial leave_flag for EmployeeLeaveForm'''
     data = Employee.objects.get(pk=employee_id)
     if data.leave == 1:
@@ -134,3 +125,29 @@ def initial_leave_flag(employee_id:int)->dict:
         initial = {'leave_flag':['unpaid_leave',]}
 
     return initial
+
+
+def erase_records(employee_id:int)->dict:
+    context = dict()
+    worker = Employee.objects.get(pk=employee_id)
+    opt1, opt2 = {'worker': worker, 'then': Value(1)}, {'default': Value(0), 'output_field': IntegerField()}
+    db = {EmployeeData._meta.verbose_name: EmployeeData,
+          WorkEvidence._meta.verbose_name: WorkEvidence,
+          EmployeeLeave._meta.verbose_name: EmployeeLeave,
+          AccountPayment._meta.verbose_name: AccountPayment,
+          EmployeeHourlyRate._meta.verbose_name: EmployeeHourlyRate,}
+
+    for model_name, model in db.items():
+        records = model.objects.aggregate(rec=Sum(Case(When(**opt1),**opt2)))
+        context.__setitem__(model_name, records['rec'])
+
+    return context
+
+
+# function for listing whole tree for passed directory
+def tree(directory):
+    print(f'+ {directory}')
+    for path in sorted(directory.rglob('*')):
+        depth = len(path.relative_to(directory).parts)
+        spacer = '    ' * depth
+        print(f'{spacer}+ {path.name}')

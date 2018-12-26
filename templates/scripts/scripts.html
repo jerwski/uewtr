@@ -10,15 +10,6 @@
             ;});
     </script>
 
-<!-- open Modal-->
-    <script>
-        $(document).ready(function(){
-            $("#myBtn").click(function(){
-                $("#myModal").modal()
-                ;})
-            ;});
-    </script>
-
 <!-- open tooltip with HTML context-->
     <script>
         $(document).ready(function(){
@@ -39,7 +30,7 @@
     <script>
         function hideAfterSomeTime(hideTime) {
 	        // 10000 = 10 seconds
-	        window.setTimeout("document.getElementById('short-time-msg').style.display='none'", (hideTime)?hideTime:2000);
+	        window.setTimeout("document.getElementById('alertButton').style.display='none'", (hideTime)?hideTime:3500);
         }
     </script>
 

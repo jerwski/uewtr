@@ -25,7 +25,7 @@ class Employee(models.Model):
         ordering = ['surname']
 
     def __str__(self):
-        return '{} {}'.format(self.surname, self.forename)
+        return f'{self.surname} {self.forename}'
 
     def __lt__(self, other):
         return self.surname < other.surname
@@ -60,15 +60,7 @@ class Employee(models.Model):
 
 class EmployeeData(models.Model):
     '''class representing an extented data table of employee'''
-    NO_OVERTIME = 0
-    WEEKLY_OVERTIME = 1
-    SATURDAT_OVERTIME = 2
-    RATINGS = (
-        (NO_OVERTIME, 'Clear contract'),
-        (WEEKLY_OVERTIME, 'Weekly overtime'),
-        (SATURDAT_OVERTIME, 'Saturday overtime'),
-    )
-    name = models.ForeignKey(Employee, on_delete=models.DO_NOTHING)
+    worker = models.ForeignKey(Employee, on_delete=models.CASCADE)
     birthday = models.DateField(null=True,)
     postal = models.CharField(max_length=100,)
     city = models.CharField(max_length=100,)
@@ -79,20 +71,20 @@ class EmployeeData(models.Model):
     workplace = models.CharField(max_length=100, )
     start_contract = models.DateField(null=True,)
     end_contract = models.DateField(null=True, blank=True)
-    overtime = models.IntegerField(choices=RATINGS, default=NO_OVERTIME,)
+    overtime = models.IntegerField()
 
     class Meta:
-        ordering = ['name']
+        ordering = ['worker']
 
     def __str__(self):
-        return '{}'.format(self.name,)
+        return f'{self.worker}'
 
 
 class EmployeeHourlyRate(models.Model):
     '''class representing an hourly rate data table of employee'''
-    name = models.ForeignKey(Employee, on_delete=models.DO_NOTHING)
+    worker = models.ForeignKey(Employee, on_delete=models.CASCADE)
     update = models.DateField()
     hourly_rate = models.FloatField(max_length=5)
 
     def __str__(self):
-        return '{:,.2f} PLN/h'.format(self.hourly_rate)
+        return f'{self.hourly_rate:,.2f} PLN/h'

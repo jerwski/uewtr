@@ -5,11 +5,10 @@
 {% block title %}Login{% endblock %}
 
 
-{% block data %}
-
+{% block content %}
     <div class="container">
-        <div class="row p-1">
-            <div class="col-8 offset-2 p-2" style="background-color: bisque">
+        <div class="row p-2">
+            <div class="col-8 offset-2 p-2 bgbisque">
                 <pre class="text-center text-danger display-4">L O G I N   F O R M</pre>
                 {% if request.user.is_authenticated %}
                     <p class="text-center font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
@@ -17,10 +16,7 @@
                     <p class="small text-center">To login please fill both fields with correct data...<br>If you are for the first time, notify the admin...</p>
                 {% endif %}
                 <div class="form-control-lg">
-
-                    <form method="POST">
-                        {% csrf_token %}
-
+                    <form method="POST">{% csrf_token %}
                         <div class="form-row">
                             <div class="col-lg-6">
                                 <div class="input-group mb-2">
@@ -63,12 +59,10 @@
                                 <a href="{% url 'account:admin_site' %}" class="btn btn-md btn-outline-dark disabled">Dashboard</a>
                                 <button type="submit" class="btn btn-sm btn-outline-success">Login</button>
                             {% endif %}
-
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
 {% endblock %}

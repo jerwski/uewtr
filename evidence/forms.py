@@ -1,34 +1,29 @@
-# standart library
-from datetime import date, timedelta
-
 # django core
 from django import forms
 
 # datetime widget
-from datetimewidget.widgets import DateTimeWidget, DateWidget
+from tempus_dominus.widgets import DateTimePicker, DatePicker
 
 # my models
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
+
+# bootstrap4 widget
+from bootstrap4.widgets import RadioSelectButtonGroup
 
 
 # Create your forms here.
 
 
-LEAVEKIND = [('unpaid_leave', 'Unpaid leave'), ('paid_leave', 'Paid leave'), ('maternity_leave', 'Maternity leave')]
-
-dateOptions = {'format': 'yyyy-mm-dd', 'autoclose': 'true', 'showMeridian': 'false', 'weekStart': 1, 'todayBtn': 'true'}
-
-dateTimeOptions = {'format': 'yyyy-mm-dd hh:ii','autoclose': 'true','showMeridian': 'false', 'weekStart': 1, 'todayBtn': 'true'}
-
-if date.today().isoweekday() == 1:
-    leave_date = date.today() - timedelta(days=3)
-else:
-    leave_date = date.today() - timedelta(days=1)
-
-
 class WorkEvidenceForm(forms.ModelForm):
-    start_work = forms.DateTimeField(widget=DateTimeWidget(options=dateTimeOptions, bootstrap_version=3), label="Date and time of start job:")
-    end_work = forms.DateTimeField(widget=DateTimeWidget(options=dateTimeOptions, bootstrap_version=3), label="Date and time of end job:")
+    options = {'icons': {'time': 'fa fa-clock-o'}, 'format': 'YYYY-MM-DD HH:mm',
+               'useCurrent': False, 'stepping': 5, 'sideBySide': True,
+               'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
+    attrs={'prepend': 'fa fa-clock-o', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+
+    start_work = forms.DateTimeField(label='Date and time of start job:',
+                                     widget=DateTimePicker(options=options, attrs=attrs))
+    end_work = forms.DateTimeField(label='Date and time of end job:',
+                                   widget=DateTimePicker(options=options, attrs=attrs))
 
     class Meta:
         model = WorkEvidence
@@ -36,21 +31,45 @@ class WorkEvidenceForm(forms.ModelForm):
 
 
 class EmployeeLeaveForm(forms.ModelForm):
-    leave_date = forms.DateField(widget=DateWidget(options=dateOptions, bootstrap_version=3), initial=leave_date)
-    leave_flag = forms.ChoiceField(widget=forms.RadioSelect, choices=LEAVEKIND, label='Choice a kind of leave:')
+    LEAVEKIND = [('unpaid_leave', 'Unpaid leave'), ('paid_leave', 'Paid leave'), ('maternity_leave', 'Maternity leave')]
+    options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True, 'daysOfWeekDisabled': [0,6],
+               'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
+    attrs = {'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+
+    leave_date = forms.DateField(label='Select a date of leave...', widget=DatePicker(options=options, attrs=attrs))
+    leave_flag = forms.ChoiceField(label="Select a kind of leave...", required=True,
+                                   widget=RadioSelectButtonGroup, choices=LEAVEKIND)
 
     class Meta:
         model = EmployeeLeave
         fields = ['leave_date', 'leave_flag']
 
 
-class ChoiceDateForm(forms.Form):
-    choice_date = forms.DateField(widget=DateWidget(options=dateOptions, bootstrap_version=3), initial=date.today())
+class PeriodCurrentComplexDataForm(forms.Form):
+    options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True, 'format': 'MM/YYYY',
+               'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
+    attrs = {'prepend': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+
+    choice_date = forms.DateField(widget=DatePicker(options=options, attrs=attrs))
+
+
+class PeriodMonthlyPayrollForm(forms.Form):
+    options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True, 'format': 'MM/YYYY',
+               'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
+    attrs = {'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+
+    choice_date = forms.DateField(label='Select a month on year...', widget=DatePicker(options=options, attrs=attrs))
 
 
 class AccountPaymentForm(forms.ModelForm):
-    account_date = forms.DateField(widget=DateWidget(options=dateOptions, bootstrap_version=3), initial=leave_date, label='Check date of the advance payment')
-    account_value = forms.DecimalField(decimal_places=2, min_value=10.00, label='Enter the value of the advance payment')
+    options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True,
+               'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
+    attrs = {'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+
+    account_date = forms.DateField(label='Select date of the advance payment...',
+                                   widget=DatePicker(options=options, attrs=attrs))
+
+    account_value = forms.DecimalField(decimal_places=2, min_value=10.00, label='Enter the value of the advance payment...')
 
     class Meta:
         model = AccountPayment

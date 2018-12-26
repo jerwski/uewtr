@@ -5,7 +5,7 @@
 
 {% block title %}Monthly payroll{% endblock %}
 
-{% block data %}
+{% block content %}
 
     <div class="container-fluid">
         <div class="row">
@@ -16,26 +16,26 @@
                     <a class="btn btn-outline-success d-print-none" href="{% url 'evidence:leave_time_recorder_add' employee_id %}">Leave time recorder</a>
                     <a class="btn btn-outline-secondary d-print-none" href="{% url 'evidence:account_payment' employee_id %}">Payment on account</a>
                     {% if amountpay and amountpay.brutto > 0 %}
-                        <a class="btn btn-outline-info d-print-none" href="{% url 'evidence:monthly_payroll_print' choice_date %}">Print</a>
-                        <a class="btn btn-outline-warning d-print-none" href="{% url 'evidence:monthly_payroll_pdf' choice_date %}">Send PDF</a>
+                        <a class="btn btn-outline-info d-print-none" href="{% url 'evidence:monthly_payroll_print' month year %}">Print</a>
+                        <a class="btn btn-outline-warning d-print-none" href="{% url 'evidence:monthly_payroll_pdf' month year %}">Send PDF</a>
                     {% else %}
-                        <a class="btn btn-outline-info d-print-none disabled" href="{% url 'evidence:monthly_payroll_print' choice_date %}">Print</a>
-                        <a class="btn btn-outline-warning d-print-none disabled" href="{% url 'evidence:monthly_payroll_pdf' choice_date %}">Send PDF</a>
+                        <a class="btn btn-outline-info d-print-none disabled" href="{% url 'evidence:monthly_payroll_print' month year %}">Print</a>
+                        <a class="btn btn-outline-warning d-print-none disabled" href="{% url 'evidence:monthly_payroll_pdf' month year %}">Send PDF</a>
                     {% endif %}
                     <a class="btn btn-outline-danger d-print-none" href="{% url 'account:exit' %}">Exit</a>
                 </div>
                 <hr class="small">
-                <form action="{% url 'evidence:monthly_payroll_view' %}" method="POST">
-                        {% csrf_token %}
+                <form action="{% url 'evidence:monthly_payroll_view' %}" method="POST">{% csrf_token %}
                         {% bootstrap_field form.choice_date label_class='text-primary font-weight-bold' %}
                         <div class="btn-sm">
                             <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
                         </div>
                 </form>
+                {% include 'blocks/alert.html' %}
             </div>
             <div class="col-10">
                 {% if amountpay.brutto %}
-                    <p class="text-center text-primary lead font-weight-bold bg-warning mt-lg-4">Monthly rollpay for {{ choice_date|date:'F Y' }}. Total work hours: {{ total_work_hours }} hours. Total payment: {{ amountpay.brutto|money_format }}</p>
+                    <p class="text-center text-primary lead font-weight-bold bg-warning mt-lg-4">Monthly rollpay for {{ month }}/{{ year }}. Total work hours: {{ total_work_hours }} hours. Total payment: {{ amountpay.brutto|money_format }}</p>
 
                     <div class="input-group">
                         <input class="form-control" id="myInput" type="text" placeholder="Search employee..." aria-label="Filtering table" aria-describedby="basic-addon">
@@ -73,11 +73,11 @@
                     </table>
                 {% elif not amountpay %}
                     <div class="jumbotron bg-warning mt-lg-5">
-                        <p class="text-center text-danger lead font-weight-bold font-italic">Your choice: {{ choice_date|date:'F Y' }}. Total work hours: {{ total_work_hours }} hours.<br>For {{ choice_date|date:'F Y' }} no data available in database!</p>
+                        <p class="text-center text-danger lead font-weight-bold font-italic">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>
                     </div>
                 {% else %}
                     <div class="jumbotron bg-warning mt-lg-5">
-                        <p class="text-center text-danger lead font-weight-bold font-italic">Your choice: {{ choice_date|date:'F Y' }}. Total work hours: {{ total_work_hours }} hours.<br>For {{ choice_date|date:'F Y' }} no data available in database!</p>
+                        <p class="text-center text-danger lead font-weight-bold font-italic">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>
                     </div>
                 {% endif %}
                 <p class="footer text-secondary text-sm-left"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
