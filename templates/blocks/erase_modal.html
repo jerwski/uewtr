@@ -1,0 +1,38 @@
+<!-- Modal for data to will be erase if you want -->
+<div class="text-center mt-sm-1">
+    <p class="text-info font-italic font-weight-bold">You can delete all records in datatabase for {{ employee }}...</p>
+    <p class="text-danger font-italic font-weight-bold">Think twice before you do it...!!!</p>
+</div>
+
+<div class="btn btn-group">
+        <button id="eraseButton" type="button" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#eraseModal">Erase all records for {{ employee }}...</button>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="eraseModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="eraseModal">You try do erase all bellow records for {{ employee }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body bg-info">
+                    <table class="table table-sm table-borderless">
+                        <tbody>
+                        <tr><th width="50%" class="text-right">Model</th><th>Amount of records</th></tr>
+                        {% for key, value in records.items %}
+                            <tr>
+                                <td width="50%" class="text-right">{{ key|capfirst }} :</td><td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+                    {% include 'blocks/commit_erase_modal.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
