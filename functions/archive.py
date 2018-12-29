@@ -12,7 +12,7 @@ from django.core import serializers
 from django.core.management import call_command
 
 # my models
-from employee.models import Employee, EmployeeData, EmployeeHourlyRate
+from employee.models import EmployeeData, EmployeeHourlyRate
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 
