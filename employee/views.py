@@ -44,6 +44,7 @@ class EmployeeBasicDataView(View):
                 context.__setitem__('active', False)
             form = EmployeeBasicDataForm(initial=initial)
             context.__setitem__('form', form)
+            context.__setitem__('worker', worker)
             context.__setitem__('status', worker.status)
             context.__setitem__('employee_id', employee_id)
             context.__setitem__('records',erase_records(employee_id,))
