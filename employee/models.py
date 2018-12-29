@@ -18,7 +18,7 @@ class Employee(models.Model):
     forename = models.CharField(max_length=100,)
     surname = models.CharField(max_length=100,)
     pesel = models.CharField(max_length=11, validators=[check_pesel])
-    status = models.BooleanField(default=True, verbose_name='Active')
+    status = models.BooleanField(default=False, verbose_name='Active')
     leave = models.IntegerField(choices=LEAVE_CHOICE, default=UNPAID_LEAVE)
 
     class Meta:

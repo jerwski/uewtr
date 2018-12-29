@@ -29,25 +29,30 @@ class EmployeeBasicDataView(View):
         if employees.exists():
             context.__setitem__('employees_st', employees.filter(status=True))
             context.__setitem__('employees_sf', employees.filter(status=False))
+            context.__setitem__('employee_id', employees.filter(status=True).first().id)
         else:
             messages.success(request, r'No employee in database...')
 
         if employee_id:
-            employee = Employee.objects.get(pk=employee_id)
-            fields = list(employee.__dict__.keys())[2:]
+            worker = Employee.objects.get(pk=employee_id)
+            fields = list(worker.__dict__.keys())[2:]
             initial = Employee.objects.filter(pk=employee_id).values(*fields)[0]
+            active = EmployeeData.objects.filter(worker=worker)
+            if active:
+                context.__setitem__('active', True)
+            else:
+                context.__setitem__('active', False)
             form = EmployeeBasicDataForm(initial=initial)
             context.__setitem__('form', form)
-            context.__setitem__('employee', employee)
+            context.__setitem__('status', worker.status)
             context.__setitem__('employee_id', employee_id)
             context.__setitem__('records',erase_records(employee_id,))
             return render(request, 'employee/employee_basicdata.html', context)
         else:
             form = EmployeeBasicDataForm()
             context.__setitem__('form',form)
-            active_worker = Employee.objects.filter(status=True).first()
+            context.__setitem__('active', True)
             context.__setitem__('new_employee', True)
-            context.__setitem__('employee_id', active_worker.id)
             return render(request, 'employee/employee_basicdata.html', context)
 
     def post(self, request, employee_id:int=None)->HttpResponseRedirect:
@@ -78,7 +83,8 @@ class EmployeeBasicDataView(View):
                 try:
                     obj, created = Employee.objects.update_or_create(defaults=new_values, **old_values)
                     if created:
-                        msg = f'Successful created basicdata for employee {obj}'
+                        EmployeeHourlyRate.objects.create(worker=obj, update=date.today(), hourly_rate=8.00)
+                        msg = f'Successful created basic data for employee {obj} with minimum rate 8.00 PLN/h'
                         messages.success(request, msg)
                         kwargs = {'employee_id': obj.id}
                         return HttpResponseRedirect(reverse('employee:employee_extendeddata', kwargs=kwargs))
@@ -103,8 +109,7 @@ class EmployeeEraseAll(View):
     '''class implementing the method for ersing all data in database for the employee by pk=employee_id'''
     def get(self, request, employee_id:int):
         worker = Employee.objects.get(pk=employee_id)
-        think_before_you_do = EmployeeData.objects.filter(worker=worker)
-        if think_before_you_do.exists():
+        if worker:
             archiving_of_deleted_records(worker)
             worker.delete()
             msg = f'You have been deleting all records in database for {worker}'
@@ -159,9 +164,7 @@ class EmployeeExtendedDataView(View):
                 try:
                     obj, created = EmployeeData.objects.update_or_create(**old_values, defaults=new_values)
                     if created:
-                        worker = Employee.objects.get(pk=obj.worker_id)
-                        EmployeeHourlyRate.objects.create(worker=worker, update=date.today(), hourly_rate=8.00)
-                        msg = f'Successful created data for employee {obj} with minimum rate 8.00 PLN/h'
+                        msg = f'Successful created extended data for employee {obj}'
                         messages.success(request, msg)
                         return HttpResponseRedirect(reverse('employee:employee_hourly_rate', kwargs=kwargs))
                     else:

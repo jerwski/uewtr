@@ -90,9 +90,13 @@
                         </div>
                     </div>
                     <div class="col-md-5">
-                        <div class="form-check-inline mt-3">
-                            {% bootstrap_field form.status size='small' %}
-                        </div>
+                        {% if not new_employee and active %}
+                            <div class="form-check-inline mt-3">
+                                {% bootstrap_field form.status size='small' %}
+                            </div>
+                        {% elif not active %}
+                            <p class="text-danger text-center small mt-1">Please complete the extended data to activate the employee</p>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -101,7 +105,7 @@
                         {% if new_employee %}
                             <button type="submit" class="btn btn-outline-success btn-block mt-2">Confirm</button>
                         {% else %}
-                            {% if employee.status %}
+                            {% if status %}
                                 <div class="btn-sm btn-group btn-group-sm mt-1" role="group">
                                     <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
                                     <a href="{% url 'employee:employee_hourly_rate' employee_id %}" class="btn btn-outline-primary">Update rate</a>
