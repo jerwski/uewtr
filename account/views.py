@@ -5,8 +5,8 @@ import pathlib
 # django library
 from django.conf import settings
 from django.shortcuts import render
-from django.urls import reverse_lazy
 from django.contrib import messages
+from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.views.generic import CreateView, View
@@ -56,14 +56,14 @@ class AdminView(View):
 def exit(request):
     '''backups features and exit from the application'''
     pdfdir = pathlib.Path(r'templates/pdf')
+    archivepath = pathlib.Path(r'backup_json/zip/wtr_archive.zip')
 
     if socket.gethostname() == 'OFFICELAPTOP':
         try:
             backup()
             mkfixture()
             make_archives()
-            args = (request, pathlib.Path(r'backup_json/zip/wtr_archive.zip'),
-                    settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
+            args = (request, archivepath, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
             uploadFileFTP(*args)
 
         except ConnectionError as ce:
