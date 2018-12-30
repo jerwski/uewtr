@@ -14,8 +14,8 @@ from employee.models import Employee, EmployeeData, EmployeeHourlyRate
 from employee.forms import EmployeeBasicDataForm, EmployeeExtendedDataForm, EmployeeHourlyRateForm
 
 # my functions
-from functions.archive import archiving_of_deleted_records
 from functions.myfunctions import erase_records
+from functions.archive import archiving_of_deleted_records
 
 
 # Create your views here.
