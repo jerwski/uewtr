@@ -1,0 +1,5 @@
+Django=2.1.4
+django-bootstrap4=0.0.7
+django-tempus-dominus=5.1.2.1
+pdfkit=0.6.1
+psycopg2=2.7.6.1
