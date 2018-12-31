@@ -57,6 +57,8 @@
 
                 {% if start_work > end_work %}
                     <p class="text-danger lead font-weight-normal mt-3">The start date is later than the end date! Please correct it!</p>
+                {% elif start_work >= end_work %}
+                    <p class="text-danger lead font-weight-normal mt-3">The start date is the same like the end date! Please correct it!</p>
                 {% else %}
                     {% if flag_work or flag_leave %}
                         <p class="text-danger lead font-weight-normal mt-3">Record for this day ({{ start_work|date:'l, d F Y' }}) is existing in database! Please check it or correct!</p>

@@ -62,36 +62,39 @@ class WorkingTimeRecorderView(View):
         if form.is_valid():
             data = form.cleaned_data
             data.__setitem__('worker', worker)
-            jobhours = (data['end_work'] - data['start_work']).total_seconds()/3600
+            start_work, end_work = data['start_work'], data['end_work']
+            jobhours = (end_work - start_work).total_seconds()/3600
             data.__setitem__('jobhours', jobhours)
-            context.__setitem__('start_work', data['start_work'])
-            context.__setitem__('end_work', data['end_work'])
+            context.__setitem__('start_work', start_work)
+            context.__setitem__('end_work', end_work)
             context.__setitem__('jobhours', jobhours)
-            year = data['start_work'].year
-            month = data['start_work'].month
+            year = start_work.year
+            month = start_work.month
 
             # check or data exisiting in WorkEvidence and EmployeeLeave table
-            check_leave = {'worker': worker, 'leave_date': data['start_work'].date(),}
+            check_leave = {'worker': worker, 'leave_date': start_work.date(),}
             flag_leave = EmployeeLeave.objects.filter(**check_leave).exists()
-            query = Q(worker=worker) & Q(start_work__year=year) & Q(start_work__month=month) & Q(start_work__day=data['start_work'].day) & Q(end_work__day=data['end_work'].day)
+            query = Q(worker=worker) & Q(start_work__year=year) & Q(start_work__month=month) & Q(start_work__day=start_work.day) & Q(end_work__day=end_work.day)
             flag_work = WorkEvidence.objects.filter(query).exists()
 
-            if data['start_work'] < data['end_work']:
+            if start_work < end_work:
 
                 if flag_work or flag_leave:
-                    msg = r'For worker {} this date ({}) is existing in database...'
-                    messages.error(request, msg.format(data['worker'], data['start_work'].date()))
+                    messages.error(request, f'For worker {worker} this date ({start_work.date()}) is existing in database...')
                     context.__setitem__('flag_work', flag_work)
                     context.__setitem__('flag_leave', flag_leave)
 
                 else:
                     WorkEvidence.objects.create(**data)
-                    msg = r'Succesful register new time working for {}'
-                    messages.success(request, msg.format(data['worker']))
+                    messages.success(request, f'Succesful register new time working for {worker}')
                     employee_total_data(month, year, employee_id, context)
+
+            elif start_work <= end_work:
+                msg = f'Start working ({start_work}) is the same like end working ({end_work}). Please correct it...'
+                messages.error(request, msg)
             else:
-                msg = r'Start working ({}) is later than end working ({}). Please correct it...'
-                messages.error(request, msg.format(data['start_work'], data['end_work']))
+                msg = f'Start working ({start_work}) is later than end working ({end_work}). Please correct it...'
+                messages.error(request, msg)
 
             employee_total_data(month, year, employee_id, context)
 
