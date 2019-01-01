@@ -125,23 +125,23 @@
     </script>
 {% endif %}
 
-    <!-- blinkin message button after hideTime: seconds-->
-<script>
-    $('.blink').each(function() {
-      var elem = $(this);
-      // count the blinks
-      var count = 1;
-      var intervalId = setInterval(function() {
-        if (elem.css('visibility') == 'hidden') {
-            elem.css('visibility', 'visible');
-            // increment counter when showing to count # of blinks and stop when visible
-            if (count++ === 3) {
-                clearInterval(intervalId);
+    <!-- blinkin after hideTime: seconds-->
+    <script>
+        $('.blink').each(function() {
+          var elem = $(this);
+          // count the blinks
+          var count = 1;
+          var intervalId = setInterval(function() {
+            if (elem.css('visibility') == 'hidden') {
+                elem.css('visibility', 'visible');
+                // increment counter when showing to count # of blinks and stop when visible
+                if (count++ === 3) {
+                    clearInterval(intervalId);
+                }
+            } else {
+                elem.css('visibility', 'hidden');
             }
-        } else {
-            elem.css('visibility', 'hidden');
-        }
-      }, 200);
-    });
-</script>
+          }, 200);
+        });
+    </script>
 {% endblock %}

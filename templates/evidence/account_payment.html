@@ -45,7 +45,7 @@
                     </div>
                     {% bootstrap_field form.notice size='medium' label_class='text-primary font-weight-bold' placeholder='Please indicate the circumstances of the down payment...' %}
                     <div class="btn-sm mb-2">
-                        <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
+                        <button type="submit" class="btn btn-outline-success btn-block">Confirm the down payment</button>
                     </div>
                 </form>
 
@@ -53,7 +53,7 @@
                     {% if salary >= advances %}
                         <p class="text-justify text-danger lead font-weight-normal">Granted an advance payment of: <em class="font-weight-bold">{{ account_value|money_format }}</em></p>
                         <div class="btn-sm mb-lg-4">
-                            <a href="{% url 'evidence:account_recorder_erase' employee_id account_date account_value %}" class="btn btn-sm btn-danger btn-block">Erase</a>
+                            <a href="{% url 'evidence:account_recorder_erase' employee_id account_date account_value %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the down payment ({{ account_value|money_format }})</em></a>
                         </div>
                     {% else %}
                         <p class="text-justify text-danger lead font-weight-normal">The sum of advances <em class="font-weight-bold">{{ advances|money_format }}</em> is greater than the income earned so far <em class="font-weight-bold">{{ salary|money_format }}</em>. The advance can not be paid!</p>
@@ -82,5 +82,27 @@
         </div>
     </div>
 </div>
+
+    <!-- blinkin after hideTime: seconds-->
+    <script>
+        $('.blink').each(function() {
+            var elem = $(this);
+            // count the blinks
+            var count = 1;
+            var intervalId = setInterval(function() {
+                if (elem.css('visibility') == 'hidden') {
+                    elem.css('visibility', 'visible');
+                    // increment counter when showing to count # of blinks and stop when visible
+                    if (count++ === 3) {
+                        clearInterval(intervalId);
+
+                    }
+
+                } else {
+                    elem.css('visibility', 'hidden');
+                }
+            }, 200);
+            });
+    </script>
 
 {% endblock%}
