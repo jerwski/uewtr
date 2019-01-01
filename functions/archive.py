@@ -55,7 +55,8 @@ def readfixture():
     for model, path in settings.FIXTURE_DIRS.items():
         try:
             call_command('loaddata', path)
-            print('Base {} has been updated...\n'.format(model.split('.')[1]))
+            mymodel = model.split('.')[1]
+            print(f'Base {mymodel} has been updated...\n')
         except FileNotFoundError as err:
             print(f'\nNo data => Error code: {err}')
 
