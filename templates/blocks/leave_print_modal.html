@@ -1,0 +1,33 @@
+<!-- Modal for data to will be erase if you want -->
+    <button id="leaveButton" type="button" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#leaveModal">Print leave data</button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="leaveModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="leaveModal">Check year to print leave for {{ worker }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'evidence:leaves_data_print' employee_id %}" method="POST">{% csrf_token %}
+                        {% for leave_year, leave_value in leave_set.items %}
+                            <div class="form-check custom-control custom-radio ml-5 text-left">
+                                <input type="radio" id="{{ leave_year }}" name="leave_year" class="custom-control-input" value="{{ leave_year }}" required>
+                                <label class="custom-control-label" for="{{ leave_year }}">{{ leave_year }} year (total leave: {{ leave_value }} day{{ leave_value|pluralize:'s' }})</label>
+                            </div>
+                        {% endfor %}
+
+                        <div class="modal-footer text-center">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-info" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Print leave data</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
