@@ -367,7 +367,7 @@ class AccountPaymentView(View):
         if form.is_valid():
             data = form.cleaned_data
             data.__setitem__('worker', worker)
-            account_date, account_value = data['account_date'], data['account_value']
+            account_date, account_value = data['account_date'], float(data['account_value'])
             context.__setitem__('account_date', account_date)
             context.__setitem__('account_value', account_value)
 
@@ -378,10 +378,10 @@ class AccountPaymentView(View):
             query = Q(worker=worker) & Q(account_date__year=account_date.year) & Q(account_date__month=account_date.month)
             advances = AccountPayment.objects.filter(query).aggregate(ap=Sum('account_value'))
             if advances['ap'] is None:
-                advances = data['account_value']
+                advances = account_value
                 context.__setitem__('advances', advances)
             else:
-                advances = advances['ap'] + float(account_value)
+                advances = advances['ap'] + account_value
                 context.__setitem__('advances', advances)
 
             if salary >= advances:
