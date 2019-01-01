@@ -124,7 +124,9 @@ class LeaveTimeRecorderView(View):
         values = {'worker':worker, 'leave_date__year': date.today().year}
         total_leaves = EmployeeLeave.objects.filter(**values).order_by('leave_date')
         remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
-        context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees,
+        leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [year for year in range(EmployeeLeave.objects.filter(worker=worker).earliest('leave_date').leave_date.year, date.today().year + 1)]}
+        context = {'form': form, 'worker': worker, 'employee_id': employee_id,
+                   'employees': employees, 'year': date.today().year, 'leave_set': leave_set,
                    'total_leaves': total_leaves.count(), 'remaining_leave': remaining_leave}
         context.__setitem__('leaves_pl', total_leaves.filter(leave_flag='paid_leave'))
         context.__setitem__('leaves_upl', total_leaves.filter(leave_flag='unpaid_leave'))
@@ -143,6 +145,7 @@ class LeaveTimeRecorderView(View):
             data = form.cleaned_data
             leave_date = data['leave_date']
             leave_flag = data['leave_flag']
+            context.__setitem__('year', date.today().year)
             context.__setitem__('leave_date', leave_date)
             data.__setitem__('worker', worker)
 
@@ -180,7 +183,9 @@ class LeaveTimeRecorderView(View):
                 EmployeeLeave.objects.create(**data)
                 msg = f'Succesful register new leave time for {worker}'
                 messages.success(request, msg)
+                leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [year for year in range(EmployeeLeave.objects.filter(worker=worker).earliest('leave_date').leave_date.year, date.today().year + 1)]}
                 context.__setitem__('leave_flag', leave_flag)
+                context.__setitem__('leave_set', leave_set)
 
             values = {'worker':worker, 'leave_date__year': date.today().year}
             total_leaves = EmployeeLeave.objects.filter(**values).order_by('leave_date')
@@ -214,9 +219,10 @@ class LeaveTimeRecorderEraseView(View):
 
 class LeavesDataPrintView(View):
     '''class representing the view of monthly payroll print'''
-    def get(self, request, employee_id:int)->HttpResponseRedirect:
+    def post(self, request, employee_id:int)->HttpResponseRedirect:
         # convert html file (evidence/leaves_data.html) to pdf file
-        leavehtml2pdf(employee_id)
+        year = int(request.POST['leave_year'])
+        leavehtml2pdf(employee_id, year)
         file = pathlib.Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/leaves_data_{employee_id}.pdf')
         try:
             os.popen(f'explorer.exe "file:///{file}"')
@@ -231,9 +237,10 @@ class LeavesDataPrintView(View):
 
 class LeavesDataPdf(View):
     '''class representing the view for sending leaves date as pdf file'''
-    def get(self, request, employee_id:int)->HttpResponseRedirect:
+    def post(self, request, employee_id:int)->HttpResponseRedirect:
         # convert html file (evidence/leave_data_{}.html.format(employee_id) to pdf file
-        leavehtml2pdf(employee_id)
+        year = int(request.POST['send_year'])
+        leavehtml2pdf(employee_id, year)
         # send e-mail with attached payroll in pdf format
         sendLeavesData(employee_id)
         messages.info(request, r'The pdf file was sending....')

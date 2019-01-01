@@ -225,15 +225,14 @@ def payrollhtml2pdf(month:int, year:int):
     pdfkit.from_string(html, f'templates/pdf/payroll_{month}_{year}.pdf', options=options)
 
 
-def leavehtml2pdf(employee_id:int):
+def leavehtml2pdf(employee_id:int, year:int):
     '''convert html annuall leave time for each employee in current yaear to pdf'''
     month_name = list(calendar.month_name)[1:]
     worker = Employee.objects.get(pk=employee_id)
-    employee = EmployeeLeave.objects.filter(worker_id=employee_id).order_by('leave_date')
+    employee = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).order_by('leave_date')
     # create leaves data as associative arrays for selected employee
-    leave_data = {data.worker:[item.leave_date for item in employee] for data in employee}
-
-    context = {'leave_data': leave_data, 'month_name': month_name, 'worker': worker}
+    leave_data = [item.leave_date for item in employee]
+    context = {'leave_data': leave_data, 'month_name': month_name, 'worker': worker, 'year': year}
     html = render_to_string(r'evidence/leaves_data.html', context)
 
     # create pdf file and save on templates/pdf/leves_data_{}.pdf'.format(employee_id)

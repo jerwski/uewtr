@@ -73,12 +73,12 @@
 
                 <table class="table table-hover table-sm">
                     <thead class="bg-info">
-                    <tr><th class="text-center text-white">TOTAL LEAVES INFO FOR {{ worker|upper }}</th></tr>
+                    <tr><th class="text-center text-white">TOTAL LEAVES INFO FOR {{ worker|upper }} IN {% now 'Y' %} YEAR</th></tr>
                     </thead>
                 </table>
                 <table class="table table-hover table-sm">
                     <tbody>
-                    <tr><td width="30%">Total leave:</td><td class="text-danger font-weight-bold">{{ total_leaves|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
+                    <tr><td width="30%">Total leave in {% now 'Y' %} year:</td><td class="text-danger font-weight-bold">{{ total_leaves|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
                         {% if remaining_leave < 0 %}
                             <td width="20%">Days of leave exceeded by:</td><td class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
                         {% elif remaining_leave < 26 %}
@@ -102,13 +102,17 @@
                 <p class="text-center text-danger lead font-weight-normal bg-warning">LEAVE EVIDENCE</p>
                 <p class="text-justify text-danger lead font-weight-normal">You can't add any leave day for <em class="font-weight-bold">{{ worker }}</em> because the employee is no longer employed.</p>
             {% endif %}
-            <div class="btn-sm btn-group mb-2 float-right">
-                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
-                <a href="{% url 'evidence:leaves_data_print' employee_id %}" class="btn btn-outline-primary">Print employee leaves data</a>
-                <a href="{% url 'evidence:leaves_data_pdf' employee_id %}" class="btn btn-outline-success">Send employee leaves data</a>
-                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+        <div class="row text-center">
+            <div class="col-12">
+                <div class="btn btn-group">
+                    <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                    <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+                    {% include 'blocks/leave_print_modal.html' %}
+                    <a class="btn btn-outline-primary" href="/admin/">Admin Data Base</a>
+                </div>
             </div>
+        </div>
+
         </div>
     </div>
 </div>
