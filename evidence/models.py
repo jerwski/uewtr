@@ -43,4 +43,4 @@ class AccountPayment(models.Model):
         ordering = ['-account_date', 'worker']
 
     def __str__(self):
-        return str(self.worker)
+        return f'{self.worker}'
