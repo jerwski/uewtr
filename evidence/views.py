@@ -68,8 +68,7 @@ class WorkingTimeRecorderView(View):
             context.__setitem__('start_work', start_work)
             context.__setitem__('end_work', end_work)
             context.__setitem__('jobhours', jobhours)
-            year = start_work.year
-            month = start_work.month
+            year, month = start_work.year, start_work.month
 
             # check or data exisiting in WorkEvidence and EmployeeLeave table
             check_leave = {'worker': worker, 'leave_date': start_work.date(),}
@@ -368,26 +367,26 @@ class AccountPaymentView(View):
         if form.is_valid():
             data = form.cleaned_data
             data.__setitem__('worker', worker)
-            context.__setitem__('account_date', data['account_date'])
-            context.__setitem__('account_value', data['account_value'])
+            account_date, account_value = data['account_date'], data['account_value']
+            context.__setitem__('account_date', account_date)
+            context.__setitem__('account_value', account_value)
 
             # check if the total of advances is not greater than the income earned
-            salary = total_payment(employee_id, data['account_date'].year, data['account_date'].month)
+            salary = total_payment(employee_id, account_date.year, account_date.month)
             salary = salary['brutto']
             context.__setitem__('salary', salary)
-            query = Q(worker=worker) & Q(account_date__year=data['account_date'].year) & Q(account_date__month=data['account_date'].month)
+            query = Q(worker=worker) & Q(account_date__year=account_date.year) & Q(account_date__month=account_date.month)
             advances = AccountPayment.objects.filter(query).aggregate(ap=Sum('account_value'))
             if advances['ap'] is None:
                 advances = data['account_value']
                 context.__setitem__('advances', advances)
             else:
-                advances = advances['ap'] + float(data['account_value'])
+                advances = advances['ap'] + float(account_value)
                 context.__setitem__('advances', advances)
 
             if salary >= advances:
                 AccountPayment.objects.create(**data)
-                msg = r'Employee {} has become an account {:,.2f} PLN on {}'
-                messages.success(request, msg.format(worker, data['account_value'], data['account_date']))
+                messages.success(request, f'Employee {worker} has become an account {account_value:,.2f} PLN on {account_date}')
             else:
                 msg = f'The sum of advances ({advances:,.2f} PLN) is greater than the income earned so far ({salary:,.2f} PLN). The advance can not be paid...'
                 messages.error(request, msg)
