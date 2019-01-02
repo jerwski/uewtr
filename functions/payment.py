@@ -202,27 +202,35 @@ def payrollhtml2pdf(month:int, year:int):
     '''convert html file (evidence/monthly_payroll_pdf.html) to pdf file'''
     heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota', 'Niedziela', 'Zaliczka', 'Do wypłaty', 'Data i podpis']
     total_work_hours = len(list(workingdays(year, month))) * 8
-    query = Q(end_contract__year__gte=year) & Q(end_contract__month__gte=month) | Q(worker__status=True) & Q(start_contract__year__lte=year) & Q(start_contract__month__lte=month)
-    employees = EmployeeData.objects.filter(query).order_by('worker')
-    # create data for payroll as associative arrays for every active employee
-    payroll = {employee.worker: total_payment(employee.worker_id, year, month) for employee in employees}
-    # create defaultdict with summary payment
-    amountpay = defaultdict(float)
-    for item in payroll.values():
-        if item['accountpay'] != item['brutto']:
-            for k,v in item.items():
-                amountpay[k] += v
+    employees = EmployeeData.objects.all()
+    employees = employees.exclude(end_contract__lt=date(year, month, 1))
+    query = (year, month + 1, 1)
+    if month == 12:
+        query = (year + 1, 1, 1)
+    employees = employees.exclude(start_contract__gte=date(*query)).order_by('worker')
+    if employees.exists():
+        # create data for payroll as associative arrays for all employees
+        payroll = {employee.worker: total_payment(employee.worker_id, year, month) for employee in employees}
+        # create defaultdict with summary payment
+        amountpay = defaultdict(float)
+        for item in payroll.values():
+            if item['accountpay'] != item['brutto']:
+                for k,v in item.items():
+                    amountpay[k] += v
 
-    context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay),
-               'year': year, 'month': month, 'total_work_hours': total_work_hours}
+        context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay),
+                   'year': year, 'month': month, 'total_work_hours': total_work_hours}
 
-    html = render_to_string('evidence/monthly_payroll_pdf.html', context)
-    # create pdf file and save on templates/pdf/payroll_{}_{}.pdf.format(choice_date.month, choice_date.year)
-    options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
-               'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
-               'orientation': 'landscape','no-outline': None, 'quiet': '', }
-
-    pdfkit.from_string(html, f'templates/pdf/payroll_{month}_{year}.pdf', options=options)
+        html = render_to_string('evidence/monthly_payroll_pdf.html', context)
+        # create pdf file and save on templates/pdf/payroll_{}_{}.pdf.format(choice_date.month, choice_date.year)
+        options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
+                   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
+                   'orientation': 'landscape','no-outline': None, 'quiet': '', }
+        # create pdf file
+        pdfkit.from_string(html, f'templates/pdf/payroll_{month}_{year}.pdf', options=options)
+        return True
+    else:
+        return False
 
 
 def leavehtml2pdf(employee_id:int, year:int):

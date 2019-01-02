@@ -145,7 +145,6 @@ class LeaveTimeRecorderView(View):
             data = form.cleaned_data
             leave_date = data['leave_date']
             leave_flag = data['leave_flag']
-            context.__setitem__('year', date.today().year)
             context.__setitem__('leave_date', leave_date)
             data.__setitem__('worker', worker)
 
@@ -207,8 +206,7 @@ class LeaveTimeRecorderEraseView(View):
         check = EmployeeLeave.objects.filter(worker=worker, leave_date=leave_date)
         if check.exists():
             check.delete()
-            msg = f'Succesful erase last record for {worker}'
-            messages.success(request, msg)
+            messages.success(request, f'Succesful erase last record for {worker}')
         else:
             messages.info(request, r'Nothing to erase...')
 
@@ -237,10 +235,9 @@ class LeavesDataPrintView(View):
 
 class LeavesDataPdf(View):
     '''class representing the view for sending leaves date as pdf file'''
-    def post(self, request, employee_id:int)->HttpResponseRedirect:
+    def get(self, request, employee_id:int)->HttpResponseRedirect:
         # convert html file (evidence/leave_data_{}.html.format(employee_id) to pdf file
-        year = int(request.POST['send_year'])
-        leavehtml2pdf(employee_id, year)
+        leavehtml2pdf(employee_id, date.today().year)
         # send e-mail with attached payroll in pdf format
         sendLeavesData(employee_id)
         messages.info(request, r'The pdf file was sending....')
@@ -257,11 +254,10 @@ class MonthlyPayrollView(View):
         month, year = now.month, now.year
         heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours', 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
         form = PeriodMonthlyPayrollForm(initial={'choice_date': now})
-        employee_id = Employee.objects.filter(employeedata__end_contract__isnull=True).first()
+        employee_id = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).first()
         employee_id = employee_id.id
         total_work_hours = len(list(workingdays(year, month))) * 8
-        query = Q(end_contract__year=year) & Q(end_contract__month__lt=month)
-        employees = EmployeeData.objects.exclude(query).order_by('worker')
+        employees = EmployeeData.objects.exclude(end_contract__lt=date(year, month, 1)).order_by('worker')
 
         # create data for payroll as associative arrays for every engaged employee
         payroll = {employee.worker: total_payment(employee.worker_id, year, month) for employee in employees}
@@ -280,20 +276,20 @@ class MonthlyPayrollView(View):
 
     def post(self, request)->render:
         heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours', 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
-        choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
-        month, year = choice_date.month, choice_date.year
-        form = PeriodMonthlyPayrollForm(data={'choice_date':choice_date})
-        employee_id = Employee.objects.filter(status=True).first()
+        employee_id = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).first()
         employee_id = employee_id.id
+        choice_date = request.POST['choice_date'].split('/')
+        month, year = int(choice_date[0]), int(choice_date[1])
+        form = PeriodMonthlyPayrollForm(data={'choice_date':date(year, month,1)})
+        employees = EmployeeData.objects.all()
+        employees = employees.exclude(end_contract__lt=date(year, month, 1))
+        query = (year, month + 1, 1)
+        if month == 12:
+            query = (year + 1, 1, 1)
+        employees = employees.exclude(start_contract__gte=date(*query)).order_by('worker')
         context = {'form': form, 'heads': heads, 'employee_id': employee_id,}
 
         if form.is_valid():
-            query = Q(end_contract__isnull=True) &\
-                    Q(start_contract__month__lte=month) &\
-                    Q(start_contract__year__lte=year) |\
-                    Q(end_contract__month__gte=month) &\
-                    Q(end_contract__year__gte=year)
-            employees = EmployeeData.objects.filter(query).order_by('worker')
             total_work_hours = len(list(workingdays(year, month))) * 8
 
             # create data for payroll as associative arrays for every engaged employee
@@ -318,25 +314,29 @@ class MonthlyPayrollPrintView(View):
     '''class representing the view of monthly payroll print'''
     def get(self, request, month:int, year:int)->HttpResponseRedirect:
         # convert html file (evidence/monthly_payroll_pdf.html) to .pdf file
-        payrollhtml2pdf(month, year)
-        file = pathlib.Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/payroll_{month}_{year}.pdf')
-        try:
-            os.popen(f'explorer.exe "file:///{file}"')
-            messages.info(request, f'File payroll_{month}_{year}.pdf file was sending to browser....')
-        except WindowsError as err:
-            print(err)
+        if payrollhtml2pdf(month, year):
+            file = pathlib.Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/payroll_{month}_{year}.pdf')
+            try:
+                os.popen(f'explorer.exe "file:///{file}"')
+                messages.info(request, f'File payroll_{month}_{year}.pdf file was sending to browser....')
+            except FileNotFoundError as error:
+                messages.warning(request, f'File {file} does not exist...\nError: {error}')
+        else:
+            messages.warning(request, r'Nothing to print...')
 
         return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
 
 
-class PayrollPdf(View):
+class SendPayrollPdf(View):
     '''class representing the view for sending monthly payroll as pdf file'''
     def get(self, request, month:int, year:int)->HttpResponseRedirect:
         # convert html file (evidence/monthly_payroll_pdf.html) to pdf file
-        payrollhtml2pdf(month, year)
-        # send e-mail with attached payroll in pdf format
-        sendPayroll(month, year)
-        messages.info(request, r'The pdf file was sending....')
+        if payrollhtml2pdf(month, year):
+            # send e-mail with attached payroll in pdf format
+            sendPayroll(month, year)
+            messages.info(request, r'The pdf file was sending....')
+        else:
+            messages.warning(request, r'Nothing to send...')
 
         return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
 
