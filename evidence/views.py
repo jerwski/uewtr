@@ -293,10 +293,8 @@ class MonthlyPayrollView(View):
 
         if form.is_valid():
             total_work_hours = len(list(workingdays(year, month))) * 8
-
             # create data for payroll as associative arrays for every engaged employee
             payroll = {employee.worker: total_payment(employee.worker_id, year, month) for employee in employees}
-
             # create defaultdict with summary payment
             amountpay = defaultdict(float)
             for item in payroll.values():
