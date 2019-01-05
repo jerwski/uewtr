@@ -282,10 +282,12 @@ class MonthlyPayrollView(View):
         month, year = int(choice_date[0]), int(choice_date[1])
         form = PeriodMonthlyPayrollForm(data={'choice_date':date(year, month,1)})
         employees = EmployeeData.objects.all()
-        employees = employees.exclude(end_contract__lt=date(year, month, 1))
-        query = (year, month + 1, 1)
+        query = (year, month, 1)
+        employees = employees.exclude(end_contract__lt=date(*query))
         if month == 12:
             query = (year + 1, 1, 1)
+        else:
+            query = (year, month + 1, 1)
         employees = employees.exclude(start_contract__gte=date(*query)).order_by('worker')
         context = {'form': form, 'heads': heads, 'employee_id': employee_id,}
 
