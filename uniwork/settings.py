@@ -109,6 +109,10 @@ if socket.gethostname() == 'HOMELAPTOP':
             'USER': get_setting('USER_HL'),
             'PASSWORD': get_setting('PASSWORD_HL'),
             'HOST': '127.0.0.1',
+            # 'NAME': get_setting('NAME_HOME'),
+            # 'USER': get_setting('NAME_HOME'),
+            # 'PASSWORD': get_setting('PASSWORD_HL'),
+            # 'HOST': 'unikolor.home.pl',
             'PORT': '5432',
         }
     }
