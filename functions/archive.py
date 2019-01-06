@@ -1,8 +1,8 @@
 # standard library
 import filecmp
 import pathlib
+from ftplib import FTP
 import http.client as client
-from ftplib import FTP, error_reply
 from shutil import make_archive, unpack_archive, copy2, ExecError
 
 # django core
@@ -30,49 +30,49 @@ def check_internet_connection():
         return False
 
 
-def backup():
+def backup(request):
     '''total backup of data base'''
     path = pathlib.Path(r'backup_json/db.json')
     try:
         with open(path, 'w') as jsonfile:
             call_command('dumpdata', indent=4, stdout=jsonfile)
-    except FileNotFoundError as err:
-        print(f'\nSomething wrong... Error: {err}')
+    except FileNotFoundError as error:
+        messages.error(request, f'Something wrong... Error: {error}')
 
 
-def mkfixture():
+def mkfixture(request):
     '''create fixtures in json format'''
     for model, path in settings.FIXTURE_DIRS.items():
         try:
             with open(path, 'w') as jsonfile:
                 call_command('dumpdata', model, indent=4, stdout=jsonfile)
-        except FileNotFoundError as err:
-            print(f'\nSerialization error: {err}')
+        except FileNotFoundError as error:
+            messages.error(request, f'Serialization error: {error}')
 
 
-def readfixture():
+def readfixture(request):
     '''reading fixtures'''
     for model, path in settings.FIXTURE_DIRS.items():
         try:
             call_command('loaddata', path)
             mymodel = model.split('.')[1]
-            print(f'Base {mymodel} has been updated...\n')
-        except FileNotFoundError as err:
-            print(f'\nNo data => Error code: {err}')
+            messages.info(request, f'Base {mymodel} has been updated...\n')
+        except FileNotFoundError as error:
+            messages.error(request, f'No data => Error code: {error}')
 
 
-def make_archives():
+def make_archives(request):
     '''create compressed in zip format archive file with fixtures'''
     archive_name = pathlib.Path(r'backup_json/zip/wtr_archive')
     root_dir = pathlib.Path(r'backup_json/wtr_archive')
     if list(pathlib.Path.iterdir(root_dir)):
         try:
             make_archive(archive_name, 'zip', root_dir)
-            print('\nThe archive has been packaged...')
+            messages.info(request, f'The archive <<{archive_name.name}>> has been packaged...')
         except FileNotFoundError as err:
-            print(f'\nArchiving has failed => Error code: {err}')
+            messages.error(request, f'Archiving has failed => Error code: {err}')
     else:
-        print(f'\nDirectory {root_dir} is empty...')
+        messages.error(f'Directory {root_dir} is empty...')
 
 
 def get_archives(request):
@@ -87,19 +87,19 @@ def get_archives(request):
     if pathlib.Path.is_file(archive_path):
         try:
             if filecmp.cmp(archtmp_path, archive_path, shallow=False):
-                print('\nThere are no new records in fixtures...\n')
+                messages.error(request, 'There are no new records in fixtures...')
             else:
                 archive_path.unlink()
                 copy2(archtmp_path, arch_dir)
                 unpack_archive(archive_path, dest_path, 'zip')
-                print('The archive has been unpacked...\n')
+                messages.info(request, 'The archive has been unpacked...')
                 readfixture()
         except:
             raise ExecError
     else:
         copy2(archtmp_path, arch_dir)
         unpack_archive(archive_path, dest_path, 'zip')
-        print('The archive has been added and unpacked...\n')
+        messages.info(request, 'The archive has been added and unpacked...')
         readfixture()
 
 
@@ -108,23 +108,27 @@ def uploadFileFTP(request, sourceFilePath:pathlib, destinationDirectory:pathlib,
     if check_internet_connection():
         try:
             with FTP(server, username, password) as myFTP:
-                print(f'\nConnected to FTP...<<{myFTP.host}>>')
+                messages.info(request, f'\nConnected to FTP...<<{myFTP.host}>>')
                 ftpdirs = list(name for name in myFTP.nlst())
                 if destinationDirectory not in ftpdirs:
-                    print(f'\nDestination directory <<{destinationDirectory}>> does not exist...\nCreating a target catalog...')
+                    msg = f'\nDestination directory <<{destinationDirectory}>> does not exist...\nCreating a target catalog...'
+                    messages.info(request, msg)
                     try:
                         myFTP.mkd(destinationDirectory)
-                        print(f'Destination directory <<{destinationDirectory}>> has been created...')
+                        messages.info(request, f'Destination directory <<{destinationDirectory}>> has been created...')
                         myFTP.cwd(destinationDirectory)
                         if pathlib.Path.is_file(sourceFilePath):
                             with open(sourceFilePath, 'rb') as fh:
                                 myFTP.storbinary(f'STOR {sourceFilePath.name}', fh)
-                                print(f'\nThe <<{sourceFilePath.name}>> file has been sent to the directory <<{destinationDirectory}>>\n')
+                                msg = f'The <<{sourceFilePath.name}>> file has been sent to the directory <<{destinationDirectory}>>'
+                                messages.info(request, msg)
                         else:
-                            print('\nNo source file...')
+                            msg = f'File <<{sourceFilePath.name}>> do not exist...'
+                            messages.error(request, msg)
 
                     except:
-                        raise error_reply
+                        msg = f'Destination directory <<{destinationDirectory}>> do not exist...'
+                        messages.error(request, msg)
 
                 else:
                     try:
@@ -132,11 +136,13 @@ def uploadFileFTP(request, sourceFilePath:pathlib, destinationDirectory:pathlib,
                         if pathlib.Path.is_file(sourceFilePath):
                             with open(sourceFilePath, 'rb') as fh:
                                 myFTP.storbinary(f'STOR {sourceFilePath.name}', fh)
-                                print(f'\nFile <<{sourceFilePath.name}>> was sent to the FTP directory <<{destinationDirectory}>>\n')
+                                msg = f'The <<{sourceFilePath.name}>> file has been sent to the directory <<{destinationDirectory}>>'
+                                messages.info(request, msg)
                     except:
-                        raise error_reply
-        except:
-            raise ConnectionError
+                        msg = f'File <<{sourceFilePath.name}>> do not exist...'
+                        messages.error(request, msg)
+        except ConnectionError as error:
+            messages.error(request, f'Connection error: {error}')
     else:
         messages.error(request, r'No internet connection...')
 
@@ -152,12 +158,12 @@ def getFilefromFTP(request, server:str, username:str, password:str):
                         archfile.unlink()
                     myFTP.cwd(r'/unikolor_db/')
                     myFTP.retrbinary(f'RETR {archfile.name}', open(archfile, 'wb').write)
-                    print(f'\nArchive <<{archfile.name}>> successfully imported...')
+                    messages.info(request, f'\nArchive <<{archfile.name}>> successfully imported...')
 
                 except:
-                    raise error_reply
-        except:
-            raise ConnectionError
+                    messages.error(request, f'File <<{archfile.name}>> do not exist...')
+        except ConnectionError as error:
+            messages.error(request, f'Connection error: {error}')
     else:
         messages.error(request, r'No internet connection...')
 

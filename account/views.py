@@ -11,11 +11,11 @@ from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.views.generic import CreateView, View
 
-# from django.contrib.auth.forms import UserCreationForm
-from account.forms import UserCreateForm
-
 # my models
 from employee.models import Employee
+
+# my forms
+from account.forms import UserCreateForm
 
 # my function
 from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, get_archives, check_internet_connection
@@ -60,9 +60,9 @@ def exit(request):
 
     if socket.gethostname() == 'OFFICELAPTOP':
         try:
-            backup()
-            mkfixture()
-            make_archives()
+            backup(request)
+            mkfixture(request)
+            make_archives(request)
             args = (request, archivepath, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
             uploadFileFTP(*args)
 
