@@ -205,11 +205,14 @@ def payrollhtml2pdf(month:int, year:int):
     heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota', 'Niedziela', 'Zaliczka', 'Do wypłaty', 'Data i podpis']
     total_work_hours = len(list(workingdays(year, month))) * 8
     employees = Employee.objects.all()
-    employees = employees.exclude(employeedata__end_contract__lt=date(year, month, 1))
-    query = (year, month + 1, 1)
+    # building complex query for actual list of employee
+    qfirst = (year, month, 1)
     if month == 12:
-        query = (year + 1, 1, 1)
-    employees = employees.exclude(employeedata__start_contract__gte=date(*query)).order_by('surname')
+        qsecond = (year + 1, 1, 1)
+    else:
+        qsecond = (year, month + 1, 1)
+    complex_query = Q(employeedata__end_contract__lt=date(*qfirst))|Q(employeedata__start_contract__gte=date(*qsecond))
+    employees = employees.exclude(complex_query).order_by('surname')
     if employees.exists():
         # create data for payroll as associative arrays for all employees
         payroll = {employee: total_payment(employee.id, year, month) for employee in employees}

@@ -280,17 +280,17 @@ class MonthlyPayrollView(View):
         employees = Employee.objects.all()
         employee_id = employees.filter(employeedata__end_contract__isnull=True, status=True).first()
         employee_id = employee_id.id
-        choice_date = request.POST['choice_date'].split('/')
-        month, year = int(choice_date[0]), int(choice_date[1])
-        form = PeriodMonthlyPayrollForm(data={'choice_date':date(year, month,1)})
-
-        query = (year, month, 1)
-        employees = employees.exclude(employeedata__end_contract__lt=date(*query))
+        choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
+        form = PeriodMonthlyPayrollForm(data={'choice_date':choice_date})
+        # building complex query for actual list of employee
+        month, year = choice_date.month, choice_date.year
+        qfirst = (year, month, 1)
         if month == 12:
-            query = (year + 1, 1, 1)
+            qsecond = (year + 1, 1, 1)
         else:
-            query = (year, month + 1, 1)
-        employees = employees.exclude(employeedata__start_contract__gte=date(*query)).order_by('surname')
+            qsecond = (year, month + 1, 1)
+        complex_query = Q(employeedata__end_contract__lt=date(*qfirst))|Q(employeedata__start_contract__gte=date(*qsecond))
+        employees = employees.exclude(complex_query).order_by('surname')
         context = {'form': form, 'heads': heads, 'employee_id': employee_id,}
 
         if form.is_valid():
