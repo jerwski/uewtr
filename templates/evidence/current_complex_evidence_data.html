@@ -4,16 +4,12 @@
 
 {% block title %}Current data of employee{% endblock %}
 
-{% block head %}
-    {% include 'blocks/header.html' %}
-{% endblock %}
-
 {% block content %}
 <div class="container">
     <div class="row m-3" style="background-color: bisque">
         {% include 'blocks/header.html' %}
         <div class="col-sm-3">
-            <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
+            <p class="text-center text-danger lead font-weight-normal bg-warning">EMPLOYED EMPLOYEES</p>
 
             <table class="table table-sm table-hover">
                 <tbody>
@@ -56,7 +52,7 @@
                                     <table class="table table-sm table-hover">
                                         <tbody>
                                         {% for key, value in holidays.items %}
-                                                        <tr class="font-weight-light font-italic"><td class="text-right text-danger" width="55%">{{ key }}:</td><td class="text-left text-dark">{{ value|date:'d-m-Y (D)' }}</td></tr>
+                                            <tr class="font-weight-light font-italic"><td class="text-right text-danger" width="55%">{{ key }}:</td><td class="text-left text-dark">{{ value|date:'d-m-Y (D)' }}</td></tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>

@@ -204,15 +204,15 @@ def payrollhtml2pdf(month:int, year:int):
     '''convert html file (evidence/monthly_payroll_pdf.html) to pdf file'''
     heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota', 'Niedziela', 'Zaliczka', 'Do wypłaty', 'Data i podpis']
     total_work_hours = len(list(workingdays(year, month))) * 8
-    employees = EmployeeData.objects.all()
-    employees = employees.exclude(end_contract__lt=date(year, month, 1))
+    employees = Employee.objects.all()
+    employees = employees.exclude(employeedata__end_contract__lt=date(year, month, 1))
     query = (year, month + 1, 1)
     if month == 12:
         query = (year + 1, 1, 1)
-    employees = employees.exclude(start_contract__gte=date(*query)).order_by('worker')
+    employees = employees.exclude(employeedata__start_contract__gte=date(*query)).order_by('surname')
     if employees.exists():
         # create data for payroll as associative arrays for all employees
-        payroll = {employee.worker: total_payment(employee.worker_id, year, month) for employee in employees}
+        payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
         # create defaultdict with summary payment
         amountpay = defaultdict(float)
         for item in payroll.values():

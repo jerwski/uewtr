@@ -254,13 +254,14 @@ class MonthlyPayrollView(View):
         month, year = now.month, now.year
         heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours', 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
         form = PeriodMonthlyPayrollForm(initial={'choice_date': now})
-        employee_id = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).first()
+        employees = Employee.objects.all()
+        employee_id = employees.filter(employeedata__end_contract__isnull=True, status=True).first()
         employee_id = employee_id.id
         total_work_hours = len(list(workingdays(year, month))) * 8
-        employees = EmployeeData.objects.exclude(end_contract__lt=date(year, month, 1)).order_by('worker')
+        employees = employees.exclude(employeedata__end_contract__lt=date(year, month, 1)).order_by('surname')
 
         # create data for payroll as associative arrays for every engaged employee
-        payroll = {employee.worker: total_payment(employee.worker_id, year, month) for employee in employees}
+        payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
 
         # create defaultdict with summary payment
         amountpay = defaultdict(float)
@@ -276,25 +277,26 @@ class MonthlyPayrollView(View):
 
     def post(self, request)->render:
         heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours', 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
-        employee_id = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).first()
+        employees = Employee.objects.all()
+        employee_id = employees.filter(employeedata__end_contract__isnull=True, status=True).first()
         employee_id = employee_id.id
         choice_date = request.POST['choice_date'].split('/')
         month, year = int(choice_date[0]), int(choice_date[1])
         form = PeriodMonthlyPayrollForm(data={'choice_date':date(year, month,1)})
-        employees = EmployeeData.objects.all()
+
         query = (year, month, 1)
-        employees = employees.exclude(end_contract__lt=date(*query))
+        employees = employees.exclude(employeedata__end_contract__lt=date(*query))
         if month == 12:
             query = (year + 1, 1, 1)
         else:
             query = (year, month + 1, 1)
-        employees = employees.exclude(start_contract__gte=date(*query)).order_by('worker')
+        employees = employees.exclude(employeedata__start_contract__gte=date(*query)).order_by('surname')
         context = {'form': form, 'heads': heads, 'employee_id': employee_id,}
 
         if form.is_valid():
             total_work_hours = len(list(workingdays(year, month))) * 8
             # create data for payroll as associative arrays for every engaged employee
-            payroll = {employee.worker: total_payment(employee.worker_id, year, month) for employee in employees}
+            payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
             # create defaultdict with summary payment
             amountpay = defaultdict(float)
             for item in payroll.values():
@@ -426,9 +428,7 @@ class EmployeeCurrentComplexDataView(View):
         month, year = choice_date.month, choice_date.year
         form = PeriodCurrentComplexDataForm(initial={'choice_date': choice_date})
         worker = Employee.objects.get(id=employee_id)
-        employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
-        active_worker = employees.first()
-        active_worker = active_worker.id
+        employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
         holidays = holiday(year)
         leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
         month_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year, leave_date__month=month)
@@ -436,9 +436,8 @@ class EmployeeCurrentComplexDataView(View):
         month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
         year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 
-        context = {'form': form, 'worker': worker, 'active_worker': active_worker,
-                   'employee_id': employee_id, 'employees': employees, 'choice_date': choice_date,
-                   'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays}
+        context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'choice_date': choice_date,
+                   'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays}
 
         employee_total_data(month, year, employee_id, context)
 
@@ -447,11 +446,8 @@ class EmployeeCurrentComplexDataView(View):
     def post(self, request, employee_id:int)->render:
         choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
         form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
-        # form = PeriodCurrentComplexDataForm(data=request.POST)
         worker = Employee.objects.get(id=employee_id)
-        employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
-        active_worker = employees.first()
-        active_worker = active_worker.id
+        employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
 
         if form.is_valid():
             data = form.cleaned_data
@@ -464,14 +460,12 @@ class EmployeeCurrentComplexDataView(View):
             month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
             year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 
-            context = {'form': form, 'worker': worker, 'active_worker': active_worker,
-                       'employee_id': employee_id, 'employees': employees, 'choice_date': choice_date,
-                       'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays}
+            context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'choice_date': choice_date,
+                       'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays}
 
             employee_total_data(month, year, employee_id, context)
 
-            return render(request, r'evidence/current_complex_evidence_data.html', context)
-
         else:
-            context = {'form': form, 'worker': worker, 'active_worker': active_worker, 'employee_id': employee_id}
-            return render(request, r'evidence/current_complex_evidence_data.html', context)
+            context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees}
+
+        return render(request, r'evidence/current_complex_evidence_data.html', context)
