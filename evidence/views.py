@@ -282,6 +282,7 @@ class MonthlyPayrollView(View):
         employee_id = employee_id.id
         choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
         form = PeriodMonthlyPayrollForm(data={'choice_date':choice_date})
+
         # building complex query for actual list of employee
         month, year = choice_date.month, choice_date.year
         qfirst = (year, month, 1)
