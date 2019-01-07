@@ -18,7 +18,7 @@ from employee.models import Employee
 from account.forms import UserCreateForm
 
 # my function
-from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, get_archives, check_internet_connection
+from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection
 
 
 # Create your views here.
@@ -37,7 +37,8 @@ class AdminView(View):
         if request.user.is_superuser or request.user.is_staff:
             user = request.user.username
             if socket.gethostname() == 'HOMELAPTOP':
-                get_archives(request)
+                args = (request, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
+                getArchiveFilefromFTP(*args)
             employee = Employee.objects.filter(status=True).first()
             if employee:
                 employee_id = employee.id
@@ -59,9 +60,9 @@ def exit(request):
 
     if socket.gethostname() == 'OFFICELAPTOP':
         try:
-            backup(request)
-            mkfixture(request)
-            make_archives(request)
+            backup()
+            mkfixture()
+            make_archives()
             args = (request, archivepath, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
             uploadFileFTP(*args)
 
