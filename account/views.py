@@ -1,6 +1,6 @@
 # standard library
 import socket
-import pathlib
+from pathlib import Path
 
 # django library
 from django.conf import settings
@@ -54,26 +54,27 @@ class AdminView(View):
 
 def exit(request):
     '''backups features and exit from the application'''
-    pdfdir = pathlib.Path(r'templates/pdf')
-    archivepath = pathlib.Path(r'backup_json/zip/wtr_archive.zip')
-
-    if socket.gethostname() == 'OFFICELAPTOP':
-        try:
-            backup()
-            mkfixture()
-            make_archives()
-            args = (archivepath, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
-            uploadFileFTP(*args)
-
-        except ConnectionError as ce:
-            print(f'Connection error => Error code: {ce}')
-
-    if request.user.is_authenticated:
-        for file in pathlib.Path.iterdir(pdfdir):
-            file.unlink()
-        logout(request)
+    pdfdir = Path(r'templates/pdf')
 
     if check_internet_connection():
+
+        if socket.gethostname() == 'OFFICELAPTOP':
+            try:
+                backup()
+                mkfixture()
+                make_archives()
+                args = (settings.ARCHIVE_PATH, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
+                uploadFileFTP(*args)
+
+            except ConnectionError as error:
+                print(f'Connection error... Error code: {error}')
+
+        if request.user.is_authenticated:
+            for file in Path.iterdir(pdfdir):
+                file.unlink()
+            logout(request)
+
         return HttpResponseRedirect(r'https://www.google.pl/')
+
     else:
         return render(request, '500.html', {'error': ConnectionError.filename})
