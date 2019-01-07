@@ -1,9 +1,8 @@
 # standard library
-import filecmp
+from ftplib import FTP
 from pathlib import Path
 import http.client as client
-from ftplib import FTP, error_reply
-from shutil import make_archive, unpack_archive, copy2, ExecError
+from shutil import make_archive, unpack_archive
 
 # django core
 from django.conf import settings
