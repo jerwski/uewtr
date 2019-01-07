@@ -37,8 +37,7 @@ class AdminView(View):
         if request.user.is_superuser or request.user.is_staff:
             user = request.user.username
             if socket.gethostname() == 'HOMELAPTOP':
-                args = (request, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
-                getArchiveFilefromFTP(*args)
+                getArchiveFilefromFTP(request, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
             employee = Employee.objects.filter(status=True).first()
             if employee:
                 employee_id = employee.id
