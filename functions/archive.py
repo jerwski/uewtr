@@ -19,10 +19,10 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 
 # archives paths
-arch_dir = Path(r'backup_json/zip')
-archive_root = Path(r'backup_json/db.json')
-dest_path = Path(r'backup_json/wtr_archive')
-archive_path = Path(r'backup_json/zip/wtr_archive.zip')
+arch_dir = settings.ARCH_DIR
+archive_root = settings.ARCHIVE_ROOT
+dest_path = settings.DEST_PATH
+archive_path = settings.ARCHIVE_PATH
 
 
 def check_internet_connection():

@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 import json
 import socket
-import pathlib
+from pathlib import Path
 
 # django core
 from django.contrib import admin
@@ -25,7 +25,7 @@ from django.core.exceptions import ImproperlyConfigured
 # read enviroment settings
 def get_setting(setting):
     try:
-        with open(pathlib.Path('mysetting.json'),'r') as file:
+        with open(Path('mysetting.json'),'r') as file:
             data = json.loads(file.read())
         return data[setting]
     except KeyError:
@@ -159,7 +159,7 @@ USE_TZ = get_setting('USE_TZ')
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = get_setting('STATIC_URL')
-STATICFILES_DIRS = [pathlib.Path('static')]
+STATICFILES_DIRS = [Path('static')]
 LOGIN_URL = get_setting('LOGIN_URL')
 LOGIN_REDIRECT_URL = 'account:admin_site'
 LOGOUT_REDIRECT_URL = 'login'
@@ -174,12 +174,18 @@ EMAIL_PORT = get_setting('EMAIL_PORT')
 ADMIN_EMAIL = get_setting('ADMIN_EMAIL')
 
 # fixture directory
-FIXTURE_DIRS = {'employee.Employee': pathlib.Path(get_setting('employee')),
-                'employee.EmployeeData': pathlib.Path(get_setting('employee_extend')),
-                'evidence.WorkEvidence': pathlib.Path(get_setting('workevidence')),
-                'evidence.EmployeeLeave': pathlib.Path(get_setting('employee_leave')),
-                'evidence.AccountPayment': pathlib.Path(get_setting('account')),
-                'employee.EmployeeHourlyRate': pathlib.Path(get_setting('employee_hourly_rate'))}
+FIXTURE_DIRS = {'employee.Employee': Path(get_setting('employee')),
+                'employee.EmployeeData': Path(get_setting('employee_extend')),
+                'evidence.WorkEvidence': Path(get_setting('workevidence')),
+                'evidence.EmployeeLeave': Path(get_setting('employee_leave')),
+                'evidence.AccountPayment': Path(get_setting('account')),
+                'employee.EmployeeHourlyRate': Path(get_setting('employee_hourly_rate'))}
+
+# archives paths
+ARCH_DIR = Path(get_setting('arch_dir'))
+DEST_PATH = Path(get_setting('dest_path'))
+ARCHIVE_ROOT = Path(get_setting('archive_root'))
+ARCHIVE_PATH = Path(get_setting('archive_path'))
 
 # FTP
 FTP = get_setting('FTP')
