@@ -38,7 +38,6 @@ class AdminView(View):
             user = request.user.username
             if socket.gethostname() == 'HOMELAPTOP':
                 get_archives(request)
-
             employee = Employee.objects.filter(status=True).first()
             if employee:
                 employee_id = employee.id

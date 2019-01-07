@@ -1,8 +1,8 @@
 # standard library
 import filecmp
 import pathlib
-from ftplib import FTP
 import http.client as client
+from ftplib import FTP, error_reply
 from shutil import make_archive, unpack_archive, copy2, ExecError
 
 # django core
@@ -93,14 +93,14 @@ def get_archives(request):
                 copy2(archtmp_path, arch_dir)
                 unpack_archive(archive_path, dest_path, 'zip')
                 messages.info(request, 'The archive has been unpacked...')
-                readfixture()
+                readfixture(request)
         except:
             raise ExecError
     else:
         copy2(archtmp_path, arch_dir)
         unpack_archive(archive_path, dest_path, 'zip')
         messages.info(request, 'The archive has been added and unpacked...')
-        readfixture()
+        readfixture(request)
 
 
 def uploadFileFTP(request, sourceFilePath:pathlib, destinationDirectory:pathlib, server:str, username:str, password:str):
@@ -108,41 +108,33 @@ def uploadFileFTP(request, sourceFilePath:pathlib, destinationDirectory:pathlib,
     if check_internet_connection():
         try:
             with FTP(server, username, password) as myFTP:
-                messages.info(request, f'\nConnected to FTP...<<{myFTP.host}>>')
+                print('\nConnected to FTP...<<{}>>'.format(myFTP.host))
                 ftpdirs = list(name for name in myFTP.nlst())
                 if destinationDirectory not in ftpdirs:
-                    msg = f'\nDestination directory <<{destinationDirectory}>> does not exist...\nCreating a target catalog...'
-                    messages.info(request, msg)
+                    print(f'\nDestination directory <<{destinationDirectory}>> does not exist...\nCreating a target catalog...')
                     try:
                         myFTP.mkd(destinationDirectory)
-                        messages.info(request, f'Destination directory <<{destinationDirectory}>> has been created...')
+                        print(f'Destination directory <<{destinationDirectory}>> has been created...')
                         myFTP.cwd(destinationDirectory)
                         if pathlib.Path.is_file(sourceFilePath):
                             with open(sourceFilePath, 'rb') as fh:
-                                myFTP.storbinary(f'STOR {sourceFilePath.name}', fh)
-                                msg = f'The <<{sourceFilePath.name}>> file has been sent to the directory <<{destinationDirectory}>>'
-                                messages.info(request, msg)
+                                myFTP.storbinary('STOR {}'.format(sourceFilePath.name), fh)
+                                print(f'\nThe <<{sourceFilePath.name}>> file has been sent to the directory <<{destinationDirectory}>>\n')
                         else:
-                            msg = f'File <<{sourceFilePath.name}>> do not exist...'
-                            messages.error(request, msg)
-
+                            print('\nNo source file...')
                     except:
-                        msg = f'Destination directory <<{destinationDirectory}>> do not exist...'
-                        messages.error(request, msg)
-
+                        raise error_reply
                 else:
                     try:
                         myFTP.cwd(destinationDirectory)
                         if pathlib.Path.is_file(sourceFilePath):
                             with open(sourceFilePath, 'rb') as fh:
-                                myFTP.storbinary(f'STOR {sourceFilePath.name}', fh)
-                                msg = f'The <<{sourceFilePath.name}>> file has been sent to the directory <<{destinationDirectory}>>'
-                                messages.info(request, msg)
+                                myFTP.storbinary('STOR {}'.format(sourceFilePath.name), fh)
+                                print(f'\nFile <<{sourceFilePath.name}>> was sent to the FTP directory <<{destinationDirectory}>>\n')
                     except:
-                        msg = f'File <<{sourceFilePath.name}>> do not exist...'
-                        messages.error(request, msg)
-        except ConnectionError as error:
-            messages.error(request, f'Connection error: {error}')
+                        raise error_reply
+        except:
+            raise ConnectionError
     else:
         messages.error(request, r'No internet connection...')
 
@@ -157,9 +149,11 @@ def getFilefromFTP(request, server:str, username:str, password:str):
                     if pathlib.Path.is_file(archfile):
                         archfile.unlink()
                     myFTP.cwd(r'/unikolor_db/')
+                    size = myFTP.size(r'wtr_archive.zip')
+                    # TODO: dopracować funkcję sprawdzającą sens sciągania pliku wtr_archive.zip z ftp
+                    print(size)
                     myFTP.retrbinary(f'RETR {archfile.name}', open(archfile, 'wb').write)
                     messages.info(request, f'\nArchive <<{archfile.name}>> successfully imported...')
-
                 except:
                     messages.error(request, f'File <<{archfile.name}>> do not exist...')
         except ConnectionError as error:
