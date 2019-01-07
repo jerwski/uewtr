@@ -150,7 +150,6 @@ def getFilefromFTP(request, server:str, username:str, password:str):
                         archfile.unlink()
                     myFTP.cwd(r'/unikolor_db/')
                     size = myFTP.size(r'wtr_archive.zip')
-                    # TODO: dopracować funkcję sprawdzającą sens sciągania pliku wtr_archive.zip z ftp
                     print(size)
                     myFTP.retrbinary(f'RETR {archfile.name}', open(archfile, 'wb').write)
                     messages.info(request, f'\nArchive <<{archfile.name}>> successfully imported...')
