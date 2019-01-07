@@ -1,6 +1,6 @@
 # standard library
 import os
-import pathlib
+from pathlib import Path
 from collections import defaultdict
 from datetime import date, datetime
 
@@ -221,7 +221,7 @@ class LeavesDataPrintView(View):
         # convert html file (evidence/leaves_data.html) to pdf file
         year = int(request.POST['leave_year'])
         leavehtml2pdf(employee_id, year)
-        file = pathlib.Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/leaves_data_{employee_id}.pdf')
+        file = Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/leaves_data_{employee_id}.pdf')
         try:
             os.popen(f'explorer.exe "file:///{file}"')
             messages.info(request, r'File leaves_data.pdf file was sending to browser....')
@@ -318,7 +318,7 @@ class MonthlyPayrollPrintView(View):
     def get(self, request, month:int, year:int)->HttpResponseRedirect:
         # convert html file (evidence/monthly_payroll_pdf.html) to .pdf file
         if payrollhtml2pdf(month, year):
-            file = pathlib.Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/payroll_{month}_{year}.pdf')
+            file = Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/payroll_{month}_{year}.pdf')
             try:
                 os.popen(f'explorer.exe "file:///{file}"')
                 messages.info(request, f'File payroll_{month}_{year}.pdf file was sending to browser....')
