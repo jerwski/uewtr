@@ -1,5 +1,5 @@
 # standard library
-import pathlib
+from pathlib import Path
 from datetime import date, datetime, timedelta
 
 # django library
@@ -54,7 +54,7 @@ def holiday(year:int)->dict:
 def sendPayroll(month:int, year:int):
     '''send e-mail with attached payroll in pdf format'''
     try:
-        file = pathlib.Path(f'templates/pdf/payroll_{month}_{year}.pdf')
+        file = Path(f'templates/pdf/payroll_{month}_{year}.pdf')
         subject = f'payrol for {month}/{year} r.'
         message = f'Payroll in attachment {month}-{year}...'
         email = EmailMessage(subject,message,settings.EMAIL_HOST_USER,['projekt@unikolor.com'])
@@ -67,7 +67,7 @@ def sendPayroll(month:int, year:int):
 def sendLeavesData(employee_id:int):
     '''send e-mail with attached leave data in pdf format for specific employee'''
     try:
-        file = pathlib.Path(f'templates/pdf/leaves_data_{employee_id}.pdf')
+        file = Path(f'templates/pdf/leaves_data_{employee_id}.pdf')
         employee = Employee.objects.get(pk=employee_id)
         subject = f'list of leave for {employee} ({date.today().year})r.'
         message = f'List of leave in attachment {employee} za {date.today().year}r.'
