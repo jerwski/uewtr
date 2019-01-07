@@ -79,7 +79,7 @@ def make_archives():
         print(f'Directory {dest_path} is empty...')
 
 
-def uploadFileFTP(request, sourceFilePath, destinationDirectory, server:str, username:str, password:str):
+def uploadFileFTP(sourceFilePath, destinationDirectory, server:str, username:str, password:str):
     '''sending compressed in zip format archive file with fixtures on ftp server'''
     if check_internet_connection():
         try:
@@ -112,7 +112,7 @@ def uploadFileFTP(request, sourceFilePath, destinationDirectory, server:str, use
         except ConnectionRefusedError as error:
             print(f'\nError code: {error}')
     else:
-        messages.error(request, r'No internet connection...')
+        print(r'No internet connection...')
 
 
 def getArchiveFilefromFTP(request, server:str, username:str, password:str):
@@ -154,7 +154,7 @@ def export_as_json(modeladmin, request, queryset):
     path = Path(f'backup_json/{opts.verbose_name}.json')
     with open(path, 'w') as file:
         serializers.serialize('json', queryset, indent=4, stream=file)
-    messages.success(request, f'Rekordy zapisane do pliku {opts.verbose_name}')
+    messages.success(request, f'Selected records have been serialized to <<{opts.verbose_name}>>')
 
 
 # archiving of delete records
