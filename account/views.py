@@ -63,7 +63,7 @@ def exit(request):
                 backup()
                 mkfixture()
                 make_archives()
-                args = (settings.ARCHIVE_PATH, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
+                args = (settings.ARCHIVE_FILE, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
                 uploadFileFTP(*args)
 
             except ConnectionError as error:

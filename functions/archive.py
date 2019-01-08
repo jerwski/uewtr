@@ -20,9 +20,10 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # archives paths
 arch_dir = settings.ARCH_DIR
-archive_root = settings.ARCHIVE_ROOT
 dest_path = settings.DEST_PATH
-archive_path = settings.ARCHIVE_PATH
+archive_root = settings.ARCHIVE_ROOT
+archive_name = settings.ARCHIVE_NAME
+archive_file = settings.ARCHIVE_FILE
 
 
 def check_internet_connection():
@@ -71,8 +72,8 @@ def make_archives():
     '''create compressed in zip format archive file with fixtures'''
     if list(Path.iterdir(dest_path)):
         try:
-            make_archive(archive_path, 'zip', dest_path)
-            print(f'The archive <<{archive_path.name}>> has been packaged...')
+            make_archive(archive_name, 'zip', dest_path)
+            print(f'The archive <<{archive_file.name}>> has been packaged...')
         except FileNotFoundError as error:
             print(f'Archiving has failed => Error code: {error}')
     else:
@@ -84,8 +85,9 @@ def uploadFileFTP(sourceFilePath, destinationDirectory, server:str, username:str
     if check_internet_connection():
         try:
             with FTP(server, username, password) as myFTP:
-                print('\nConnected to FTP...<<{}>>'.format(myFTP.host))
+                print(f'\nConnected to FTP...<<{myFTP.host}>>')
                 ftpdirs = list(name for name in myFTP.nlst())
+
                 if destinationDirectory not in ftpdirs:
                     print(f'\nDestination directory <<{destinationDirectory}>> does not exist...\nCreating a target catalog...')
                     try:
@@ -93,8 +95,8 @@ def uploadFileFTP(sourceFilePath, destinationDirectory, server:str, username:str
                         print(f'Destination directory <<{destinationDirectory}>> has been created...')
                         myFTP.cwd(destinationDirectory)
                         if Path.is_file(sourceFilePath):
-                            with open(sourceFilePath, 'rb') as fh:
-                                myFTP.storbinary('STOR {}'.format(sourceFilePath.name), fh)
+                            with open(sourceFilePath, 'rb') as file:
+                                myFTP.storbinary(f'STOR {sourceFilePath.name}', file)
                                 print(f'\nThe <<{sourceFilePath.name}>> file has been sent to the directory <<{destinationDirectory}>>\n')
                         else:
                             print('\nNo source file...')
@@ -104,8 +106,8 @@ def uploadFileFTP(sourceFilePath, destinationDirectory, server:str, username:str
                     try:
                         myFTP.cwd(destinationDirectory)
                         if Path.is_file(sourceFilePath):
-                            with open(sourceFilePath, 'rb') as fh:
-                                myFTP.storbinary('STOR {}'.format(sourceFilePath.name), fh)
+                            with open(sourceFilePath, 'rb') as file:
+                                myFTP.storbinary(f'STOR {sourceFilePath.name}', file)
                                 print(f'\nFile <<{sourceFilePath.name}>> was sent to the FTP directory <<{destinationDirectory}>>\n')
                     except ConnectionRefusedError as error:
                         print(f'\nError code: {error}')
@@ -121,27 +123,27 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str):
         try:
             with FTP(server, username, password) as myFTP:
                 myFTP.cwd(r'/unikolor_db/')
-                if Path.is_file(archive_path) and myFTP.size(archive_path.name) != archive_path.stat().st_size:
+                if Path.is_file(archive_file) and myFTP.size(archive_file.name) != archive_file.stat().st_size:
                     try:
-                        archive_path.unlink()
-                        myFTP.retrbinary(f'RETR {archive_path.name}', open(archive_path, 'wb').write)
-                        messages.info(request, f'\nArchive <<{archive_path.name}>> successfully imported...')
-                        unpack_archive(archive_path, dest_path, 'zip')
+                        archive_file.unlink()
+                        myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
+                        messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
+                        unpack_archive(archive_file, dest_path, 'zip')
                         messages.info(request, 'The archive has been unpacked...')
                         readfixture(request)
                     except:
-                        messages.error(request, f'File <<{archive_path.name}>> do not exist...')
-                elif not Path.is_file(archive_path):
+                        messages.error(request, f'File <<{archive_file.name}>> do not exist...')
+                elif not Path.is_file(archive_file):
                     try:
-                        myFTP.retrbinary(f'RETR {archive_path.name}', open(archive_path, 'wb').write)
-                        messages.info(request, f'\nArchive <<{archive_path.name}>> successfully imported...')
-                        unpack_archive(archive_path, dest_path, 'zip')
+                        myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
+                        messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
+                        unpack_archive(archive_file, dest_path, 'zip')
                         messages.info(request, 'The archive has been added and unpacked...')
                         readfixture(request)
                     except:
-                        messages.error(request, f'File <<{archive_path.name}>> do not exist...')
+                        messages.error(request, f'File <<{archive_file.name}>> do not exist...')
                 else:
-                    messages.info(request, f'\nThe file <<{archive_path.name}>> has already been downloaded...')
+                    messages.info(request, f'\nThe file <<{archive_file.name}>> has already been downloaded...')
         except ConnectionError as error:
             messages.error(request, f'Connection error: {error}')
     else:

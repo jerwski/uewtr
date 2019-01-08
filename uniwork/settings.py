@@ -185,7 +185,8 @@ FIXTURE_DIRS = {'employee.Employee': Path(get_setting('employee')),
 ARCH_DIR = Path(get_setting('arch_dir'))
 DEST_PATH = Path(get_setting('dest_path'))
 ARCHIVE_ROOT = Path(get_setting('archive_root'))
-ARCHIVE_PATH = Path(get_setting('archive_path'))
+ARCHIVE_FILE = Path(get_setting('archive_file'))
+ARCHIVE_NAME = Path(get_setting('archive_name'))
 
 # FTP
 FTP = get_setting('FTP')
