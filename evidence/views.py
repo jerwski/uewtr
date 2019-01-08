@@ -1,5 +1,6 @@
 # standard library
 import os
+import calendar
 from pathlib import Path
 from collections import defaultdict
 from datetime import date, datetime
@@ -283,15 +284,11 @@ class MonthlyPayrollView(View):
         choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
         form = PeriodMonthlyPayrollForm(data={'choice_date':choice_date})
 
-        # building complex query for actual list of employee
-        month, year = choice_date.month, choice_date.year
-        qfirst = (year, month, 1)
-        if month == 12:
-            qsecond = (year + 1, 1, 1)
-        else:
-            qsecond = (year, month + 1, 1)
-        complex_query = Q(employeedata__end_contract__lt=date(*qfirst))|Q(employeedata__start_contract__gte=date(*qsecond))
-        employees = employees.exclude(complex_query).order_by('surname')
+        # building query for actual list of employee
+        year, month = choice_date.year, choice_date.month
+        day = calendar.monthrange(year, month)[1]
+        query = Q(employeedata__end_contract__lt=date(year,month,1))|Q(employeedata__start_contract__gt=date(year,month,day))
+        employees = employees.exclude(query).order_by('surname')
         context = {'form': form, 'heads': heads, 'employee_id': employee_id,}
 
         if form.is_valid():

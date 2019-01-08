@@ -22,11 +22,10 @@ from functions.myfunctions import holiday
 
 
 def worker_rate(employee_id:int, year:int, month:int)->float:
-    worker = Employee.objects.get(id=employee_id)
-    query = Q(worker=worker) & Q(update__year__lte=year) & Q(update__month__lt=month)
-    rate = EmployeeHourlyRate.objects.filter(query).last()
+    day = calendar.monthrange(year, month)
+    rate = EmployeeHourlyRate.objects.filter(worker_id=employee_id, update__lte=date(year, month,day[1])).last()
     if rate is None:
-        rate=EmployeeHourlyRate.objects.filter(worker=worker).earliest('hourly_rate')
+        rate=EmployeeHourlyRate.objects.filter(worker_id=employee_id).earliest('hourly_rate')
         rate = rate.hourly_rate
     else:
         rate = rate.hourly_rate
@@ -206,13 +205,9 @@ def payrollhtml2pdf(month:int, year:int):
     total_work_hours = len(list(workingdays(year, month))) * 8
     employees = Employee.objects.all()
     # building complex query for actual list of employee
-    qfirst = (year, month, 1)
-    if month == 12:
-        qsecond = (year + 1, 1, 1)
-    else:
-        qsecond = (year, month + 1, 1)
-    complex_query = Q(employeedata__end_contract__lt=date(*qfirst))|Q(employeedata__start_contract__gte=date(*qsecond))
-    employees = employees.exclude(complex_query).order_by('surname')
+    day = calendar.monthrange(year, month)[1]
+    query = Q(employeedata__end_contract__lt=date(year,month,1))|Q(employeedata__start_contract__gt=date(year,month,day))
+    employees = employees.exclude(query).order_by('surname')
     if employees.exists():
         # create data for payroll as associative arrays for all employees
         payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
