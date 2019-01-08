@@ -34,9 +34,9 @@ def worker_rate(employee_id:int, year:int, month:int)->float:
 
 def workingdays(year:int, month:int):
     '''return quanity of working days in a given year and month'''
-    t = calendar.monthrange(year, month)
+    day = calendar.monthrange(year, month)[1]
     start = date(year, month, 1)
-    stop = date(start.year, start.month, t[1])
+    stop = date(start.year, start.month, day)
     while start <= stop:
         if start.weekday() < 5 and start not in holiday(year).values():
             yield start

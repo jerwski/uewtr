@@ -80,7 +80,7 @@ def make_archives():
         print(f'Directory {dest_path} is empty...')
 
 
-def uploadFileFTP(sourceFilePath, destinationDirectory, server:str, username:str, password:str):
+def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, username:str, password:str):
     '''sending compressed in zip format archive file with fixtures on ftp server'''
     if check_internet_connection():
         try:
