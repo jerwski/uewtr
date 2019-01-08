@@ -1,5 +1,9 @@
 <!-- Modal for data to will be erase if you want -->
+{% if leave_set %}
     <button id="leaveButton" type="button" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#leaveModal">Print leave data</button>
+{% else %}
+    <button id="leaveButton" type="button" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#leaveModal" disabled>No leave data</button>
+{% endif %}
 
     <!-- Modal -->
     <div class="modal fade" id="leaveModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
