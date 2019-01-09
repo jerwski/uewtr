@@ -225,7 +225,7 @@ class LeavesDataPrintView(View):
         # convert html file (evidence/leaves_data.html) to pdf file
         year = int(request.POST['leave_year'])
         leavehtml2pdf(employee_id, year)
-        file = Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/leaves_data_{employee_id}.pdf')
+        file = Path.cwd().joinpath(f'templates/pdf/leaves_data_{employee_id}.pdf')
         try:
             os.popen(f'explorer.exe "file:///{file}"')
             messages.info(request, r'File leaves_data.pdf file was sending to browser....')
