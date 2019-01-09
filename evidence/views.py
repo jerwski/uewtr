@@ -90,7 +90,7 @@ class WorkingTimeRecorderView(View):
                     messages.success(request, f'Succesful register new time working for {worker}')
                     employee_total_data(employee_id, year, month, context)
 
-            elif start_work <= end_work:
+            elif start_work == end_work:
                 msg = f'Start working ({start_work}) is the same like end working ({end_work}). Please correct it...'
                 messages.error(request, msg)
             else:
