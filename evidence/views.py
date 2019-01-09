@@ -446,14 +446,12 @@ class EmployeeCurrentComplexDataView(View):
 
     def post(self, request, employee_id:int)->render:
         choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
+        month, year = choice_date.month, choice_date.year
         form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
 
         if form.is_valid():
-            data = form.cleaned_data
-            choice_date = data['choice_date']
-            month, year = choice_date.month, choice_date.year
             leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
             holidays = holiday(year)
             month_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year, leave_date__month=month)

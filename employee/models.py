@@ -54,9 +54,6 @@ class Employee(models.Model):
     def employee_complex_data(self):
         return reverse('evidence:employee_complex_data', args=[self.id])
 
-    def employee_data_set(self):
-        return reverse('evidence:employee_data_set', args=[self.id])
-
 
 class EmployeeData(models.Model):
     '''class representing an extented data table of employee'''
