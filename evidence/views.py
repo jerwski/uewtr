@@ -318,7 +318,7 @@ class MonthlyPayrollPrintView(View):
     def get(self, request, month:int, year:int)->HttpResponseRedirect:
         # convert html file (evidence/monthly_payroll_pdf.html) to .pdf file
         if payrollhtml2pdf(month, year):
-            file = Path(f'C:/Users/kopia/Desktop/UniApps/uniwork/templates/pdf/payroll_{month}_{year}.pdf')
+            file = Path().cwd().joinpath(f'templates/pdf/payroll_{month}_{year}.pdf')
             try:
                 os.popen(f'explorer.exe "file:///{file}"')
                 messages.info(request, f'File payroll_{month}_{year}.pdf file was sending to browser....')
