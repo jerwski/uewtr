@@ -74,8 +74,9 @@ class WorkingTimeRecorderView(View):
             # check or data exisiting in WorkEvidence and EmployeeLeave table
             check_leave = {'worker': worker, 'leave_date': start_work.date(),}
             flag_leave = EmployeeLeave.objects.filter(**check_leave).exists()
-            query = Q(worker=worker) & Q(start_work__year=year) & Q(start_work__month=month) & Q(start_work__day=start_work.day) & Q(end_work__day=end_work.day)
-            flag_work = WorkEvidence.objects.filter(query).exists()
+            mainquery = Q(worker=worker) & Q(start_work__year=year) & Q(start_work__month=month)
+            workquery = Q(start_work__day=start_work.day) & Q(end_work__day=end_work.day)
+            flag_work = WorkEvidence.objects.filter(mainquery&workquery).exists()
 
             if start_work < end_work:
 
@@ -163,7 +164,7 @@ class LeaveTimeRecorderView(View):
                 if date_holiday == leave_date:
                     name_holiday = name
 
-            query = Q(worker=worker) & Q(start_work__year=leave_date.year) & Q(start_work__month=leave_date.month) & Q(start_work__day=leave_date.day)
+            query = Q(worker=worker) & Q(start_work__date=leave_date)
             flag_work = WorkEvidence.objects.filter(query).exists()
 
             if flag_leave or flag_work:
@@ -256,7 +257,8 @@ class MonthlyPayrollView(View):
     def get(self, request)->render:
         now = date.today()
         month, year = now.month, now.year
-        heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours', 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
+        heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
+                 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
         form = PeriodMonthlyPayrollForm(initial={'choice_date': now})
         employees = Employee.objects.all()
         employee_id = employees.filter(employeedata__end_contract__isnull=True, status=True).first()
@@ -280,7 +282,8 @@ class MonthlyPayrollView(View):
         return render(request, 'evidence/monthly_payroll.html', context)
 
     def post(self, request)->render:
-        heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours', 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
+        heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
+                 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
         employees = Employee.objects.all()
         employee_id = employees.filter(employeedata__end_contract__isnull=True, status=True).first()
         employee_id = employee_id.id
@@ -378,6 +381,7 @@ class AccountPaymentView(View):
             data = form.cleaned_data
             data.__setitem__('worker', worker)
             account_date, account_value = data['account_date'], float(data['account_value'])
+            year, month = account_date.year, account_date.month
             context.__setitem__('account_date', account_date)
             context.__setitem__('account_value', account_value)
 
@@ -385,7 +389,7 @@ class AccountPaymentView(View):
             salary = total_payment(employee_id, account_date.year, account_date.month)
             salary = salary['brutto']
             context.__setitem__('salary', salary)
-            query = Q(worker=worker) & Q(account_date__year=account_date.year) & Q(account_date__month=account_date.month)
+            query = Q(worker=worker) & Q(account_date__year=year) & Q(account_date__month=month)
             advances = AccountPayment.objects.filter(query).aggregate(ap=Sum('account_value'))
             if advances['ap'] is None:
                 advances = account_value
