@@ -23,7 +23,7 @@ from functions.myfunctions import holiday
 
 def worker_rate(employee_id:int, year:int, month:int)->float:
     day = calendar.monthrange(year, month)
-    rate = EmployeeHourlyRate.objects.filter(worker_id=employee_id, update__lte=date(year, month,day[1])).last()
+    rate = EmployeeHourlyRate.objects.filter(worker_id=employee_id, update__lte=date(year, month, day[1])).last()
     if rate is None:
         rate=EmployeeHourlyRate.objects.filter(worker_id=employee_id).earliest('hourly_rate')
         rate = rate.hourly_rate
@@ -44,37 +44,50 @@ def workingdays(year:int, month:int):
 
 
 def saturday_payment(employee_id:int, year:int, month:int)->float:
-    '''returns the employee's income for worked Saturdays in a given year and month'''
+    '''returns the employee's income for worked Saturdays without Holidays in a given year and month'''
+    satpay = 0
     rate= worker_rate(employee_id, year, month)
-    query = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month) & Q(start_work__week_day=7) & (Q(end_work__week_day=7) | Q(end_work__week_day=1))
-    saturday_hours = WorkEvidence.objects.filter(query)
-    if saturday_hours:
-        # satpay => remuneration for work on Saturday
+    holidays = holiday(year).values()
+    mainquery = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month)
+    saturdaysquery = Q(start_work__week_day=7) & (Q(end_work__week_day=7) | Q(end_work__week_day=1))
+    exclude_holidays = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
+    saturday_hours = WorkEvidence.objects.filter(mainquery&saturdaysquery).exclude(exclude_holidays)
+    if saturday_hours.exists():
+        # satpay => remuneration for work on Saturday without Holidays
         satpay = saturday_hours.aggregate(sh=Sum('jobhours') * rate)
         satpay = satpay['sh']
-    else:
-        satpay = 0
     return satpay
 
 
 def sunday_payment(employee_id:int, year:int, month:int)->float:
-    '''returns the employee's income for worked Sundays in a given year and month'''
-    sunpay, holidayhours = 0, 0
+    '''returns the employee's income for worked Sundays without Holidays in a given year and month'''
+    sunpay = 0
     rate= worker_rate(employee_id, year, month)
-    query = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month)
-    work_hours = WorkEvidence.objects.filter(query)
     holidays = holiday(year).values()
-    for hour in work_hours:
-        if hour.start_work.date() in holidays and hour.end_work.date() in holidays:
-            holidayhours += hour.jobhours
-    holidaypay = holidayhours * rate * 2
-    query = query & Q(start_work__week_day=1) & Q(end_work__week_day=1)
-    sunday_hours = WorkEvidence.objects.filter(query)
-    if sunday_hours:
-        # sunpay => remuneration for work on Sunday
+    mainquery = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month)
+    sundaysquery = Q(start_work__week_day=1) & Q(end_work__week_day=1)
+    exclude_holidays = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
+    sunday_hours = WorkEvidence.objects.filter(mainquery&sundaysquery).exclude(exclude_holidays)
+    if sunday_hours.exists():
+        # sunpay => remuneration for work on Sunday without Holidays
         sunpay = sunday_hours.aggregate(sh=Sum('jobhours') * rate * 2)
         sunpay = sunpay['sh']
-    return sunpay + holidaypay
+    return sunpay
+
+
+def holiday_payment(employee_id:int, year:int, month:int)->float:
+    '''returns the employee's income for worked Holidays in a given year and month'''
+    holidaypay = 0
+    rate= worker_rate(employee_id, year, month)
+    holidays = holiday(year).values()
+    mainquery = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month)
+    holidays_query = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
+    holiday_hours = WorkEvidence.objects.filter(mainquery&holidays_query)
+    if holiday_hours.exists():
+        # holidaypay => remuneration for work on Holidays
+        holidaypay = holiday_hours.aggregate(hh=Sum('jobhours') * rate * 2)
+        holidaypay = holidaypay['hh']
+    return holidaypay
 
 
 def overhours_payment(employee_id:int, year:int, month:int)->float:
@@ -88,15 +101,19 @@ def overhours_payment(employee_id:int, year:int, month:int)->float:
         rate = rate/2
         # returns the number of working hours in a given month
         monthly_work_hours = len(list(workingdays(year, month))) * 8
+        holidays = holiday(year).values()
+        mainquery = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month)
+        filterquery = Q(start_work__week_day__range=[1,6]) & Q(end_work__week_day__gt=1)
+        exclude_sundays = Q(start_work__week_day=1) & Q(end_work__week_day=1)
+        exclude_holidays = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
 
         if worker_exdata.overtime == 1:
-            # returns the number of hours worked without Saturdays and Sundays in a given year and month
-            query = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month) & Q(start_work__week_day__gte=1) & Q(start_work__week_day__lt=7) & Q(end_work__week_day__gt=1)
-            basic_work_hours = WorkEvidence.objects.filter(query)
+            # returns the number of hours worked without Holidyas Saturdays and Sundays in a given year and month
+            basic_work_hours = WorkEvidence.objects.filter(mainquery&filterquery).exclude(exclude_holidays)
         elif worker_exdata.overtime == 2:
-            # returns the number of hours worked on Saturdays but no Sundays in a given year and month
-            query = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month)
-            basic_work_hours = WorkEvidence.objects.filter(query).exclude(start_work__week_day=1, end_work__week_day=1)
+            # returns the number of hours worked on Saturdays but no Sundays and Holidays in a given year and month
+            basic_work_hours = WorkEvidence.objects.filter(mainquery).exclude(exclude_sundays)
+            basic_work_hours = basic_work_hours.exclude(exclude_holidays)
 
         # returns the number of paid holiday hours in a given year and month
         leave_paid_hours = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
@@ -121,17 +138,16 @@ def overhours_payment(employee_id:int, year:int, month:int)->float:
 
 def basic_payment(employee_id:int, year:int, month:int)->float:
     '''returns the employee's basic income (without Saturdays, Sundays, holidays) in a given year and month'''
-    basicpay = 0
     rate= worker_rate(employee_id, year, month)
-    query = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month) & Q(start_work__week_day__gte=1) & Q(start_work__week_day__lt=7) & Q(end_work__week_day__gt=1)
-    basic_work_hours = WorkEvidence.objects.filter(query)
     holidays = holiday(year).values()
+    mainquery = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month)
+    filterquery = Q(start_work__week_day__range=[1,6]) & Q(end_work__week_day__gt=1)
+    exclude_holidays = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
+    basic_work_hours = WorkEvidence.objects.filter(mainquery&filterquery).exclude(exclude_holidays)
     if basic_work_hours.exists():
-        for workday in basic_work_hours:
-            if workday.start_work.date() not in holidays and workday.end_work.date() not in holidays:
-                # returns the employee's basic salary in a given year and month
-                basicpay = basic_work_hours.aggregate(bwh=Sum('jobhours') * rate)
-                basicpay = basicpay['bwh']
+        # returns the employee's basic salary in a given year and month
+        basicpay = basic_work_hours.aggregate(bwh=Sum('jobhours') * rate)
+        basicpay = basicpay['bwh']
     else:
         basicpay = 0
     return basicpay
@@ -170,6 +186,9 @@ def total_payment(employee_id:int, year:int, month:int)->dict:
     overhourspay = overhours_payment(employee_id, year, month)
     satpay = saturday_payment(employee_id, year, month)
     sunpay = sunday_payment(employee_id, year, month)
+    holipay = holiday_payment(employee_id, year, month)
+    if holipay:
+        sunpay += holipay
     accountpay = account_payment(employee_id, year, month)
     # returns the total wage for a given employee in selected year and month
     brutto = basicpay + leavepay + overhourspay + satpay + sunpay
@@ -180,7 +199,7 @@ def total_payment(employee_id:int, year:int, month:int)->dict:
     return context
 
 
-def employee_total_data(month:int, year:int, employee_id:int, context:dict)->dict:
+def employee_total_data(employee_id:int, year:int, month:int, context:dict)->dict:
     '''returns complete data on the employee's wokrhours, rate, income in a given date'''
     rate= worker_rate(employee_id, year, month)
     query = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month)

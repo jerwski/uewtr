@@ -37,7 +37,7 @@ class WorkingTimeRecorderView(View):
         query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
         overhours = EmployeeData.objects.filter(query).exists()
         context = {'worker': worker, 'employee_id': employee_id, 'employees': employees, 'overhours': overhours}
-        employee_total_data(date.today().month, date.today().year, employee_id, context)
+        employee_total_data(employee_id, date.today().year, date.today().month, context)
 
         if default_work:
             initial = initial_worktime_form(employee_id)
@@ -87,7 +87,7 @@ class WorkingTimeRecorderView(View):
                 else:
                     WorkEvidence.objects.create(**data)
                     messages.success(request, f'Succesful register new time working for {worker}')
-                    employee_total_data(month, year, employee_id, context)
+                    employee_total_data(employee_id, year, month, context)
 
             elif start_work <= end_work:
                 msg = f'Start working ({start_work}) is the same like end working ({end_work}). Please correct it...'
@@ -96,7 +96,7 @@ class WorkingTimeRecorderView(View):
                 msg = f'Start working ({start_work}) is later than end working ({end_work}). Please correct it...'
                 messages.error(request, msg)
 
-            employee_total_data(month, year, employee_id, context)
+            employee_total_data(employee_id, year, month, context)
 
         return render(request, 'evidence/working_time_recorder.html', context)
 
@@ -440,7 +440,7 @@ class EmployeeCurrentComplexDataView(View):
         context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'choice_date': choice_date,
                    'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays}
 
-        employee_total_data(month, year, employee_id, context)
+        employee_total_data(employee_id, year, month, context)
 
         return render(request, r'evidence/current_complex_evidence_data.html', context)
 
@@ -462,7 +462,7 @@ class EmployeeCurrentComplexDataView(View):
             context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'choice_date': choice_date,
                        'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays}
 
-            employee_total_data(month, year, employee_id, context)
+            employee_total_data(employee_id, year, month, context)
 
         else:
             context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees}
