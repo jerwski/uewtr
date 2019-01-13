@@ -6,6 +6,9 @@ from datetime import date, timedelta
 # pdfkit library
 import pdfkit
 
+# matplotlib library
+import matplotlib.pyplot as plt
+
 # django library
 from django.db.models import Sum, Q
 from django.template.loader import render_to_string
@@ -216,6 +219,39 @@ def employee_total_data(employee_id:int, year:int, month:int, context:dict)->dic
     payroll = total_payment(employee_id, year, month)
     context.update(payroll)
     return context
+
+
+def total_brutto_set(employee_id):
+    total_brutto = dict()
+    if WorkEvidence.objects.filter(worker_id=employee_id).exists():
+        for year in [year for year in range(WorkEvidence.objects.filter(worker_id=employee_id).earliest('start_work').start_work.year, date.today().year + 1)]:
+            total_brutto.__setitem__(year,{month:WorkEvidence.objects.filter(worker_id=10,start_work__year=2018,start_work__month=month).aggregate(Sum('jobhours')) for month in range(1,13)})
+    else:
+        total_brutto = None
+    context = {'total_brutto_set': total_brutto}
+    return context
+
+
+def data_chart(employee_id:int, year:int)->dict:
+    '''return data for Annual chart income for passed employee_id'''
+    month_name = list(calendar.month_name)[1:]
+    brutto_income=[total_payment(employee_id,year,month)['brutto'] for month in range(1,13)]
+    incomes = dict(zip(month_name,brutto_income))
+
+    return incomes
+
+
+def plot_chart(employee_id:int, year:int):
+    worker = Employee.objects.get(pk=employee_id)
+    incomes = data_chart(employee_id, year)
+    plt.style.use('dark_background')
+    fig, ax = plt.subplots()
+    ax.bar(list(incomes.keys()), list(incomes.values()), color='green')
+    labels = ax.get_xticklabels()
+    plt.setp(labels, rotation=45, horizontalalignment='right')
+    ax.set(xlabel='Months', ylabel='Value [PLN]', title=f'Incomes in {year} year for {worker}')
+    plt.show()
+
 
 
 def payrollhtml2pdf(month:int, year:int):

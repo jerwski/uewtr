@@ -62,25 +62,37 @@
                 {% else %}
                     {% if flag_work or flag_leave %}
                         <p class="text-danger lead font-weight-normal mt-3">Record for this day ({{ start_work|date:'l, d F Y' }}) is existing in database! Please check it or correct!</p>
+                        <div class="row">
+                            <div class="col">
+                                <div class="btn-sm mb-2">
+                                    <a class="btn btn-primary btn-block font-weight-bold" href="/admin/">Admin Data Base</a>
+                                </div>
+                            </div>
+                        </div>
                     {% else %}
                         {% if jobhours %}
                             <p class="text-center text-primary font-weight-bold">For <em class="text-danger">{{ worker }}</em> adding <em class="text-danger">{{ jobhours|floatformat:2 }}</em> hour{{ total_hours|pluralize:'s' }}.</p>
                             <p class="text-center text-primary  font-weight-bold"><em>{{ start_work|date:'r' }} - {{ end_work|date:'r' }}</em></p>
-                            <div class="btn-sm mb-lg-4">
-                                {% if jobhours != 8 %}
-                                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase non standard jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
-                                {% else %}
-                                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase standard jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
-                                {% endif %}
+                            <div class="row">
+                                <div class="col-md-6 btn-sm mb-2">
+                                     <a href="{% url 'account:admin_site' %}" class="btn btn-sm btn-outline-dark btn-block">Back to the dashboard</a>
+                                </div>
+                                <div class="col-md-6 btn-sm mb-lg-4">
+                                    {% if jobhours != 8 %}
+                                        <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase non standard jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
+                                    {% else %}
+                                        <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase standard jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
+                                    {% endif %}
+                                </div>
                             </div>
                         {% endif %}
                     {% endif %}
                 {% endif %}
-                <div class="row mt-2">
-                    <div class="col">
-                        <table class="table table-hover table-sm">
+                <div class="row p-sm-1">
+                    <div class="col-md-12">
+                        <table class="table table-hover table-sm p-2">
                             <thead class="bg-info">
-                                <tr><th>TOTAL PAYMENT FOR:</th><th class="text-white">{{ worker }}</th><th class="text-right" width="8%">RATE:</th><th class="text-white" width="15%">{{ rate|floatformat:2 }} PLN/h</th><th width="10%">HOURS:</th><th class="text-white" width="8%">{{ total_hours|floatformat:2 }}</th></tr>
+                                <tr><th>TOTAL PAYMENT FOR:</th><th class="text-white">{{ worker }}</th><th class="text-right" width="8%">RATE:</th><th class="text-white" width="18%">{{ rate|floatformat:2 }} PLN/h</th><th width="10%">HOURS:</th><th class="text-white" width="10%">{{ total_hours|floatformat:2 }}</th></tr>
                             </thead>
                         </table>
                         <table class="table table-hover table-sm">
@@ -102,9 +114,13 @@
                 <p class="text-center text-danger lead font-weight-normal bg-warning">{{ worker|upper }} IS DEACTIVE</p>
                 <p class="text-center text-danger lead font-weight-bold">{{ worker|upper }} isn't employee or is deactive. You can't add any evidence.</p>
             {% endif %}
-            <div class="btn-sm mb-2">
-                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
-            </div>
+            {% if request.method == 'GET' %}
+                <div class="row">
+                    <div class="col-sm-12 btn-sm mb-2">
+                        <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

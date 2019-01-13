@@ -23,7 +23,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # my function
 from functions.myfunctions import (sendPayroll, sendLeavesData, initial_leave_form,
                                    holiday, initial_worktime_form, initial_accountdate_form)
-from functions.payment import total_payment, workingdays, employee_total_data, payrollhtml2pdf, leavehtml2pdf
+from functions.payment import total_payment, workingdays, employee_total_data, payrollhtml2pdf, leavehtml2pdf, worker_rate, data_chart, plot_chart
 
 
 # Create your views here.
@@ -440,11 +440,12 @@ class EmployeeCurrentComplexDataView(View):
         year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
         month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
         year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
-
         context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'choice_date': choice_date,
                    'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays}
-
         employee_total_data(employee_id, year, month, context)
+        # data for chart
+        total_brutto_set = {eachyear:sum([total_payment(employee_id,eachyear,month)['brutto'] for month in range(1,13)]) for eachyear in [item for item in range(WorkEvidence.objects.filter(worker_id=employee_id).earliest('start_work').start_work.year, date.today().year + 1)]}
+        context.__setitem__('total_brutto_set', total_brutto_set)
 
         return render(request, r'evidence/current_complex_evidence_data.html', context)
 
@@ -454,6 +455,9 @@ class EmployeeCurrentComplexDataView(View):
         form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
+        # data for chart
+        total_brutto_set = {eachyear:sum([total_payment(employee_id,eachyear,month)['brutto'] for month in range(1,13)]) for eachyear in [item for item in range(WorkEvidence.objects.filter(worker_id=employee_id).earliest('start_work').start_work.year, date.today().year + 1)]}
+        context = {'total_brutto_set': total_brutto_set}
 
         if form.is_valid():
             leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
@@ -463,12 +467,29 @@ class EmployeeCurrentComplexDataView(View):
             month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
             year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 
-            context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'choice_date': choice_date,
-                       'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays}
+            context.update({'form': form, 'worker': worker, 'employee_id': employee_id, 'choice_date': choice_date,
+                       'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves, 'holidays': holidays})
 
             employee_total_data(employee_id, year, month, context)
 
         else:
-            context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees}
+            context.update({'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees})
 
         return render(request, r'evidence/current_complex_evidence_data.html', context)
+
+
+class PlotChart(View):
+
+    def get(self, request, employee_id:int)->HttpResponseRedirect:
+        year = date.today().year
+        plot_chart(employee_id, year)
+        kwargs = {'employee_id': employee_id}
+
+        return HttpResponseRedirect(reverse('evidence:employee_complex_data', kwargs=kwargs))
+
+    def post(self, request, employee_id:int)->HttpResponseRedirect:
+        year = int(request.POST['plot_year'])
+        plot_chart(employee_id, year)
+        kwargs = {'employee_id': employee_id}
+
+        return HttpResponseRedirect(reverse('evidence:employee_complex_data', kwargs=kwargs))

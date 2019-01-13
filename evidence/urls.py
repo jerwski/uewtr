@@ -20,4 +20,5 @@ urlpatterns = [
     path('leaves_data/print/<int:employee_id>/', views.LeavesDataPrintView.as_view(),name='leaves_data_print'),
     path('leaves_data/pdf/send/<int:employee_id>/', views.LeavesDataPdf.as_view(),name='leaves_data_pdf'),
     path('complex/data/<int:employee_id>/', views.EmployeeCurrentComplexDataView.as_view(), name='employee_complex_data'),
+    path('chart/<int:employee_id>/', views.PlotChart.as_view(), name='plot_chart')
 ]

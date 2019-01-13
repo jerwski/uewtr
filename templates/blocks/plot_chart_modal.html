@@ -1,0 +1,39 @@
+{% load utility_tags %}
+<!-- Modal for data to will be erase if you want -->
+{% if total_brutto_set %}
+    <button id="plotchartButton" type="button" class="btn btn-outline-success btn-block" data-toggle="modal" data-target="#plotModal">Show annual brutto income chart</button>
+{% else %}
+    <button id="plotchartButton" type="button" class="btn btn-outline-success btn-block" data-toggle="modal" data-target="#plotModal" disabled>No data to plot chart</button>
+{% endif %}
+
+    <!-- Modal -->
+    <div class="modal fade" id="plotModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h6 class="modal-title" id="leaveModal">Check year to print leave for {{ worker }}</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'evidence:plot_chart' employee_id %}" method="POST">{% csrf_token %}
+                        {% for year, value in total_brutto_set.items %}
+                            <div class="form-check custom-control custom-radio ml-5 text-left">
+                                <input type="radio" id="{{ year }}" name="plot_year" class="custom-control-input" value="{{ year }}" required>
+                                <label class="custom-control-label" for="{{ year }}">{{ year }} year (total brutto income: {{ value|money_format }})</label>
+                            </div>
+                        {% endfor %}
+                        <div class="modal-footer">
+                                <div class="col-md-6 btn">
+                                    <button type="button" class="btn btn-outline-info btn-block" data-dismiss="modal">Close</button>
+                                </div>
+                                <div class="col-md-6 btn">
+                                    <button type="submit" class="btn btn-outline-success btn-block">Show chart</button>
+                                </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>

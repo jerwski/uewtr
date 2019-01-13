@@ -23,11 +23,12 @@
                                 <label class="custom-control-label" for="{{ leave_year }}">{{ leave_year }} year (total leave: {{ leave_value }} day{{ leave_value|pluralize:'s' }})</label>
                             </div>
                         {% endfor %}
-
-                        <div class="modal-footer text-center">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-outline-info" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-sm btn-outline-primary">Print leave data</button>
+                        <div class="modal-footer">
+                            <div class="col-md-6 btn">
+                                <button type="button" class="btn btn-outline-info btn-block" data-dismiss="modal">Close</button>
+                            </div>
+                            <div class="col-md-6 btn">
+                                <button type="submit" class="btn btn-outline-success btn-block">Print leave data</button>
                             </div>
                         </div>
                     </form>
