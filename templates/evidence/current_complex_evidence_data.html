@@ -106,11 +106,12 @@
                 <p class="text-center lead font-weight-normal">No data for {{ worker }} available because the employee is no longer employed.</p>
             {% endif %}
             <div class="row">
-                <div class="col-9 btn">
+                <div class="col-6 btn">
                     <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
                 </div>
-                <div class="col-3 btn btn-group float-right" role="group">
+                <div class="col-6 btn btn-group float-right" role="group">
                     <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                    {% include 'blocks/plot_chart_modal.html' %}
                     <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
                 </div>
             </div>
