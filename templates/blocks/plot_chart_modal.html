@@ -1,3 +1,4 @@
+{% load staticfiles %}
 {% load utility_tags %}
 <!-- Modal for data to will be erase if you want -->
 {% if total_brutto_set %}
@@ -10,8 +11,8 @@
     <div class="modal fade" id="plotModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h6 class="modal-title" id="leaveModal">Check year to print leave for {{ worker }}</h6>
+                <div class="modal-header bg-danger text-white text-center">
+                    <h6 class="modal-title" id="leaveModal">Check year to print chart for {{ worker }}</h6>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -25,15 +26,22 @@
                             </div>
                         {% endfor %}
                         <div class="modal-footer">
-                                <div class="col-md-6 btn">
-                                    <button type="button" class="btn btn-outline-info btn-block" data-dismiss="modal">Close</button>
-                                </div>
-                                <div class="col-md-6 btn">
-                                    <button type="submit" class="btn btn-outline-success btn-block">Show chart</button>
-                                </div>
+                            <div class="col-md-6 btn">
+                                <button type="button" class="btn btn-outline-info btn-block" data-dismiss="modal">Close</button>
+                            </div>
+                            <div class="col-md-6 btn">
+                                <button type="submit" class="btn btn-outline-success btn-block">Show chart</button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+<script>
+function chartWin() {
+  var myWindow = window.open("", "MsgWindow", "resizable=yes,top=100,left=300,width=500,height=420");
+  myWindow.document.write("<img src=\"{% static 'images/mainboard/income.png' %}\">");
+}
+</script>

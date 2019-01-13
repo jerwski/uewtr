@@ -1,12 +1,17 @@
 # standard library
+import os
 import calendar
+from pathlib import Path
 from collections import defaultdict
 from datetime import date, timedelta
+
 
 # pdfkit library
 import pdfkit
 
 # matplotlib library
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 # django library
@@ -245,13 +250,18 @@ def plot_chart(employee_id:int, year:int):
     worker = Employee.objects.get(pk=employee_id)
     incomes = data_chart(employee_id, year)
     plt.style.use('dark_background')
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(8, 4))
     ax.bar(list(incomes.keys()), list(incomes.values()), color='green')
     labels = ax.get_xticklabels()
     plt.setp(labels, rotation=45, horizontalalignment='right')
     ax.set(xlabel='Months', ylabel='Value [PLN]', title=f'Incomes in {year} year for {worker}')
-    plt.show()
-
+    image = Path.cwd().joinpath(f'templates/pdf/income.png')
+    plt.savefig(image, transparent=False, dpi=144, bbox_inches="tight")
+    plt.close(fig)
+    try:
+        os.popen(f'explorer.exe "file:///{image}"')
+    except:
+        raise FileNotFoundError
 
 
 def payrollhtml2pdf(month:int, year:int):

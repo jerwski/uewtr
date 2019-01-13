@@ -445,6 +445,8 @@ class EmployeeCurrentComplexDataView(View):
         employee_total_data(employee_id, year, month, context)
         # data for chart
         total_brutto_set = {eachyear:sum([total_payment(employee_id,eachyear,month)['brutto'] for month in range(1,13)]) for eachyear in [item for item in range(WorkEvidence.objects.filter(worker_id=employee_id).earliest('start_work').start_work.year, date.today().year + 1)]}
+        file = Path.cwd().joinpath(f'templates/pdf/income.pdf')
+        context.__setitem__('file', file)
         context.__setitem__('total_brutto_set', total_brutto_set)
 
         return render(request, r'evidence/current_complex_evidence_data.html', context)
@@ -458,6 +460,8 @@ class EmployeeCurrentComplexDataView(View):
         # data for chart
         total_brutto_set = {eachyear:sum([total_payment(employee_id,eachyear,month)['brutto'] for month in range(1,13)]) for eachyear in [item for item in range(WorkEvidence.objects.filter(worker_id=employee_id).earliest('start_work').start_work.year, date.today().year + 1)]}
         context = {'total_brutto_set': total_brutto_set}
+        file = Path.cwd().joinpath(f'templates/pdf/income.pdf')
+        context.__setitem__('file', file)
 
         if form.is_valid():
             leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
