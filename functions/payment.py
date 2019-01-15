@@ -242,7 +242,6 @@ def data_chart(employee_id:int, year:int)->dict:
     month_name = list(calendar.month_name)[1:]
     brutto_income=[total_payment(employee_id,year,month)['brutto'] for month in range(1,13)]
     incomes = dict(zip(month_name,brutto_income))
-
     return incomes
 
 
