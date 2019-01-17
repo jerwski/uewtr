@@ -226,7 +226,7 @@ def employee_total_data(employee_id:int, year:int, month:int, context:dict)->dic
     return context
 
 
-def total_brutto_set(employee_id):
+def total_brutto_set(employee_id:int)->dict:
     total_brutto = dict()
     if WorkEvidence.objects.filter(worker_id=employee_id).exists():
         for year in [year for year in range(WorkEvidence.objects.filter(worker_id=employee_id).earliest('start_work').start_work.year, date.today().year + 1)]:
@@ -265,7 +265,7 @@ def plot_chart(employee_id:int, year:int):
         raise FileNotFoundError
 
 
-def payrollhtml2pdf(month:int, year:int):
+def payrollhtml2pdf(month:int, year:int)->bool:
     '''convert html file (evidence/monthly_payroll_pdf.html) to pdf file'''
     heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota', 'Niedziela', 'Zaliczka', 'Do wypłaty', 'Data i podpis']
     total_work_hours = len(list(workingdays(year, month))) * 8

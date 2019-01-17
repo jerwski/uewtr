@@ -26,7 +26,7 @@ archive_name = settings.ARCHIVE_NAME
 archive_file = settings.ARCHIVE_FILE
 
 
-def check_internet_connection():
+def check_internet_connection()->bool:
     '''checks whether the internet is connected'''
     connect = client.HTTPConnection("www.google.com", timeout=5)
     try:

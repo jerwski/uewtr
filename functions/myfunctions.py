@@ -60,8 +60,8 @@ def sendPayroll(month:int, year:int):
         email = EmailMessage(subject,message,settings.EMAIL_HOST_USER,['projekt@unikolor.com'])
         email.attach_file(file)
         email.send(fail_silently=True)
-    except ConnectionError as err:
-        print(err)
+    except:
+        raise ConnectionError
 
 
 def sendLeavesData(employee_id:int):
@@ -74,8 +74,8 @@ def sendLeavesData(employee_id:int):
         email = EmailMessage(subject,message,settings.EMAIL_HOST_USER,['projekt@unikolor.com'])
         email.attach_file(file)
         email.send(fail_silently=True)
-    except ConnectionError as err:
-        print(err)
+    except:
+        raise ConnectionError
 
 
 def initial_worktime_form(employee_id:int)->dict:

@@ -108,7 +108,7 @@ class EmployeeBasicDataView(View):
 
 class EmployeeEraseAll(View):
     '''class implementing the method for ersing all data in database for the employee by pk=employee_id'''
-    def get(self, request, employee_id:int):
+    def get(self, request, employee_id:int)->HttpResponseRedirect:
         worker = Employee.objects.get(pk=employee_id)
         if worker:
             archiving_of_deleted_records(worker)

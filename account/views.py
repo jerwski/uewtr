@@ -52,7 +52,7 @@ class AdminView(View):
 
 
 
-def exit(request):
+def exit(request)->HttpResponseRedirect:
     '''backups features and exit from the application'''
     pdfdir = Path(r'templates/pdf')
 
