@@ -250,7 +250,9 @@ def plot_chart(employee_id:int, year:int):
     incomes = data_chart(employee_id, year)
     plt.style.use('dark_background')
     fig, ax = plt.subplots(figsize=(8, 4))
-    ax.bar(list(incomes.keys()), list(incomes.values()), color='green')
+    bar_with = 0.55
+    ax.bar(list(incomes.keys()), list(incomes.values()), bar_with, color='green', label='Income')
+    fig.legend()
     labels = ax.get_xticklabels()
     plt.setp(labels, rotation=45, horizontalalignment='right')
     ax.set(xlabel='Months', ylabel='Value [PLN]', title=f'Incomes in {year} year for {worker}')
