@@ -23,7 +23,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # my function
 from functions.myfunctions import (sendPayroll, sendLeavesData, initial_leave_form,
                                    holiday, initial_worktime_form, initial_accountdate_form)
-from functions.payment import total_payment, workingdays, employee_total_data, payrollhtml2pdf, leavehtml2pdf, worker_rate, data_chart, plot_chart
+from functions.payment import total_payment, workingdays, employee_total_data, payrollhtml2pdf, leavehtml2pdf, plot_chart
 
 
 # Create your views here.
