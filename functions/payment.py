@@ -242,7 +242,7 @@ def data_chart(employee_id:int, year:int)->dict:
     '''return data for Annual chart income for passed employee_id'''
     _, *month_name = list(calendar.month_name)
     brutto_income=[total_payment(employee_id,year,month)['brutto'] for month in range(1,13)]
-    incomes = dict(zip(month_name,brutto_income))
+    incomes = dict(zip(reversed(month_name),reversed(brutto_income)))
     return incomes
 
 
@@ -251,14 +251,13 @@ def plot_chart(employee_id:int, year:int):
     incomes = data_chart(employee_id, year)
     plt.style.use('dark_background')
     fig, ax = plt.subplots(figsize=(8, 4))
-    bar_with = 0.55
-    ax.bar(list(incomes.keys()), list(incomes.values()), bar_with, color='green', label='Income')
+    ax.barh(list(incomes.keys()), list(incomes.values()), color='green', label='Income')
     fig.legend()
     labels = ax.get_xticklabels()
     plt.setp(labels, rotation=45, horizontalalignment='right')
-    ax.set(xlabel='Months', ylabel='Value [PLN]', title=f'Incomes in {year} year for {worker}')
+    ax.set(xlabel='Value [PLN]', ylabel='Months', title=f'Incomes in {year} year for {worker}')
     for k, v in incomes.items():
-        plt.text(k, 175, money_format(v), ha='center', va='bottom', fontsize=10, fontweight='bold', rotation=90)
+        plt.text(175,k, money_format(v), ha='left', va='center', fontsize=10, fontweight='bold', rotation=0)
     image = Path.cwd().joinpath(f'templates/pdf/income.png')
     plt.savefig(image, transparent=False, dpi=144, bbox_inches="tight")
     plt.close(fig)
