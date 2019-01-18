@@ -24,6 +24,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # my function
 from functions.myfunctions import holiday
+from employee.templatetags.utility_tags import money_format
 
 
 # Create your payment functions here
@@ -256,6 +257,8 @@ def plot_chart(employee_id:int, year:int):
     labels = ax.get_xticklabels()
     plt.setp(labels, rotation=45, horizontalalignment='right')
     ax.set(xlabel='Months', ylabel='Value [PLN]', title=f'Incomes in {year} year for {worker}')
+    for k, v in incomes.items():
+        plt.text(k, 175, money_format(v), ha='center', va='bottom', fontsize=10, fontweight='bold', rotation=90)
     image = Path.cwd().joinpath(f'templates/pdf/income.png')
     plt.savefig(image, transparent=False, dpi=144, bbox_inches="tight")
     plt.close(fig)
