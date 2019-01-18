@@ -238,6 +238,14 @@ def total_brutto_set(employee_id:int)->dict:
     return context
 
 
+def data_modal_chart(employee_id:int)->dict:
+    start_workyear = WorkEvidence.objects.filter(worker_id=employee_id).earliest('start_work').start_work.year
+    end_workyear = date.today().year + 1
+    workyears = (item for item in range(start_workyear, end_workyear))
+    total_brutto_set = {eachyear:sum((total_payment(employee_id,eachyear,month)['brutto'] for month in range(1,13))) for eachyear in workyears}
+    return total_brutto_set
+
+
 def data_chart(employee_id:int, year:int)->dict:
     '''return data for Annual chart income for passed employee_id'''
     _, *month_name = list(calendar.month_name)
@@ -257,7 +265,10 @@ def plot_chart(employee_id:int, year:int):
     plt.setp(labels, rotation=45, horizontalalignment='right')
     ax.set(xlabel='Value [PLN]', ylabel='Months', title=f'Incomes in {year} year for {worker}')
     for k, v in incomes.items():
-        plt.text(175,k, money_format(v), ha='left', va='center', fontsize=10, fontweight='bold', rotation=0)
+        if 0<v<=300:
+            plt.text(1.1*v+len(str(v)), k, money_format(v), ha='left', va='center', fontsize=10, fontweight='bold')
+        elif v!=0:
+            plt.text(v-len(str(v)), k, money_format(v), ha='right', va='center', fontsize=10, fontweight='bold')
     image = Path.cwd().joinpath(f'templates/pdf/income.png')
     plt.savefig(image, transparent=False, dpi=144, bbox_inches="tight")
     plt.close(fig)
