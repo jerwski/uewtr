@@ -266,7 +266,7 @@ def plot_chart(employee_id:int, year:int):
     plt.setp(labels, rotation=45, horizontalalignment='right')
     ax.set(xlabel='Value [PLN]', ylabel='Months', title=f'Incomes in {year} year for {worker}')
     for k, v in incomes.items():
-        if 0<v<400:
+        if 0<v<300:
             ax.set_xlim(0, max(list(incomes.values()))*1.25)
             plt.text(v+len(str(v)), k, money_format(v), ha='left', va='center', fontsize=10, fontweight='bold')
         elif v!=0:
