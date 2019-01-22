@@ -1,16 +1,18 @@
 # standard library
-import os
 import calendar
-from pathlib import Path
 from collections import defaultdict
 from datetime import date, datetime
+
+# pdfkit library
+import pdfkit
 
 # django core
 from django.urls import reverse
 from django.contrib import messages
 from django.db.models import Sum, Q
 from django.views.generic import View
-from django.shortcuts import render, HttpResponseRedirect
+from django.template.loader import get_template
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 
 # my forms
 from evidence.forms import (WorkEvidenceForm, EmployeeLeaveForm, AccountPaymentForm,
@@ -21,9 +23,10 @@ from employee.models import Employee, EmployeeData
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # my function
-from functions.myfunctions import (sendPayroll, sendLeavesData, initial_leave_form,
-                                   holiday, initial_worktime_form, initial_accountdate_form)
-from functions.payment import total_payment, workingdays, employee_total_data, payrollhtml2pdf, leavehtml2pdf, plot_chart, data_modal_chart
+from functions.myfunctions import (payrollhtml2pdf, leavehtml2pdf, plot_chart,
+                                   sendPayroll, sendLeavesData, initial_leave_form,
+                                   initial_worktime_form, initial_accountdate_form)
+from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
 
 
 # Create your views here.
@@ -223,19 +226,34 @@ class LeaveTimeRecorderEraseView(View):
 class LeavesDataPrintView(View):
     '''class representing the view of monthly payroll print'''
     def post(self, request, employee_id:int)->HttpResponseRedirect:
-        # convert html file (evidence/leaves_data.html) to pdf file
+        '''convert html annuall leave time for each employee in current year to pdf'''
         year = int(request.POST['leave_year'])
-        leavehtml2pdf(employee_id, year)
-        file = Path.cwd().joinpath(f'templates/pdf/leaves_data_{employee_id}.pdf')
-        try:
-            os.popen(f'explorer.exe "file:///{file}"')
-            messages.info(request, r'File leaves_data.pdf file was sending to browser....')
-        except WindowsError as err:
-            print(err)
+        month_name = list(calendar.month_name)[1:]
+        worker = Employee.objects.get(pk=employee_id)
+        employee = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
+        if employee.exists():
+            # create leaves data as associative arrays for selected employee
+            employee = employee.order_by('leave_date')
+            leave_data = [item.leave_date for item in employee]
+            template = get_template(r'evidence/leaves_data.html')
+            context = {'leave_data': leave_data, 'month_name': month_name, 'worker': worker, 'year': year}
+            html = template.render(context)
 
-        kwargs = {'employee_id': employee_id}
+            # create pdf file and save on templates/pdf/leves_data_{}.pdf'.format(employee_id)
+            options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
+                       'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
+                       'orientation': 'landscape','no-outline': None, 'quiet': '', }
 
-        return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', kwargs=kwargs))
+            pdf = pdfkit.from_string(html, False, options=options)
+            filename = f'leaves_data_{employee_id}.pdf'
+
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+            return response
+        else:
+            messages.warning(request, r'Nothing to print...')
+            kwargs = {'employee_id': employee_id}
+            return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', kwargs=kwargs))
 
 
 class LeavesDataPdf(View):
@@ -246,9 +264,7 @@ class LeavesDataPdf(View):
         # send e-mail with attached payroll in pdf format
         sendLeavesData(employee_id)
         messages.info(request, r'The pdf file was sending....')
-
         kwargs = {'employee_id': employee_id}
-
         return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', kwargs=kwargs))
 
 
@@ -319,18 +335,44 @@ class MonthlyPayrollView(View):
 class MonthlyPayrollPrintView(View):
     '''class representing the view of monthly payroll print'''
     def get(self, request, month:int, year:int)->HttpResponseRedirect:
-        # convert html file (evidence/monthly_payroll_pdf.html) to .pdf file
-        if payrollhtml2pdf(month, year):
-            file = Path().cwd().joinpath(f'templates/pdf/payroll_{month}_{year}.pdf')
-            try:
-                os.popen(f'explorer.exe "file:///{file}"')
-                messages.info(request, f'File payroll_{month}_{year}.pdf file was sending to browser....')
-            except FileNotFoundError as error:
-                messages.warning(request, f'File {file} does not exist...\nError: {error}')
+        '''convert html file (evidence/monthly_payroll_pdf.html) to pdf file'''
+        heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny',
+                 'Sobota', 'Niedziela', 'Zaliczka', 'Do wypłaty', 'Data i podpis']
+        total_work_hours = len(list(workingdays(year, month))) * 8
+        employees = Employee.objects.all()
+        # building complex query for actual list of employee
+        day = calendar.monthrange(year, month)[1]
+        query = Q(employeedata__end_contract__lt=date(year,month,1))|Q(employeedata__start_contract__gt=date(year,month,day))
+        employees = employees.exclude(query).order_by('surname')
+        if employees.exists():
+            # create data for payroll as associative arrays for all employees
+            payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
+            # create defaultdict with summary payment
+            amountpay = defaultdict(float)
+            for item in payroll.values():
+                if item['accountpay'] != item['brutto']:
+                    for k,v in item.items():
+                        amountpay[k] += v
+
+            context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay),
+                       'year': year, 'month': month, 'total_work_hours': total_work_hours}
+
+            template = get_template('evidence/monthly_payroll_pdf.html')
+            html = template.render(context)
+            # create pdf file with following options
+            options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
+                       'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
+                       'orientation': 'landscape','no-outline': None, 'quiet': '', }
+            pdf = pdfkit.from_string(html, False, options=options)
+            filename = f'payroll_{month}_{year}.pdf'
+
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+            return response
         else:
             messages.warning(request, r'Nothing to print...')
+            return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
 
-        return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
 
 
 class SendPayrollPdf(View):

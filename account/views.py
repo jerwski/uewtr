@@ -55,6 +55,7 @@ class AdminView(View):
 def exit(request)->HttpResponseRedirect:
     '''backups features and exit from the application'''
     pdfdir = Path(r'templates/pdf')
+    downloads = Path(r'C:/Users/kopia/Downloads')
 
     if check_internet_connection():
 
@@ -72,6 +73,11 @@ def exit(request)->HttpResponseRedirect:
         if request.user.is_authenticated:
             for file in Path.iterdir(pdfdir):
                 file.unlink()
+            for file in Path.iterdir(downloads):
+                if file.match('leaves_data_*.pdf'):
+                    file.unlink()
+                if file.match('payroll_*.pdf'):
+                    file.unlink()
             logout(request)
 
         return HttpResponseRedirect(r'https://www.google.pl/')
