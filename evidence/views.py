@@ -509,7 +509,6 @@ class EmployeeCurrentComplexDataView(View):
 class PlotChart(View):
 
     def get(self, request, employee_id:int)->HttpResponseRedirect:
-        print(request)
         year = date.today().year
         plot_chart(employee_id, year)
         kwargs = {'employee_id': employee_id}
