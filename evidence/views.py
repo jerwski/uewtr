@@ -510,14 +510,14 @@ class PlotChart(View):
 
     def get(self, request, employee_id:int)->HttpResponseRedirect:
         year = date.today().year
-        plot_chart(employee_id, year)
         kwargs = {'employee_id': employee_id}
+        plot_chart(employee_id, year)
 
         return HttpResponseRedirect(reverse('evidence:employee_complex_data', kwargs=kwargs))
 
     def post(self, request, employee_id:int)->HttpResponseRedirect:
         year = int(request.POST['plot_year'])
-        plot_chart(employee_id, year)
         kwargs = {'employee_id': employee_id}
+        plot_chart(employee_id, year)
 
         return HttpResponseRedirect(reverse('evidence:employee_complex_data', kwargs=kwargs))
