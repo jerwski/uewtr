@@ -46,7 +46,7 @@ class AdminView(View):
 
             return render(request, 'account/admin.html', {'user': user, 'employee_id': employee_id})
         else:
-            messages.warning(request, f'User ({request.user.username}) has not permission to the dashboard...')
+            messages.warning(request, f'You haven\'t permission to the dashboard...')
             return HttpResponseRedirect('/login/')
 
 
