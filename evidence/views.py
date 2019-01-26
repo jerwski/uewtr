@@ -224,7 +224,7 @@ class LeaveTimeRecorderEraseView(View):
 
 class LeavesDataPrintView(View):
     '''class representing the view of monthly payroll print'''
-    def post(self, request, employee_id:int)->HttpResponseRedirect:
+    def post(self, request, employee_id:int)->HttpResponse:
         '''convert html annuall leave time for each employee in current year to pdf'''
         year = int(request.POST['leave_year'])
         html = leavehtml2pdf(employee_id, year)
@@ -299,7 +299,7 @@ class MonthlyPayrollView(View):
 
         return render(request, 'evidence/monthly_payroll.html', context)
 
-    def post(self, request)->render:
+    def post(self,request)->render:
         heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
                  'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
         employees = Employee.objects.all()

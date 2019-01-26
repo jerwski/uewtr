@@ -155,7 +155,7 @@ def export_as_json(modeladmin, request, queryset):
     opts = modeladmin.model._meta
     path = Path(f'backup_json/{opts.verbose_name}.json')
     with open(path, 'w') as file:
-        serializers.serialize('json', queryset, indent=4, stream=file)
+        serializers.serialize()
     messages.success(request, f'Selected records have been serialized to <<{opts.verbose_name}>>')
 
 
