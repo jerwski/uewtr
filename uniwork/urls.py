@@ -23,9 +23,14 @@ from account import views
 
 urlpatterns = [
     path('', include(urls)),
+    path('admin/doc/', include('django.contrib.admindocs.urls')), # must to be before path admin/
     path('admin/', admin.site.urls),
     path('', views.AdminView.as_view()),
     path('account/', include('account.urls', namespace='account')),
     path('employee/', include('employee.urls', namespace='employee')),
     path('evidence/', include('evidence.urls', namespace='evidence')),
 ]
+
+admin.site.site_title = '/admin/'
+admin.site.site_header = 'Employee Working Time Recorder'
+admin.site.index_title = 'Uniwork administration'
