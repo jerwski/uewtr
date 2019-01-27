@@ -3,9 +3,13 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+
+# Pillow library
+from PIL import Image
+
 # standard library
-import os
 import calendar
+from io import BytesIO
 from pathlib import Path
 from collections import defaultdict
 from datetime import date, datetime, timedelta
@@ -130,34 +134,33 @@ def data_chart(employee_id:int, year:int)->dict:
     '''return data for Annual chart income for passed employee_id'''
     _, *month_name = list(calendar.month_name)
     brutto_income=[total_payment(employee_id,year,month)['brutto'] for month in range(1,13)]
-    incomes = dict(zip(reversed(month_name),reversed(brutto_income)))
-    return incomes
+    total_income = sum(brutto_income)
+    income = dict(zip(reversed(month_name),reversed(brutto_income)))
+    return income, total_income
 
 
 def plot_chart(employee_id:int, year:int):
     worker = Employee.objects.get(pk=employee_id)
-    incomes = data_chart(employee_id, year)
+    income, total_income = data_chart(employee_id, year)
     plt.style.use('dark_background')
-    fig, ax = plt.subplots(figsize=(8, 4))
-    ax.barh(list(incomes.keys()), list(incomes.values()), color='green', label='Income')
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.barh(list(income.keys()), list(income.values()), color='green', label='Income')
     ax.grid(True, linestyle='-.', color='grey')
     fig.legend()
     labels = ax.get_xticklabels()
     plt.setp(labels, rotation=45, horizontalalignment='right')
-    ax.set(xlabel='Value [PLN]', ylabel='Months', title=f'Incomes in {year} year for {worker}')
-    for k, v in incomes.items():
+    ax.set(xlabel='Value [PLN]', ylabel='Months', title=f'Incomes in {year} year for {worker} (total {total_income:,.2f} PLN)')
+    for k, v in income.items():
         if 0<v<300:
-            ax.set_xlim(0, max(list(incomes.values()))*1.25)
+            ax.set_xlim(0, max(list(income.values()))*1.25)
             plt.text(v+len(str(v)), k, money_format(v), ha='left', va='center', fontsize=10, fontweight='bold')
         elif v!=0:
             plt.text(v-len(str(v)), k, money_format(v), ha='right', va='center', fontsize=10, fontweight='bold')
-    image = Path.cwd().joinpath(f'templates/pdf/income.png')
-    plt.savefig(image, transparent=False, dpi=144, bbox_inches="tight")
-    plt.close(fig)
-    try:
-        os.popen(f'explorer.exe "file:///{image}"')
-    except:
-        raise FileNotFoundError
+    imgdata = BytesIO()
+    fig.savefig(imgdata, format='png')
+    imgdata.seek(0)  # rewind the data
+    chart = Image.open(imgdata)
+    chart.show()
 
 
 def payrollhtml2pdf(month:int, year:int)->bool:
