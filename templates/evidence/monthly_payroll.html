@@ -26,7 +26,7 @@
                 </div>
                 <hr class="small">
                 <form action="{% url 'evidence:monthly_payroll_view' %}" method="POST">{% csrf_token %}
-                        {% bootstrap_field form.choice_date label_class='text-primary font-weight-bold' %}
+                        {% bootstrap_field form.choice_date label_class='text-primary font-weight-bold' placeholder='Choose date...' %}
                         <div class="btn-sm">
                             <button type="submit" class="btn btn-outline-success btn-block">Confirm selected date</button>
                         </div>

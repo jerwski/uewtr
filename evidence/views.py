@@ -277,7 +277,7 @@ class MonthlyPayrollView(View):
         month, year = now.month, now.year
         heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
                  'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
-        form = PeriodMonthlyPayrollForm(initial={'choice_date': now})
+        form = PeriodMonthlyPayrollForm()
         employees = Employee.objects.all()
         employee_id = employees.filter(employeedata__end_contract__isnull=True, status=True).first()
         employee_id = employee_id.id
