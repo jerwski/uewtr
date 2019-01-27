@@ -5,7 +5,6 @@ from pathlib import Path
 # django library
 from django.conf import settings
 from django.shortcuts import render
-from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
@@ -45,11 +44,7 @@ class AdminView(View):
                 return render(request, '500.html', {'user': user})
 
             return render(request, 'account/admin.html', {'user': user, 'employee_id': employee_id})
-        else:
-            messages.warning(request, f'You haven\'t permission to the dashboard...')
-            return HttpResponseRedirect('/login/')
-
-
+        return HttpResponseRedirect('/login/')
 
 
 def exit(request)->HttpResponseRedirect:
