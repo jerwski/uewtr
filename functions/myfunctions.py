@@ -143,7 +143,7 @@ def plot_chart(employee_id:int, year:int):
     worker = Employee.objects.get(pk=employee_id)
     income, total_income = data_chart(employee_id, year)
     plt.style.use('dark_background')
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(9, 6))
     ax.barh(list(income.keys()), list(income.values()), color='green', label='Income')
     ax.grid(True, linestyle='-.', color='grey')
     fig.legend()
