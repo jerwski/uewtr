@@ -182,14 +182,6 @@ EMAIL_USE_TLS = get_setting('EMAIL_USE_TLS')
 EMAIL_PORT = get_setting('EMAIL_PORT')
 ADMIN_EMAIL = get_setting('ADMIN_EMAIL')
 
-# fixture directory
-FIXTURE_DIRS = {'employee.Employee': Path(get_setting('employee')),
-                'employee.EmployeeData': Path(get_setting('employee_extend')),
-                'evidence.WorkEvidence': Path(get_setting('workevidence')),
-                'evidence.EmployeeLeave': Path(get_setting('employee_leave')),
-                'evidence.AccountPayment': Path(get_setting('account')),
-                'employee.EmployeeHourlyRate': Path(get_setting('employee_hourly_rate'))}
-
 # archives paths
 ARCH_DIR = Path(get_setting('arch_dir'))
 DEST_PATH = Path(get_setting('dest_path'))

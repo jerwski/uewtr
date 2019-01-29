@@ -1,17 +1,21 @@
 # standard library
 from ftplib import FTP
 from pathlib import Path
+from datetime import date
 import http.client as client
 from shutil import make_archive, unpack_archive
 
 # django core
+from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
-from django.core import serializers
+from uniwork.settings import get_setting
+from django.core.serializers import serialize
 from django.core.management import call_command
 
+
 # my models
-from employee.models import EmployeeData, EmployeeHourlyRate
+from employee.models import Employee, EmployeeData, EmployeeHourlyRate
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 
@@ -49,23 +53,30 @@ def backup():
 
 def mkfixture():
     '''create fixtures in json format'''
-    for model, path in settings.FIXTURE_DIRS.items():
-        try:
-            with open(path, 'w') as jsonfile:
-                call_command('dumpdata', model, indent=4, stdout=jsonfile)
-        except FileNotFoundError as error:
-            print(f'Serialization error: {error}')
+    year = date.today().year
+    querys = {'employee': Employee.objects.all(),
+              'employee data': EmployeeData.objects.all(),
+              'employee hourly rate': EmployeeHourlyRate.objects.filter(update__year=year),
+              'work evidence': WorkEvidence.objects.filter(start_work__year=year),
+              'employee leave': EmployeeLeave.objects.filter(leave_date__year=year),
+              'account payment': AccountPayment.objects.filter(account_date__year=year)}
+    try:
+        for app in ('employee', 'evidence'):
+            models = apps.all_models[app]
+            for model in models.values():
+                with open(Path.cwd().joinpath(f'{dest_path}/{model._meta.model_name}.json'), 'w') as fixture:
+                    serialize('json', querys[f'{model._meta.verbose_name}'], indent=4, stream=fixture)
+    except FileNotFoundError as error:
+        print(f'Serialization error: {error}')
 
 
 def readfixture(request):
-    '''reading fixtures'''
-    for model, path in settings.FIXTURE_DIRS.items():
-        try:
-            call_command('loaddata', path)
-            mymodel = model.split('.')[1]
-            messages.info(request, f'Table {mymodel} has been updated...\n')
-        except FileNotFoundError as error:
-            messages.error(request, f'No data => Error code: {error}')
+    try:
+        for file in list(Path.iterdir(dest_path)):
+            call_command('loaddata', file)
+        messages.info(request, f'Database {get_setting("NAME")} has been updated...\n')
+    except FileNotFoundError as error:
+        messages.error(request, f'Fixture don\'t exist... => Error code: {error}')
 
 
 def make_archives():
@@ -139,11 +150,13 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str):
                         messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
                         unpack_archive(archive_file, dest_path, 'zip')
                         messages.info(request, 'The archive has been added and unpacked...')
+                        print(f'\n{"*"*22}\nStart read fixtures...\n{"*"*42}')
                         readfixture(request)
+                        print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
                     except:
                         messages.error(request, f'File <<{archive_file.name}>> do not exist...')
                 else:
-                    messages.info(request, f'\nThe file <<{archive_file.name}>> has already been downloaded...')
+                    messages.info(request, f'\nDatabase is up to date...')
         except ConnectionError as error:
             messages.error(request, f'Connection error: {error}')
     else:
@@ -155,7 +168,7 @@ def export_as_json(modeladmin, request, queryset):
     opts = modeladmin.model._meta
     path = Path(f'backup_json/{opts.verbose_name}.json')
     with open(path, 'w') as file:
-        serializers.serialize('json', queryset, indent=4, stream=file)
+        serialize('json', queryset, indent=4, stream=file)
     messages.success(request, f'Selected records have been serialized to <<{opts.verbose_name}>>')
 
 
@@ -169,4 +182,4 @@ def archiving_of_deleted_records(worker):
 
     path = Path(f'backup_json/erase_worker/{worker.surname}_{worker.forename}.json')
     with open(path, 'w') as file:
-        serializers.serialize('json', all_records, indent=4, stream=file)
+        serialize('json', all_records, indent=4, stream=file)
