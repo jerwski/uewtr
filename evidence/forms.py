@@ -20,9 +20,9 @@ class WorkEvidenceForm(forms.ModelForm):
                'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
     attrs={'prepend': 'fa fa-clock-o', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
 
-    start_work = forms.DateTimeField(label='Date and time of start job:',
+    start_work = forms.DateTimeField(label='Start of work (date and time):',
                                      widget=DateTimePicker(options=options, attrs=attrs))
-    end_work = forms.DateTimeField(label='Date and time of end job:',
+    end_work = forms.DateTimeField(label='End of work (date and time):',
                                    widget=DateTimePicker(options=options, attrs=attrs))
 
     class Meta:

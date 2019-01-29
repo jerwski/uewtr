@@ -31,16 +31,18 @@
                 <form action="{% url 'evidence:working_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
                     <div class="row">
                         <div class="col-2">
-                            <div class="btn-sm mt-4">
-                                <a href="{% url 'evidence:working_time_recorder_add' employee_id 1 %}" class="btn btn-sm btn-info btn-block">Default</a>
+                            <div class="btn btn-group-sm btn-group-vertical" role="group">
+                                <a href="{% url 'evidence:working_time_recorder_add' employee_id 1 %}" class="btn btn-sm btn-outline-info font-weight-bold">6:00-14:00</a>
+                                <a href="{% url 'evidence:working_time_recorder_add' employee_id 2 %}" class="btn btn-sm btn-outline-primary font-weight-bold">6:00-16:00</a>
+                                <a href="{% url 'evidence:working_time_recorder_add' employee_id 3 %}" class="btn btn-sm btn-outline-danger font-weight-bold">6:00-18:00</a>
                             </div>
                         </div>
-                        <div class='col-5'>
+                        <div class='col-5 mt-3'>
                             <div class="form-group">
                                 {% bootstrap_field form.start_work size='small' label_class='text-primary font-weight-bold' placeholder='Pick date and time start job' %}
                             </div>
                         </div>
-                        <div class='col-5'>
+                        <div class='col-5 mt-3'>
                             <div class="form-group">
                                 {% bootstrap_field form.end_work size='small' label_class='text-primary font-weight-bold' placeholder='Pick date and time end job' %}
                             </div>

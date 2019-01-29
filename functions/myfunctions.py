@@ -64,30 +64,38 @@ def sendLeavesData(employee_id:int):
         raise ConnectionError
 
 
-def initial_worktime_form(employee_id:int)->dict:
+def initial_worktime_form(employee_id:int, default_work:int)->dict:
     '''return initial data for WorkEvidenceForm'''
     if date.today().isoweekday() == 1:
-        if employee_id == 10:
-            start_date = date.today() - timedelta(days=3)
+        start_date = date.today() - timedelta(days=3)
+        if employee_id==10:
             start_date = datetime(start_date.year, start_date.month,start_date.day,22,0)
             end_date = date.today() - timedelta(days=2)
             end_date = datetime(end_date.year, end_date.month, end_date.day,6,0)
         else:
-            start_date = date.today() - timedelta(days=3)
             start_date = datetime(start_date.year, start_date.month,start_date.day,6,0)
             end_date = date.today() - timedelta(days=3)
-            end_date = datetime(end_date.year, end_date.month, end_date.day,14,0)
+            if default_work==1:
+                end_date = datetime(end_date.year, end_date.month, end_date.day,14,0)
+            elif default_work==2:
+                end_date = datetime(end_date.year, end_date.month, end_date.day,16,0)
+            elif default_work==3:
+                end_date = datetime(end_date.year, end_date.month, end_date.day,18,0)
     else:
+        start_date = date.today() - timedelta(days=1)
         if employee_id == 10:
-            start_date = date.today() - timedelta(days=1)
             start_date = datetime(start_date.year, start_date.month,start_date.day,22,0)
             end_date = date.today()
             end_date = datetime(end_date.year, end_date.month, end_date.day,6,0)
         else:
-            start_date = date.today() - timedelta(days=1)
             start_date = datetime(start_date.year, start_date.month,start_date.day,6,0)
             end_date = date.today() - timedelta(days=1)
-            end_date = datetime(end_date.year, end_date.month, end_date.day,14,0)
+            if default_work==1:
+                end_date = datetime(end_date.year, end_date.month, end_date.day,14,0)
+            elif default_work==2:
+                end_date = datetime(end_date.year, end_date.month, end_date.day,16,0)
+            elif default_work==3:
+                end_date = datetime(end_date.year, end_date.month, end_date.day,18,0)
 
     context = {'start_work': start_date, 'end_work': end_date}
 
