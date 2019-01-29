@@ -43,9 +43,9 @@ def check_internet_connection()->bool:
 
 
 def backup():
-    '''total backup of data base'''
+    '''total backup of database'''
     try:
-        with open(archive_root, 'w') as jsonfile:
+        with archive_root.open('w') as jsonfile:
             call_command('dumpdata', indent=4, stdout=jsonfile)
     except FileNotFoundError as error:
         print(f'Something wrong... Error: {error}')
@@ -64,7 +64,7 @@ def mkfixture():
         for app in ('employee', 'evidence'):
             models = apps.all_models[app]
             for model in models.values():
-                with open(Path.cwd().joinpath(f'{dest_path}/{model._meta.model_name}.json'), 'w') as fixture:
+                with Path.cwd().joinpath(f'{dest_path}/{model._meta.model_name}.json').open('w') as fixture:
                     serialize('json', querys[f'{model._meta.verbose_name}'], indent=4, stream=fixture)
     except FileNotFoundError as error:
         print(f'Serialization error: {error}')
@@ -106,7 +106,7 @@ def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, us
                         print(f'Destination directory <<{destinationDirectory}>> has been created...')
                         myFTP.cwd(destinationDirectory)
                         if Path.is_file(sourceFilePath):
-                            with open(sourceFilePath, 'rb') as file:
+                            with sourceFilePath.open('rb') as file:
                                 myFTP.storbinary(f'STOR {sourceFilePath.name}', file)
                                 print(f'\nThe <<{sourceFilePath.name}>> file has been sent to the directory <<{destinationDirectory}>>\n')
                         else:
@@ -117,7 +117,7 @@ def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, us
                     try:
                         myFTP.cwd(destinationDirectory)
                         if Path.is_file(sourceFilePath):
-                            with open(sourceFilePath, 'rb') as file:
+                            with sourceFilePath.open('rb') as file:
                                 myFTP.storbinary(f'STOR {sourceFilePath.name}', file)
                                 print(f'\nFile <<{sourceFilePath.name}>> was sent to the FTP directory <<{destinationDirectory}>>\n')
                     except ConnectionRefusedError as error:
@@ -167,7 +167,7 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str):
 def export_as_json(modeladmin, request, queryset):
     opts = modeladmin.model._meta
     path = Path(f'backup_json/{opts.verbose_name}.json')
-    with open(path, 'w') as file:
+    with path.open('w') as file:
         serialize('json', queryset, indent=4, stream=file)
     messages.success(request, f'Selected records have been serialized to <<{opts.verbose_name}>>')
 
@@ -181,5 +181,5 @@ def archiving_of_deleted_records(worker):
         all_records += list(model.objects.filter(worker=worker))
 
     path = Path(f'backup_json/erase_worker/{worker.surname}_{worker.forename}.json')
-    with open(path, 'w') as file:
+    with path.open('w') as file:
         serialize('json', all_records, indent=4, stream=file)

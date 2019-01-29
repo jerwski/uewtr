@@ -25,7 +25,7 @@ from django.core.exceptions import ImproperlyConfigured
 # read enviroment settings
 def get_setting(setting):
     try:
-        with open(Path('mysetting.json'),'r') as file:
+        with Path('mysetting.json').open('r') as file:
             data = json.loads(file.read())
         return data[setting]
     except KeyError:
