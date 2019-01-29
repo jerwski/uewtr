@@ -33,7 +33,7 @@ from employee.templatetags.utility_tags import money_format
 # Create your functions here
 
 
-def sendemail(subject:str, message:str, sender:int, recipient:str, attachment:str):
+def sendemail(subject:str, message:str, sender:int, recipient:list, attachment:str):
     email = EmailMessage(subject, message, sender, recipient)
     email.attach_file(attachment)
     email.send(fail_silently=True)
@@ -130,7 +130,7 @@ def erase_records(employee_id:int)->dict:
     return context
 
 
-def data_chart(employee_id:int, year:int)->dict:
+def data_chart(employee_id:int, year:int)->tuple:
     '''return data for Annual chart income for passed employee_id'''
     _, *month_name = list(calendar.month_name)
     brutto_income=[total_payment(employee_id,year,month)['brutto'] for month in range(1,13)]
@@ -209,10 +209,18 @@ def leavehtml2pdf(employee_id:int, year:int):
         return False
 
 
-# function for listing whole tree for passed directory
 def tree(directory):
+    '''listing whole tree for passed directory'''
     print(f'+ {directory}')
     for path in sorted(directory.rglob('*')):
         depth = len(path.relative_to(directory).parts)
         spacer = '    ' * depth
         print(f'{spacer}+ {path.name}')
+
+
+def remgarbage(*paths):
+    '''removes attachment pdf file'''
+    for path in paths:
+        for file in Path.iterdir(path):
+            if file.match('leaves_data_*.pdf')|file.match('payroll_*.pdf'):
+                file.unlink()

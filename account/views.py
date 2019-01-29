@@ -1,4 +1,5 @@
 # standard library
+import os
 import socket
 from pathlib import Path
 
@@ -17,6 +18,7 @@ from employee.models import Employee
 from account.forms import UserCreateForm
 
 # my function
+from functions.myfunctions import remgarbage
 from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection
 
 
@@ -49,8 +51,8 @@ class AdminView(View):
 
 def exit(request)->HttpResponseRedirect:
     '''backups features and exit from the application'''
-    pdfdir = Path(r'templates/pdf')
-    downloads = Path(r'C:/Users/kopia/Downloads')
+    paths = (Path(r'templates/pdf'), Path(os.path.expanduser('~')).joinpath('Downloads'))
+    args = (settings.ARCHIVE_FILE, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
 
     if check_internet_connection():
 
@@ -59,20 +61,13 @@ def exit(request)->HttpResponseRedirect:
                 backup()
                 mkfixture()
                 make_archives()
-                args = (settings.ARCHIVE_FILE, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
                 uploadFileFTP(*args)
 
             except ConnectionError as error:
                 print(f'Connection error... Error code: {error}')
 
         if request.user.is_authenticated:
-            for file in Path.iterdir(pdfdir):
-                file.unlink()
-            for file in Path.iterdir(downloads):
-                if file.match('leaves_data_*.pdf'):
-                    file.unlink()
-                if file.match('payroll_*.pdf'):
-                    file.unlink()
+            remgarbage(*paths)
             logout(request)
 
         return HttpResponseRedirect(r'https://www.google.pl/')
