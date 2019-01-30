@@ -28,35 +28,40 @@
         <div class="col-sm-8">
             {% if worker.status %}
                 <p class="text-center text-danger lead font-weight-normal bg-warning">WORK EVIDENCE FOR: {{ worker|upper }}</p>
-                <form action="{% url 'evidence:working_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
-                    <div class="row">
-                        <div class="col-2">
-                            <div class="btn btn-group-sm btn-group-vertical" role="group">
-                                <a href="{% url 'evidence:working_time_recorder_add' employee_id 1 %}" class="btn btn-sm btn-outline-info font-weight-bold">6:00-12:00</a>
-                                <a href="{% url 'evidence:working_time_recorder_add' employee_id 2 %}" class="btn btn-sm btn-outline-success font-weight-bold">6:00-14:00</a>
-                                <a href="{% url 'evidence:working_time_recorder_add' employee_id 3 %}" class="btn btn-sm btn-outline-primary font-weight-bold">6:00-16:00</a>
-                                <a href="{% url 'evidence:working_time_recorder_add' employee_id 4 %}" class="btn btn-sm btn-outline-danger font-weight-bold">6:00-18:00</a>
-                            </div>
-                        </div>
-                        <div class='col-5 mt-3'>
-                            <div class="form-group">
-                                {% bootstrap_field form.start_work size='small' label_class='text-primary font-weight-bold' placeholder='Pick date and time start job' %}
-                            </div>
-                        </div>
-                        <div class='col-5 mt-3'>
-                            <div class="form-group">
-                                {% bootstrap_field form.end_work size='small' label_class='text-primary font-weight-bold' placeholder='Pick date and time end job' %}
-                            </div>
+                <div class="row">
+                    <div class="col-2">
+                        <div class="btn btn-group-sm btn-group-vertical" role="group">
+                            <a href="{% url 'evidence:working_time_recorder_add' employee_id %}" class="btn btn-sm btn-outline-secondary font-weight-bold">Insert hours</a>
+                            <a href="{% url 'evidence:working_time_recorder_add' employee_id 1 %}" class="btn btn-sm btn-outline-info font-weight-bold">6:00-12:00</a>
+                            <a href="{% url 'evidence:working_time_recorder_add' employee_id 2 %}" class="btn btn-sm btn-outline-success font-weight-bold">6:00-14:00</a>
+                            <a href="{% url 'evidence:working_time_recorder_add' employee_id 3 %}" class="btn btn-sm btn-outline-primary font-weight-bold">6:00-16:00</a>
+                            <a href="{% url 'evidence:working_time_recorder_add' employee_id 4 %}" class="btn btn-sm btn-outline-danger font-weight-bold">6:00-18:00</a>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col">
-                            <div class="btn-sm mb-2">
-                                <button type="submit" class="btn btn-outline-success btn-block font-weight-bold">Confirm</button>
+                    <div class="col-10">
+                        <form action="{% url 'evidence:working_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
+                            <div class="row mt-3">
+                                <div class='col-6'>
+                                    <div class="form-group">
+                                        {% bootstrap_field form.start_work size='small' label_class='text-primary font-weight-bold' placeholder='Pick date and time start job' %}
+                                    </div>
+                                </div>
+                                <div class='col-6'>
+                                    <div class="form-group">
+                                        {% bootstrap_field form.end_work size='small' label_class='text-primary font-weight-bold' placeholder='Pick date and time end job' %}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                            <div class="row mt-2">
+                                <div class="col">
+                                    <div class="btn-sm mb-2">
+                                        <button type="submit" class="btn btn-outline-success btn-block font-weight-bold">Confirm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                </form>
+                </div>
 
                 {% if start_work > end_work %}
                     <p class="text-danger lead font-weight-normal mt-3">The start date is later than the end date! Please correct it!</p>
@@ -75,7 +80,7 @@
                     {% else %}
                         {% if jobhours %}
                             <p class="text-center text-primary font-weight-bold">For <em class="text-danger">{{ worker }}</em> adding <em class="text-danger">{{ jobhours|floatformat:2 }}</em> hour{{ total_hours|pluralize:'s' }}.</p>
-                            <p class="text-center text-primary  font-weight-bold"><em>{{ start_work|date:'r' }} - {{ end_work|date:'r' }}</em></p>
+                            <p class="text-center text-primary font-weight-bold"><em>{{ start_work|date:'r' }} - {{ end_work|date:'r' }}</em></p>
                             <div class="row">
                                 <div class="col-md-6 btn-sm mb-2">
                                      <a href="{% url 'account:admin_site' %}" class="btn btn-sm btn-outline-dark btn-block">Back to the dashboard</a>
@@ -129,7 +134,7 @@
 </div>
 
 
-{% if default_work == False %}
+{% if work_hours == False %}
     <script type="text/javascript">
         $(function () {
             $('#id_start_work').datetimepicker();

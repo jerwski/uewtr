@@ -33,7 +33,7 @@ from functions.payment import holiday, total_payment, workingdays, employee_tota
 
 class WorkingTimeRecorderView(View):
     '''class implementing the method of adding working time for specific employee'''
-    def get(self, request, employee_id:int, default_work:int=0)->render:
+    def get(self, request, employee_id:int, work_hours:int=0)->render:
         worker = Employee.objects.get(pk=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
         query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
@@ -41,15 +41,15 @@ class WorkingTimeRecorderView(View):
         context = {'worker': worker, 'employee_id': employee_id, 'employees': employees, 'overhours': overhours}
         employee_total_data(employee_id, date.today().year, date.today().month, context)
 
-        if default_work:
-            initial = initial_worktime_form(employee_id, default_work)
+        if work_hours:
+            initial = initial_worktime_form(employee_id, work_hours)
             form = WorkEvidenceForm(initial=initial)
             context.__setitem__('form', form)
-            context.__setitem__('default_work', True)
+            context.__setitem__('work_hours', True)
         else:
             form = WorkEvidenceForm()
             context.__setitem__('form', form)
-            context.__setitem__('default_work', False)
+            context.__setitem__('work_hours', False)
 
         return render(request, 'evidence/working_time_recorder.html', context)
 
