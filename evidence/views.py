@@ -336,7 +336,7 @@ class MonthlyPayrollView(View):
 
 class MonthlyPayrollPrintView(View):
     '''class representing the view of monthly payroll print'''
-    def get(self, request, month:int, year:int)->HttpResponseRedirect:
+    def get(self, request, month:int, year:int):
         '''send montly payroll as pdf attachmnet on browser'''
         html = payrollhtml2pdf(month, year)
         if html:
