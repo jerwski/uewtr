@@ -8,7 +8,7 @@ app_name = 'evidence'
 
 urlpatterns = [
     path('time/recorder/<int:employee_id>/', views.WorkingTimeRecorderView.as_view(), name='working_time_recorder_add'),
-    path('time/recorder/<int:employee_id>/<int:work_hours>/', views.WorkingTimeRecorderView.as_view(), name='working_time_recorder_add'),
+    path('time/recorder/<int:employee_id>/end_work_hour=<int:work_hours>/', views.WorkingTimeRecorderView.as_view(), name='working_time_recorder_add'),
     path('time/recorder/erase/<int:employee_id>/<str:start_work>/<str:end_work>/', views.WorkingTimeRecorderEraseView.as_view(), name='working_time_recorder_erase'),
     path('leave/recorder/<int:employee_id>/', views.LeaveTimeRecorderView.as_view(), name='leave_time_recorder_add'),
     path('leave/recorder/erase/<int:employee_id>/<str:leave_date>/', views.LeaveTimeRecorderEraseView.as_view(), name='leave_time_recorder_erase'),

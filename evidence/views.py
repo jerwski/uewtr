@@ -42,7 +42,7 @@ class WorkingTimeRecorderView(View):
         employee_total_data(employee_id, date.today().year, date.today().month, context)
 
         if work_hours:
-            initial = initial_worktime_form(employee_id, work_hours)
+            initial = initial_worktime_form(work_hours)
             form = WorkEvidenceForm(initial=initial)
             context.__setitem__('form', form)
             context.__setitem__('work_hours', True)
