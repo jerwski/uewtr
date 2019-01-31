@@ -66,27 +66,27 @@ def sendLeavesData(employee_id:int):
 
 def initial_worktime_form(employee_id:int, work_hours:int)->dict:
     '''return initial data for WorkEvidenceForm'''
-    data = dict(zip(range(1,5),range(12,19,2)))
+    hours = dict(zip(range(1,7),range(12,23,2)))
     if date.today().isoweekday() == 1:
         start_date = date.today() - timedelta(days=3)
-        if employee_id==10:
+        if work_hours==6:
             start_date = datetime(start_date.year, start_date.month,start_date.day,22,0)
             end_date = date.today() - timedelta(days=2)
             end_date = datetime(end_date.year, end_date.month, end_date.day,6,0)
         else:
             start_date = datetime(start_date.year, start_date.month,start_date.day,6,0)
             end_date = date.today() - timedelta(days=3)
-            end_date = datetime(end_date.year, end_date.month, end_date.day,data[work_hours],0)
+            end_date = datetime(end_date.year, end_date.month, end_date.day,hours[work_hours],0)
     else:
         start_date = date.today() - timedelta(days=1)
-        if employee_id == 10:
+        if work_hours==6:
             start_date = datetime(start_date.year, start_date.month,start_date.day,22,0)
             end_date = date.today()
             end_date = datetime(end_date.year, end_date.month, end_date.day,6,0)
         else:
             start_date = datetime(start_date.year, start_date.month,start_date.day,6,0)
             end_date = date.today() - timedelta(days=1)
-            end_date = datetime(end_date.year, end_date.month, end_date.day,data[work_hours],0)
+            end_date = datetime(end_date.year, end_date.month, end_date.day,hours[work_hours],0)
 
     context = {'start_work': start_date, 'end_work': end_date}
 
