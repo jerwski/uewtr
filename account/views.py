@@ -5,6 +5,7 @@ from pathlib import Path
 
 # django library
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.contrib.auth import logout
@@ -49,6 +50,7 @@ class AdminView(View):
         return HttpResponseRedirect('/login/')
 
 
+@login_required
 def exit(request)->HttpResponseRedirect:
     '''backups features and exit from the application'''
     paths = (Path(r'templates/pdf'), Path(os.path.expanduser('~')).joinpath('Downloads'))

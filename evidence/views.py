@@ -53,7 +53,6 @@ class WorkingTimeRecorderView(View):
 
         return render(request, 'evidence/working_time_recorder.html', context)
 
-
     def post(self, request, employee_id:int)->render:
         form = WorkEvidenceForm(data=request.POST)
         worker = Employee.objects.get(id=employee_id)
