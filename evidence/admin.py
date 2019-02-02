@@ -1,6 +1,6 @@
 # django library
 from django.contrib import admin
-from django.utils import timezone
+from django.utils.timezone import now
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
@@ -23,7 +23,7 @@ class LastMonthWorkingDaysFilter(admin.SimpleListFilter):
     parameter_name = 'month_year'
 
     def lookups(self, request, model_admin):
-        year, month = timezone.now().year, timezone.now().month
+        year, month = now().year, now().month
         if month == 1:
             year, month = year-1, 12
         else:
@@ -36,7 +36,7 @@ class LastMonthWorkingDaysFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value():
-            year, month = timezone.now().year, timezone.now().month
+            year, month = now().year, now().month
             if month == 1:
                 year, month = year-1, 12
             else:
