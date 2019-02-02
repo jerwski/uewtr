@@ -11,7 +11,7 @@ from functions.archive import export_as_json
 # Register your models here.
 
 
-export_as_json.short_description = 'Eksportuj zaznaczone do JSON'
+export_as_json.short_description = 'Export selected records to json file'
 
 
 @admin.register(Employee)

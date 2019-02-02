@@ -274,9 +274,10 @@ class MonthlyPayrollView(View):
     def get(self, request)->render:
         now = date.today()
         month, year = now.month, now.year
+        choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
         heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
                  'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
-        form = PeriodMonthlyPayrollForm()
+        form = PeriodMonthlyPayrollForm(initial={'choice_date': choice_date})
         employees = Employee.objects.all()
         employee_id = employees.filter(employeedata__end_contract__isnull=True, status=True).first()
         employee_id = employee_id.id
@@ -460,6 +461,7 @@ class EmployeeCurrentComplexDataView(View):
     def get(self, request, employee_id:int)->render:
         choice_date = date.today()
         month, year = choice_date.month, choice_date.year
+        choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
         form = PeriodCurrentComplexDataForm(initial={'choice_date': choice_date})
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')

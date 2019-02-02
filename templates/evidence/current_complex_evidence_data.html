@@ -88,7 +88,7 @@
 
                     <table class="table table-hover table-sm">
                         <tbody>
-                            <tr><td class="text-right">Total hours:</td><td class="text-danger font-weight-bold">{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</td><td class="text-right">Brutto income:</td><td class="text-danger font-weight-bold">{{ brutto|money_format }}</td></tr>
+                            <tr><td class="text-right">Total hours:</td><td class="text-danger font-weight-bold">{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</td><td class="text-right">Netto income:</td><td class="text-danger font-weight-bold">{{ salary|money_format }}</td></tr>
                             <tr><td class="text-right">Basic payment (100%):</td><td class="text-danger font-weight-bold">{{ basicpay|money_format }}</td><td class="text-right">Leave payment (100%):</td><td class="text-danger font-weight-bold">{{ leavepay|money_format }}</td></tr>
                             <tr><td class="text-right">Saturday payment (100%):</td><td class="text-danger font-weight-bold">{{ satpay|money_format }}</td><td class="text-right">Sunday payment (200%):</td><td class="text-danger font-weight-bold">{{ sunpay|money_format }}</td></tr>
                             {% if overhourspay > 0 %}
@@ -98,7 +98,7 @@
                             {% endif %}
                             </tbody>
                     </table>
-                    <p class="text-center text-white lead font-weight-bold bg-info">NETTO INCOME: {{ salary|money_format }}</p>
+                    <p class="text-center text-white lead font-weight-bold bg-info">BRUTTO INCOME: {{ brutto|money_format }}</p>
                 {% else %}
                     <p class="text-center lead font-weight-normal">No data is available!</p>
                 {% endif %}

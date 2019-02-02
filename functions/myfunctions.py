@@ -105,10 +105,12 @@ def initial_accountdate_form()->dict:
 def initial_leave_form(employee_id:int)->dict:
     '''return initial leave_flag for EmployeeLeaveForm'''
     data = Employee.objects.get(pk=employee_id)
+    leave_date = date.today() - timedelta(days=1)
+    initial= {'leave_date': leave_date}
     if data.leave == 1:
-        initial = {'leave_flag':['paid_leave',]}
+        initial.__setitem__('leave_flag', ['paid_leave',])
     else:
-        initial = {'leave_flag':['unpaid_leave',]}
+        initial.__setitem__('leave_flag', ['unpaid_leave',])
 
     return initial
 
