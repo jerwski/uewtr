@@ -20,7 +20,7 @@ export_as_json.short_description = 'Export selected records to json file'
 
 class LastMonthWorkingDaysFilter(admin.SimpleListFilter):
     title = _('last month')
-    parameter_name = 'start_work'
+    parameter_name = 'month_year'
 
     def lookups(self, request, model_admin):
         year, month = timezone.now().year, timezone.now().month
