@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.db.models import Sum, Q
 from django.views.generic import View
+from django.utils.timezone import now
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 
 # my forms
@@ -39,7 +40,7 @@ class WorkingTimeRecorderView(View):
         query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
         overhours = EmployeeData.objects.filter(query).exists()
         context = {'worker': worker, 'employee_id': employee_id, 'employees': employees, 'overhours': overhours}
-        employee_total_data(employee_id, date.today().year, date.today().month, context)
+        employee_total_data(employee_id, now().year, now().month, context)
 
         if work_hours:
             initial = initial_worktime_form(work_hours)
@@ -124,15 +125,15 @@ class LeaveTimeRecorderView(View):
         form = EmployeeLeaveForm(initial=initial_leave_form(employee_id))
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
-        values = {'worker':worker, 'leave_date__year': date.today().year}
+        values = {'worker':worker, 'leave_date__year': now().year}
         total_leaves = EmployeeLeave.objects.filter(**values).order_by('leave_date')
         remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
         if EmployeeLeave.objects.filter(worker=worker).exists():
-            leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [year for year in range(EmployeeLeave.objects.filter(worker=worker).earliest('leave_date').leave_date.year, date.today().year + 1)]}
+            leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [year for year in range(EmployeeLeave.objects.filter(worker=worker).earliest('leave_date').leave_date.year, now().year + 1)]}
         else:
             leave_set = None
         context = {'form': form, 'worker': worker, 'employee_id': employee_id,
-                   'employees': employees, 'year': date.today().year, 'leave_set': leave_set,
+                   'employees': employees, 'year': now().year, 'leave_set': leave_set,
                    'total_leaves': total_leaves.count(), 'remaining_leave': remaining_leave}
         context.__setitem__('leaves_pl', total_leaves.filter(leave_flag='paid_leave'))
         context.__setitem__('leaves_upl', total_leaves.filter(leave_flag='unpaid_leave'))
@@ -188,11 +189,11 @@ class LeaveTimeRecorderView(View):
                 EmployeeLeave.objects.create(**data)
                 msg = f'Succesful register new leave time for {worker}'
                 messages.success(request, msg)
-                leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [year for year in range(EmployeeLeave.objects.filter(worker=worker).earliest('leave_date').leave_date.year, date.today().year + 1)]}
+                leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [year for year in range(EmployeeLeave.objects.filter(worker=worker).earliest('leave_date').leave_date.year, now().year + 1)]}
                 context.__setitem__('leave_flag', leave_flag)
                 context.__setitem__('leave_set', leave_set)
 
-            values = {'worker':worker, 'leave_date__year': date.today().year}
+            values = {'worker':worker, 'leave_date__year': now().year}
             total_leaves = EmployeeLeave.objects.filter(**values).order_by('leave_date')
             remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
 
@@ -251,7 +252,7 @@ class LeavesDataPdf(View):
     def get(self, request, employee_id:int)->HttpResponseRedirect:
         kwargs = {'employee_id': employee_id}
         # convert html file (evidence/leave_data_{}.html.format(employee_id) to pdf file
-        html = leavehtml2pdf(employee_id, date.today().year)
+        html = leavehtml2pdf(employee_id, now().year)
         # create pdf file and save on templates/pdf/leves_data_{}.pdf'.format(employee_id)
         options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
                    'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
@@ -272,8 +273,7 @@ class LeavesDataPdf(View):
 class MonthlyPayrollView(View):
     '''class representing the view of monthly payroll'''
     def get(self, request)->render:
-        now = date.today()
-        month, year = now.month, now.year
+        month, year = now().month, now().year
         choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
         heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
                  'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
@@ -380,14 +380,14 @@ class SendPayrollPdf(View):
 class AccountPaymentView(View):
     '''class representing the view of payment on account'''
     def get(self, request, employee_id:int)->render:
-        month, year = date.today().month, date.today().year
+        month, year = now().month, now().year
         form = AccountPaymentForm(initial=initial_accountdate_form())
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
         salary = total_payment(employee_id, year, month)
         salary = salary['brutto']
         context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees, 'salary': salary}
-        query = Q(worker=worker) & Q(account_date__year=date.today().year) & Q(account_date__month=date.today().month)
+        query = Q(worker=worker) & Q(account_date__year=now().year) & Q(account_date__month=now().month)
         total_account = AccountPayment.objects.filter(query)
 
         if total_account.exists():
@@ -459,7 +459,7 @@ class AccountPaymentEraseView(View):
 class EmployeeCurrentComplexDataView(View):
     '''class representing employee complex data view'''
     def get(self, request, employee_id:int)->render:
-        choice_date = date.today()
+        choice_date = now()
         month, year = choice_date.month, choice_date.year
         choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
         form = PeriodCurrentComplexDataForm(initial={'choice_date': choice_date})
