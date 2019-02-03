@@ -33,6 +33,7 @@
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-6">
+                            {% bootstrap_field form.worker size='small' %}
                             {% bootstrap_field form.account_date size='medium' label_class='text-primary font-weight-bold' %}
                         </div>
                         <div class="col-6">

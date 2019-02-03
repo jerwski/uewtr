@@ -31,11 +31,12 @@ class EmployeeExtendedDataForm(forms.ModelForm):
     WEEKLY_OVERTIME = 1
     SATURDAT_OVERTIME = 2
     RATINGS = [(NO_OVERTIME, 'Clear contract'), (WEEKLY_OVERTIME, 'Weekly overtime'), (SATURDAT_OVERTIME, 'Saturday overtime')]
+    queryset = Employee.objects.all()
     options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True,
                'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
     attrs={'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
 
-    worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=Employee.objects.all())
+    worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset)
     birthday = forms.DateField(label='Date of birthday', widget=DatePicker(options=options, attrs=attrs))
     start_contract = forms.DateField(label='Date of start contract', widget=DatePicker(options=options, attrs=attrs))
     end_contract = forms.DateField(required=False, label='Date of end contract', widget=DatePicker(options=options, attrs=attrs))

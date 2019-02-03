@@ -25,7 +25,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # my function
 from functions.myfunctions import (payrollhtml2pdf, leavehtml2pdf, plot_chart,
                                    sendPayroll, sendLeavesData, initial_leave_form,
-                                   initial_worktime_form, initial_accountdate_form)
+                                   initial_worktime_form, initial_account_form)
 from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
 
 
@@ -390,7 +390,7 @@ class AccountPaymentView(View):
     '''class representing the view of payment on account'''
     def get(self, request, employee_id:int)->render:
         month, year = now().month, now().year
-        form = AccountPaymentForm(initial=initial_accountdate_form())
+        form = AccountPaymentForm(initial=initial_account_form(employee_id))
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
         salary = total_payment(employee_id, year, month)
@@ -411,16 +411,15 @@ class AccountPaymentView(View):
 
     def post(self, request, employee_id:int)->render:
         form = AccountPaymentForm(data=request.POST)
-        worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
 
-        context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees}
+        context = {'form': form, 'employee_id': employee_id, 'employees': employees}
 
         if form.is_valid():
             data = form.cleaned_data
-            data.__setitem__('worker', worker)
-            account_date, account_value = data['account_date'], float(data['account_value'])
+            worker, account_date, account_value = data['worker'], data['account_date'], data['account_value']
             year, month = account_date.year, account_date.month
+            context.__setitem__('worker', worker)
             context.__setitem__('account_date', account_date)
             context.__setitem__('account_value', account_value)
 
@@ -445,7 +444,7 @@ class AccountPaymentView(View):
                 msg = f'The sum of advances ({advances:,.2f} PLN) is greater than the income earned so far ({salary:,.2f} PLN). The advance can not be paid...'
                 messages.error(request, msg)
 
-            return render(request, 'evidence/account_payment.html', context)
+        return render(request, 'evidence/account_payment.html', context)
 
 
 class AccountPaymentEraseView(View):

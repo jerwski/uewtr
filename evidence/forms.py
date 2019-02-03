@@ -5,6 +5,7 @@ from django import forms
 from tempus_dominus.widgets import DateTimePicker, DatePicker
 
 # my models
+from employee.models import Employee
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # bootstrap4 widget
@@ -62,16 +63,17 @@ class PeriodMonthlyPayrollForm(forms.Form):
 
 
 class AccountPaymentForm(forms.ModelForm):
+    queryset = Employee.objects.filter(status=True)
     options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True,
                'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
     attrs = {'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
 
+    worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset)
+
     account_date = forms.DateField(label='Select date of the advance payment...',
                                    widget=DatePicker(options=options, attrs=attrs))
-
-    account_value = forms.DecimalField(decimal_places=2, min_value=10.00, label='Enter the value of the advance payment...')
-
+    account_value = forms.FloatField(min_value=10)
     class Meta:
         model = AccountPayment
-        fields = ['account_date', 'account_value', 'notice']
+        fields = ['worker', 'account_date', 'account_value', 'notice']
         widgets = {'notice': forms.Textarea(attrs={'cols': 40, 'rows': 2})}

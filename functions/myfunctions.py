@@ -94,10 +94,11 @@ def initial_worktime_form(work_hours:int)->dict:
     return context
 
 
-def initial_accountdate_form()->dict:
+def initial_account_form(employee_id:int)->dict:
     '''return initial date for AccountPaymentForm'''
+    worker = Employee.objects.get(id=employee_id)
     account_date = date.today() - timedelta(days=int(date.today().day))
-    context = {'account_date':account_date}
+    context = {'worker': worker, 'account_date':account_date}
 
     return context
 
