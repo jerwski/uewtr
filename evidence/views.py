@@ -86,7 +86,6 @@ class WorkingTimeRecorderView(View):
                     messages.error(request, f'For worker {worker} this date ({start_work.date()}) is existing in database...')
                     context.__setitem__('flag_work', flag_work)
                     context.__setitem__('flag_leave', flag_leave)
-
                 else:
                     WorkEvidence.objects.create(**data)
                     messages.success(request, f'Succesful register new time working for {worker}')
@@ -95,6 +94,7 @@ class WorkingTimeRecorderView(View):
             elif start_work == end_work:
                 msg = f'Start working ({start_work}) is the same like end working ({end_work}). Please correct it...'
                 messages.error(request, msg)
+
             else:
                 msg = f'Start working ({start_work}) is later than end working ({end_work}). Please correct it...'
                 messages.error(request, msg)
@@ -109,6 +109,7 @@ class WorkingTimeRecorderEraseView(View):
     def get(self, request, employee_id:int, start_work:str, end_work:str)->HttpResponseRedirect:
         worker = Employee.objects.get(id=employee_id)
         check = WorkEvidence.objects.filter(worker=worker, start_work=start_work, end_work=end_work)
+
         if check.exists():
             check.delete()
             msg = f'Succesful erase last record for {worker}'
@@ -128,6 +129,7 @@ class LeaveTimeRecorderView(View):
         values = {'worker':worker, 'leave_date__year': now().year}
         total_leaves = EmployeeLeave.objects.filter(**values).order_by('leave_date')
         remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
+
         if EmployeeLeave.objects.filter(worker=worker).exists():
             leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [year for year in range(EmployeeLeave.objects.filter(worker=worker).earliest('leave_date').leave_date.year, now().year + 1)]}
         else:
@@ -138,6 +140,7 @@ class LeaveTimeRecorderView(View):
         context.__setitem__('leaves_pl', total_leaves.filter(leave_flag='paid_leave'))
         context.__setitem__('leaves_upl', total_leaves.filter(leave_flag='unpaid_leave'))
         context.__setitem__('leaves_ml', total_leaves.filter(leave_flag='maternity_leave'))
+
         return render(request, 'evidence/leave_time_recorder.html', context)
 
     def post(self, request, employee_id:int)->render:
@@ -145,7 +148,6 @@ class LeaveTimeRecorderView(View):
         form = EmployeeLeaveForm(data=request.POST)
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
-
         context = {'form': form, 'worker': worker, 'employees': employees, 'employee_id': employee_id}
 
         if form.is_valid():
@@ -211,6 +213,7 @@ class LeaveTimeRecorderEraseView(View):
     def get(self, request, employee_id:int, leave_date:date)->HttpResponseRedirect:
         worker = Employee.objects.get(id=employee_id)
         check = EmployeeLeave.objects.filter(worker=worker, leave_date=leave_date)
+
         if check.exists():
             check.delete()
             messages.success(request, f'Succesful erase last record for {worker}')
@@ -244,6 +247,7 @@ class LeavesDataPrintView(View):
         else:
             messages.warning(request, r'Nothing to print...')
             kwargs = {'employee_id': employee_id}
+
             return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', kwargs=kwargs))
 
 
@@ -289,6 +293,7 @@ class MonthlyPayrollView(View):
 
         # create defaultdict with summary payment
         amountpay = defaultdict(float)
+
         for item in payroll.values():
             if item['accountpay'] != item['brutto']:
                 for k,v in item.items():
@@ -339,6 +344,7 @@ class MonthlyPayrollPrintView(View):
     def get(self, request, month:int, year:int):
         '''send montly payroll as pdf attachmnet on browser'''
         html = payrollhtml2pdf(month, year)
+
         if html:
             # create pdf file with following options
             options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
@@ -349,9 +355,11 @@ class MonthlyPayrollPrintView(View):
             # send montly pyroll as attachment
             response = HttpResponse(pdf, content_type='application/pdf')
             response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+
             return response
         else:
             messages.warning(request, r'Nothing to print...')
+
             return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
 
 
@@ -360,6 +368,7 @@ class SendPayrollPdf(View):
     def get(self, request, month:int, year:int)->HttpResponseRedirect:
         # convert html file (evidence/monthly_payroll_pdf.html) to pdf file
         html = payrollhtml2pdf(month, year)
+
         if html:
             # create pdf file and save on templates/pdf/payroll_{}_{}.pdf.format(choice_date.month, choice_date.year)
             options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
@@ -421,6 +430,7 @@ class AccountPaymentView(View):
             context.__setitem__('salary', salary)
             query = Q(worker=worker) & Q(account_date__year=year) & Q(account_date__month=month)
             advances = AccountPayment.objects.filter(query).aggregate(ap=Sum('account_value'))
+
             if advances['ap'] is None:
                 advances = account_value
                 context.__setitem__('advances', advances)
@@ -444,6 +454,7 @@ class AccountPaymentEraseView(View):
         worker = Employee.objects.get(id=employee_id)
         account_value = float(account_value)
         check = AccountPayment.objects.filter(worker=worker, account_date=account_date, account_value=account_value)
+
         if check.exists():
             check.delete()
             msg = f'Succesful erase last record for {worker}'

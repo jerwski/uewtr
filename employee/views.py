@@ -5,6 +5,7 @@ from datetime import date
 from django.urls import reverse
 from django.contrib import messages
 from django.views.generic import View
+from django.utils.timezone import now
 from django.shortcuts import render, HttpResponseRedirect
 
 # my models
@@ -26,6 +27,7 @@ class EmployeeBasicDataView(View):
     def get(self, request, employee_id:int=None)->render:
         context = dict()
         employees = Employee.objects.all()
+
         if employees.exists():
             context.__setitem__('employees_st', employees.filter(status=True))
             context.__setitem__('employees_sf', employees.filter(status=False))
@@ -38,10 +40,12 @@ class EmployeeBasicDataView(View):
             fields = list(worker.__dict__.keys())[2:]
             initial = Employee.objects.filter(pk=employee_id).values(*fields)[0]
             active = EmployeeData.objects.filter(worker=worker)
+
             if active:
                 context.__setitem__('active', True)
             else:
                 context.__setitem__('active', False)
+
             form = EmployeeBasicDataForm(initial=initial)
             context.__setitem__('form', form)
             context.__setitem__('worker', worker)
@@ -54,12 +58,14 @@ class EmployeeBasicDataView(View):
             context.__setitem__('form',form)
             context.__setitem__('active', True)
             context.__setitem__('new_employee', True)
+
             return render(request, 'employee/employee_basicdata.html', context)
 
     def post(self, request, employee_id:int=None)->HttpResponseRedirect:
         form = EmployeeBasicDataForm(data=request.POST)
         context = {'form': form}
         employees = Employee.objects.all()
+
         if employees.exists():
             context.__setitem__('employees_st', employees.filter(status=True))
             context.__setitem__('employees_sf', employees.filter(status=False))
@@ -83,8 +89,9 @@ class EmployeeBasicDataView(View):
             if new_values != old_values:
                 try:
                     obj, created = Employee.objects.update_or_create(defaults=new_values, **old_values)
+
                     if created:
-                        EmployeeHourlyRate.objects.create(worker=obj, update=date.today(), hourly_rate=8.00)
+                        EmployeeHourlyRate.objects.create(worker=obj, update=now().date(), hourly_rate=8.00)
                         msg = f'Successful created basic data for employee {obj} with minimum rate 8.00 PLN/h'
                         messages.success(request, msg)
                         kwargs = {'employee_id': obj.id}
@@ -92,17 +99,19 @@ class EmployeeBasicDataView(View):
                     else:
                         msg = f'Successful update data for employee {obj}'
                         messages.success(request, msg)
-                        return HttpResponseRedirect(reverse('employee:employee_basicdata', kwargs=kwargs))
 
+                        return HttpResponseRedirect(reverse('employee:employee_basicdata', kwargs=kwargs))
 
                 except Employee.DoesNotExist:
                     messages.warning(request, r'Somthing wrong... try again!')
 
             else:
                 messages.info(request, r'Nothing to change!')
+
                 return HttpResponseRedirect(reverse('employee:employee_basicdata', kwargs=kwargs))
         else:
             context.__setitem__('new_employee', True)
+
             return render(request, 'employee/employee_basicdata.html', context)
 
 
@@ -110,6 +119,7 @@ class EmployeeEraseAll(View):
     '''class implementing the method for ersing all data in database for the employee by pk=employee_id'''
     def get(self, request, employee_id:int)->HttpResponseRedirect:
         worker = Employee.objects.get(pk=employee_id)
+
         if worker:
             archiving_of_deleted_records(worker)
             worker.delete()
@@ -117,6 +127,7 @@ class EmployeeEraseAll(View):
             messages.success(request, msg)
         else:
             messages.info(request, r'Nothing to delete!')
+
         return HttpResponseRedirect(reverse('employee:employee_basicdata'))
 
 
@@ -146,7 +157,6 @@ class EmployeeExtendedDataView(View):
         worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(status=True)
         old_values = {'worker': worker}
-
         context = {'form': form, 'employee_id': employee_id, 'employees': employees, 'employee': worker}
 
         if EmployeeData.objects.filter(worker=worker).exists():
@@ -161,9 +171,9 @@ class EmployeeExtendedDataView(View):
             new_values = form.cleaned_data
 
             if new_values != old_values:
-
                 try:
                     obj, created = EmployeeData.objects.update_or_create(**old_values, defaults=new_values)
+
                     if created:
                         msg = f'Successful created extended data for employee {obj}'
                         messages.success(request, msg)
@@ -171,14 +181,15 @@ class EmployeeExtendedDataView(View):
                     else:
                         msg = f'Successful update data for employee {obj}'
                         messages.success(request, msg)
-                        return HttpResponseRedirect(reverse('employee:employee_basicdata', kwargs=kwargs))
 
+                        return HttpResponseRedirect(reverse('employee:employee_basicdata', kwargs=kwargs))
 
                 except Employee.DoesNotExist:
                     messages.warning(request, r'Somthing wrong... try again!')
 
             else:
                 messages.info(request, r'Nothing to change!')
+
                 return HttpResponseRedirect(reverse('employee:employee_extendeddata', kwargs={'employee_id': employee_id}))
         else:
             return render(request, 'employee/employee_extendeddata.html', context)
@@ -191,7 +202,7 @@ class EmployeeHourlyRateView(View):
         employees = Employee.objects.filter(status=True)
         all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=employee)
         last_hourly_rate = all_hourly_rate.last()
-        form = EmployeeHourlyRateForm()
+        form = EmployeeHourlyRateForm(initial={'hourly_rate': f'{last_hourly_rate.hourly_rate:.2f}'})
         context = {'employee_id': employee_id, 'employee': employee, 'employees': employees,
                    'last_hourly_rate': last_hourly_rate, 'all_hourly_rate': all_hourly_rate, 'form': form}
         return render(request, 'employee/employee_hourly_rate.html', context)
@@ -199,31 +210,38 @@ class EmployeeHourlyRateView(View):
     def post(self, request, employee_id:int)->render:
         employee = Employee.objects.get(pk=employee_id)
         employees = Employee.objects.filter(status=True)
-        values = {'worker': employee, 'update__year': date.today().year, 'update__month': date.today().month}
+        values = {'worker': employee, 'update__year': now().year, 'update__month': now().month}
         form = EmployeeHourlyRateForm(data=request.POST)
         context = {'form': form, 'employee_id': employee_id,
-                   'employee': employee, 'employees': employees, 'update': date.today()}
+                   'employee': employee, 'employees': employees, 'update': now().date()}
 
         if form.is_valid():
             data = form.cleaned_data
 
-            if EmployeeHourlyRate.objects.filter(**values).exclude(update__exact=date.today()).exists():
+            if EmployeeHourlyRate.objects.filter(**values).exclude(update__exact=now().date()).exists():
                 msg = f'Rate for employee ({employee}) is existing in database...'
                 messages.error(request, msg)
                 context.__setitem__('check_rate', True)
-
             else:
-                defaults = {'hourly_rate': data['hourly_rate']}
-                kwargs = {'worker_id': employee.id, 'update': date.today()}
-                obj, created = EmployeeHourlyRate.objects.update_or_create(defaults=defaults, **kwargs)
-                context.__setitem__('hourly_rate', obj.hourly_rate)
+                all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=employee)
+                last_exist_hourly_rate = all_hourly_rate.last()
 
-                if created:
-                    msg = f'For employee ({employee}) add new hourly rate ({obj.hourly_rate} PLN)'
-                    messages.success(request, msg)
+                if data['hourly_rate'] != last_exist_hourly_rate.hourly_rate:
+                    defaults = {'hourly_rate': data['hourly_rate']}
+                    kwargs = {'worker_id': employee.id, 'update': now().date()}
+                    obj, created = EmployeeHourlyRate.objects.update_or_create(defaults=defaults, **kwargs)
+                    context.__setitem__('hourly_rate', obj.hourly_rate)
+
+                    if created:
+                        msg = f'For employee ({employee}) add new hourly rate ({obj.hourly_rate} PLN)'
+                        messages.success(request, msg)
+                    else:
+                        msg = f'For employee {employee} update hourly rate ({obj.hourly_rate} PLN)'
+                        messages.success(request, msg)
                 else:
-                    msg = f'For employee ({employee}) update hourly rate ({obj.hourly_rate} PLN)'
+                    msg = f'Last hourly rate {last_exist_hourly_rate} for {employee} is the same like enterd.'
                     messages.success(request, msg)
+                    context.__setitem__('last_exist_hourly_rate', last_exist_hourly_rate)
 
         return render(request, 'employee/employee_hourly_rate.html', context)
 
@@ -233,13 +251,15 @@ class EmployeeHourlyRateEraseView(View):
     def get(self, request, employee_id:int)->HttpResponseRedirect:
         kwargs = {'employee_id': employee_id}
         employee = Employee.objects.get(id=employee_id)
-        check = EmployeeHourlyRate.objects.filter(worker=employee, update__exact=date.today())
+        check = EmployeeHourlyRate.objects.filter(worker=employee, update__exact=now().date())
+
         if check.exists():
             check.delete()
             msg = f'Succesful erase last record for {employee}'
             messages.success(request, msg)
+
             if not EmployeeHourlyRate.objects.filter(worker=employee).exists():
-                EmployeeHourlyRate.objects.create(worker=employee, update=date.today(), hourly_rate=8.00)
+                EmployeeHourlyRate.objects.create(worker=employee, update=now().date(), hourly_rate=8.00)
                 msg = f'Set minimum hourly rate for {employee}'
                 messages.success(request, msg)
         else:
