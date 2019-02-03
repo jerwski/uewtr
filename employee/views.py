@@ -169,7 +169,7 @@ class EmployeeExtendedDataView(View):
                 old_values.update(EmployeeData.objects.filter(worker=worker).values(*fields)[0])
                 old_values.pop('worker_id')
                 val = old_values['overtime']
-                old_values['overtime']=str(val)
+                old_values['overtime'] = str(val)
 
             if new_values != old_values:
                 try:
