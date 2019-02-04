@@ -205,7 +205,7 @@ class EmployeeHourlyRateView(View):
         last_hourly_rate = all_hourly_rate.last()
         initial={'worker': worker, 'hourly_rate': f'{last_hourly_rate.hourly_rate:.2f}'}
         form = EmployeeHourlyRateForm(initial=initial)
-        context = {'employee_id': employee_id, 'employee': worker, 'employees': employees,
+        context = {'employee_id': employee_id, 'worker': worker, 'employees': employees,
                    'last_hourly_rate': last_hourly_rate, 'all_hourly_rate': all_hourly_rate, 'form': form}
         return render(request, 'employee/employee_hourly_rate.html', context)
 
@@ -218,7 +218,7 @@ class EmployeeHourlyRateView(View):
             # TODO: try to set auto_now_add=True for update field
             data = form.cleaned_data
             worker = data['worker']
-            context.__setitem__('employee', worker)
+            context.__setitem__('worker', worker)
             values = {'worker': worker, 'update__year': now().year, 'update__month': now().month}
 
             if EmployeeHourlyRate.objects.filter(**values).exclude(update__exact=now().date()).exists():

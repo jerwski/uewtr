@@ -2,7 +2,7 @@
 {% load bootstrap4 %}
 {% load utility_tags %}
 
-{% block title %}Change employee hourly rate{% endblock %}
+{% block title %}Add/Change employee hourly rate{% endblock %}
 
 
 {% block content %}
@@ -27,7 +27,7 @@
         </div>
 
         <div class="col-sm-7">
-            <p class="text-center text-danger lead font-weight-normal bg-warning">CHANGE RATE FOR {{ employee|upper }}</p>
+            <p class="text-center text-danger lead font-weight-normal bg-warning">CHANGE RATE FOR {{ worker|upper }}</p>
             {% if last_hourly_rate %}
                 <p class="offset-1">Last hourly rate: <em class="text-danger font-weight-bold">{{ last_hourly_rate }}</em></p>
             {% endif %}
@@ -55,15 +55,15 @@
             {% if check_rate %}
                 <button type="button" class="btn btn-block btn-outline-danger" data-toggle="collapse" data-target="#rate">Hourly rate has not been adding => click me</button>
                 <div id="rate" class="collapse">
-                    <p class="text-primary mt-3">For employee <em class="font-weight-bold"> {{ employee }}</em> you can't change hourly rate on this month ({{ update|date:'M/Y' }}).</p>
+                    <p class="text-primary mt-3">For employee <em class="font-weight-bold"> {{ worker }}</em> you can't change hourly rate on this month ({{ update|date:'M/Y' }}).</p>
                 </div>
             {% endif %}
             {% if hourly_rate %}
-                <p class="text-primary mt-3">For employee <em class="text-danger font-weight-bold">{{ employee }}</em> is today ({{ update|date:'d-m-Y' }}) new rate <em class="text-danger font-weight-bold">({{ hourly_rate|floatformat:2 }} PLN/h)</em> on database adding.<br><br><em class="text-danger font-weight-bold">Would you like to erase this record???</em></p>
+                <p class="text-primary mt-3">For employee <em class="text-danger font-weight-bold">{{ worker }}</em> is today ({{ update|date:'d-m-Y' }}) new rate <em class="text-danger font-weight-bold">({{ hourly_rate|floatformat:2 }} PLN/h)</em> on database adding.<br><br><em class="text-danger font-weight-bold">Would you like to erase this record???</em></p>
                 <a href="{% url 'employee:employee_hourly_rate_erase' employee_id %}" class="btn btn-danger btn-block mt-3">Erase</a>
             {% endif %}
             {% if last_exist_hourly_rate %}
-                <p class="text-primary mt-3">For employee <em class="text-danger font-weight-bold">{{ employee }}</em> last hourly rate <em class="text-danger font-weight-bold">{{ last_exist_hourly_rate }}</em> is the same like entered. Please insert new one or back to the Dashboard.</p>
+                <p class="text-primary mt-3">For employee <em class="text-danger font-weight-bold">{{ worker }}</em> last hourly rate <em class="text-danger font-weight-bold">{{ last_exist_hourly_rate }}</em> is the same like entered. Please insert new one or back to the Dashboard.</p>
             {% endif %}
             <div class="offset-1 btn-sm btn-group mt-2" role="group">
                 <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
