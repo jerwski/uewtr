@@ -54,9 +54,9 @@ def sendPayroll(month:int, year:int):
 def sendLeavesData(employee_id:int):
     '''send e-mail with attached leave data in pdf format for specific employee'''
     try:
-        employee = Employee.objects.get(pk=employee_id)
-        subject = f'list of leave for {employee} ({date.today().year})r.'
-        message = f'List of leave in attachment {employee} za {date.today().year}r.'
+        worker = Employee.objects.get(pk=employee_id)
+        subject = f'list of leave for {worker} ({date.today().year})r.'
+        message = f'List of leave in attachment {worker} za {date.today().year}r.'
         sender, recipient = settings.EMAIL_HOST_USER,['projekt@unikolor.com']
         attachment = Path(f'templates/pdf/leaves_data_{employee_id}.pdf')
         sendemail(subject, message, sender, recipient, attachment)
@@ -89,26 +89,26 @@ def initial_worktime_form(work_hours:int)->dict:
     start_date = datetime(start_date.year, start_date.month, start_date.day, hours[work_hours], 0)
     end_date = datetime(end_date.year, end_date.month, end_date.day, work_hours, 0)
 
-    context = {'start_work': start_date, 'end_work': end_date}
+    initial = {'start_work': start_date, 'end_work': end_date}
 
-    return context
+    return initial
 
 
 def initial_account_form(employee_id:int)->dict:
     '''return initial date for AccountPaymentForm'''
-    worker = Employee.objects.get(id=employee_id)
+    worker = Employee.objects.get(pk=employee_id)
     account_date = date.today() - timedelta(days=int(date.today().day))
-    context = {'worker': worker, 'account_date':account_date}
+    initial = {'worker': worker, 'account_date':account_date}
 
-    return context
+    return initial
 
 
 def initial_leave_form(employee_id:int)->dict:
     '''return initial leave_flag for EmployeeLeaveForm'''
-    data = Employee.objects.get(pk=employee_id)
+    worker = Employee.objects.get(pk=employee_id)
     leave_date = date.today() - timedelta(days=1)
-    initial= {'leave_date': leave_date}
-    if data.leave == 1:
+    initial= {'worker': worker, 'leave_date': leave_date}
+    if worker.leave == 1:
         initial.__setitem__('leave_flag', ['paid_leave',])
     else:
         initial.__setitem__('leave_flag', ['unpaid_leave',])

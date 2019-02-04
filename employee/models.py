@@ -80,7 +80,7 @@ class EmployeeData(models.Model):
 class EmployeeHourlyRate(models.Model):
     '''class representing an hourly rate data table of employee'''
     worker = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    update = models.DateField()
+    update = models.DateField(auto_now_add=True)
     hourly_rate = models.FloatField(max_length=5)
 
     def __str__(self):

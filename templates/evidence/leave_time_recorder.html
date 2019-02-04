@@ -31,8 +31,8 @@
         <div class="col-sm-8">
             {% if worker.status %}
                 <p class="text-center text-danger lead font-weight-normal bg-warning">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
-                <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">
-                    {% csrf_token %}
+                <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
+                    {% bootstrap_field form.worker %}
                     <div class="row">
                         <div class="col-4 ml-2">
                             {% bootstrap_field form.leave_date size='medium' label_class='text-info font-italic font-weight-bold' %}
@@ -46,12 +46,14 @@
                     </div>
                 </form>
 
-                {% if flag_work or flag_leave %}
-                    <p class="text-justify text-danger lead font-weight-normal">Work or leave data exist on datebase - <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }})</em></p>
+                {% if flag_leave %}
+                    <p class="text-justify text-danger lead font-weight-normal">Selected date: <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> exist on datebase as leave day! </p>
+                {% elif flag_work %}
+                    <p class="text-justify text-danger lead font-weight-normal">Selected date: <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> exist on datebase as work day!</p>
                 {% elif name_holiday %}
-                    <p class="text-justify text-danger lead font-weight-normal">Selected date - <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> is a holiday <em class="font-weight-bold">({{ name_holiday }})</em></p>
+                    <p class="text-justify text-danger lead font-weight-normal">Selected date: <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> is a holiday <em class="font-weight-bold">({{ name_holiday }})</em></p>
                 {% elif flag_weekend %}
-                    <p class="text-justify text-danger lead font-weight-normal">You've been trying add leave day on <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em>! You haven't to do it!</p>
+                    <p class="text-justify text-danger lead font-weight-normal">You've been trying add leave day on <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em>!<br>It's impossible!</p>
                 {% else %}
                     {% if leave_flag == 'unpaid_leave' %}
                         <p class="text-justify text-danger lead font-weight-normal">CAUTION: You've been adding <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em> one day of unpaid leave!</p>

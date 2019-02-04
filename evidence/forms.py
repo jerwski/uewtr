@@ -15,12 +15,16 @@ from bootstrap4.widgets import RadioSelectButtonGroup
 # Create your forms here.
 
 
+# queryset to validate HiddenInput fields
+queryset = Employee.objects.all()
+
 class WorkEvidenceForm(forms.ModelForm):
     options = {'icons': {'time': 'fa fa-clock-o'}, 'format': 'YYYY-MM-DD HH:mm',
                'useCurrent': False, 'stepping': 5, 'sideBySide': True,
                'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
     attrs={'prepend': 'fa fa-clock-o', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
 
+    worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset)
     start_work = forms.DateTimeField(label='Start of work (date and time):',
                                      widget=DateTimePicker(options=options, attrs=attrs))
     end_work = forms.DateTimeField(label='End of work (date and time):',
@@ -28,7 +32,7 @@ class WorkEvidenceForm(forms.ModelForm):
 
     class Meta:
         model = WorkEvidence
-        fields = ['start_work', 'end_work']
+        fields = ['worker', 'start_work', 'end_work']
 
 
 class EmployeeLeaveForm(forms.ModelForm):
@@ -37,13 +41,14 @@ class EmployeeLeaveForm(forms.ModelForm):
                'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
     attrs = {'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
 
+    worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset)
     leave_date = forms.DateField(label='Select a date of leave...', widget=DatePicker(options=options, attrs=attrs))
     leave_flag = forms.ChoiceField(label="Select a kind of leave...", required=True,
                                    widget=RadioSelectButtonGroup, choices=LEAVEKIND)
 
     class Meta:
         model = EmployeeLeave
-        fields = ['leave_date', 'leave_flag']
+        fields = ['worker', 'leave_date', 'leave_flag']
 
 
 class PeriodCurrentComplexDataForm(forms.Form):

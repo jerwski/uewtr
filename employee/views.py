@@ -215,7 +215,6 @@ class EmployeeHourlyRateView(View):
         context = {'form': form, 'employee_id': employee_id, 'employees': employees, 'update': now().date()}
 
         if form.is_valid():
-            # TODO: try to set auto_now_add=True for update field
             data = form.cleaned_data
             worker = data['worker']
             context.__setitem__('worker', worker)
@@ -253,17 +252,17 @@ class EmployeeHourlyRateEraseView(View):
     '''class implementing the method of deleting the new hourly rate entered for the employee by pk=employee_id'''
     def get(self, request, employee_id:int)->HttpResponseRedirect:
         kwargs = {'employee_id': employee_id}
-        employee = Employee.objects.get(id=employee_id)
-        check = EmployeeHourlyRate.objects.filter(worker=employee, update__exact=now().date())
+        worker = Employee.objects.get(id=employee_id)
+        check = EmployeeHourlyRate.objects.filter(worker=worker, update__exact=now().date())
 
         if check.exists():
             check.delete()
-            msg = f'Succesful erase last record for {employee}'
+            msg = f'Succesful erase last record for {worker}'
             messages.success(request, msg)
 
-            if not EmployeeHourlyRate.objects.filter(worker=employee).exists():
-                EmployeeHourlyRate.objects.create(worker=employee, update=now().date(), hourly_rate=8.00)
-                msg = f'Set minimum hourly rate for {employee}'
+            if not EmployeeHourlyRate.objects.filter(worker=worker).exists():
+                EmployeeHourlyRate.objects.create(worker=worker, update=now().date(), hourly_rate=8.00)
+                msg = f'Set minimum hourly rate for {worker}'
                 messages.success(request, msg)
         else:
             messages.info(request, r'Nothing to erase...')

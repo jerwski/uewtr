@@ -36,6 +36,7 @@ class WorkingTimeRecorderView(View):
     '''class implementing the method of adding working time for specific employee'''
     def get(self, request, employee_id:int, work_hours:int=0)->render:
         worker = Employee.objects.get(pk=employee_id)
+        initial = {'worker': worker}
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
         query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
         overhours = EmployeeData.objects.filter(query).exists()
@@ -43,12 +44,12 @@ class WorkingTimeRecorderView(View):
         employee_total_data(employee_id, now().year, now().month, context)
 
         if work_hours:
-            initial = initial_worktime_form(work_hours)
+            initial.update(initial_worktime_form(work_hours))
             form = WorkEvidenceForm(initial=initial)
             context.__setitem__('form', form)
             context.__setitem__('work_hours', True)
         else:
-            form = WorkEvidenceForm()
+            form = WorkEvidenceForm(initial=initial)
             context.__setitem__('form', form)
             context.__setitem__('work_hours', False)
 
@@ -56,21 +57,19 @@ class WorkingTimeRecorderView(View):
 
     def post(self, request, employee_id:int)->render:
         form = WorkEvidenceForm(data=request.POST)
-        worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
-        query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
-        overhours = EmployeeData.objects.filter(query).exists()
-        context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees, 'overhours': overhours}
+
+        context = {'form': form, 'employee_id': employee_id, 'employees': employees}
 
         if form.is_valid():
             data = form.cleaned_data
-            data.__setitem__('worker', worker)
-            start_work, end_work = data['start_work'], data['end_work']
+            worker, start_work, end_work = data['worker'], data['start_work'], data['end_work']
+            query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
+            overhours = EmployeeData.objects.filter(query).exists()
+            context.update({'worker': worker, 'overhours': overhours})
             jobhours = (end_work - start_work).total_seconds()/3600
             data.__setitem__('jobhours', jobhours)
-            context.__setitem__('start_work', start_work)
-            context.__setitem__('end_work', end_work)
-            context.__setitem__('jobhours', jobhours)
+            context.update({'start_work': start_work, 'end_work': end_work, 'jobhours': jobhours})
             year, month = start_work.year, start_work.month
 
             # check or data exisiting in WorkEvidence and EmployeeLeave table
@@ -107,12 +106,11 @@ class WorkingTimeRecorderView(View):
 class WorkingTimeRecorderEraseView(View):
     '''class implementing the method of erase last added working time record for specific employee'''
     def get(self, request, employee_id:int, start_work:str, end_work:str)->HttpResponseRedirect:
-        worker = Employee.objects.get(id=employee_id)
-        check = WorkEvidence.objects.filter(worker=worker, start_work=start_work, end_work=end_work)
+        check = WorkEvidence.objects.filter(worker_id=employee_id, start_work=start_work, end_work=end_work)
 
         if check.exists():
             check.delete()
-            msg = f'Succesful erase last record for {worker}'
+            msg = f'Succesful erase working day: start_work: {start_work} - end_work: {end_work}'
             messages.success(request, msg)
 
         kwargs = {'employee_id': employee_id}
@@ -123,10 +121,11 @@ class WorkingTimeRecorderEraseView(View):
 class LeaveTimeRecorderView(View):
     '''class implementing the method of adding leave time for specific employee'''
     def get(self, request, employee_id:int)->render:
-        form = EmployeeLeaveForm(initial=initial_leave_form(employee_id))
-        worker = Employee.objects.get(id=employee_id)
+        initial=initial_leave_form(employee_id)
+        form = EmployeeLeaveForm(initial=initial)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
-        values = {'worker':worker, 'leave_date__year': now().year}
+        worker = initial['worker']
+        values = {'worker': worker, 'leave_date__year': now().year}
         total_leaves = EmployeeLeave.objects.filter(**values).order_by('leave_date')
         remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
 
@@ -146,16 +145,14 @@ class LeaveTimeRecorderView(View):
     def post(self, request, employee_id:int)->render:
         name_holiday, flag_weekend = False, False
         form = EmployeeLeaveForm(data=request.POST)
-        worker = Employee.objects.get(id=employee_id)
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
-        context = {'form': form, 'worker': worker, 'employees': employees, 'employee_id': employee_id}
+        context = {'form': form, 'employees': employees, 'employee_id': employee_id}
 
         if form.is_valid():
+            form.save(commit=False)
             data = form.cleaned_data
-            leave_date = data['leave_date']
-            leave_flag = data['leave_flag']
-            context.__setitem__('leave_date', leave_date)
-            data.__setitem__('worker', worker)
+            worker, leave_date, leave_flag = data['worker'], data['leave_date'], data['leave_flag']
+            context.update({'worker': worker, 'leave_date': leave_date})
 
             # check or data exisiting in WorkEvidence and EmployeeLeave table or isn't Sunday or Saturday
             check_leave = {'worker': worker, 'leave_date': leave_date}
@@ -171,25 +168,29 @@ class LeaveTimeRecorderView(View):
             query = Q(worker=worker) & Q(start_work__date=leave_date)
             flag_work = WorkEvidence.objects.filter(query).exists()
 
-            if flag_leave or flag_work:
-                msg = f'For worker {worker} this date ({leave_date}) is existing in database...'
+            if flag_leave:
+                msg = f'For worker {worker} this date ({leave_date}) is existing in database as leave day!'
                 messages.error(request, msg)
                 context.__setitem__('flag_leave', flag_leave)
+
+            elif flag_work:
+                msg = f'For worker {worker} this date ({leave_date}) is existing in database as working day!'
+                messages.error(request, msg)
                 context.__setitem__('flag_work', flag_work)
 
             elif flag_weekend:
-                msg = f'Selectet date {leave_date} is Saturday or Sunday. You can not set this as leave day'
+                msg = f'Selectet date {leave_date} is Saturday or Sunday. You can\'t set this as leave day!'
                 messages.error(request, msg)
                 context.__setitem__('flag_weekend', flag_weekend)
 
-            elif leave_date in holiday(leave_date.year).values():
-                msg = f'Selectet date {leave_date} is holiday ({name_holiday}). You can not set this as leave day'
+            elif name_holiday:
+                msg = f'Selectet date {leave_date} is holiday ({name_holiday}). You can\'t set this as leave day!'
                 messages.error(request, msg)
                 context.__setitem__('name_holiday', name_holiday)
 
             else:
-                EmployeeLeave.objects.create(**data)
-                msg = f'Succesful register new leave time for {worker}'
+                form.save()
+                msg = f'Succesful register new leave day ({leave_date}) for {worker}'
                 messages.success(request, msg)
                 leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [year for year in range(EmployeeLeave.objects.filter(worker=worker).earliest('leave_date').leave_date.year, now().year + 1)]}
                 context.__setitem__('leave_flag', leave_flag)
@@ -211,12 +212,11 @@ class LeaveTimeRecorderView(View):
 class LeaveTimeRecorderEraseView(View):
     '''class implementing the method of erase last added leave time record for specific employee'''
     def get(self, request, employee_id:int, leave_date:date)->HttpResponseRedirect:
-        worker = Employee.objects.get(id=employee_id)
-        check = EmployeeLeave.objects.filter(worker=worker, leave_date=leave_date)
+        check = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date=leave_date)
 
         if check.exists():
             check.delete()
-            messages.success(request, f'Succesful erase last record for {worker}')
+            messages.success(request, f'Succesful erase leave date: {leave_date}')
         else:
             messages.info(request, r'Nothing to erase...')
 
@@ -390,8 +390,9 @@ class AccountPaymentView(View):
     '''class representing the view of payment on account'''
     def get(self, request, employee_id:int)->render:
         month, year = now().month, now().year
-        form = AccountPaymentForm(initial=initial_account_form(employee_id))
-        worker = Employee.objects.get(id=employee_id)
+        initial=initial_account_form(employee_id)
+        form = AccountPaymentForm(initial=initial)
+        worker = initial['worker']
         employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
         salary = total_payment(employee_id, year, month)
         salary = salary['brutto']
@@ -402,10 +403,10 @@ class AccountPaymentView(View):
         if total_account.exists():
             total_account = total_account.aggregate(ta=Sum('account_value'))
             total_account = total_account['ta']
-            context.__setitem__('total_account', total_account)
         else:
             total_account = 0
-            context.__setitem__('total_account', total_account)
+
+        context.__setitem__('total_account', total_account)
 
         return render(request, 'evidence/account_payment.html', context)
 
@@ -449,14 +450,13 @@ class AccountPaymentView(View):
 
 class AccountPaymentEraseView(View):
     '''class implementing the method of erase last added working time record for specific employee'''
-    def get(self, request, employee_id:int, account_date:str, account_value:float)->HttpResponseRedirect:
-        worker = Employee.objects.get(id=employee_id)
-        account_value = float(account_value)
-        check = AccountPayment.objects.filter(worker=worker, account_date=account_date, account_value=account_value)
+    def get(self, request, employee_id:int, account_date:date, account_value:float)->HttpResponseRedirect:
+        data = {'worker_id': employee_id, 'account_date': account_date, 'account_value': account_value}
+        check = AccountPayment.objects.filter(**data)
 
         if check.exists():
             check.delete()
-            msg = f'Succesful erase last record for {worker}'
+            msg = f'Succesful erase account payment {float(account_value):.2f} PLN'
             messages.success(request, msg)
         else:
             messages.info(request, r'Nothing to erase...')

@@ -41,6 +41,7 @@
                     </div>
                     <div class="col-10">
                         <form action="{% url 'evidence:working_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
+                            {% bootstrap_field form.worker %}
                             <div class="row mt-4">
                                 <div class='col-6'>
                                     <div class="form-group">
@@ -88,7 +89,7 @@
                                 </div>
                                 <div class="col-md-6 btn-sm mb-lg-4">
                                     {% if jobhours != 8 %}
-                                        <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase non standard jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
+                                        <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase expanded jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
                                     {% else %}
                                         <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase standard jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
                                     {% endif %}

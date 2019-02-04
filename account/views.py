@@ -55,22 +55,20 @@ def exit(request)->HttpResponseRedirect:
     args = (settings.ARCHIVE_FILE, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
 
     if check_internet_connection():
-
-        if socket.gethostname() == 'OFFICELAPTOP':
-            try:
+        try:
+            if socket.gethostname() == 'OFFICELAPTOP':
                 backup()
                 mkfixture()
                 make_archives()
                 uploadFileFTP(*args)
 
-            except ConnectionError as error:
+            if request.user.is_authenticated:
+                remgarbage(*paths)
+                logout(request)
+
+            return HttpResponseRedirect(r'https://www.google.pl/')
+        except ConnectionError as error:
                 print(f'Connection error... Error code: {error}')
 
-        if request.user.is_authenticated:
-            remgarbage(*paths)
-            logout(request)
-
-        return HttpResponseRedirect(r'https://www.google.pl/')
-
     else:
-        return render(request, '500.html', {'error': ConnectionError.filename})
+        return render(request, '500.html', {'error': ConnectionError.__doc__})

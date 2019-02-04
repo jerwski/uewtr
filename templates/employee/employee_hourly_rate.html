@@ -48,7 +48,7 @@
                 <p class="text-primary font-weight-bold font-italic offset-1">All hourly rates:</p>
                 {% for rate in all_hourly_rate %}
                     <ul>
-                        <p class="text-info font-weight-bold font-italic offset-1">{{ forloop.counter }}) {{ rate.hourly_rate|money_format }}/h : {{ rate.update|date:'l, F Y d' }}</p>
+                        <p class="text-info font-weight-bold font-italic offset-1">{{ forloop.counter }}) {{ rate.hourly_rate|money_format }}/h : {{ rate.update|date:'l, d F Y' }}</p>
                     </ul>
                 {% endfor %}
             {% endif %}
