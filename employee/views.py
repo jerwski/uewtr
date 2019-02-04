@@ -199,48 +199,50 @@ class EmployeeExtendedDataView(View):
 class EmployeeHourlyRateView(View):
     '''class implementing the method of changing the hourly rate for the employee by pk=employee_id'''
     def get(self, request, employee_id:int)->render:
-        employee = Employee.objects.get(pk=employee_id)
+        worker = Employee.objects.get(pk=employee_id)
         employees = Employee.objects.filter(status=True)
-        all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=employee)
+        all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=worker)
         last_hourly_rate = all_hourly_rate.last()
-        form = EmployeeHourlyRateForm(initial={'hourly_rate': f'{last_hourly_rate.hourly_rate:.2f}'})
-        context = {'employee_id': employee_id, 'employee': employee, 'employees': employees,
+        initial={'worker': worker, 'hourly_rate': f'{last_hourly_rate.hourly_rate:.2f}'}
+        form = EmployeeHourlyRateForm(initial=initial)
+        context = {'employee_id': employee_id, 'employee': worker, 'employees': employees,
                    'last_hourly_rate': last_hourly_rate, 'all_hourly_rate': all_hourly_rate, 'form': form}
         return render(request, 'employee/employee_hourly_rate.html', context)
 
     def post(self, request, employee_id:int)->render:
-        employee = Employee.objects.get(pk=employee_id)
         employees = Employee.objects.filter(status=True)
-        values = {'worker': employee, 'update__year': now().year, 'update__month': now().month}
         form = EmployeeHourlyRateForm(data=request.POST)
-        context = {'form': form, 'employee_id': employee_id,
-                   'employee': employee, 'employees': employees, 'update': now().date()}
+        context = {'form': form, 'employee_id': employee_id, 'employees': employees, 'update': now().date()}
 
         if form.is_valid():
+            # TODO: try to set auto_now_add=True for update field
             data = form.cleaned_data
+            worker = data['worker']
+            context.__setitem__('employee', worker)
+            values = {'worker': worker, 'update__year': now().year, 'update__month': now().month}
 
             if EmployeeHourlyRate.objects.filter(**values).exclude(update__exact=now().date()).exists():
-                msg = f'Rate for employee ({employee}) is existing in database...'
+                msg = f'Rate for employee ({worker}) is existing in database...'
                 messages.error(request, msg)
                 context.__setitem__('check_rate', True)
             else:
-                all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=employee)
+                all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=worker)
                 last_exist_hourly_rate = all_hourly_rate.last()
 
                 if data['hourly_rate'] != last_exist_hourly_rate.hourly_rate:
                     defaults = {'hourly_rate': data['hourly_rate']}
-                    kwargs = {'worker_id': employee.id, 'update': now().date()}
+                    kwargs = {'worker_id': employee_id, 'update': now().date()}
                     obj, created = EmployeeHourlyRate.objects.update_or_create(defaults=defaults, **kwargs)
                     context.__setitem__('hourly_rate', obj.hourly_rate)
 
                     if created:
-                        msg = f'For employee ({employee}) add new hourly rate ({obj.hourly_rate} PLN)'
+                        msg = f'For employee ({worker}) add new hourly rate ({obj.hourly_rate} PLN)'
                         messages.success(request, msg)
                     else:
-                        msg = f'For employee {employee} update hourly rate ({obj.hourly_rate} PLN)'
+                        msg = f'For employee {worker} update hourly rate ({obj.hourly_rate} PLN)'
                         messages.success(request, msg)
                 else:
-                    msg = f'Last hourly rate {last_exist_hourly_rate} for {employee} is the same like enterd.'
+                    msg = f'Last hourly rate {last_exist_hourly_rate} for {worker} is the same like enterd.'
                     messages.success(request, msg)
                     context.__setitem__('last_exist_hourly_rate', last_exist_hourly_rate)
 

@@ -33,7 +33,7 @@
             {% endif %}
             <form action="{% url 'employee:employee_hourly_rate' employee_id %}" method="POST">
                 {% csrf_token %}
-
+                {% bootstrap_field form.worker %}
                 <div class="input-group mb-3 offset-1">
                     <div class="input-group-prepend">
                         <div class="input-group-text bg-info">New value of hourly rate:</div>
