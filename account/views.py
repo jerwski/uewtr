@@ -58,7 +58,7 @@ class AdminView(View):
         return HttpResponseRedirect('/login/')
 
 
-class Zip2File(View):
+class Zip2Ftp(View):
     '''class that allows archiving the database of issued invoices'''
     def get(self, request)->HttpResponseRedirect:
         backup_file = Path(os.path.expanduser('~')).joinpath('Desktop/zip2ftp/invoices.zip')
