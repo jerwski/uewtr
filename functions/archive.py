@@ -1,4 +1,5 @@
 # standard library
+import os
 from ftplib import FTP
 from pathlib import Path
 from datetime import date
@@ -89,6 +90,31 @@ def make_archives():
             print(f'Archiving has failed => Error code: {error}')
     else:
         print(f'Directory {dest_path} is empty...')
+
+
+def invoices_backup():
+    '''create compressed in zip format archive file with invoices'''
+    root = Path(os.path.expanduser('~'))
+    root_backup= root.joinpath('Desktop/Faktury backup')
+    base_dir = root.joinpath('Desktop/zip2ftp')
+    base_name = base_dir.joinpath('invoices')
+    backup_file = base_name.with_suffix('.zip')
+    if list(Path.iterdir(root_backup)):
+        try:
+            make_archive(base_name, 'zip', root_backup)
+            print(f'The invoices has been packaged to <<{backup_file.name}>>...')
+        except FileNotFoundError as error:
+            print(f'Archiving has failed => Error code: {error}')
+            return False
+        if check_internet_connection():
+            with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+                myFTP.cwd(r'/Faktury Backup/')
+                if Path.is_file(backup_file) and myFTP.size(backup_file.name) != backup_file.stat().st_size:
+                    return True
+                else:
+                    return False
+    else:
+        return False
 
 
 def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, username:str, password:str):

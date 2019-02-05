@@ -6,6 +6,7 @@ from pathlib import Path
 # django library
 from django.conf import settings
 from django.shortcuts import render
+from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
@@ -19,7 +20,7 @@ from account.forms import UserCreateForm
 
 # my function
 from functions.myfunctions import remgarbage
-from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection
+from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection, invoices_backup
 
 
 # Create your views here.
@@ -37,16 +38,37 @@ class AdminView(View):
     def get(self, request)->HttpResponseRedirect:
         if request.user.is_superuser or request.user.is_staff:
             user = request.user.username
+            context = {'user': user}
+
             if socket.gethostname() == 'HOMELAPTOP':
                 getArchiveFilefromFTP(request, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
+
+            elif socket.gethostname() == 'OFFICELAPTOP':
+                context.__setitem__('zip2ftp', True)
+
             employee = Employee.objects.filter(status=True).first()
+
             if employee:
                 employee_id = employee.id
+                context.__setitem__('employee_id', employee_id)
             else:
                 return render(request, '500.html', {'user': user})
 
-            return render(request, 'account/admin.html', {'user': user, 'employee_id': employee_id})
+            return render(request, 'account/admin.html', context)
         return HttpResponseRedirect('/login/')
+
+
+class Zip2File(View):
+    '''class that allows archiving the database of issued invoices'''
+    def get(self, request)->HttpResponseRedirect:
+        backup_file = Path(os.path.expanduser('~')).joinpath('Desktop/zip2ftp/invoices.zip')
+        ftp_dir = Path(r'/Faktury Backup/')
+        args = (backup_file, ftp_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
+        if socket.gethostname() == 'OFFICELAPTOP' and invoices_backup():
+            uploadFileFTP(*args)
+            messages.info(request, f'\nInvoices archive is safe...')
+
+        return HttpResponseRedirect('account:admin_site')
 
 
 def exit(request)->HttpResponseRedirect:
