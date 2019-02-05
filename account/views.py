@@ -55,6 +55,7 @@ class AdminView(View):
                 return render(request, '500.html', {'user': user})
 
             return render(request, 'account/admin.html', context)
+
         return HttpResponseRedirect('/login/')
 
 
