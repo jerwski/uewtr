@@ -17,9 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth import urls
 from django.urls import path, include
+from django.views.generic import RedirectView
 
 # my apps
 from account import views
+
 
 urlpatterns = [
     path('', include(urls)),
@@ -29,6 +31,7 @@ urlpatterns = [
     path('account/', include('account.urls', namespace='account')),
     path('employee/', include('employee.urls', namespace='employee')),
     path('evidence/', include('evidence.urls', namespace='evidence')),
+    path(r'favicon/.ico', RedirectView.as_view(url='/static/images/favicon.ico')),
 ]
 
 admin.site.site_title = '/admin/'

@@ -41,7 +41,8 @@ class AdminView(View):
             context = {'user': user}
 
             if socket.gethostname() == 'HOMELAPTOP':
-                getArchiveFilefromFTP(request, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
+                args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
+                getArchiveFilefromFTP(request, *args)
 
             elif socket.gethostname() == 'OFFICELAPTOP':
                 context.__setitem__('zip2ftp', True)
@@ -56,15 +57,15 @@ class AdminView(View):
 
             return render(request, 'account/admin.html', context)
 
-        return HttpResponseRedirect('/login/')
+        return HttpResponseRedirect(reverse_lazy('/login/'))
 
 
 class Zip2Ftp(View):
     '''class that allows archiving the database of issued invoices'''
     def get(self, request)->HttpResponseRedirect:
         backup_file = Path(os.path.expanduser('~')).joinpath('Desktop/zip2ftp/invoices.zip')
-        ftp_dir = Path(r'/Faktury Backup/')
-        args = (backup_file, ftp_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
+        ftp_invoice_dir = r'Invoice_backup'
+        args = (backup_file, ftp_invoice_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
         if socket.gethostname() == 'OFFICELAPTOP' and invoices_backup():
             uploadFileFTP(*args)
             messages.info(request, f'\nInvoices archive is safe...')
@@ -81,8 +82,8 @@ def exit(request)->HttpResponseRedirect:
         try:
             if socket.gethostname() == 'OFFICELAPTOP':
                 backup()
-                mkfixture()
-                make_archives()
+                mkfixture(settings.ROOT_BACKUP)
+                make_archives(settings.ARCHIVE_NAME, settings.ROOT_BACKUP, settings.ARCHIVE_FILE)
                 uploadFileFTP(*args)
 
             if request.user.is_authenticated:

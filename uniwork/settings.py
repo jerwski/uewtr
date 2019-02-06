@@ -184,7 +184,7 @@ ADMIN_EMAIL = get_setting('ADMIN_EMAIL')
 
 # archives paths
 ARCH_DIR = Path(get_setting('arch_dir'))
-DEST_PATH = Path(get_setting('dest_path'))
+ROOT_BACKUP = Path(get_setting('root_backup'))
 ARCHIVE_ROOT = Path(get_setting('archive_root'))
 ARCHIVE_FILE = Path(get_setting('archive_file'))
 ARCHIVE_NAME = Path(get_setting('archive_name'))

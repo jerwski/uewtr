@@ -23,14 +23,6 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # Create your archive functions here.
 
 
-# archives paths
-arch_dir = settings.ARCH_DIR
-dest_path = settings.DEST_PATH
-archive_root = settings.ARCHIVE_ROOT
-archive_name = settings.ARCHIVE_NAME
-archive_file = settings.ARCHIVE_FILE
-
-
 def check_internet_connection()->bool:
     '''checks whether the internet is connected'''
     connect = client.HTTPConnection("www.google.com", timeout=5)
@@ -46,13 +38,13 @@ def check_internet_connection()->bool:
 def backup():
     '''total backup of database'''
     try:
-        with archive_root.open('w') as jsonfile:
+        with settings.ARCHIVE_ROOT.open('w') as jsonfile:
             call_command('dumpdata', indent=4, stdout=jsonfile)
     except FileNotFoundError as error:
         print(f'Something wrong... Error: {error}')
 
 
-def mkfixture():
+def mkfixture(root_backup):
     '''create fixtures in json format'''
     year = date.today().year
     querys = {'employee': Employee.objects.all(),
@@ -65,54 +57,48 @@ def mkfixture():
         for app in ('employee', 'evidence'):
             models = apps.all_models[app]
             for model in models.values():
-                with Path.cwd().joinpath(f'{dest_path}/{model._meta.model_name}.json').open('w') as fixture:
+                with Path.cwd().joinpath(f'{root_backup}/{model._meta.model_name}.json').open('w') as fixture:
                     serialize('json', querys[f'{model._meta.verbose_name}'], indent=4, stream=fixture)
     except FileNotFoundError as error:
         print(f'Serialization error: {error}')
 
 
-def readfixture(request):
+def readfixture(request, root_backup):
     try:
-        for file in list(Path.iterdir(dest_path)):
+        for file in list(Path.iterdir(root_backup)):
             call_command('loaddata', file)
         messages.info(request, f'Database {get_setting("NAME")} has been updated...\n')
     except FileNotFoundError as error:
         messages.error(request, f'Fixture don\'t exist... => Error code: {error}')
 
 
-def make_archives():
+def make_archives(archive_name, root_backup, archive_file):
     '''create compressed in zip format archive file with fixtures'''
-    if list(Path.iterdir(dest_path)):
+    if list(Path.iterdir(root_backup)):
         try:
-            make_archive(archive_name, 'zip', dest_path)
+            make_archive(archive_name, 'zip', root_backup)
             print(f'The archive <<{archive_file.name}>> has been packaged...')
         except FileNotFoundError as error:
             print(f'Archiving has failed => Error code: {error}')
     else:
-        print(f'Directory {dest_path} is empty...')
+        print(f'Directory {root_backup} is empty...')
 
 
 def invoices_backup():
     '''create compressed in zip format archive file with invoices'''
     root = Path(os.path.expanduser('~'))
-    root_backup= root.joinpath('Desktop/Faktury backup')
+    root_backup= root.joinpath('Desktop/Invoice_backup')
     base_dir = root.joinpath('Desktop/zip2ftp')
     base_name = base_dir.joinpath('invoices')
     backup_file = base_name.with_suffix('.zip')
-    if list(Path.iterdir(root_backup)):
-        try:
-            make_archive(base_name, 'zip', root_backup)
-            print(f'The invoices has been packaged to <<{backup_file.name}>>...')
-        except FileNotFoundError as error:
-            print(f'Archiving has failed => Error code: {error}')
-            return False
-        if check_internet_connection():
-            with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-                myFTP.cwd(r'/Faktury Backup/')
-                if Path.is_file(backup_file) and myFTP.size(backup_file.name) != backup_file.stat().st_size:
-                    return True
-                else:
-                    return False
+    make_archives(base_name, root_backup, backup_file)
+    if check_internet_connection():
+        with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+            myFTP.cwd(r'/Invoice_backup/')
+            if myFTP.size(backup_file.name) != backup_file.stat().st_size:
+                return True
+            else:
+                return False
     else:
         return False
 
@@ -154,7 +140,7 @@ def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, us
         print(r'No internet connection...')
 
 
-def getArchiveFilefromFTP(request, server:str, username:str, password:str):
+def getArchiveFilefromFTP(request, server:str, username:str, password:str, archive_file, root_backup):
     '''loading compressed in zip format archive file with fixtures on ftp server'''
     if check_internet_connection():
         try:
@@ -165,19 +151,19 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str):
                         archive_file.unlink()
                         myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
                         messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
-                        unpack_archive(archive_file, dest_path, 'zip')
+                        unpack_archive(archive_file, root_backup, 'zip')
                         messages.info(request, 'The archive has been unpacked...')
-                        readfixture(request)
+                        readfixture(request, settings.root_backup)
                     except:
                         messages.error(request, f'File <<{archive_file.name}>> do not exist...')
                 elif not Path.is_file(archive_file):
                     try:
                         myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
                         messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
-                        unpack_archive(archive_file, dest_path, 'zip')
+                        unpack_archive(archive_file, root_backup, 'zip')
                         messages.info(request, 'The archive has been added and unpacked...')
                         print(f'\n{"*"*22}\nStart read fixtures...\n{"*"*42}')
-                        readfixture(request)
+                        readfixture(request, settings.ROOT_BACKUP)
                         print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
                     except:
                         messages.error(request, f'File <<{archive_file.name}>> do not exist...')
