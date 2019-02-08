@@ -15,27 +15,22 @@ from functions.archive import export_as_json
 
 
 export_as_json.short_description = 'Export selected records to json file'
+LAST_MONTH = 'last_month'
 
 
 
 class LastMonthWorkingDaysFilter(admin.SimpleListFilter):
+
     title = _('last month')
-    parameter_name = 'month_year'
+    parameter_name = 'last month'
 
     def lookups(self, request, model_admin):
-        year, month = now().year, now().month
-        if month == 1:
-            year, month = year-1, 12
-        else:
-            year, month = year, month-1
+        yield (LAST_MONTH, _("Last month"))
 
-        qs = model_admin.get_queryset(request)
-        if qs.filter(start_work__year=year, start_work__month=month).exists():
-            yield (f'{month}/{year}',_('Last month'))
 
 
     def queryset(self, request, queryset):
-        if self.value():
+        if self.value() == LAST_MONTH:
             year, month = now().year, now().month
             if month == 1:
                 year, month = year-1, 12
@@ -49,7 +44,7 @@ class LastMonthWorkingDaysFilter(admin.SimpleListFilter):
 @admin.register(WorkEvidence)
 class WorkEvidenceAdmin(admin.ModelAdmin):
     list_display = ('worker', 'start_work', 'end_work', 'jobhours')
-    list_filter = ('worker', 'start_work', LastMonthWorkingDaysFilter)
+    list_filter = (LastMonthWorkingDaysFilter, 'worker', 'start_work')
     ordering = ['worker', '-start_work']
     actions = [export_as_json, 'aggregate', 'working_days']
 
