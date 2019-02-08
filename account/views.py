@@ -57,7 +57,7 @@ class AdminView(View):
 
             return render(request, 'account/admin.html', context)
 
-        return HttpResponseRedirect(reverse_lazy('/login/'))
+        return HttpResponseRedirect(reverse_lazy('login'))
 
 
 class Zip2Ftp(View):
@@ -70,7 +70,7 @@ class Zip2Ftp(View):
             uploadFileFTP(*args)
             messages.info(request, f'\nInvoices archive is safe...')
 
-        return HttpResponseRedirect('account:admin_site')
+        return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
 
 def exit(request)->HttpResponseRedirect:

@@ -94,7 +94,7 @@ def invoices_backup():
     make_archives(base_name, root_backup, backup_file)
     if check_internet_connection():
         with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-            myFTP.cwd(r'/Invoice_backup/')
+            myFTP.cwd(r'Invoice_backup')
             if myFTP.size(backup_file.name) != backup_file.stat().st_size:
                 return True
             else:
