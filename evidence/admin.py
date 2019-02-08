@@ -18,7 +18,6 @@ export_as_json.short_description = 'Export selected records to json file'
 LAST_MONTH = 'last_month'
 
 
-
 class LastMonthWorkingDaysFilter(admin.SimpleListFilter):
 
     title = _('last month')
@@ -26,8 +25,6 @@ class LastMonthWorkingDaysFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         yield (LAST_MONTH, _("Last month"))
-
-
 
     def queryset(self, request, queryset):
         if self.value() == LAST_MONTH:
