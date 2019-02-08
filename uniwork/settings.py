@@ -105,13 +105,6 @@ WSGI_APPLICATION = 'uniwork.wsgi.application'
 
 if socket.gethostname() == 'HOMELAPTOP':
     DATABASES = {
-        # 'default': {
-        #     'ENGINE': 'django.db.backends.postgresql',
-        #     'NAME': 'postgres',
-        #     'USER': 'postgres',
-        #     'PASSWORD': 'hunter2',
-        #     'HOST': 'db'
-        # }
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': get_setting('NAME'),
