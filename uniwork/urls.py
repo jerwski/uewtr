@@ -32,7 +32,6 @@ urlpatterns = [
     path('employee/', include('employee.urls', namespace='employee')),
     path('evidence/', include('evidence.urls', namespace='evidence')),
     path(r'favicon/.ico', RedirectView.as_view(url='/static/images/favicon.ico')),
-    path('search/', include('haystack.urls')),
 ]
 
 admin.site.site_title = '/admin/'
