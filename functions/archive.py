@@ -11,7 +11,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from uniwork.settings import get_setting
-from django.core.serializers import serialize
+from django.core.serializers import serialize, BadSerializer
 from django.core.management import call_command
 
 
@@ -185,13 +185,19 @@ def export_as_json(modeladmin, request, queryset):
 
 
 # archiving of delete records
-def archiving_of_deleted_records(worker):
-    models = EmployeeData, EmployeeHourlyRate, WorkEvidence, EmployeeLeave, AccountPayment
-    all_records = [worker]
+def archiving_of_deleted_records(employee_id):
+    all_records = []
 
-    for model in models:
-        all_records += list(model.objects.filter(worker=worker))
-
-    path = Path(f'backup_json/erase_worker/{worker.surname}_{worker.forename}.json')
-    with path.open('w') as file:
-        serialize('json', all_records, indent=4, stream=file)
+    try:
+        for app in ('employee', 'evidence'):
+            models = apps.all_models[app]
+            for model in models.values():
+                if model._meta.model_name=='employee':
+                    all_records.append(model.objects.get(pk=employee_id))
+                else:
+                    all_records += list(model.objects.filter(worker_id=employee_id))
+        path = Path(f'backup_json/erase_worker/{employee_id}.json')
+        with path.open('w') as file:
+            serialize('json', all_records, indent=4, stream=file)
+    except BadSerializer as error:
+        print(f'Serialization error: {error}')

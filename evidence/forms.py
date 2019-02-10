@@ -68,12 +68,11 @@ class PeriodMonthlyPayrollForm(forms.Form):
 
 
 class AccountPaymentForm(forms.ModelForm):
-    queryset = Employee.objects.filter(status=True)
     options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True,
                'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
     attrs = {'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
 
-    worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset)
+    worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset.filter(status=True))
 
     account_date = forms.DateField(label='Select date of the advance payment...',
                                    widget=DatePicker(options=options, attrs=attrs))
@@ -82,3 +81,15 @@ class AccountPaymentForm(forms.ModelForm):
         model = AccountPayment
         fields = ['worker', 'account_date', 'account_value', 'notice']
         widgets = {'notice': forms.Textarea(attrs={'cols': 40, 'rows': 2})}
+
+
+RATING_CHOICES=((1, "★☆☆☆☆☆☆☆☆☆"),
+                (2, "★★☆☆☆☆☆☆☆☆"),
+                (3, "★★★☆☆☆☆☆☆☆"),
+                (4, "★★★★☆☆☆☆☆☆"),
+                (5, "★★★★★☆☆☆☆☆"),
+                (6, "★★★★★★☆☆☆☆"),
+                (7, "★★★★★★★☆☆☆"),
+                (8, "★★★★★★★★☆☆"),
+                (9, "★★★★★★★★★☆"),
+                (10, "★★★★★★★★★★"))

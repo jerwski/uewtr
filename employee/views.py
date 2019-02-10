@@ -1,6 +1,3 @@
-# standard library
-from datetime import date
-
 # django core
 from django.urls import reverse
 from django.contrib import messages
@@ -121,7 +118,7 @@ class EmployeeEraseAll(View):
         worker = Employee.objects.get(pk=employee_id)
 
         if worker:
-            archiving_of_deleted_records(worker)
+            archiving_of_deleted_records(employee_id)
             worker.delete()
             msg = f'You have been deleting all records in database for {worker}'
             messages.success(request, msg)
