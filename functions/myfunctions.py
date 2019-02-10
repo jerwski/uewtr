@@ -213,7 +213,7 @@ def leavehtml2pdf(employee_id:int, year:int):
 
 
 def tree(directory):
-    '''listing whole tree for passed directory'''
+    '''listing whole tree for passed directory as instance of class WindowsPath'''
     print(f'+ {directory}')
     for path in sorted(directory.rglob('*')):
         depth = len(path.relative_to(directory).parts)
