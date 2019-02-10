@@ -62,7 +62,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
-    'haystack',
     'account.apps.AccountConfig',
     'employee.apps.EmployeeConfig',
     'evidence.apps.EvidenceConfig',
@@ -132,13 +131,6 @@ elif socket.gethostname() == 'OFFICELAPTOP':
     }
 else:
     raise ConnectionError
-
-HAYSTACK_CONNECTIONS = {
-        'default': {
-            'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-            'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
-        },
-    }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
