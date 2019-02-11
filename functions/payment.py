@@ -152,8 +152,9 @@ def overhours_payment(employee_id:int, year:int, month:int)->float:
         # returns the number of overtime for a given employee in the selected year and month
         if basic_work_hours.exists():
             basic_work_hours = basic_work_hours.aggregate(bwh=Sum('jobhours'))
-            if basic_work_hours['bwh'] > monthly_work_hours:
-                overhours = basic_work_hours['bwh'] + leave_paid_hours + leave_maternity_hours - monthly_work_hours
+            all_workhours = basic_work_hours['bwh'] + leave_paid_hours + leave_maternity_hours
+            if all_workhours > monthly_work_hours:
+                overhours = all_workhours - monthly_work_hours
                 overhourspay = overhours * rate
                 return overhourspay
             else:
