@@ -88,13 +88,28 @@
 
                     <table class="table table-hover table-sm">
                         <tbody>
-                            <tr><td class="text-right">Total hours:</td><td class="text-danger font-weight-bold">{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</td><td class="text-right">Netto income:</td><td class="text-danger font-weight-bold">{{ salary|money_format }}</td></tr>
-                            <tr><td class="text-right">Basic payment (100%):</td><td class="text-danger font-weight-bold">{{ basicpay|money_format }}</td><td class="text-right">Leave payment (100%):</td><td class="text-danger font-weight-bold">{{ leavepay|money_format }}</td></tr>
-                            <tr><td class="text-right">Saturday payment (100%):</td><td class="text-danger font-weight-bold">{{ satpay|money_format }}</td><td class="text-right">Sunday payment (200%):</td><td class="text-danger font-weight-bold">{{ sunpay|money_format }}</td></tr>
+                            <tr>
+                                <td class="text-right">Total hours:</td><td class="text-danger font-weight-bold"><a data-toggle="tooltip" data-html="true" title='<p class="text-justify">The total number of working hours is the sum of all hours worked in a given month, including Saturdays, Sundays and holidays but without days marked as paid vacation.</p>'>{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</a></td>
+                                <td class="text-right">Netto income:</td><td class="text-danger font-weight-bold"><a data-toggle="tooltip" data-html="true" title='<p class="text-justify">Net income results from the difference between gross income and the sum of advances granted.</p>'>{{ salary|money_format }}</a></td>
+                            </tr>
+                            <tr>
+                                <td class="text-right">Basic payment (100%):</td><td class="text-danger font-weight-bold">{{ basicpay|money_format }}</td>
+                                <td class="text-right">Leave payment (100%):</td><td class="text-danger font-weight-bold">{{ leavepay|money_format }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-right">Saturday payment (100%):</td><td class="text-danger font-weight-bold">{{ satpay|money_format }}</td>
+                                <td class="text-right">Sunday payment (200%):</td><td class="text-danger font-weight-bold">{{ sunpay|money_format }}</td>
+                            </tr>
                             {% if overhourspay > 0 %}
-                                <tr><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td><td class="text-right">Overhours payment (50%):</td><td class="text-danger font-weight-bold">{{ overhourspay|money_format }}</td></tr>
+                                <tr>
+                                    <td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td>
+                                    <td class="text-right">Overhours payment (50%):</td><td class="text-danger font-weight-bold">{{ overhourspay|money_format }}</td>
+                                </tr>
                             {% else %}
-                                <tr><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td></tr>
+                                <tr>
+                                    <td class="text-right">Account payment:</td>
+                                    <td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td>
+                                </tr>
                             {% endif %}
                             </tbody>
                     </table>
