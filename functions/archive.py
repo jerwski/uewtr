@@ -146,18 +146,21 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
         try:
             with FTP(server, username, password) as myFTP:
                 myFTP.cwd(r'/unikolor_db/')
-                if Path.is_file(archive_file) and myFTP.size(archive_file.name) > archive_file.stat().st_size:
-                    try:
-                        archive_file.unlink()
-                        myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
-                        messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
-                        unpack_archive(archive_file, root_backup, 'zip')
-                        messages.info(request, 'The archive has been unpacked...')
-                        print(f'\n{"*"*22}\nStart read fixtures...\n{"*"*42}')
-                        readfixture(request, settings.root_backup)
-                        print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
-                    except:
-                        messages.error(request, f'File <<{archive_file.name}>> do not exist...')
+                if Path.is_file(archive_file):
+                    if myFTP.size(archive_file.name) > archive_file.stat().st_size:
+                        try:
+                            archive_file.unlink()
+                            myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
+                            messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
+                            unpack_archive(archive_file, root_backup, 'zip')
+                            messages.info(request, 'The archive has been unpacked...')
+                            print(f'\n{"*"*22}\nStart read fixtures...\n{"*"*42}')
+                            readfixture(request, settings.root_backup)
+                            print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
+                        except:
+                            messages.error(request, f'File <<{archive_file.name}>> do not exist...')
+                    else:
+                        messages.info(request, f'\nDatabase is up to date...')
                 elif not Path.is_file(archive_file):
                     try:
                         myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
@@ -169,8 +172,7 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
                         print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
                     except:
                         messages.error(request, f'File <<{archive_file.name}>> do not exist...')
-                else:
-                    messages.info(request, f'\nDatabase is up to date...')
+
         except ConnectionError as error:
             messages.error(request, f'Connection error: {error}')
     else:
