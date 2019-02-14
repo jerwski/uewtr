@@ -161,7 +161,7 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
                             messages.error(request, f'File <<{archive_file.name}>> do not exist...')
                     else:
                         messages.info(request, f'\nDatabase is up to date...')
-                elif not Path.is_file(archive_file):
+                else:
                     try:
                         myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
                         messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
