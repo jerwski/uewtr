@@ -147,6 +147,7 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
             with FTP(server, username, password) as myFTP:
                 myFTP.cwd(r'/unikolor_db/')
                 if Path.is_file(archive_file):
+                    # checking difference between archive files
                     if myFTP.size(archive_file.name) > archive_file.stat().st_size:
                         try:
                             archive_file.unlink()
