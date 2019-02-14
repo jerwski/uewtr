@@ -52,7 +52,7 @@ class AdminView(View):
                 if getArchiveFilefromFTP(request, *args):
                     messages.info(request, f'\nDatabase is up to date...')
                 else:
-                    messages.info(request, f'\nSomething\'s wrong. Check your archive file...')
+                    messages.info(request, f'\nSomething\'s wrong. Check your archive file or internet connection status...')
 
             elif socket.gethostname() == 'OFFICELAPTOP':
                 context.__setitem__('zip2ftp', True)
