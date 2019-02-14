@@ -39,14 +39,6 @@ class AdminView(View):
         if request.user.is_superuser or request.user.is_staff:
             user = request.user.username
             context = {'user': user}
-
-            if socket.gethostname() == 'HOMELAPTOP':
-                args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
-                getArchiveFilefromFTP(request, *args)
-
-            elif socket.gethostname() == 'OFFICELAPTOP':
-                context.__setitem__('zip2ftp', True)
-
             employee = Employee.objects.filter(status=True).first()
 
             if employee:
@@ -54,6 +46,16 @@ class AdminView(View):
                 context.__setitem__('employee_id', employee_id)
             else:
                 return render(request, '500.html', {'user': user})
+
+            if socket.gethostname() == 'HOMELAPTOP':
+                args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
+                if getArchiveFilefromFTP(request, *args):
+                    messages.info(request, f'\nDatabase is up to date...')
+                else:
+                    messages.info(request, f'\nSomething\'s wrong. Check your archive file...')
+
+            elif socket.gethostname() == 'OFFICELAPTOP':
+                context.__setitem__('zip2ftp', True)
 
             return render(request, 'account/admin.html', context)
 

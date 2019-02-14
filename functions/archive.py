@@ -67,7 +67,7 @@ def readfixture(request, root_backup):
     try:
         for file in list(Path.iterdir(root_backup)):
             call_command('loaddata', file)
-        messages.info(request, f'Database {get_setting("NAME")} has been updated...\n')
+            messages.info(request, f'Fixture {file.name} have beed loaded...\n')
     except FileNotFoundError as error:
         messages.error(request, f'Fixture don\'t exist... => Error code: {error}')
 
@@ -147,37 +147,35 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
             with FTP(server, username, password) as myFTP:
                 myFTP.cwd(r'/unikolor_db/')
                 if Path.is_file(archive_file):
-                    # checking difference between archive files
                     if myFTP.size(archive_file.name) > archive_file.stat().st_size:
-                        try:
-                            archive_file.unlink()
-                            myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
-                            messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
-                            unpack_archive(archive_file, root_backup, 'zip')
-                            messages.info(request, 'The archive has been unpacked...')
-                            print(f'\n{"*"*22}\nStart read fixtures...\n{"*"*42}')
-                            readfixture(request, settings.root_backup)
-                            print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
-                        except:
-                            messages.error(request, f'File <<{archive_file.name}>> do not exist...')
-                    else:
-                        messages.info(request, f'\nDatabase is up to date...')
-                else:
-                    try:
+                        archive_file.unlink()
                         myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
                         messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
-                        unpack_archive(archive_file, root_backup, 'zip')
-                        messages.info(request, 'The archive has been added and unpacked...')
+                        unpack_archive(archive_file, settings.ROOT_BACKUP, 'zip')
+                        messages.info(request, 'The archive has been unpacked...')
                         print(f'\n{"*"*22}\nStart read fixtures...\n{"*"*42}')
                         readfixture(request, settings.ROOT_BACKUP)
                         print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
-                    except:
-                        messages.error(request, f'File <<{archive_file.name}>> do not exist...')
+                    else:
+                        messages.info(request, f'\nSince the last archiving, the archival file {archive_file.name} remains unchanged...')
+                else:
+                    myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
+                    messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
+                    unpack_archive(archive_file, root_backup, 'zip')
+                    messages.info(request, 'The archive has been added and unpacked...')
+                    print(f'\n{"*"*22}\nStart read fixtures...\n{"*"*42}')
+                    readfixture(request, settings.ROOT_BACKUP)
+                    print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
+
+                return True
 
         except ConnectionError as error:
             messages.error(request, f'Connection error: {error}')
+
+            return False
     else:
         messages.error(request, r'No internet connection...')
+
 
 
 # serialization json
