@@ -247,20 +247,7 @@ def employee_total_data(employee_id:int, year:int, month:int, context:dict)->dic
     return context
 
 
-def total_brutto_set(employee_id:int)->dict:
-    total_brutto = dict()
-    if WorkEvidence.objects.filter(worker_id=employee_id).exists():
-        for year in [year for year in range(WorkEvidence.objects.filter(worker_id=employee_id).earliest('start_work').start_work.year, date.today().year + 1)]:
-            total_brutto.__setitem__(year,{month:WorkEvidence.objects.filter(worker_id=10,start_work__year=2018,start_work__month=month).aggregate(Sum('jobhours')) for month in range(1,13)})
-    else:
-        total_brutto = None
-    context = {'total_brutto_set': total_brutto}
-    return context
-
-
 def data_modal_chart(employee_id:int)->dict:
-    start_workyear = WorkEvidence.objects.filter(worker_id=employee_id).earliest('start_work').start_work.year
-    end_workyear = date.today().year + 1
-    workyears = (item for item in range(start_workyear, end_workyear))
-    total_brutto_set = {eachyear:sum((total_payment(employee_id,eachyear,month)['brutto'] for month in range(1,13))) for eachyear in workyears}
+    years = set(WorkEvidence.objects.filter(worker_id=employee_id).values_list('start_work__year', flat=True))
+    total_brutto_set = {year:sum([total_payment(employee_id,year,month)['brutto'] for month in range(1,13)]) for year in years}
     return total_brutto_set
