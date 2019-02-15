@@ -10,7 +10,6 @@ from shutil import make_archive, unpack_archive
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
-from uniwork.settings import get_setting
 from django.core.management import call_command
 from django.core.serializers import serialize, BadSerializer
 
