@@ -11,5 +11,5 @@ urlpatterns = [
     path('register/', login_required(views.RegisterView.as_view()), name='register'),
     path('admin-site/', views.AdminView.as_view(), name='admin_site'),
     path('load-invoices-backup-file/', login_required(views.Zip2Ftp.as_view()), name='invoices_backup'),
-    path('exit/', login_required(views.exit), name='exit'),
+    path('exit/', views.exit, name='exit'),
 ]
