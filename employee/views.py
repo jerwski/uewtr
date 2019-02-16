@@ -29,8 +29,9 @@ class EmployeeBasicDataView(View):
             context.__setitem__('employees_st', employees.filter(status=True))
             context.__setitem__('employees_sf', employees.filter(status=False))
             context.__setitem__('employee_id', employees.filter(status=True).first().id)
+
         else:
-            messages.success(request, r'No employee in database...')
+            messages.warning(request, r'No employee in database...')
 
         if employee_id:
             worker = Employee.objects.get(pk=employee_id)
@@ -49,7 +50,9 @@ class EmployeeBasicDataView(View):
             context.__setitem__('status', worker.status)
             context.__setitem__('employee_id', employee_id)
             context.__setitem__('records',erase_records(employee_id,))
+
             return render(request, 'employee/employee_basicdata.html', context)
+
         else:
             form = EmployeeBasicDataForm()
             context.__setitem__('form',form)

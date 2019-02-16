@@ -31,6 +31,7 @@ urlpatterns = [
     path('account/', include('account.urls', namespace='account')),
     path('employee/', include('employee.urls', namespace='employee')),
     path('evidence/', include('evidence.urls', namespace='evidence')),
+    path('cashregister/', include('cashregister.ulrs', namespace='cashregister')),
     path(r'favicon/.ico', RedirectView.as_view(url='/static/images/favicon.ico')),
 ]
 
