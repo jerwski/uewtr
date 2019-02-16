@@ -57,6 +57,7 @@ def worker_rate(employee_id:int, year:int, month:int)->float:
         rate = rate.hourly_rate
     else:
         rate = rate.hourly_rate
+
     return rate
 
 
@@ -84,6 +85,7 @@ def saturday_payment(employee_id:int, year:int, month:int)->float:
         # satpay => remuneration for work on Saturday without Holidays
         satpay = saturday_hours.aggregate(sh=Sum('jobhours') * rate)
         satpay = satpay['sh']
+
     return satpay
 
 
@@ -100,6 +102,7 @@ def sunday_payment(employee_id:int, year:int, month:int)->float:
         # sunpay => remuneration for work on Sunday without Holidays
         sunpay = sunday_hours.aggregate(sh=Sum('jobhours') * rate * 2)
         sunpay = sunpay['sh']
+
     return sunpay
 
 
@@ -115,6 +118,7 @@ def holiday_payment(employee_id:int, year:int, month:int)->float:
         # holidaypay => remuneration for work on Holidays
         holidaypay = holiday_hours.aggregate(hh=Sum('jobhours') * rate * 2)
         holidaypay = holidaypay['hh']
+
     return holidaypay
 
 
@@ -179,6 +183,7 @@ def basic_payment(employee_id:int, year:int, month:int)->float:
         basicpay = basicpay['bwh']
     else:
         basicpay = 0
+
     return basicpay
 
 
@@ -193,6 +198,7 @@ def leave_payment(employee_id:int, year:int, month:int)->float:
         leavepay = leave_paid_hours.count() * 8 * rate
     else:
         leavepay = 0
+
     return leavepay
 
 
@@ -205,6 +211,7 @@ def account_payment(employee_id:int, year:int, month:int)->float:
         accountpay = account_paid['ap']
     else:
         accountpay = 0
+
     return accountpay
 
 
@@ -244,11 +251,14 @@ def employee_total_data(employee_id:int, year:int, month:int, context:dict)->dic
     context.__setitem__('rate', rate)
     payroll = total_payment(employee_id, year, month)
     context.update(payroll)
+
     return context
 
 
 def data_modal_chart(employee_id:int)->dict:
+    '''creates a set of gross income each subsequent year for a given employee'''
     years = set(WorkEvidence.objects.filter(worker_id=employee_id).values_list('start_work__year', flat=True))
     months = set(WorkEvidence.objects.filter(worker_id=employee_id).values_list('start_work__month', flat=True))
     total_brutto_set = {year:sum([total_payment(employee_id,year,month)['brutto'] for month in months]) for year in years}
+
     return total_brutto_set
