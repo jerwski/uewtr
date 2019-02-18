@@ -2,6 +2,9 @@
 from django.db import models
 from django.urls import reverse
 
+# validators
+from validators.my_validator import positive_value
+
 # Create your models here.
 
 '''
@@ -33,9 +36,10 @@ class Company(models.Model):
     nip = models.CharField(max_length=13,)
     street = models.CharField(blank=True, max_length=100,)
     city = models.CharField(blank=True, max_length=100,)
-    zip = models.CharField(blank=True, max_length=10,)
+    postal = models.CharField(blank=True, max_length=10, verbose_name='Postal code')
     phone = models.CharField(blank=True, max_length=20,)
-    email = models.EmailField(blank=True,)
+    account = models.CharField(blank=True, max_length=34, verbose_name='Contrary account')
+    status = models.IntegerField(default=1,)
     created = models.DateTimeField(auto_now_add=True,)
     updated = models.DateTimeField(auto_now=True,)
 
@@ -47,3 +51,21 @@ class Company(models.Model):
 
     def get_absolute_url(self):
         return reverse('cashregister:change_company', args=[self.id])
+
+    def add_records(self):
+        return reverse('cashregister:cash_register', args=[self.id])
+
+
+class CashRegister(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.DO_NOTHING)
+    date = models.DateField(auto_now_add=True)
+    symbol = models.CharField(max_length=100, blank=True, verbose_name='Symbol and document number')
+    contents = models.CharField(max_length=250)
+    income = models.FloatField(default=0.00, validators=[positive_value])
+    expenditure = models.FloatField(default=0.00, validators=[positive_value])
+
+    class Meta:
+        ordering = ['date']
+
+    def __str__(self):
+        return f'Cash register: {self.company}'

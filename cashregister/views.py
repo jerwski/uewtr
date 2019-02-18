@@ -2,23 +2,24 @@
 from django.urls import reverse
 from django.shortcuts import render
 from django.contrib import messages
+from django.utils.timezone import now
 from django.views.generic import View
 from django.http import HttpResponseRedirect
 
 # my models
-from cashregister.models import Company
+from cashregister.models import Company, CashRegister
 
 # my forms
-from cashregister.forms import CompanyAddForm
+from cashregister.forms import CompanyAddForm, CashRegisterForm
 
 
 # Create your views here.
 
 
 class CompanyAddView(View):
-
+    '''class implementing the method of adding/changing basic data for the new or existing company'''
     def get(self, request, company_id:int=None)->render:
-        companies = Company.objects.all().order_by('company')
+        companies = Company.objects.filter(status__range=[1,3]).order_by('company')
         if company_id:
             company = Company.objects.get(pk=company_id)
             fields = list(company.__dict__.keys())[2:-2]
@@ -70,3 +71,44 @@ class CompanyAddView(View):
                 return HttpResponseRedirect(reverse('cashregister:change_company', kwargs=kwargs))
         else:
             return render(request, 'cashregister/company_add.html', context)
+
+
+class CashRegisterView(View):
+    '''class implementing the method of adding records to the Cash Register'''
+    def get(self, request, company_id:int=None)->HttpResponseRedirect:
+        companies = Company.objects.filter(status__range=[1,3]).order_by('company')
+        context = {'companies': companies}
+
+        if company_id:
+            month, year = now().month, now().year
+            company = Company.objects.get(pk=company_id)
+            records = CashRegister.objects.filter(company_id=company_id, date__month=month, date__year=year).order_by('date')
+            form = CashRegisterForm(initial={'company': company})
+            context.update({'form': form, 'company': company, 'company_id': company_id, 'records': records})
+
+        return render(request, 'cashregister/cashregister.html', context)
+
+    def post(self, request, company_id:int=None)->HttpResponseRedirect:
+        form = CashRegisterForm(data=request.POST)
+        companies = Company.objects.filter(status__range=[1,3]).order_by('company')
+        context = {'form': form, 'companies': companies}
+
+        if company_id:
+            kwargs = {'company_id': company_id}
+            month, year = now().month, now().year
+            company = Company.objects.get(pk=company_id)
+            records = CashRegister.objects.filter(company_id=company_id, date__month=month, date__year=year)
+            context.update({'company': company, 'company_id': company_id,  'records': records.order_by('date')})
+
+            if form.is_valid():
+                form.save(commit=False)
+                data = form.cleaned_data
+                symbol, contents, income, expenditure = [data[key] for key in ('symbol', 'contents', 'income', 'expenditure')]
+                if income > 0 or expenditure > 0:
+                    form.save(commit=True)
+                    msg = f'Succesful register new record in {company} Cash Register...'
+                    messages.success(request, msg)
+
+                return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
+
+        return render(request, 'cashregister/cashregister.html', context)
