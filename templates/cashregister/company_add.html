@@ -35,7 +35,7 @@
                             {% if request.path == '/cashregister/add_company/' %}
                                 <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
                             {% else %}
-                                {% if company_id == company_id %}
+                                {% if company_id == company.id %}
                                     <td><a class="font-weight-normal text-danger" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
                                 {% else %}
                                 <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
