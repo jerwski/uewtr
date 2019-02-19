@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load utility_tags %}
+{% load staticfiles %}
+
+{% block title %}Add/Change employee hourly rate{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row ml-3 mr-3 mt-2 bgbisque">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
+            <p class="h1 font-weight-normal">Company Cash Register</p>
+            <p class="text-info font-weight-bold font-italic">Application to create and handle cash register</p>
+        </div>
+        <div class="col-sm-2">
+            <p class="footer text-secondary text-sm-right">Copyright UNIKOLOR Jerzy Wygonowski</p>
+            {% include 'blocks/alert.html' %}
+        </div>
+    </div>
+    <div class="row ml-3 mr-3 mb-2 bgbisque">
+        <div class="col-sm-4">
+            <p class="text-center text-danger lead font-weight-normal bg-warning">COMPANIES</p>
+            <table class="table table-hover table-sm">
+                <tbody>
+                {% for company in companies %}
+                    <tr>
+                        {% if company_id == company.id %}
+                            <td><a class="text-danger" href="{{ company.add_records }}">{{ company }}</a></td>
+                        {% else %}
+                            <td><a href="{{ company.add_records }}">{{ company }}</a></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="row mt-4">
+                <div class="col">
+                    <div class="btn-sm mb-2">
+                        <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary btn-block">Add/change company</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-8">
+        {% if company_id %}
+            <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD FOR {{ company }}</p>
+
+            <form action="." method="POST">{% csrf_token %}
+                {% bootstrap_field form.company %}
+                <div class="row text-center">
+                    <div class="col-sm-2"><p>Symbol</p></div>
+                    <div class="col-sm-5"><p>Contents</p></div>
+                    <div class="col-sm-2"><p>Income</p></div>
+                    <div class="col-sm-3"><p>Expenditure</p></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">{% bootstrap_field form.symbol size='small' show_label=False placeholder='Symbol...' %}</div>
+                    <div class="col-sm-5">{% bootstrap_field form.contents size='small' show_label=False placeholder='Type contents of operation...' %}</div>
+                    <div class="col-sm-2">{% bootstrap_field form.income size='small' show_label=False placeholder='Value...' %}</div>
+                    <div class="col-sm-3">{% bootstrap_field form.expenditure size='small' show_label=False placeholder='Value...' %}</div>
+                </div>
+                <div class="btn-sm mb-2">
+                    <button type="submit" class="btn btn-outline-success btn-block">Confirm new entry in Cash Register</button>
+                </div>
+            </form>
+            <div class="col-sm-12">
+                <div class="input-group">
+                    <input class="form-control" id="myInput" type="text" placeholder="Search records..." aria-label="Filtering table" aria-describedby="basic-addon">
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px"></span>
+                    </div>
+                </div>
+                <p class="text-center text-danger lead font-weight-normal bgburlywood">Cash Register</p>
+                <table class="table table-sm ">
+                    <thead class="text-center">
+                        <tr class="font-weight-light small">
+                            <th width="3%">Nr</th>
+                            <th width="12%">Symbol</th>
+                            <th width="55%">Contents</th>
+                            <th width="15%">Income</th>
+                            <th width="15%">Expenditure</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div class="scrollit">
+                    <table class="table table-sm table-hover">
+                        <tbody id="searchTable">
+                            {% for record in records %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td><td>{{ record.symbol }}</td><td>{{ record.contents  }}</td><td class="text-sm-right">{{ record.income|money_format }}</td><td class="text-sm-right">{{ record.expenditure|money_format }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        {% else %}
+            <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD FOR {{ company }}</p>
+            <div class="row">
+                <div class="col text-center">
+                    <p class="text-danger lead font-weight-bold font-italic">Please select company to add records into Cash register...</p>
+                </div>
+            </div>
+        {% endif %}
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <div class="btn-sm">
+                            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger btn-block">Exit</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="btn-sm">
+                            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
