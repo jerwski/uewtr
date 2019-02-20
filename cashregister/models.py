@@ -59,7 +59,7 @@ class Company(models.Model):
 class CashRegister(models.Model):
     company = models.ForeignKey(Company, on_delete=models.DO_NOTHING)
     date = models.DateField(auto_now_add=True)
-    symbol = models.CharField(max_length=100, blank=True, verbose_name='Symbol and document number')
+    symbol = models.CharField(max_length=100, verbose_name='Symbol and document number')
     contents = models.CharField(max_length=250)
     income = models.FloatField(default=0.00, validators=[positive_value])
     expenditure = models.FloatField(default=0.00, validators=[positive_value])

@@ -75,30 +75,30 @@ class CompanyAddView(View):
 
 class CashRegisterView(View):
     '''class implementing the method of adding records to the Cash Register'''
-    def get(self, request, company_id:int=None)->HttpResponseRedirect:
+    def get(self, request, company_id:int=None, choice:int=None)->HttpResponseRedirect:
         companies = Company.objects.filter(status__range=[1,3]).order_by('company')
-        context = {'companies': companies}
+        context = {'companies': companies, 'choice': choice}
 
         if company_id:
             month, year = now().month, now().year
             company = Company.objects.get(pk=company_id)
-            records = CashRegister.objects.filter(company_id=company_id, date__month=month, date__year=year).order_by('date')
+            records = CashRegister.objects.filter(company_id=company_id, date__month=month, date__year=year)
             form = CashRegisterForm(initial={'company': company})
-            context.update({'form': form, 'company': company, 'company_id': company_id, 'records': records})
+            context.update({'form': form, 'company': company, 'company_id': company_id, 'records': records.order_by('-date')})
 
         return render(request, 'cashregister/cashregister.html', context)
 
-    def post(self, request, company_id:int=None)->HttpResponseRedirect:
+    def post(self, request, company_id:int=None, choice:int=None)->HttpResponseRedirect:
         form = CashRegisterForm(data=request.POST)
         companies = Company.objects.filter(status__range=[1,3]).order_by('company')
-        context = {'form': form, 'companies': companies}
+        context = {'form': form, 'companies': companies, 'choice': choice}
 
         if company_id:
             kwargs = {'company_id': company_id}
             month, year = now().month, now().year
             company = Company.objects.get(pk=company_id)
             records = CashRegister.objects.filter(company_id=company_id, date__month=month, date__year=year)
-            context.update({'company': company, 'company_id': company_id,  'records': records.order_by('date')})
+            context.update({'company': company, 'company_id': company_id,  'records': records})
 
             if form.is_valid():
                 form.save(commit=False)
