@@ -6,6 +6,9 @@ from django.utils.timezone import now
 from django.views.generic import View
 from django.http import HttpResponseRedirect
 
+# my functions
+from functions.myfunctions import cashregisterdata
+
 # my models
 from cashregister.models import Company, CashRegister
 
@@ -82,6 +85,8 @@ class CashRegisterView(View):
         if company_id:
             month, year = now().month, now().year
             company = Company.objects.get(pk=company_id)
+            registerdata = cashregisterdata(company_id, month, year)
+            context.update({'registerdata': dict(registerdata)})
             records = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
             form = CashRegisterForm(initial={'company': company})
             context.update({'form': form, 'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
@@ -98,6 +103,8 @@ class CashRegisterView(View):
             kwargs = {'company_id': company_id}
             month, year = now().month, now().year
             company = Company.objects.get(pk=company_id)
+            registerdata = cashregisterdata(company_id, month, year)
+            context.update({'registerdata': dict(registerdata)})
             records = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
             context.update({'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
 

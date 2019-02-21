@@ -22,6 +22,7 @@ from django.template.loader import get_template
 from django.db.models import Sum, Case, When, Value, IntegerField
 
 # my models
+from cashregister.models import Company, CashRegister
 from employee.models import Employee, EmployeeData, EmployeeHourlyRate
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
@@ -227,3 +228,25 @@ def remgarbage(*paths):
         for file in Path.iterdir(path):
             if file.match('leaves_data_*.pdf')|file.match('payroll_*.pdf'):
                 file.unlink()
+
+
+def cashregisterdata(company_id:int, month:int, year:int)->dict:
+    registerdata, saldo = defaultdict(float), 0
+    presentregister = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
+    lastregister = CashRegister.objects.filter(company_id=company_id).exclude(created__month=month, created__year=year)
+    lastdate = lastregister.latest('created')
+    if lastdate:
+        month, year = lastdate.created.date().month, lastdate.created.date().year
+        incomes = CashRegister.objects.filter(created__month=month, created__year=year).aggregate(inc=Sum('income'))
+        expenditures = CashRegister.objects.filter(created__month=month, created__year=year).aggregate(exp=Sum('expenditure'))
+        saldo = incomes['inc'] - expenditures['exp']
+
+    registerdata['saldo'] = saldo
+
+    for item in presentregister:
+        registerdata['incomes'] += item.income
+        registerdata['expenditures'] += item.expenditure
+
+    registerdata['status'] = registerdata['incomes'] - registerdata['expenditures']
+
+    return registerdata
