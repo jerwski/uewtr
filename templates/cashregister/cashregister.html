@@ -47,24 +47,41 @@
     <div class="col-sm-9">
       {% if company_id %}
         <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD TO CASH REGISTER FOR {{ company }}</p>
+
         <form action="." method="POST">{% csrf_token %}
           {% bootstrap_field form.company %}
-          <div class="row text-center">
-            <div class="col-sm-3"><p>Symbol</p></div>
-            <div class="col-sm-5"><p>Contents</p></div>
-            <div class="col-sm-2"><p>Income</p></div>
-            <div class="col-sm-2"><p>Expenditure</p></div>
-          </div>
-          <div class="row">
-            <div class="col-sm-3">{% bootstrap_field form.symbol size='small' show_label=False placeholder='Symbol...' %}</div>
-            <div class="col-sm-5">{% bootstrap_field form.contents size='small' show_label=False placeholder='Type contents of operation...' %}</div>
-            <div class="col-sm-2">{% bootstrap_field form.income size='small' show_label=False placeholder='Value...' %}</div>
-            <div class="col-sm-2">{% bootstrap_field form.expenditure size='small' show_label=False placeholder='Value...' %}</div>
-          </div>
-          <div class="btn-sm mb-2">
-            <button type="submit" class="btn btn-outline-success btn-block">Confirm new entry for {{ company|upper }}</button>
-          </div>
-        </form>
+            <div class="row ml-5">
+              <div class="col-sm-4">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text bg-info text-white font-weight-normal">Symbol&nbsp;&nbsp;&nbsp;</span>
+                  </div>
+                  {% bootstrap_field form.symbol form_group_class='form-inline' show_label=False placeholder='Symbol...' %}
+                </div>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text bg-success text-white font-weight-normal" id="income">Przychód</span>
+                  </div>
+                  {% bootstrap_field form.income form_group_class='form-inline' show_label=False placeholder='Value...' %}
+                </div>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text bg-danger text-white font-weight-normal" id="expenditure">Rozchód&nbsp;</span>
+                  </div>
+                  {% bootstrap_field form.expenditure form_group_class='form-inline' show_label=False placeholder='Value...' %}
+                </div>
+              </div>
+              <div class="col-sm-7">
+                {% bootstrap_field form.contents size='small' label_class='text-info font-weight-bold' placeholder='Type contents of operation...' %}
+              </div>
+            </div>
+            <div class="row p-2">
+              <div class="col-sm-12 btn-sm">
+                <button type="submit" class="btn btn-outline-success btn-block">Confirm new entry for {{ company|upper }}</button>
+              </div>
+            </div>
+          </form>
+
         <div class="input-group">
           <input class="form-control" id="myInput" type="text" placeholder="Search records..." aria-label="Filtering table" aria-describedby="basic-addon">
           <div class="input-group-append">

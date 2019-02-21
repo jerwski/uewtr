@@ -58,14 +58,14 @@ class Company(models.Model):
 
 class CashRegister(models.Model):
     company = models.ForeignKey(Company, on_delete=models.DO_NOTHING)
-    date = models.DateField(auto_now_add=True)
-    symbol = models.CharField(max_length=100, verbose_name='Symbol and document number')
-    contents = models.CharField(max_length=250)
-    income = models.FloatField(default=0.00, validators=[positive_value])
-    expenditure = models.FloatField(default=0.00, validators=[positive_value])
+    created = models.DateTimeField(auto_now_add=True)
+    symbol = models.CharField(max_length=100, verbose_name='Symbol')
+    contents = models.CharField(max_length=250, verbose_name='Opis dokonywanej operacji...')
+    income = models.FloatField(default=0.00, validators=[positive_value], verbose_name='Przychód')
+    expenditure = models.FloatField(default=0.00, validators=[positive_value], verbose_name='Rozchód')
 
     class Meta:
-        ordering = ['date']
+        ordering = ['created']
 
     def __str__(self):
         return f'Cash register: {self.company}'

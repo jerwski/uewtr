@@ -40,3 +40,17 @@
             $("#after-time-msg").delay(2000).fadeIn(500);
         });
     </script>
+
+<!-- toggle between income and expendiure fields-->
+<script>
+$(document).ready(function(){
+  $("#income").click(function(){
+    $('[id="id_expenditure"]').hide();
+    $('[id="id_income"]').show();
+  });
+  $("#expenditure").click(function(){
+    $('[id="id_expenditure"]').show();
+    $('[id="id_income"]').hide();
+  });
+});
+</script>

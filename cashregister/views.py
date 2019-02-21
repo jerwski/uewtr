@@ -75,40 +75,44 @@ class CompanyAddView(View):
 
 class CashRegisterView(View):
     '''class implementing the method of adding records to the Cash Register'''
-    def get(self, request, company_id:int=None, choice:int=None)->HttpResponseRedirect:
+    def get(self, request, company_id:int=None)->HttpResponseRedirect:
         companies = Company.objects.filter(status__range=[1,3]).order_by('company')
-        context = {'companies': companies, 'choice': choice}
+        context = {'companies': companies}
 
         if company_id:
             month, year = now().month, now().year
             company = Company.objects.get(pk=company_id)
-            records = CashRegister.objects.filter(company_id=company_id, date__month=month, date__year=year)
+            records = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
             form = CashRegisterForm(initial={'company': company})
-            context.update({'form': form, 'company': company, 'company_id': company_id, 'records': records.order_by('-date')})
+            context.update({'form': form, 'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
+
 
         return render(request, 'cashregister/cashregister.html', context)
 
-    def post(self, request, company_id:int=None, choice:int=None)->HttpResponseRedirect:
+    def post(self, request, company_id:int=None)->HttpResponseRedirect:
         form = CashRegisterForm(data=request.POST)
         companies = Company.objects.filter(status__range=[1,3]).order_by('company')
-        context = {'form': form, 'companies': companies, 'choice': choice}
+        context = {'form': form, 'companies': companies}
 
         if company_id:
             kwargs = {'company_id': company_id}
             month, year = now().month, now().year
             company = Company.objects.get(pk=company_id)
-            records = CashRegister.objects.filter(company_id=company_id, date__month=month, date__year=year)
-            context.update({'company': company, 'company_id': company_id,  'records': records})
+            records = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
+            context.update({'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
 
             if form.is_valid():
                 form.save(commit=False)
                 data = form.cleaned_data
                 symbol, contents, income, expenditure = [data[key] for key in ('symbol', 'contents', 'income', 'expenditure')]
-                if income > 0 or expenditure > 0:
+                if income > 0 and expenditure > 0:
+                    messages.warning(request, f'One of the fields (income {income:.2f} or expenditure {expenditure:.2f})  must be zero!')
+                    return render(request, 'cashregister/cashregister.html', context)
+                elif income or expenditure:
                     form.save(commit=True)
-                    msg = f'Succesful register new record in {company} Cash Register...'
-                    messages.success(request, msg)
+                    if income > 0:
+                        messages.success(request, f'Succesful register new record in {company} (income={income:.2f})')
+                    elif expenditure > 0:
+                        messages.success(request, f'Succesful register new record in {company} (expenditure={expenditure:.2f})')
 
-                return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
-
-        return render(request, 'cashregister/cashregister.html', context)
+                    return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))

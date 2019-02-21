@@ -50,7 +50,7 @@ class EmployeeExtendedDataForm(forms.ModelForm):
         model = EmployeeData
         fields = ('worker', 'birthday', 'postal', 'city', 'street', 'house', 'flat',
                   'phone', 'workplace', 'start_contract', 'end_contract', 'overtime')
-        widgets = {'city': forms.TextInput(attrs={'id':'cities'}),}
+        widgets = {'city': forms.TextInput(attrs={'id':'autocpl'}),}
 
 
 class EmployeeHourlyRateForm(forms.ModelForm):

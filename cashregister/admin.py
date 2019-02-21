@@ -23,7 +23,7 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(CashRegister)
 class CashRegisterAdmin(admin.ModelAdmin):
-    list_display = ('company', 'date', 'symbol', 'contents', 'income', 'expenditure')
-    list_filter = ('company', 'date')
-    ordering = ['company', '-date']
+    list_display = ('company', 'created', 'symbol', 'contents', 'income', 'expenditure')
+    list_filter = ('company', 'created')
+    ordering = ['created']
     actions = [export_as_json]
