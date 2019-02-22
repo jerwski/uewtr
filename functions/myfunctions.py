@@ -235,8 +235,9 @@ def cashregisterdata(company_id:int, month:int, year:int)->dict:
     registerdata, saldo = defaultdict(float), 0
     presentregister = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
     lastregister = CashRegister.objects.filter(company_id=company_id).exclude(created__month=month, created__year=year)
-    lastdate = lastregister.latest('created')
-    if lastdate:
+
+    if lastregister:
+        lastdate = lastregister.latest('created')
         month, year = lastdate.created.date().month, lastdate.created.date().year
         incomes = CashRegister.objects.filter(created__month=month, created__year=year).aggregate(inc=Sum('income'))
         expenditures = CashRegister.objects.filter(created__month=month, created__year=year).aggregate(exp=Sum('expenditure'))
