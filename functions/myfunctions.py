@@ -249,6 +249,6 @@ def cashregisterdata(company_id:int, month:int, year:int)->dict:
         registerdata['incomes'] += item.income
         registerdata['expenditures'] += item.expenditure
 
-    registerdata['status'] = registerdata['incomes'] - registerdata['expenditures']
+    registerdata['status'] = registerdata['incomes'] - registerdata['expenditures'] + saldo
 
     return registerdata

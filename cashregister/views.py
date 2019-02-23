@@ -111,7 +111,7 @@ class CashRegisterView(View):
             if form.is_valid():
                 form.save(commit=False)
                 data = form.cleaned_data
-                symbol, contents, income, expenditure = [data[key] for key in ('symbol', 'contents', 'income', 'expenditure')]
+                income, expenditure = [data[key] for key in ('income', 'expenditure')]
                 if income > 0 and expenditure > 0:
                     messages.warning(request, f'One of the fields (income {income:.2f} or expenditure {expenditure:.2f})  must be zero!')
                     return render(request, 'cashregister/cashregister.html', context)
