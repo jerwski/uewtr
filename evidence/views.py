@@ -233,7 +233,7 @@ class LeavesDataPrintView(View):
         html = leavehtml2pdf(employee_id, year)
 
         if html:
-            # create pdf file and save on templates/pdf/leves_data_{}.pdf'.format(employee_id)
+            # create pdf file
             options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
                        'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
                        'orientation': 'landscape','no-outline': None, 'quiet': '', }

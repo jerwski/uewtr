@@ -132,16 +132,16 @@ class CashRegisterView(View):
 
 
 class CashRegisterPrintView(View):
-    '''class representing the view of monthly payroll print'''
+    '''class representing the view of monthly cash register print'''
     def get(self, request, company_id:int)->HttpResponse:
-        '''convert html annuall leave time for each employee in current year to pdf'''
+        '''convert html cashregister_pdf for each companies to pdf'''
         # TODO: create modal for choice year and month to print cash register
         # year, month = int(request.POST['created_year']), int(request.POST['created_month'])
         month, year = now().month, now().year
         html = cashregisterhtml2pdf(company_id, month, year)
 
         if html:
-            # create pdf file and save on templates/pdf/leves_data_{}.pdf'.format(employee_id)
+            # create pdf file as attachment
             options = {'page-size': 'A4', 'margin-top': '0.5in', 'margin-right': '0.5in',
                        'margin-bottom': '0.5in', 'margin-left': '0.7in', 'encoding': "UTF-8",
                        'orientation': 'portrait','no-outline': None, 'quiet': '', }
