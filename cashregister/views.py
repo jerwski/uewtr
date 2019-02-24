@@ -135,7 +135,7 @@ class CashRegisterPrintView(View):
     '''class representing the view of monthly cash register print'''
     def get(self, request, company_id:int)->HttpResponse:
         '''convert html cashregister_pdf for each companies to pdf'''
-        # TODO: create modal for choice year and month to print cash register
+        # TODO: create modal for choice year and month to print cash register and KP KW as get_absolute_url
         # year, month = int(request.POST['created_year']), int(request.POST['created_month'])
         month, year = now().month, now().year
         html = cashregisterhtml2pdf(company_id, month, year)
