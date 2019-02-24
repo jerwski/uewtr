@@ -12,4 +12,5 @@ urlpatterns = [
     path('register/', login_required(views.CashRegisterView.as_view()), name='cash_register'),
     path('register/company=<int:company_id>/', login_required(views.CashRegisterView.as_view()), name='cash_register'),
     path('change_company/<int:company_id>/', login_required(views.CompanyAddView.as_view()), name='change_company'),
+    path('register/print/company=<int:company_id>/', login_required(views.CashRegisterPrintView.as_view()), name='print_register'),
 ]

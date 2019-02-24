@@ -4,10 +4,13 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.utils.timezone import now
 from django.views.generic import View
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
+
+# pdfkit library
+import pdfkit
 
 # my functions
-from functions.myfunctions import cashregisterdata
+from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf
 
 # my models
 from cashregister.models import Company, CashRegister
@@ -86,7 +89,7 @@ class CashRegisterView(View):
             month, year = now().month, now().year
             company = Company.objects.get(pk=company_id)
             registerdata = cashregisterdata(company_id, month, year)
-            context.update({'registerdata': dict(registerdata)})
+            context.update(dict(registerdata))
             records = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
             form = CashRegisterForm(initial={'company': company})
             context.update({'form': form, 'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
@@ -104,7 +107,7 @@ class CashRegisterView(View):
             month, year = now().month, now().year
             company = Company.objects.get(pk=company_id)
             registerdata = cashregisterdata(company_id, month, year)
-            context.update({'registerdata': dict(registerdata)})
+            context.update(dict(registerdata))
             records = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
             context.update({'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
 
@@ -113,13 +116,44 @@ class CashRegisterView(View):
                 data = form.cleaned_data
                 income, expenditure = [data[key] for key in ('income', 'expenditure')]
                 if income > 0 and expenditure > 0:
-                    messages.warning(request, f'One of the fields (income {income:.2f} or expenditure {expenditure:.2f})  must be zero!')
+                    msg = f'One of the fields (income {income:.2f}PLN or expenditure {expenditure:.2f}PLN)  must be zero!'
+                    messages.warning(request, msg)
                     return render(request, 'cashregister/cashregister.html', context)
                 elif income or expenditure:
                     form.save(commit=True)
                     if income > 0:
-                        messages.success(request, f'Succesful register new record in {company} (income={income:.2f})')
+                        msg = f'Succesful register new record in {company} (income={income:.2f}PLN)'
+                        messages.success(request, msg)
                     elif expenditure > 0:
-                        messages.success(request, f'Succesful register new record in {company} (expenditure={expenditure:.2f})')
+                        msg = f'Succesful register new record in {company} (expenditure={expenditure:.2f}PLN)'
+                        messages.success(request, msg)
 
                     return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
+
+
+class CashRegisterPrintView(View):
+    '''class representing the view of monthly payroll print'''
+    def get(self, request, company_id:int)->HttpResponse:
+        '''convert html annuall leave time for each employee in current year to pdf'''
+        # TODO: create modal for choice year and month to print cash register
+        # year, month = int(request.POST['created_year']), int(request.POST['created_month'])
+        month, year = now().month, now().year
+        html = cashregisterhtml2pdf(company_id, month, year)
+
+        if html:
+            # create pdf file and save on templates/pdf/leves_data_{}.pdf'.format(employee_id)
+            options = {'page-size': 'A4', 'margin-top': '0.5in', 'margin-right': '0.5in',
+                       'margin-bottom': '0.5in', 'margin-left': '0.7in', 'encoding': "UTF-8",
+                       'orientation': 'portrait','no-outline': None, 'quiet': '', }
+
+            pdf = pdfkit.from_string(html, False, options=options)
+            filename = f'cashregister_{company_id}_{year}_{month}.pdf'
+
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+            return response
+        else:
+            messages.warning(request, r'Nothing to print...')
+            kwargs = {'company_id': company_id}
+
+            return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))

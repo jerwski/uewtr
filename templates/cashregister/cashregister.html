@@ -77,7 +77,7 @@
                 {% bootstrap_field form.contents size='small' label_class='text-info font-weight-bold' placeholder='Type contents of operation...' %}
               </div>
             </div>
-            <div class="row p-2">
+            <div class="row p-1">
               <div class="col-sm-12 btn-sm">
                 <button type="submit" class="btn btn-outline-success btn-block">Confirm new entry
                   for {{ company|upper }}</button>
@@ -96,10 +96,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr class="col-sm-3 text-center font-weight-light small">
-                  {% for value in registerdata.values %}
-                      <td class="text-dark font-weight-bold font-italic">{{ value|money_format }}</td>
-                  {% endfor %}
+                <tr class="col-sm-3 text-center font-weight-bold font-italic">
+                  <td>{{ saldo|money_format }}</td><td>{{ incomes|money_format }}</td>
+                  <td>{{ expenditures|money_format }}</td><td>{{ status|money_format }}</td>
                 </tr>
               </tbody>
             </table>
@@ -150,15 +149,15 @@
             </div>
           </div>
         {% endif %}
-        <div class="row mb-3">
-          <div class="col-sm-6">
-            <div class="btn-sm">
-              <a href="{% url 'account:exit' %}" class="btn btn-outline-danger btn-block">Exit</a>
-            </div>
-          </div>
-          <div class="col-sm-6">
-            <div class="btn-sm">
-              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Dashboard</a>
+        <div class="row text-center">
+          <div class="col-12">
+            <div class="btn btn-group mt-2 mb-2">
+              <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+              {% if company_id %}
+                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print register</a>
+              {% endif %}
+              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+              <a class="btn btn-outline-primary" href="/admin/">Admin Data Base</a>
             </div>
           </div>
         </div>

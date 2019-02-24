@@ -15,6 +15,7 @@ from django.core.serializers import serialize, BadSerializer
 
 
 # my models
+from cashregister.models import Company, CashRegister
 from employee.models import Employee, EmployeeData, EmployeeHourlyRate
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
@@ -51,9 +52,11 @@ def mkfixture(root_backup):
               'employee hourly rate': EmployeeHourlyRate.objects.filter(update__year=year),
               'work evidence': WorkEvidence.objects.filter(start_work__year=year),
               'employee leave': EmployeeLeave.objects.filter(leave_date__year=year),
-              'account payment': AccountPayment.objects.filter(account_date__year=year)}
+              'account payment': AccountPayment.objects.filter(account_date__year=year),
+              'company': Company.objects.filter(created__year=year),
+              'cashregister': CashRegister.objects.filter(created__year=year)}
     try:
-        for app in ('employee', 'evidence'):
+        for app in ('employee', 'evidence', 'cashregister'):
             models = apps.all_models[app]
             for model in models.values():
                 with Path.cwd().joinpath(f'{root_backup}/{model._meta.model_name}.json').open('w') as fixture:

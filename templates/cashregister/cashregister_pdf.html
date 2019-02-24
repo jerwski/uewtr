@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load utility_tags %}
+
+{% block title %}Cash register{% endblock %}
+
+{% block content %}
+    <div class="container">
+      <div class="row">
+        <div class="col-sm">
+          <table class="table table-borderless">
+            <tbody class="font-weight-normal">
+            <tr><td>{{ company.company }}<br>{{ company.postal }} {{ company.city }}<br>ul. {{ company.street }}<br>NIP: {{ company.nip }}</td><td class="text-center lead font-weight-bold">RAPORT KASOWY Nr: {{ month }}/{{ year }}<br><em class="small">Za okres: {{ month }}/{{ year }}</em></td></tr>
+              <tr><td>&nbsp;</td><td class="text-right">Konto przeciwstawne: {{ company.account }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm">
+          <table class="table table-sm table-bordered">
+            <thead class="thead-light">
+              <tr class="text-center">
+                <th>Poz.</th><th>Data</th><th>Symbol</th><th>TREŚĆ</th><th>PRZYCHÓD</th><th>ROZCHÓD</th>
+              </tr>
+              <tr class="text-center">
+                <th colspan="4">Z przeniesienia:</th><th class="bg-white" colspan="2">{{ saldo|money_format }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in presentregister %}
+                <tr>
+                  <td class="text-right">{{ forloop.counter }}.</td><td>{{ item.created|date:'d-m-Y' }}</td><td>{{ item.symbol }}</td><td>{{ item.contents }}</td><td class="text-right">{% if item.income > 0 %}{{ item.income|money_format }}{% else %}-----{% endif %}</td><td class="text-right">{% if item.expenditure > 0 %}{{ item.expenditure|money_format }}{% else %}-----{% endif %}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+            <thead class="text-center thead-light">
+              <tr>
+                <th colspan="2">Do przeniesienia:</th><th>{{ status|money_format }}</th>
+                <th class="text-right">Razem:</th><th>{{ incomes|money_format }}</th><th>{{ expenditures|money_format }}</th>
+              </tr>
+            </thead>
+          </table>
+            <p class="footer text-secondary text-sm-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+        </div>
+      </div>
+    </div>
+{% endblock %}
