@@ -142,8 +142,8 @@ class CashRegisterPrintView(View):
 
         if html:
             # create pdf file as attachment
-            options = {'page-size': 'A4', 'margin-top': '0.5in', 'margin-right': '0.5in',
-                       'margin-bottom': '0.5in', 'margin-left': '0.7in', 'encoding': "UTF-8",
+            options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in',
+                       'margin-bottom': '0.4in', 'margin-left': '0.8in', 'encoding': "UTF-8",
                        'orientation': 'portrait','no-outline': None, 'quiet': '', }
 
             pdf = pdfkit.from_string(html, False, options=options)
