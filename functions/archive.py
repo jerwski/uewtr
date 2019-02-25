@@ -54,7 +54,7 @@ def mkfixture(root_backup):
               'employee leave': EmployeeLeave.objects.filter(leave_date__year=year),
               'account payment': AccountPayment.objects.filter(account_date__year=year),
               'company': Company.objects.filter(created__year=year),
-              'cashregister': CashRegister.objects.filter(created__year=year)}
+              'cash register': CashRegister.objects.filter(created__year=year)}
     try:
         for app in ('employee', 'evidence', 'cashregister'):
             models = apps.all_models[app]
