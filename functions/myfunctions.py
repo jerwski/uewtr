@@ -241,10 +241,10 @@ def cashregisterdata(company_id:int, month:int, year:int)->dict:
         incomes = CashRegister.objects.filter(created__month=month, created__year=year).aggregate(inc=Sum('income'))
         expenditures = CashRegister.objects.filter(created__month=month, created__year=year).aggregate(exp=Sum('expenditure'))
         saldo = incomes['inc'] - expenditures['exp']
-        if not presentregister:
-            transfer = {'company_id':company_id, 'symbol': f'RK {month}/{year}',
-                        'contents': 'Z przeniesienia', 'income': saldo, 'expenditure': 0}
-            CashRegister.objects.create(**transfer)
+        # if not presentregister:
+        #     transfer = {'company_id':company_id, 'symbol': f'RK {month}/{year}',
+        #                 'contents': 'Z przeniesienia', 'income': saldo, 'expenditure': 0}
+        #     CashRegister.objects.create(**transfer)
 
     registerdata['saldo'] = saldo
 
@@ -260,10 +260,10 @@ def cashregisterdata(company_id:int, month:int, year:int)->dict:
 def cashregisterhtml2pdf(company_id:int, month:int, year:int):
     '''convert html annuall leave time for each employee in current year to pdf'''
     company = Company.objects.get(pk=company_id)
-    presentregister = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
-    if presentregister.exists():
+    registerdata = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
+    if registerdata.exists():
         # create cash register data as associative arrays for passed arguments
-        context = {'company': company, 'presentregister': presentregister, 'month': month, 'year': year}
+        context = {'company': company, 'registerdata': registerdata, 'month': month, 'year': year}
         registerdata = dict(cashregisterdata(company_id, month, year))
         context.update(registerdata)
         template = get_template(r'cashregister/cashregister_pdf.html')
