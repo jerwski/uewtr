@@ -64,6 +64,19 @@ def sendLeavesData(employee_id:int):
         raise ConnectionError
 
 
+def sendCashRegister(company_id:int, month:int, year:int):
+    '''send e-mail with attached cash register in pdf format'''
+    try:
+        company = Company.objects.get(pk=company_id)
+        subject = f'cash register for {month}/{year} r.'
+        message = f'Cash Register for {company} on {month}/{year} in attachment ...'
+        sender, recipient = settings.EMAIL_HOST_USER, ['projekt@unikolor.com']
+        attachment = Path(f'templates/pdf/cashregister_{company}_{month}_{year}.pdf')
+        sendemail(subject, message, sender, recipient, attachment)
+    except:
+        raise ConnectionError
+
+
 def initial_worktime_form(work_hours:int)->dict:
     '''return initial data for WorkEvidenceForm'''
     hours = dict(zip([12,14,16,18,6],[6,6,6,6,22]))

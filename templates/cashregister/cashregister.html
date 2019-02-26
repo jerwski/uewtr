@@ -133,8 +133,16 @@
                   <td>{{ record.created|date:'d F Y' }}</td>
                   <td>{{ record.symbol }}</td>
                   <td>{{ record.contents }}</td>
-                  <td class="text-sm-right">{{ record.income|money_format }}</td>
-                  <td class="text-sm-right">{{ record.expenditure|money_format }}</td>
+                  <td class="text-sm-right">
+                    {% if record.income > 0 %}
+                      <a href="{{ record.cash_accept }}">{{ record.income|money_format }}</a>
+                    {% else %}-----{% endif %}
+                  </td>
+                  <td class="text-sm-right">
+                    {% if record.expenditure > 0 %}
+                      <a href="{{ record.cash_pay }}">{{ record.expenditure|money_format }}</a>
+                    {% else %}-----{% endif %}
+                  </td>
                 </tr>
               {% endfor %}
               </tbody>
@@ -153,8 +161,9 @@
           <div class="col-12">
             <div class="btn btn-group mt-2 mb-2">
               <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-              {% if company_id %}
+              {% if company_id and records %}
                 <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print register</a>
+                <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info">Send register</a>
               {% endif %}
               <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
               <a class="btn btn-outline-primary" href="/admin/">Admin Data Base</a>

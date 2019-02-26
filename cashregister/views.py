@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 import pdfkit
 
 # my functions
-from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf
+from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendCashRegister
 
 # my models
 from cashregister.models import Company, CashRegister
@@ -157,3 +157,42 @@ class CashRegisterPrintView(View):
             kwargs = {'company_id': company_id}
 
             return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
+
+
+class CashRegisterSendView(View):
+    '''class representing the view for sending cash register as pdf file'''
+    def get(self, request, company_id)->HttpResponseRedirect:
+        kwargs = {'company_id': company_id}
+        company = Company.objects.get(pk=company_id)
+        month, year = now().month, now().year
+        html = cashregisterhtml2pdf(company_id, month, year)
+
+        if html:
+            # create pdf file and save on templates/pdf/payroll_{}_{}.pdf.format(choice_date.month, choice_date.year)
+            options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in',
+                       'margin-bottom': '0.4in', 'margin-left': '0.8in', 'encoding': "UTF-8",
+                       'orientation': 'portrait','no-outline': None, 'quiet': '', }
+            # create pdf file
+            pdfile = f'templates/pdf/cashregister_{company}_{month}_{year}.pdf'
+            pdfkit.from_string(html, pdfile, options=options)
+            # send e-mail with attached pdfile
+            sendCashRegister(company_id, month, year)
+            messages.info(request, f'Cash register for {company} on {month}/{year} was sending....')
+        else:
+            messages.warning(request, r'Nothing to send...')
+
+        return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
+
+
+class CashAccept(View):
+
+    def get(self, request, record:int):
+        messages.warning(request, f'You call CashAccept class...record={record}')
+        return HttpResponseRedirect(reverse('cashregister:cash_register'))
+
+
+class CashPay(View):
+
+    def get(self, request, record:int):
+        messages.warning(request, f'You call CashPay class...record={record}')
+        return HttpResponseRedirect(reverse('cashregister:cash_register'))
