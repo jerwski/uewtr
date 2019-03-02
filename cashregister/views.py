@@ -189,7 +189,7 @@ class CashRegisterPrintView(View):
 
 class CashRegisterSendView(View):
     '''class representing the view for sending cash register as pdf file'''
-    def get(self, request, company_id)->HttpResponseRedirect:
+    def get(self, request, company_id:int)->HttpResponseRedirect:
         kwargs = {'company_id': company_id}
         company = Company.objects.get(pk=company_id)
 
@@ -201,7 +201,7 @@ class CashRegisterSendView(View):
         html = cashregisterhtml2pdf(company_id, month, year)
 
         if html:
-            # create pdf file and save on templates/pdf/payroll_{}_{}.pdf.format(choice_date.month, choice_date.year)
+            # create pdf file and save on templates/pdf/cashregister_{company}_{month}_{year}.pdf
             options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in',
                        'margin-bottom': '0.4in', 'margin-left': '0.8in', 'encoding': "UTF-8",
                        'orientation': 'portrait','no-outline': None, 'quiet': '', }
@@ -219,7 +219,7 @@ class CashRegisterSendView(View):
 
 class CashRegisterAccept(View):
 
-    def get(self, request, record:int):
+    def get(self, request, record:int)->HttpResponseRedirect:
         data = CashRegister.objects.get(pk=record)
 
         if data.income:
