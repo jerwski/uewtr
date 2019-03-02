@@ -70,7 +70,7 @@ def sendCashRegister(company_id:int, month:int, year:int):
         company = Company.objects.get(pk=company_id)
         subject = f'cash register for {month}/{year} r.'
         message = f'Cash Register for {company} on {month}/{year} in attachment ...'
-        sender, recipient = settings.EMAIL_HOST_USER, ['projekt@unikolor.com']
+        sender, recipient = settings.EMAIL_HOST_USER, ['biuro.hossa@wp.pl']
         attachment = Path(f'templates/pdf/cashregister_{company}_{month}_{year}.pdf')
         sendemail(subject, message, sender, recipient, attachment)
     except:
@@ -245,24 +245,28 @@ def remgarbage(*paths):
 def cashregisterdata(company_id:int, month:int, year:int)->dict:
     '''return data from cash register'''
     registerdata, saldo = defaultdict(float), 0
-    presentregister = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
-    lastregister = CashRegister.objects.filter(company_id=company_id).exclude(created__month=month, created__year=year)
+    register = CashRegister.objects.filter(company_id=company_id)
 
-    if lastregister:
-        lastdate = lastregister.latest('created')
-        month, year = lastdate.created.date().month, lastdate.created.date().year
-        incomes = CashRegister.objects.filter(created__month=month, created__year=year).aggregate(inc=Sum('income'))
-        expenditures = CashRegister.objects.filter(created__month=month, created__year=year).aggregate(exp=Sum('expenditure'))
+    if register.exclude(created__month__gte=month, created__year__gte=year):
+        lastdate = register.exclude(created__month__gte=month, created__year__gte=year).latest('created')
+        check = {'company_id': company_id,
+                 'created__month': lastdate.created.date().month,
+                 'created__year': lastdate.created.date().year}
+        lastdata = CashRegister.objects.filter(**check)
+        incomes = lastdata.aggregate(inc=Sum('income'))
+        expenditures = lastdata.aggregate(exp=Sum('expenditure'))
         saldo = incomes['inc'] - expenditures['exp']
-        # if not presentregister:
-        #     transfer = {'company_id':company_id, 'symbol': f'RK {month}/{year}',
-        #                 'contents': 'Z przeniesienia', 'income': saldo, 'expenditure': 0}
-        #     CashRegister.objects.create(**transfer)
+
+        if not register.filter(company_id=company_id, created__month=month, created__year=year) and saldo > 0:
+            transfer = {'company_id':company_id, 'symbol': f'RK {lastdate.created.date().month}/{lastdate.created.date().year}',
+                        'contents': 'Z przeniesienia', 'income': saldo, 'expenditure': 0}
+            CashRegister.objects.create(**transfer)
 
     registerdata['saldo'] = saldo
 
-    for item in presentregister:
-        registerdata['incomes'] += item.income
+    for item in register.filter(company_id=company_id, created__month=month, created__year=year):
+        if item.contents != 'Z przeniesienia':
+            registerdata['incomes'] += item.income
         registerdata['expenditures'] += item.expenditure
 
     registerdata['status'] = registerdata['incomes'] - registerdata['expenditures'] + saldo

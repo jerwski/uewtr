@@ -29,9 +29,11 @@
             </thead>
             <tbody>
               {% for item in registerdata %}
-                <tr>
-                  <td class="text-right">{{ forloop.counter }}.</td><td>{{ item.created|date:'d-m-Y' }}</td><td>{{ item.symbol }}</td><td>{{ item.contents }}</td><td class="text-right">{% if item.income > 0 %}{{ item.income|money_format }}{% else %}-----{% endif %}</td><td class="text-right">{% if item.expenditure > 0 %}{{ item.expenditure|money_format }}{% else %}-----{% endif %}</td>
-                </tr>
+                {% if item.contents != 'Z przeniesienia' %}
+                  <tr>
+                    <td class="text-right">{{ forloop.counter }}.</td><td>{{ item.created|date:'d-m-Y' }}</td><td>{{ item.symbol }}</td><td>{{ item.contents }}</td><td class="text-right">{% if item.income > 0 %}{{ item.income|money_format }}{% else %}-----{% endif %}</td><td class="text-right">{% if item.expenditure > 0 %}{{ item.expenditure|money_format }}{% else %}-----{% endif %}</td>
+                  </tr>
+                {% endif %}
               {% endfor %}
             </tbody>
             <thead class="text-center thead-light">

@@ -128,22 +128,24 @@
             <table class="table table-sm table-hover">
               <tbody class="small" id="searchTable">
               {% for record in records %}
-                <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"{% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
-                  <td>{{ forloop.counter }}</td>
-                  <td>{{ record.created|date:'d F Y' }}</td>
-                  <td>{{ record.symbol }}</td>
-                  <td>{{ record.contents }}</td>
-                  <td class="text-sm-right">
-                    {% if record.income > 0 %}
-                      <a href="{{ record.cash_accept }}">{{ record.income|money_format }}</a>
-                    {% else %}-----{% endif %}
-                  </td>
-                  <td class="text-sm-right">
-                    {% if record.expenditure > 0 %}
-                      <a href="{{ record.cash_pay }}">{{ record.expenditure|money_format }}</a>
-                    {% else %}-----{% endif %}
-                  </td>
-                </tr>
+                {% if not record.contents == 'Z przeniesienia' %}
+                  <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"{% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ record.created|date:'d F Y' }}</td>
+                    <td>{{ record.symbol }}</td>
+                    <td>{{ record.contents }}</td>
+                    <td class="text-sm-right">
+                      {% if record.income > 0 %}
+                        <a href="{{ record.cash_accept }}">{{ record.income|money_format }}</a>
+                      {% else %}-----{% endif %}
+                    </td>
+                    <td class="text-sm-right">
+                      {% if record.expenditure > 0 %}
+                        <a href="{{ record.cash_accept }}">{{ record.expenditure|money_format }}</a>
+                      {% else %}-----{% endif %}
+                    </td>
+                  </tr>
+                {% endif %}
               {% endfor %}
               </tbody>
             </table>
@@ -161,9 +163,12 @@
           <div class="col-12">
             <div class="btn btn-group mt-2 mb-2">
               <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-              {% if company_id and records %}
-                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print register</a>
-                <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info">Send register</a>
+              {% if company_id and previous %}
+                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print last register</a>
+                <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info">Send last register</a>
+              {% elif company_id and not previous %}
+                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success disabled">Print last register</a>
+                <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info disabled">Send last register</a>
               {% endif %}
               <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
               <a class="btn btn-outline-primary" href="/admin/">Admin Data Base</a>

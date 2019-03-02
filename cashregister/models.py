@@ -63,6 +63,7 @@ class CashRegister(models.Model):
     contents = models.CharField(max_length=250, verbose_name='Opis dokonywanej operacji...')
     income = models.FloatField(default=0.00, validators=[positive_value], verbose_name='Przychód')
     expenditure = models.FloatField(default=0.00, validators=[positive_value], verbose_name='Rozchód')
+    cashaccept = models.SmallIntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ['created']
@@ -72,6 +73,3 @@ class CashRegister(models.Model):
 
     def cash_accept(self):
         return reverse('cashregister:cash_accept', args=[self.id])
-
-    def cash_pay(self):
-        return reverse('cashregister:cash_pay', args=[self.id])

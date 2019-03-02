@@ -82,6 +82,7 @@ class CompanyAddView(View):
 class CashRegisterView(View):
     '''class implementing the method of adding records to the Cash Register'''
     def get(self, request, company_id:int=None)->HttpResponseRedirect:
+        check = CashRegister.objects.filter(company_id=company_id)
         companies = Company.objects.filter(status__range=[1,3]).order_by('company')
         context = {'companies': companies}
 
@@ -90,15 +91,27 @@ class CashRegisterView(View):
             company = Company.objects.get(pk=company_id)
             registerdata = cashregisterdata(company_id, month, year)
             context.update(dict(registerdata))
-            records = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
+            records = check.filter(created__month=month, created__year=year)
             form = CashRegisterForm(initial={'company': company})
             context.update({'form': form, 'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
 
+            if now().month==1:
+                month, year = 12, now().year - 1
+            else:
+                month, year = now().month - 1, now().year
+
+            previous = check.filter(created__month=month, created__year=year)
+
+            if previous:
+                context.__setitem__('previous', True)
+            else:
+                context.__setitem__('previous', False)
 
         return render(request, 'cashregister/cashregister.html', context)
 
     def post(self, request, company_id:int=None)->HttpResponseRedirect:
         form = CashRegisterForm(data=request.POST)
+        check = CashRegister.objects.filter(company_id=company_id)
         companies = Company.objects.filter(status__range=[1,3]).order_by('company')
         context = {'form': form, 'companies': companies}
 
@@ -108,8 +121,20 @@ class CashRegisterView(View):
             company = Company.objects.get(pk=company_id)
             registerdata = cashregisterdata(company_id, month, year)
             context.update(dict(registerdata))
-            records = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
+            records = check.filter(created__month=month, created__year=year)
             context.update({'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
+
+            if now().month==1:
+                month, year = 12, now().year - 1
+            else:
+                month, year = now().month - 1, now().year
+
+            previous = check.filter(created__month=month, created__year=year)
+
+            if previous:
+                context.__setitem__('previous', True)
+            else:
+                context.__setitem__('previous', False)
 
             if form.is_valid():
                 form.save(commit=False)
@@ -135,9 +160,12 @@ class CashRegisterPrintView(View):
     '''class representing the view of monthly cash register print'''
     def get(self, request, company_id:int)->HttpResponse:
         '''convert html cashregister_pdf for each companies to pdf'''
-        # TODO: create modal for choice year and month to print cash register and KP KW as get_absolute_url
-        # year, month = int(request.POST['created_year']), int(request.POST['created_month'])
-        month, year = now().month, now().year
+        # TODO: create KP KW as get_absolute_url
+        if now().month==1:
+            month, year = 12, now().year - 1
+        else:
+            month, year = now().month - 1, now().year
+
         html = cashregisterhtml2pdf(company_id, month, year)
 
         if html:
@@ -164,7 +192,12 @@ class CashRegisterSendView(View):
     def get(self, request, company_id)->HttpResponseRedirect:
         kwargs = {'company_id': company_id}
         company = Company.objects.get(pk=company_id)
-        month, year = now().month, now().year
+
+        if now().month==1:
+            month, year = 12, now().year - 1
+        else:
+            month, year = now().month - 1, now().year
+
         html = cashregisterhtml2pdf(company_id, month, year)
 
         if html:
@@ -184,15 +217,17 @@ class CashRegisterSendView(View):
         return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
 
 
-class CashAccept(View):
+class CashRegisterAccept(View):
 
     def get(self, request, record:int):
-        messages.warning(request, f'You call CashAccept class...record={record}')
-        return HttpResponseRedirect(reverse('cashregister:cash_register'))
+        data = CashRegister.objects.get(pk=record)
 
-
-class CashPay(View):
-
-    def get(self, request, record:int):
-        messages.warning(request, f'You call CashPay class...record={record}')
+        if data.income:
+            value = f'Income: {data.income}'
+            msg = f'You call CashRegisterAccept class...record={record}, Income={data.income}'
+        else:
+            value = f'Expenditure: {data.expenditure}'
+            msg = f'You call CashRegisterAccept class...record={record}, Expenditure={data.expenditure}'
+        print(f'Company; {data.company}\nCreted: {data.created}\nContents: {data.contents}\n{value}')
+        messages.warning(request, msg)
         return HttpResponseRedirect(reverse('cashregister:cash_register'))
