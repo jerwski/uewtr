@@ -225,7 +225,7 @@ class CashRegisterAccept(View):
 
     def get(self, request, record:int)->HttpResponseRedirect:
         data = CashRegister.objects.get(pk=record)
-        check = Q(company_id=3, created__month=data.created.month, created__year=data.created.year, created__gte=data.created)
+        check = Q(company_id=3, created__month=data.created.month, created__year=data.created.year, created__lte=data.created)
         number = CashRegister.objects.filter(check).exclude(contents='Z przeniesienia')
         number = len(number)
         if data.income:
