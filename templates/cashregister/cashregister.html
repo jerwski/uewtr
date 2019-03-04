@@ -117,8 +117,8 @@
             <tr class="font-weight-light small">
               <th width="3%">Nr</th>
               <th width="10%">Date</th>
-              <th width="25%">Symbol</th>
-              <th width="32%">Contents</th>
+              <th width="25%">Who is who</th>
+              <th width="32%">Invoice, symbol, contents</th>
               <th class="text-right" width="15%">Income</th>
               <th class="text-right" width="15%">Expenditure</th>
             </tr>
@@ -128,24 +128,22 @@
             <table class="table table-sm table-hover">
               <tbody class="small" id="searchTable">
               {% for record in records %}
-                {% if not record.contents == 'Z przeniesienia' %}
-                  <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"{% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ record.created|date:'d F Y' }}</td>
-                    <td>{{ record.symbol }}</td>
-                    <td>{{ record.contents }}</td>
-                    <td class="text-sm-right">
-                      {% if record.income > 0 %}
-                        <a href="{{ record.cash_accept }}">{{ record.income|money_format }}</a>
-                      {% else %}-----{% endif %}
-                    </td>
-                    <td class="text-sm-right">
-                      {% if record.expenditure > 0 %}
-                        <a href="{{ record.cash_accept }}">{{ record.expenditure|money_format }}</a>
-                      {% else %}-----{% endif %}
-                    </td>
-                  </tr>
-                {% endif %}
+                <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"{% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ record.created|date:'d F Y' }}</td>
+                  <td>{{ record.symbol }}</td>
+                  <td>{{ record.contents }}</td>
+                  <td class="text-sm-right">
+                    {% if record.income > 0 %}
+                      <a href="{{ record.cash_accept }}">{{ record.income|money_format }}</a>
+                    {% else %}-----{% endif %}
+                  </td>
+                  <td class="text-sm-right">
+                    {% if record.expenditure > 0 %}
+                      <a href="{{ record.cash_accept }}">{{ record.expenditure|money_format }}</a>
+                    {% else %}-----{% endif %}
+                  </td>
+                </tr>
               {% endfor %}
               </tbody>
             </table>

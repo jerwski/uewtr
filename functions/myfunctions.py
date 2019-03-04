@@ -14,11 +14,10 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 
 # django library
-from django.db.models import Q
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
-from django.db.models import Sum, Case, When, Value, IntegerField
+from django.db.models import Q, Sum, Case, When, Value, IntegerField
 
 # my models
 from cashregister.models import Company, CashRegister
@@ -238,7 +237,7 @@ def remgarbage(*paths):
     '''removes attachment pdf file'''
     for path in paths:
         for file in Path.iterdir(path):
-            if file.match('leaves_data_*.pdf')|file.match('payroll_*.pdf'):
+            if file.match('leaves_data_*.pdf')|file.match('payroll_*.pdf')|file.match('cashregister_*.pdf'):
                 file.unlink()
 
 

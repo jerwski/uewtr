@@ -1,4 +1,8 @@
+# standard library
+import num2words
+
 # django library
+from django.db.models import Q
 from django.urls import reverse
 from django.shortcuts import render
 from django.contrib import messages
@@ -91,7 +95,7 @@ class CashRegisterView(View):
             company = Company.objects.get(pk=company_id)
             registerdata = cashregisterdata(company_id, month, year)
             context.update(dict(registerdata))
-            records = check.filter(created__month=month, created__year=year)
+            records = check.filter(created__month=month, created__year=year).exclude(contents='Z przeniesienia')
             form = CashRegisterForm(initial={'company': company})
             context.update({'form': form, 'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
 
@@ -121,7 +125,7 @@ class CashRegisterView(View):
             company = Company.objects.get(pk=company_id)
             registerdata = cashregisterdata(company_id, month, year)
             context.update(dict(registerdata))
-            records = check.filter(created__month=month, created__year=year)
+            records = check.filter(created__month=month, created__year=year).exclude(contents='Z przeniesienia')
             context.update({'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
 
             if now().month==1:
@@ -221,13 +225,18 @@ class CashRegisterAccept(View):
 
     def get(self, request, record:int)->HttpResponseRedirect:
         data = CashRegister.objects.get(pk=record)
-
+        check = Q(company_id=3, created__month=data.created.month, created__year=data.created.year, created__gte=data.created)
+        number = CashRegister.objects.filter(check).exclude(contents='Z przeniesienia')
+        number = len(number)
         if data.income:
             value = f'Income: {data.income}'
-            msg = f'You call CashRegisterAccept class...record={record}, Income={data.income}'
+            numword = num2words.num2words (data.income, lang='pl', to='currency', currency='PLN')
+            msg = f'You call CashRegisterAccept class...record={record}, Income={data.income}, Number={number}'
         else:
             value = f'Expenditure: {data.expenditure}'
-            msg = f'You call CashRegisterAccept class...record={record}, Expenditure={data.expenditure}'
+            numword=num2words.num2words (data.expenditure, lang='pl', to='currency', currency='PLN')
+            msg = f'You call CashRegisterAccept class...record={record}, Expenditure={data.expenditure}, Number={number}'
         print(f'Company; {data.company}\nCreted: {data.created}\nContents: {data.contents}\n{value}')
+        print(numword)
         messages.warning(request, msg)
         return HttpResponseRedirect(reverse('cashregister:cash_register'))
