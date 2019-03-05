@@ -25,5 +25,5 @@ class CompanyAdmin(admin.ModelAdmin):
 class CashRegisterAdmin(admin.ModelAdmin):
     list_display = ('company', 'created', 'symbol', 'contents', 'income', 'expenditure')
     list_filter = ('company', 'created')
-    ordering = ['created']
+    ordering = ['company', 'created']
     actions = [export_as_json]

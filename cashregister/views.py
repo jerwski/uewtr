@@ -95,7 +95,7 @@ class CashRegisterView(View):
             company = Company.objects.get(pk=company_id)
             registerdata = cashregisterdata(company_id, month, year)
             context.update(dict(registerdata))
-            records = check.filter(created__month=month, created__year=year).exclude(contents='Z przeniesienia')
+            records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
             form = CashRegisterForm(initial={'company': company})
             context.update({'form': form, 'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
 

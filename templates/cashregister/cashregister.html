@@ -5,7 +5,6 @@
 
 {% block title %}Add/Change employee hourly rate{% endblock %}
 
-
 {% block content %}
   <div class="container-fluid">
     <div class="row ml-3 mr-3 mt-2 bgbisque">
@@ -47,34 +46,32 @@
 
       <div class="col-sm-9">
         {% if company_id %}
-          <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD TO CASH REGISTER
-            FOR {{ company }}</p>
-
+          <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD TO CASH REGISTER FOR {{ company }}</p>
           <form action="." method="POST">{% csrf_token %}
             {% bootstrap_field form.company %}
             <div class="row ml-5">
               <div class="col-sm-4">
                 <div class="input-group">
                   <div class="input-group-prepend">
-                    <span class="input-group-text bg-info text-white font-weight-normal">Symbol&nbsp;&nbsp;&nbsp;</span>
+                    <span class="input-group-text bg-info text-white font-weight-normal">Komu...&nbsp;&nbsp;&nbsp;</span>
                   </div>
-                  {% bootstrap_field form.symbol form_group_class='form-inline' show_label=False placeholder='Symbol...' %}
+                  {% bootstrap_field form.symbol form_group_class='form-inline' show_label=False placeholder='Firma, osoba...' %}
                 </div>
                 <div class="input-group">
                   <div class="input-group-prepend">
                     <span class="input-group-text bg-success text-white font-weight-normal" id="income">Przychód</span>
                   </div>
-                  {% bootstrap_field form.income form_group_class='form-inline' show_label=False placeholder='Value...' %}
+                  {% bootstrap_field form.income form_group_class='form-inline' show_label=False placeholder='Wpłata do kasy...' %}
                 </div>
                 <div class="input-group">
                   <div class="input-group-prepend">
                     <span class="input-group-text bg-danger text-white font-weight-normal" id="expenditure">Rozchód&nbsp;</span>
                   </div>
-                  {% bootstrap_field form.expenditure form_group_class='form-inline' show_label=False placeholder='Value...' %}
+                  {% bootstrap_field form.expenditure form_group_class='form-inline' show_label=False placeholder='Wypłata z kasy...' %}
                 </div>
               </div>
               <div class="col-sm-7">
-                {% bootstrap_field form.contents size='small' label_class='text-info font-weight-bold' placeholder='Type contents of operation...' %}
+                {% bootstrap_field form.contents size='small' label_class='text-info font-weight-bold' placeholder='Numer faktury, rachunku, dokumentu lub treść operacji...' %}
               </div>
             </div>
             <div class="row p-1">
@@ -88,18 +85,20 @@
           <div class="row">
             <table class="table table-sm table-hover">
               <thead class="text-center">
-                <tr class="font-weight-bold small">
-                  <th class="text-primary" width="25%">Z przeniesienia</th>
-                  <th class="text-success" width="25%">Przychód</th>
-                  <th class="text-danger" width="25%">Rozchód</th>
-                  <th class="text-info" width="25%">Stan kasy</th>
-                </tr>
+              <tr class="font-weight-bold small">
+                <th class="text-primary" width="25%">Z przeniesienia</th>
+                <th class="text-success" width="25%">Przychód</th>
+                <th class="text-danger" width="25%">Rozchód</th>
+                <th class="text-info" width="25%">Stan kasy</th>
+              </tr>
               </thead>
               <tbody>
-                <tr class="col-sm-3 text-center font-weight-bold font-italic">
-                  <td>{{ saldo|money_format }}</td><td>{{ incomes|money_format }}</td>
-                  <td>{{ expenditures|money_format }}</td><td>{{ status|money_format }}</td>
-                </tr>
+              <tr class="col-sm-3 text-center font-weight-bold font-italic">
+                <td>{{ saldo|money_format }}</td>
+                <td>{{ incomes|money_format }}</td>
+                <td>{{ expenditures|money_format }}</td>
+                <td>{{ status|money_format }}</td>
+              </tr>
               </tbody>
             </table>
           </div>
@@ -116,11 +115,11 @@
             <thead class="text-center">
             <tr class="font-weight-light small">
               <th width="3%">Nr</th>
-              <th width="10%">Date</th>
-              <th width="25%">Who is who</th>
-              <th width="32%">Invoice, symbol, contents</th>
-              <th class="text-right" width="15%">Income</th>
-              <th class="text-right" width="15%">Expenditure</th>
+              <th width="10%">Data</th>
+              <th width="25%">Firma, osoba</th>
+              <th width="32%">Nr faktury, rachunku, dokumentu, treść operacji</th>
+              <th class="text-right" width="15%">Wpłata</th>
+              <th class="text-right" width="15%">Wypłata</th>
             </tr>
             </thead>
           </table>
@@ -128,7 +127,8 @@
             <table class="table table-sm table-hover">
               <tbody class="small" id="searchTable">
               {% for record in records %}
-                <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"{% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
+                <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"
+                    {% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
                   <td>{{ forloop.counter }}</td>
                   <td>{{ record.created|date:'d F Y' }}</td>
                   <td>{{ record.symbol }}</td>
@@ -162,11 +162,15 @@
             <div class="btn btn-group mt-2 mb-2">
               <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
               {% if company_id and previous %}
-                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print last register</a>
-                <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info">Send last register</a>
+                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print last
+                  register</a>
+                <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info">Send last
+                  register</a>
               {% elif company_id and not previous %}
-                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success disabled">Print last register</a>
-                <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info disabled">Send last register</a>
+                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success disabled">Print
+                  last register</a>
+                <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info disabled">Send
+                  last register</a>
               {% endif %}
               <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
               <a class="btn btn-outline-primary" href="/admin/">Admin Data Base</a>

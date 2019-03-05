@@ -66,7 +66,7 @@ class CashRegister(models.Model):
     cashaccept = models.SmallIntegerField(null=True, blank=True)
 
     class Meta:
-        ordering = ['created']
+        ordering = ['company', 'created']
 
     def __str__(self):
         return f'Cash register: {self.company}'

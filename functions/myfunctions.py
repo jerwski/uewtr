@@ -258,14 +258,15 @@ def cashregisterdata(company_id:int, month:int, year:int)->dict:
 
         if not register.filter(company_id=company_id, created__month=month, created__year=year) and saldo > 0:
             transfer = {'company_id':company_id, 'symbol': f'RK {lastdate.created.date().month}/{lastdate.created.date().year}',
-                        'contents': 'Z przeniesienia', 'income': saldo, 'expenditure': 0}
+                        'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
             CashRegister.objects.create(**transfer)
 
     registerdata['saldo'] = saldo
 
-    for item in register.filter(company_id=company_id, created__month=month, created__year=year):
-        if item.contents != 'Z przeniesienia':
-            registerdata['incomes'] += item.income
+    presentdata = register.filter(company_id=company_id, created__month=month, created__year=year)
+    presentdata = presentdata.exclude(contents='z przeniesienia')
+    for item in presentdata:
+        registerdata['incomes'] += item.income
         registerdata['expenditures'] += item.expenditure
 
     registerdata['status'] = registerdata['incomes'] - registerdata['expenditures'] + saldo
