@@ -238,10 +238,12 @@ def tree(directory):
 
 def remgarbage(*paths):
     '''removes attachment pdf file'''
+    patterns = ('leaves_data_*.pdf', 'payroll_*.pdf', 'cashregister_*.pdf', 'cashaccept_*.pdf')
     for path in paths:
         for file in Path.iterdir(path):
-            if file.match('leaves_data_*.pdf')|file.match('payroll_*.pdf')|file.match('cashregister_*.pdf'):
-                file.unlink()
+            for pattern in patterns:
+                if file.match(pattern):
+                    file.unlink()
 
 
 def cashregisterdata(company_id:int, month:int, year:int)->dict:
@@ -303,7 +305,7 @@ def cashaccept2pdf(record:int, number=False):
     register = CashRegister.objects.filter(check)
     position = len (register.filter(created__gte=created).exclude (contents='z przeniesienia'))
     context = {'data': data, 'position': position}
-
+    # TODO: pass date, month and taer from register query to html
     # opt1, opt2={'created__lte': data.created, 'then': Value (1)}, {'default': Value (0), 'output_field': IntegerField ()}
     # number=CashRegister.objects.filter(check).exclude(contents='z przeniesienia').aggregate (nr=Sum(Case (When (**opt1), **opt2)))
     # TODO: check or is KP or KW number in database? if not update record with following number
