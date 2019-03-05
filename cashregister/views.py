@@ -2,13 +2,13 @@
 import num2words
 
 # django library
-from django.db.models import Q
 from django.urls import reverse
 from django.shortcuts import render
 from django.contrib import messages
 from django.utils.timezone import now
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import Q, Sum, Case, When, Value, IntegerField
 
 # pdfkit library
 import pdfkit
@@ -224,10 +224,15 @@ class CashRegisterSendView(View):
 class CashRegisterAccept(View):
 
     def get(self, request, record:int)->HttpResponseRedirect:
+        month, year = now().month, now().year
         data = CashRegister.objects.get(pk=record)
-        check = Q(company=data.company, created__month=data.created.month, created__year=data.created.year, created__lte=data.created)
+        check = Q(company=data.company, created__month=month, created__year=year, created__gte=data.created)
         number = CashRegister.objects.filter(check).exclude(contents='Z przeniesienia')
         number = len(number)
+
+        # opt1, opt2={'created__lte': data.created, 'then': Value (1)}, {'default': Value (0), 'output_field': IntegerField ()}
+        # number=CashRegister.objects.filter(check).exclude(contents='Z przeniesienia').aggregate (nr=Sum(Case (When (**opt1), **opt2)))
+
         if data.income:
             value = f'Income: {data.income}'
             numword = num2words.num2words (data.income, lang='pl', to='currency', currency='PLN')
