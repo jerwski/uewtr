@@ -111,15 +111,15 @@
                                                                    width="24px"></span>
             </div>
           </div>
-          <table class="table table-sm">
+          <table class="table table-borderless table-info table-sm">
             <thead class="text-center">
             <tr class="font-weight-light small">
               <th width="3%">Nr</th>
-              <th width="10%">Data</th>
-              <th width="25%">Firma, osoba</th>
-              <th width="32%">Nr faktury, rachunku, dokumentu, treść operacji</th>
-              <th class="text-right" width="15%">Wpłata</th>
-              <th class="text-right" width="15%">Wypłata</th>
+              <th width="15%">Data</th>
+              <th width="30%">Firma, osoba</th>
+              <th width="23%">Nr faktury, dokumentu, treść operacji</th>
+              <th width="15%">Wpłata</th>
+              <th width="15%">Wypłata</th>
             </tr>
             </thead>
           </table>
@@ -129,16 +129,16 @@
               {% for record in records %}
                 <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"
                     {% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
-                  <td>{{ forloop.counter }}</td>
-                  <td>{{ record.created|date:'d F Y' }}</td>
-                  <td>{{ record.symbol }}</td>
-                  <td>{{ record.contents }}</td>
-                  <td class="text-sm-right">
+                  <td width="3%">{{ forloop.counter }}</td>
+                  <td width="15%">{{ record.created|date:'d F Y' }}</td>
+                  <td width="30%">{{ record.symbol }}</td>
+                  <td width="23%">{{ record.contents }}</td>
+                  <td class="text-sm-right" width="15%">
                     {% if record.income > 0 %}
                       <a href="{{ record.cash_accept }}">{{ record.income|money_format }}</a>
                     {% else %}-----{% endif %}
                   </td>
-                  <td class="text-sm-right">
+                  <td class="text-sm-right" width="15%">
                     {% if record.expenditure > 0 %}
                       <a href="{{ record.cash_accept }}">{{ record.expenditure|money_format }}</a>
                     {% else %}-----{% endif %}

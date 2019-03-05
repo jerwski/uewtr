@@ -6,90 +6,89 @@
 {% block title %}{% if company_id %}Change{% else %}Add{% endif %} Company Data{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="row m-3">
-            <div class="col"></div>
-            <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
-                <p class="h1 font-weight-normal">Working Time Recorder</p>
-                <p class="text-info font-weight-bold font-italic">Application to handle employee working time in small business</p>
-            </div>
-            <div class="col">
-                <p class="footer text-secondary text-sm-right">Copyright UNIKOLOR Jerzy Wygonowski</p>
-                {% include 'blocks/alert.html' %}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-6">
-                <p class="lead text-center bgburlywood"><strong class="text-danger">REGISTERED COMPANIES</strong></p>
-                <div class="input-group">
-                    <input class="form-control" id="myInput" type="text" placeholder="Search company..." aria-label="Filtering table" aria-describedby="basic-addon">
-                    <div class="input-group-append">
-                        <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Search company..."></span>
-                    </div>
-                </div>
-                <table class="table table-hover table-sm">
-                    <thead class="text-info font-weight-bold"><tr><th>Company</th><th>City</th></tr></thead>
-                    <tbody id="searchTable">
-                        {% for company in companies %}
-                            <tr>
-                            {% if request.path == '/cashregister/add_company/' %}
-                                <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
-                            {% else %}
-                                {% if company_id == company.id %}
-                                    <td><a class="font-weight-normal text-danger" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
-                                {% else %}
-                                <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
-                                {% endif %}
-                            {% endif %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="col-sm-6">
-                <p class="lead text-center bgburlywood"><strong class="text-danger">{% if company_id %}CHANGE{% else %}ADD{% endif %} COMPANY DATA</strong></p>
-
-                <div class="form-control-lg">
-                    <form action="." method="POST">{% csrf_token %}
-                        <div class="row">
-                            <div class="col-sm-12">
-                                {% bootstrap_field form.company size='small' label_class='text-info font-italic' %}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                {% bootstrap_field form.nip size='small' label_class='text-info font-italic' %}
-                                {% bootstrap_field form.street size='small' label_class='text-info font-italic' %}
-                                {% bootstrap_field form.phone size='small' label_class='text-info font-italic' %}
-                            </div>
-                            <div class="col-6">
-                                {% bootstrap_field form.postal size='small' label_class='text-info font-italic' %}
-                                {% bootstrap_field form.city size='small' label_class='text-info font-italic' %}
-                                {% bootstrap_field form.account size='small' label_class='text-info font-italic' %}
-                            </div>
-                        </div>
-                        <div class="row text-center">
-                            <div class="col-sm-12 mb-1">
-                                {% bootstrap_field form.status label_class='text-info font-italic' %}
-                            </div>
-                        </div>
-                        <div class="row text-center">
-                            <div class="col-sm-12">
-                                <div class="btn btn-sm btn-group mb-2" role="group">
-                                    <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                                    <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
-                                    {% if company_id %}
-                                        <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Back to add company</a>
-                                    {% endif %}
-                                    <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
-                                    <button type="submit" class="btn btn-outline-success">Confirm</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <div class="row m-3">
+      <div class="col"></div>
+      <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
+        <p class="h1 font-weight-normal">Working Time Recorder</p>
+        <p class="text-info font-weight-bold font-italic">Application to handle employee working time in small business</p>
+      </div>
+      <div class="col">
+        <p class="footer text-secondary text-sm-right">Copyright UNIKOLOR Jerzy Wygonowski</p>
+        {% include 'blocks/alert.html' %}
+      </div>
     </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <p class="lead text-center bgburlywood"><strong class="text-danger">REGISTERED COMPANIES</strong></p>
+        <div class="input-group">
+          <input class="form-control" id="myInput" type="text" placeholder="Search company..." aria-label="Filtering table" aria-describedby="basic-addon">
+          <div class="input-group-append">
+            <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Search company..."></span>
+          </div>
+        </div>
+        <table class="table table-hover table-sm">
+          <thead class="text-info font-weight-bold"><tr><th>Company</th><th>City</th></tr></thead>
+            <tbody id="searchTable">
+            {% for company in companies %}
+              <tr>
+                {% if request.path == '/cashregister/add_company/' %}
+                  <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
+                {% else %}
+                  {% if company_id == company.id %}
+                    <td><a class="font-weight-normal text-danger" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
+                  {% else %}
+                    <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
+                  {% endif %}
+                {% endif %}
+              </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+      </div>
+
+      <div class="col-sm-6">
+        <p class="lead text-center bgburlywood"><strong class="text-danger">{% if company_id %}CHANGE{% else %}ADD{% endif %} COMPANY DATA</strong></p>
+        <div class="form-control-lg">
+          <form action="." method="POST">{% csrf_token %}
+            <div class="row">
+              <div class="col-sm-12">
+                {% bootstrap_field form.company size='small' label_class='text-info font-italic' %}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                {% bootstrap_field form.nip size='small' label_class='text-info font-italic' %}
+                {% bootstrap_field form.street size='small' label_class='text-info font-italic' %}
+                {% bootstrap_field form.phone size='small' label_class='text-info font-italic' %}
+              </div>
+              <div class="col-6">
+                {% bootstrap_field form.postal size='small' label_class='text-info font-italic' %}
+                {% bootstrap_field form.city size='small' label_class='text-info font-italic' %}
+                {% bootstrap_field form.account size='small' label_class='text-info font-italic' %}
+              </div>
+            </div>
+            <div class="row text-center">
+              <div class="col-sm-12 mb-1">
+                {% bootstrap_field form.status label_class='text-info font-italic' %}
+              </div>
+            </div>
+            <div class="row text-center">
+              <div class="col-sm-12">
+                <div class="btn btn-sm btn-group mb-2" role="group">
+                  <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                  <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+                  {% if company_id %}
+                    <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Back to add company</a>
+                  {% endif %}
+                  <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
+                  <button type="submit" class="btn btn-outline-success">Confirm</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

@@ -1,6 +1,3 @@
-# standard library
-import num2words
-
 # django library
 from django.urls import reverse
 from django.shortcuts import render
@@ -8,13 +5,12 @@ from django.contrib import messages
 from django.utils.timezone import now
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseRedirect
-from django.db.models import Q, Sum, Case, When, Value, IntegerField
 
 # pdfkit library
 import pdfkit
 
 # my functions
-from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendCashRegister
+from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendCashRegister, cashaccept2pdf
 
 # my models
 from cashregister.models import Company, CashRegister
@@ -176,7 +172,7 @@ class CashRegisterPrintView(View):
             # create pdf file as attachment
             options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in',
                        'margin-bottom': '0.4in', 'margin-left': '0.8in', 'encoding': "UTF-8",
-                       'orientation': 'portrait','no-outline': None, 'quiet': '', }
+                       'orientation': 'portrait','no-outline': None, 'quiet': ''}
 
             pdf = pdfkit.from_string(html, False, options=options)
             filename = f'cashregister_{company_id}_{year}_{month}.pdf'
@@ -208,8 +204,7 @@ class CashRegisterSendView(View):
             # create pdf file and save on templates/pdf/cashregister_{company}_{month}_{year}.pdf
             options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in',
                        'margin-bottom': '0.4in', 'margin-left': '0.8in', 'encoding': "UTF-8",
-                       'orientation': 'portrait','no-outline': None, 'quiet': '', }
-            # create pdf file
+                       'orientation': 'portrait','no-outline': None, 'quiet': ''}
             pdfile = f'templates/pdf/cashregister_{company}_{month}_{year}.pdf'
             pdfkit.from_string(html, pdfile, options=options)
             # send e-mail with attached pdfile
@@ -221,27 +216,27 @@ class CashRegisterSendView(View):
         return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
 
 
-class CashRegisterAccept(View):
+class CashRegisterAcceptView(View):
 
-    def get(self, request, record:int)->HttpResponseRedirect:
-        month, year = now().month, now().year
+    def get(self, request, record:int)->HttpResponse:
         data = CashRegister.objects.get(pk=record)
-        check = Q(company=data.company, created__month=month, created__year=year, created__gte=data.created)
-        number = CashRegister.objects.filter(check).exclude(contents='z przeniesienia')
-        number = len(number)
+        company_id = data.company.id
+        kwargs = {'company_id': company_id}
+        html = cashaccept2pdf(record)
 
-        # opt1, opt2={'created__lte': data.created, 'then': Value (1)}, {'default': Value (0), 'output_field': IntegerField ()}
-        # number=CashRegister.objects.filter(check).exclude(contents='z przeniesienia').aggregate (nr=Sum(Case (When (**opt1), **opt2)))
+        if html:
+            # create pdf file and save on templates/pdf/cashaccept_{record}.pdf
+            options={'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
+                     'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None,
+                     'quiet': ''}
+            # create pdf file
+            pdf=pdfkit.from_string(html, False, options=options)
+            filename=f'cashaccept_{record}.pdf'
 
-        if data.income:
-            value = f'Income: {data.income}'
-            numword = num2words.num2words (data.income, lang='pl', to='currency', currency='PLN')
-            msg = f'You call CashRegisterAccept class...record={record}, Income={data.income}, Number={number}'
+            response=HttpResponse(pdf, content_type='application/pdf')
+            response ['Content-Disposition']='attachment; filename="'+filename+'"'
+            return response
         else:
-            value = f'Expenditure: {data.expenditure}'
-            numword=num2words.num2words (data.expenditure, lang='pl', to='currency', currency='PLN')
-            msg = f'You call CashRegisterAccept class...record={record}, Expenditure={data.expenditure}, Number={number}'
-        print(f'Company; {data.company}\nCreted: {data.created}\nContents: {data.contents}\n{value}')
-        print(numword)
-        messages.warning(request, msg)
-        return HttpResponseRedirect(reverse('cashregister:cash_register'))
+            messages.warning(request, r'Nothing to print...')
+
+        return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))

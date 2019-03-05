@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 # Pillow library
 from PIL import Image
 
+# num2words library
+import num2words
+
 # standard library
 import calendar
 from io import BytesIO
@@ -275,7 +278,7 @@ def cashregisterdata(company_id:int, month:int, year:int)->dict:
 
 
 def cashregisterhtml2pdf(company_id:int, month:int, year:int):
-    '''convert html annuall leave time for each employee in current year to pdf'''
+    '''convert html cash register for last month to pdf'''
     company = Company.objects.get(pk=company_id)
     cashregister = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
 
@@ -290,3 +293,34 @@ def cashregisterhtml2pdf(company_id:int, month:int, year:int):
         return html
     else:
         return False
+
+
+def cashaccept2pdf(record:int, number=False):
+    '''convert html cash pay/accept for given record to pdf'''
+    data=CashRegister.objects.get (pk=record)
+    created, month, year = data.created, data.created.month, data.created.year
+    check = Q(company=data.company, created__month=month, created__year=year)
+    register = CashRegister.objects.filter(check)
+    position = len (register.filter(created__gte=created).exclude (contents='z przeniesienia'))
+    context = {'data': data, 'position': position}
+
+    # opt1, opt2={'created__lte': data.created, 'then': Value (1)}, {'default': Value (0), 'output_field': IntegerField ()}
+    # number=CashRegister.objects.filter(check).exclude(contents='z przeniesienia').aggregate (nr=Sum(Case (When (**opt1), **opt2)))
+    # TODO: check or is KP or KW number in database? if not update record with following number
+    if data.income:
+        template = get_template(r'cashregister/cashaccept.html')
+        lastnumber = register.filter (expenditure=0, cashaccept__isnull=False)
+        numwords = num2words.num2words (data.income, lang='pl', to='currency', currency='PLN')
+    else:
+        template = get_template(r'cashregister/cashpay.html')
+        lastnumber = register.filter (income=0, cashaccept__isnull=False)
+        numwords = num2words.num2words (data.expenditure, lang='pl', to='currency', currency='PLN')
+
+    if lastnumber.exists():
+        number = max(i.cashaccept for i in lastnumber) + 1
+
+    context.__setitem__('number', number)
+    context.__setitem__('numwords', numwords)
+    html = template.render (context)
+
+    return html
