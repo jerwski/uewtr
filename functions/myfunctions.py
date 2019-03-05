@@ -277,10 +277,12 @@ def cashregisterdata(company_id:int, month:int, year:int)->dict:
 def cashregisterhtml2pdf(company_id:int, month:int, year:int):
     '''convert html annuall leave time for each employee in current year to pdf'''
     company = Company.objects.get(pk=company_id)
-    registerdata = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
-    if registerdata.exists():
+    cashregister = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
+
+    if cashregister.exists():
         # create cash register data as associative arrays for passed arguments
-        context = {'company': company, 'registerdata': registerdata, 'month': month, 'year': year}
+        cashregister=cashregister.exclude (contents='z przeniesienia')
+        context = {'company': company, 'cashregister': cashregister, 'month': month, 'year': year}
         registerdata = dict(cashregisterdata(company_id, month, year))
         context.update(registerdata)
         template = get_template(r'cashregister/cashregister_pdf.html')

@@ -125,7 +125,7 @@ class CashRegisterView(View):
             company = Company.objects.get(pk=company_id)
             registerdata = cashregisterdata(company_id, month, year)
             context.update(dict(registerdata))
-            records = check.filter(created__month=month, created__year=year).exclude(contents='Z przeniesienia')
+            records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
             context.update({'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
 
             if now().month==1:
@@ -227,11 +227,11 @@ class CashRegisterAccept(View):
         month, year = now().month, now().year
         data = CashRegister.objects.get(pk=record)
         check = Q(company=data.company, created__month=month, created__year=year, created__gte=data.created)
-        number = CashRegister.objects.filter(check).exclude(contents='Z przeniesienia')
+        number = CashRegister.objects.filter(check).exclude(contents='z przeniesienia')
         number = len(number)
 
         # opt1, opt2={'created__lte': data.created, 'then': Value (1)}, {'default': Value (0), 'output_field': IntegerField ()}
-        # number=CashRegister.objects.filter(check).exclude(contents='Z przeniesienia').aggregate (nr=Sum(Case (When (**opt1), **opt2)))
+        # number=CashRegister.objects.filter(check).exclude(contents='z przeniesienia').aggregate (nr=Sum(Case (When (**opt1), **opt2)))
 
         if data.income:
             value = f'Income: {data.income}'
