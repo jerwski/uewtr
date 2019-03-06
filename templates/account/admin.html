@@ -3,13 +3,15 @@
 
 {% block title %}Dashboard{% endblock %}
 
-{% block content %}
+{% block header %}
   <div class="jumbotron text-center">
     <p class="text-primary display-4">Administration Dashboard</p>
     <p class="text-center font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
     <p class="text-center text-secondary font-italic lead">Et nos credimus, quid velint credere...</p>
   </div>
+{% endblock %}
 
+{% block content %}
   <div class="container">
     <div class="row">
       <div class="col-sm-12 text-center">

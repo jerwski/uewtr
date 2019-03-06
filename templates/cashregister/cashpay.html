@@ -12,8 +12,8 @@
           <tbody class="font-weight-normal">
             <tr>
               <td colspan="2">{{ data.company.company }}<br>{{ data.company.postal }} {{ data.company.city }}<br>ul. {{ data.company.street }}<br>NIP: {{ data.company.nip }}</td>
-              <td class="text-center" colspan="2">Bydgoszcz<br><br>dnia {% now "d.m.Y" %}</td>
-              <td class="text-center lead font-weight-bold" colspan="2">KW - wypłata<br><em>Nr&nbsp;{{ number }}/{% now "m" %}</em></td>
+              <td class="text-center" colspan="2">Bydgoszcz<br><br>dnia {{ data.created|date:'d-m-Y' }}</td>
+              <td class="text-center lead font-weight-bold" colspan="2">KW - wypłata<br><em>Nr&nbsp;{{ number }}/{{ data.created|date:'Y' }}</em></td>
             </tr>
             <tr class="text-right">
               <td class="text-left" colspan="2">Komu:<br>{{ data.symbol }}</td>

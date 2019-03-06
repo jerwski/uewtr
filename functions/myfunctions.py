@@ -297,32 +297,51 @@ def cashregisterhtml2pdf(company_id:int, month:int, year:int):
         return False
 
 
-def cashaccept2pdf(record:int, number=False):
+def cashaccept2pdf(record:int, number=1):
     '''convert html cash pay/accept for given record to pdf'''
     data=CashRegister.objects.get (pk=record)
     created, month, year = data.created, data.created.month, data.created.year
     check = Q(company=data.company, created__month=month, created__year=year)
     register = CashRegister.objects.filter(check)
-    position = len (register.filter(created__gte=created).exclude (contents='z przeniesienia'))
+    position = len (register.filter(created__lte=created).exclude (contents='z przeniesienia'))
     context = {'data': data, 'position': position}
-    # TODO: pass date, month and taer from register query to html
+
     # opt1, opt2={'created__lte': data.created, 'then': Value (1)}, {'default': Value (0), 'output_field': IntegerField ()}
     # number=CashRegister.objects.filter(check).exclude(contents='z przeniesienia').aggregate (nr=Sum(Case (When (**opt1), **opt2)))
-    # TODO: check or is KP or KW number in database? if not update record with following number
+
     if data.income:
         template = get_template(r'cashregister/cashaccept.html')
-        lastnumber = register.filter (expenditure=0, cashaccept__isnull=False)
-        numwords = num2words.num2words (data.income, lang='pl', to='currency', currency='PLN')
+
+        if data.cashaccept:
+            number = data.cashaccept
+        else:
+            lastnumber = register.filter(expenditure=0, cashaccept__isnull=False)
+            if lastnumber.exists():
+                number = max(i.cashaccept for i in lastnumber) + 1
+            else:
+                number = number
+
+            CashRegister.objects.filter(pk=record).update(cashaccept=number)
+
+        numwords = num2words.num2words(data.income, lang='pl', to='currency', currency='PLN')
     else:
         template = get_template(r'cashregister/cashpay.html')
-        lastnumber = register.filter (income=0, cashaccept__isnull=False)
-        numwords = num2words.num2words (data.expenditure, lang='pl', to='currency', currency='PLN')
 
-    if lastnumber.exists():
-        number = max(i.cashaccept for i in lastnumber) + 1
+        if data.cashaccept:
+            number = data.cashaccept
+        else:
+            lastnumber = register.filter(income=0, cashaccept__isnull=False)
+            if lastnumber.exists():
+                number = max(i.cashaccept for i in lastnumber) + 1
+            else:
+                number = number
+
+            CashRegister.objects.filter(pk=record).update(cashaccept=number)
+
+        numwords = num2words.num2words(data.expenditure, lang='pl', to='currency', currency='PLN')
 
     context.__setitem__('number', number)
     context.__setitem__('numwords', numwords)
-    html = template.render (context)
+    html = template.render(context)
 
     return html
