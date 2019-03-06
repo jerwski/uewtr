@@ -226,10 +226,10 @@ class CashRegisterAcceptView(View):
             options={'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
                      'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None,
                      'quiet': ''}
-            pdf=pdfkit.from_string(html, False, options=options)
-            filename=f'cashaccept_{record}.pdf'
-            response=HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition']='attachment; filename="'+filename+'"'
+            pdf = pdfkit.from_string(html, False, options=options)
+            filename = f'cashaccept_{record}.pdf'
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
             return response
         else:
             messages.warning(request, r'Nothing to print...')
