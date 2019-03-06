@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load utility_tags %}
+
+{% block title %}Cash accept{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <table class="table table-bordered">
+          <tbody class="font-weight-normal">
+            <tr>
+              <td colspan="2">{{ data.company.company }}<br>{{ data.company.postal }} {{ data.company.city }}<br>ul. {{ data.company.street }}<br>NIP: {{ data.company.nip }}</td>
+              <td class="text-center" colspan="2">Bydgoszcz<br><br>dnia {% now "d.m.Y" %}</td>
+              <td class="text-center lead font-weight-bold" colspan="2">KP - wpłata<br><em>Nr&nbsp;{{ number }}/{% now "m" %}</em></td>
+            </tr>
+            <tr class="text-right">
+              <td class="text-left" colspan="2">Od kogo:<br>{{ data.symbol }}</td>
+              <td class="text-center" colspan="2">WINIEN<br><em class="small font-weight-normal">Kasa</em></td>
+              <td class="text-center" colspan="2">MA<br><em class="small font-weight-normal">Konto</em></td>
+            </tr>
+            <tr>
+              <td class="text-left small" colspan="2">Za co</td><td class="text-center small" colspan="2">PLN</td><td class="text-center small" colspan="2">numer</td>
+            </tr>
+            <tr class="text-left">
+              <td colspan="2">{{ data.contents }}</td><td class="text-right" colspan="2">{{ data.income|floatformat:2 }}</td><td colspan="2">&nbsp;</td>
+            </tr>
+            <tr class="text-left">
+              <td colspan="2">&nbsp;</td><td colspan="2">&nbsp;</td><td colspan="2">&nbsp;</td>
+            </tr>
+            <tr class="text-left">
+              <td colspan="2">&nbsp;</td><td colspan="2">&nbsp;</td><td colspan="2">&nbsp;</td>
+            </tr>
+            <tr class="text-right">
+              <td colspan="2">Razem:</td><td class="text-center font-weight-bold" colspan="2">{{ data.income|floatformat:2 }}</td><td colspan="2"><h6 class="text-left">SYMBOLE PL KAS. Nr</h6></td>
+            </tr>
+            <tr class="text-left">
+              <td colspan="6">Słownie: -{{ numwords }}-</td>
+            </tr>
+            <tr class="text-center samll">
+              <td>Wystawił</td><td>Sprawdził</td><td>Zatwierdził</td><td>Raport kasowy</td><td colspan="2">Kwotę powyższą otrzymałem</td>
+            </tr>
+            <tr class="text-center small">
+              <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+              <td class="text-left">Nr: {% now "m" %}/{% now "Y" %}<br><br>Poz.: {{ position }}</td>
+              <td class="text-center"><br><br><br>(podpis kasjera)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <p class="footer text-secondary text-sm-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+      </div>
+    </div>
+  </div>
+{% endblock %}
