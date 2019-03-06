@@ -72,4 +72,4 @@ class CashRegister(models.Model):
         return f'Cash register: {self.company}'
 
     def cash_accept(self):
-        return reverse('cashregister:cash_accept', args=[self.id])
+        return reverse('cashregister:cash_accept', args=[self.company.id, self.id])

@@ -160,7 +160,6 @@ class CashRegisterPrintView(View):
     '''class representing the view of monthly cash register print'''
     def get(self, request, company_id:int)->HttpResponse:
         '''convert html cashregister_pdf for each companies to pdf'''
-        # TODO: create KP KW as get_absolute_url
         if now().month==1:
             month, year = 12, now().year - 1
         else:
@@ -218,9 +217,7 @@ class CashRegisterSendView(View):
 
 class CashRegisterAcceptView(View):
 
-    def get(self, request, record:int)->HttpResponse:
-        data = CashRegister.objects.get(pk=record)
-        company_id = data.company.id
+    def get(self, request, company_id:int, record:int)->HttpResponse:
         kwargs = {'company_id': company_id}
         html = cashaccept2pdf(record)
 
