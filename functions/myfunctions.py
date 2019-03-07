@@ -300,14 +300,14 @@ def cashregisterhtml2pdf(company_id:int, month:int, year:int):
 def cashaccept2pdf(record:int, number=1):
     '''convert html cash pay/accept for given record to pdf'''
     data=CashRegister.objects.get (pk=record)
-    created, month, year = data.created, data.created.month, data.created.year
-    check = Q(company=data.company, created__month=month, created__year=year)
+    company, created, month, year = data.company, data.created, data.created.month, data.created.year
+    check = Q(company=company, created__month=month, created__year=year)
     register = CashRegister.objects.filter(check)
-    position = len (register.filter(created__lte=created).exclude (contents='z przeniesienia'))
+    position = len(register.filter(created__lte=created).exclude (contents='z przeniesienia'))
     context = {'data': data, 'position': position}
 
     # opt1, opt2={'created__lte': data.created, 'then': Value (1)}, {'default': Value (0), 'output_field': IntegerField ()}
-    # number=CashRegister.objects.filter(check).exclude(contents='z przeniesienia').aggregate (nr=Sum(Case (When (**opt1), **opt2)))
+    # number=CashRegister.objects.filter(check).exclude(contents='z przeniesienia').aggregate (nr=Sum(Case(When(**opt1), **opt2)))
 
     if data.income:
         template = get_template(r'cashregister/cashaccept.html')
