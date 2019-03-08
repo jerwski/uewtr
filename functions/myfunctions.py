@@ -20,7 +20,7 @@ from datetime import date, datetime, timedelta
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
-from django.db.models import Q, Sum, Case, When, Value, IntegerField
+from django.db.models import Case, Count, IntegerField, Max, Q, Sum, Value, When
 
 # my models
 from cashregister.models import Company, CashRegister
@@ -256,15 +256,13 @@ def cashregisterdata(company_id: int, month: int, year: int) -> dict:
 
 	if register.exclude(created__month__gte=month, created__year__gte=year):
 		lastdate = register.exclude(created__month__gte=month, created__year__gte=year).latest('created')
-		check = {'company_id': company_id,
-		         'created__month': lastdate.created.date().month,
-		         'created__year': lastdate.created.date().year}
-		lastdata = CashRegister.objects.filter(**check)
+		check = {'created__month': lastdate.created.date().month, 'created__year': lastdate.created.date().year}
+		lastdata = register.filter(**check)
 		incomes = lastdata.aggregate(inc=Sum('income'))
 		expenditures = lastdata.aggregate(exp=Sum('expenditure'))
 		saldo = incomes['inc'] - expenditures['exp']
 
-		if not register.filter(company_id=company_id, created__month=month, created__year=year) and saldo > 0:
+		if not register.filter(created__month=month, created__year=year) and saldo > 0:
 			transfer = {'company_id': company_id,
 			            'symbol': f'RK {lastdate.created.date().month}/{lastdate.created.date().year}',
 			            'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
@@ -272,8 +270,7 @@ def cashregisterdata(company_id: int, month: int, year: int) -> dict:
 
 	registerdata['saldo'] = saldo
 
-	presentdata = register.filter(company_id=company_id, created__month=month, created__year=year)
-	presentdata = presentdata.exclude(contents='z przeniesienia')
+	presentdata = register.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
 	for item in presentdata:
 		registerdata['incomes'] += item.income
 		registerdata['expenditures'] += item.expenditure
@@ -296,6 +293,7 @@ def cashregisterhtml2pdf(company_id: int, month: int, year: int):
 		context.update(registerdata)
 		template = get_template(r'cashregister/cashregister_pdf.html')
 		html = template.render(context)
+
 		return html
 	else:
 		return False
@@ -304,14 +302,12 @@ def cashregisterhtml2pdf(company_id: int, month: int, year: int):
 def cashaccept2pdf(record: int, number=1):
 	'''convert html cash pay/accept for given record to pdf'''
 	data = CashRegister.objects.get(pk=record)
+	context = {'data': data}
 	company, created, month, year = data.company, data.created, data.created.month, data.created.year
 	check = Q(company=company, created__month=month, created__year=year)
 	register = CashRegister.objects.filter(check)
-	position = len(register.filter(created__lte=created).exclude(contents='z przeniesienia'))
-	context = {'data': data, 'position': position}
-
-	# opt1, opt2={'created__lte': data.created, 'then': Value (1)}, {'default': Value (0), 'output_field': IntegerField ()}
-	# number=CashRegister.objects.filter(check).exclude(contents='z przeniesienia').aggregate (nr=Sum(Case(When(**opt1), **opt2)))
+	position = register.filter(created__lte=created).exclude(contents='z przeniesienia').aggregate(position=Count('pk'))
+	context.update(position)
 
 	if data.income:
 		template = get_template(r'cashregister/cashaccept.html')
@@ -319,9 +315,9 @@ def cashaccept2pdf(record: int, number=1):
 		if data.cashaccept:
 			number = data.cashaccept
 		else:
-			lastnumber = register.filter(expenditure=0, cashaccept__isnull=False)
-			if lastnumber.exists():
-				number = max(i.cashaccept for i in lastnumber) + 1
+			maxnumber = register.filter(expenditure=0, cashaccept__isnull=False).aggregate(Max('cashaccept'))
+			if maxnumber['cashaccept__max']:
+				number = maxnumber['cashaccept__max'] + 1
 			else:
 				number = number
 
@@ -334,9 +330,9 @@ def cashaccept2pdf(record: int, number=1):
 		if data.cashaccept:
 			number = data.cashaccept
 		else:
-			lastnumber = register.filter(income=0, cashaccept__isnull=False)
-			if lastnumber.exists():
-				number = max(i.cashaccept for i in lastnumber) + 1
+			maxnumber = register.filter(income=0, cashaccept__isnull=False).aggregate(Max('cashaccept'))
+			if maxnumber['cashaccept__max']:
+				number = maxnumber['cashaccept__max'] + 1
 			else:
 				number = number
 

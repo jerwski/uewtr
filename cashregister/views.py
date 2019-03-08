@@ -65,16 +65,14 @@ class CompanyAddView(View):
                         msg = f'Successful update data for company {obj}'
                         messages.success(request, msg)
 
-                    kwargs = {'company_id': obj.id}
-                    return HttpResponseRedirect(reverse('cashregister:change_company', kwargs=kwargs))
+                    return HttpResponseRedirect(reverse('cashregister:change_company', args=[obj.id]))
 
                 except Company.DoesNotExist:
                     messages.warning(request, r'Somthing wrong... try again!')
 
             else:
-                kwargs = {'company_id': company_id}
                 messages.info(request, r'Nothing to change!')
-                return HttpResponseRedirect(reverse('cashregister:change_company', kwargs=kwargs))
+                return HttpResponseRedirect(reverse('cashregister:change_company', args=[company_id]))
         else:
             return render(request, 'cashregister/company_add.html', context)
 
@@ -116,7 +114,6 @@ class CashRegisterView(View):
         context = {'form': form, 'companies': companies}
 
         if company_id:
-            kwargs = {'company_id': company_id}
             month, year = now().month, now().year
             company = Company.objects.get(pk=company_id)
             registerdata = cashregisterdata(company_id, month, year)
@@ -153,7 +150,7 @@ class CashRegisterView(View):
                         msg = f'Succesful register new record in {company} (expenditure={expenditure:.2f}PLN)'
                         messages.success(request, msg)
 
-                    return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 
 
 class CashRegisterPrintView(View):
@@ -181,15 +178,13 @@ class CashRegisterPrintView(View):
             return response
         else:
             messages.warning(request, r'Nothing to print...')
-            kwargs = {'company_id': company_id}
 
-            return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 
 
 class CashRegisterSendView(View):
     '''class representing the view for sending cash register as pdf file'''
     def get(self, request, company_id:int)->HttpResponseRedirect:
-        kwargs = {'company_id': company_id}
         company = Company.objects.get(pk=company_id)
 
         if now().month==1:
@@ -212,13 +207,12 @@ class CashRegisterSendView(View):
         else:
             messages.warning(request, r'Nothing to send...')
 
-        return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 
 
 class CashRegisterAcceptView(View):
 
     def get(self, request, company_id:int, record:int)->HttpResponse:
-        kwargs = {'company_id': company_id}
         html = cashaccept2pdf(record)
 
         if html:
@@ -234,4 +228,4 @@ class CashRegisterAcceptView(View):
         else:
             messages.warning(request, r'Nothing to print...')
 
-        return HttpResponseRedirect(reverse('cashregister:cash_register', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))

@@ -8,4 +8,10 @@ def check_pesel(digit:str):
 
 def positive_value(value:float):
     if value < 0:
-        raise ValidationError(('The value must be greater than or equal to zero...'))
+        raise ValidationError(('The value must be greater than or equal to zero...'),)
+
+
+def from_transfer(contents:str):
+    variants = ('z przeniesienia', 'Z przeniesienia', 'Z Przeniesienia', 'Z PRZENIESIENIA')
+    if contents in variants:
+        raise  ValidationError(('%(contenst)s is not allowed! Use any other...'), params={'contents': contents})

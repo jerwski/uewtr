@@ -73,12 +73,10 @@ class EmployeeBasicDataView(View):
             messages.success(request, r'No employee in database...')
 
         if employee_id:
-            kwargs = {'employee_id': employee_id}
             employee = Employee.objects.get(pk=employee_id)
             fields = list(employee.__dict__.keys())[2:]
             old_values = Employee.objects.filter(pk=employee_id).values(*fields)[0]
         else:
-            kwargs = {}
             old_values = {'pesel': request.POST['pesel']}
             active_worker = Employee.objects.filter(status=True).first()
             context.__setitem__('employee_id', active_worker.id)
@@ -94,13 +92,12 @@ class EmployeeBasicDataView(View):
                         EmployeeHourlyRate.objects.create(worker=obj, update=now().date(), hourly_rate=8.00)
                         msg = f'Successful created basic data for employee {obj} with minimum rate 8.00 PLN/h'
                         messages.success(request, msg)
-                        kwargs = {'employee_id': obj.id}
-                        return HttpResponseRedirect(reverse('employee:employee_extendeddata', kwargs=kwargs))
+                        return HttpResponseRedirect(reverse('employee:employee_extendeddata', args=[obj.id]))
                     else:
                         msg = f'Successful update data for employee {obj}'
                         messages.success(request, msg)
 
-                        return HttpResponseRedirect(reverse('employee:employee_basicdata', kwargs=kwargs))
+                        return HttpResponseRedirect(reverse('employee:employee_basicdata', args=[employee_id]))
 
                 except Employee.DoesNotExist:
                     messages.warning(request, r'Somthing wrong... try again!')
@@ -108,7 +105,7 @@ class EmployeeBasicDataView(View):
             else:
                 messages.info(request, r'Nothing to change!')
 
-                return HttpResponseRedirect(reverse('employee:employee_basicdata', kwargs=kwargs))
+                return HttpResponseRedirect(reverse('employee:employee_basicdata', args=[employee_id]))
         else:
             context.__setitem__('new_employee', True)
 
@@ -116,7 +113,7 @@ class EmployeeBasicDataView(View):
 
 
 class EmployeeEraseAll(View):
-    '''class implementing the method for ersing all data in database for the employee by pk=employee_id'''
+    '''class implementing the method for erasing all data in database for the employee by pk=employee_id'''
     def get(self, request, employee_id:int)->HttpResponseRedirect:
         worker = Employee.objects.get(pk=employee_id)
 
@@ -153,7 +150,6 @@ class EmployeeExtendedDataView(View):
 
     def post(self, request, employee_id:int)->HttpResponseRedirect:
         form = EmployeeExtendedDataForm(data=request.POST)
-        kwargs = {'employee_id': employee_id}
         employees = Employee.objects.filter(status=True)
         context = {'form': form, 'employee_id': employee_id, 'employees': employees}
 
@@ -178,12 +174,12 @@ class EmployeeExtendedDataView(View):
                     if created:
                         msg = f'Successful created extended data for employee {obj}'
                         messages.success(request, msg)
-                        return HttpResponseRedirect(reverse('employee:employee_hourly_rate', kwargs=kwargs))
+                        return HttpResponseRedirect(reverse('employee:employee_hourly_rate', args=[employee_id]))
                     else:
                         msg = f'Successful update data for employee {obj}'
                         messages.success(request, msg)
 
-                        return HttpResponseRedirect(reverse('employee:employee_basicdata', kwargs=kwargs))
+                        return HttpResponseRedirect(reverse('employee:employee_basicdata', args=[employee_id]))
 
                 except Employee.DoesNotExist:
                     messages.warning(request, r'Somthing wrong... try again!')
@@ -191,7 +187,7 @@ class EmployeeExtendedDataView(View):
             else:
                 messages.info(request, r'Nothing to change!')
 
-                return HttpResponseRedirect(reverse('employee:employee_extendeddata', kwargs={'employee_id': employee_id}))
+                return HttpResponseRedirect(reverse('employee:employee_extendeddata', args=[employee_id]))
         else:
             return render(request, 'employee/employee_extendeddata.html', context)
 
@@ -251,7 +247,6 @@ class EmployeeHourlyRateView(View):
 class EmployeeHourlyRateEraseView(View):
     '''class implementing the method of deleting the new hourly rate entered for the employee by pk=employee_id'''
     def get(self, request, employee_id:int)->HttpResponseRedirect:
-        kwargs = {'employee_id': employee_id}
         worker = Employee.objects.get(id=employee_id)
         check = EmployeeHourlyRate.objects.filter(worker=worker, update__exact=now().date())
 
@@ -267,5 +262,5 @@ class EmployeeHourlyRateEraseView(View):
         else:
             messages.info(request, r'Nothing to erase...')
 
-        return HttpResponseRedirect(reverse('employee:employee_hourly_rate', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('employee:employee_hourly_rate', args=[employee_id]))
 

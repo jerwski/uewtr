@@ -53,7 +53,7 @@
               <div class="col-sm-4">
                 <div class="input-group">
                   <div class="input-group-prepend">
-                    <span class="input-group-text bg-info text-white font-weight-normal">Komu...&nbsp;&nbsp;&nbsp;</span>
+                    <span class="input-group-text bg-info text-white font-weight-normal">Podmiot&nbsp;</span>
                   </div>
                   {% bootstrap_field form.symbol form_group_class='form-inline' show_label=False placeholder='Firma, osoba...' %}
                 </div>
@@ -112,14 +112,15 @@
             </div>
           </div>
           <table class="table table-borderless table-info table-sm">
-            <thead class="text-center">
+            <thead class="text-left">
             <tr class="font-weight-light small">
               <th width="3%">Nr</th>
-              <th width="15%">Data</th>
-              <th width="30%">Firma, osoba</th>
-              <th width="23%">Nr faktury, dokumentu, treść operacji</th>
-              <th width="15%">Wpłata</th>
-              <th width="15%">Wypłata</th>
+              <th width="10%">Data</th>
+              <th width="25%">Firma, osoba</th>
+              <th width="24%">Nr faktury, dokumentu, treść operacji</th>
+              <th class="text-center" width="14%">Wpłata</th>
+              <th class="text-center" width="14%">Wypłata</th>
+              <th class="text-center" width="11%">KP/KW</th>
             </tr>
             </thead>
           </table>
@@ -130,17 +131,26 @@
                 <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"
                     {% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
                   <td width="3%">{{ forloop.counter }}</td>
-                  <td width="15%">{{ record.created|date:'d F Y' }}</td>
-                  <td width="30%">{{ record.symbol }}</td>
-                  <td width="23%">{{ record.contents }}</td>
-                  <td class="text-sm-right" width="15%">
+                  <td width="10%">{{ record.created|date:'d-m-Y' }}</td>
+                  <td width="25%">{{ record.symbol }}</td>
+                  <td width="24%">{{ record.contents }}</td>
+                  <td class="text-right" width="14%">
                     {% if record.income > 0 %}
                       <a href="{{ record.cash_accept }}">{{ record.income|money_format }}</a>
                     {% else %}-----{% endif %}
                   </td>
-                  <td class="text-sm-right" width="15%">
+                  <td class="text-right" width="14%">
                     {% if record.expenditure > 0 %}
                       <a href="{{ record.cash_accept }}">{{ record.expenditure|money_format }}</a>
+                    {% else %}-----{% endif %}
+                  </td>
+                  <td class="text-right text-secondary" width="11%">
+                    {% if record.cashaccept %}
+                      {% if record.income %}
+                        KP {{ record.cashaccept }}/{{ record.created|date:'m/Y' }}
+                      {% else %}
+                        KW {{ record.cashaccept }}/{{ record.created|date:'m/Y' }}
+                      {% endif %}
                     {% else %}-----{% endif %}
                   </td>
                 </tr>

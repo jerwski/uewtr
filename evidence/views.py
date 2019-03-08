@@ -113,9 +113,7 @@ class WorkingTimeRecorderEraseView(View):
             msg = f'Succesful erase working day: start_work: {start_work} - end_work: {end_work}'
             messages.success(request, msg)
 
-        kwargs = {'employee_id': employee_id}
-
-        return HttpResponseRedirect(reverse('evidence:working_time_recorder_add', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('evidence:working_time_recorder_add', args=[employee_id]))
 
 
 class LeaveTimeRecorderView(View):
@@ -220,9 +218,7 @@ class LeaveTimeRecorderEraseView(View):
         else:
             messages.info(request, r'Nothing to erase...')
 
-        kwargs = {'employee_id': employee_id}
-
-        return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[employee_id]))
 
 
 class LeavesDataPrintView(View):
@@ -246,15 +242,13 @@ class LeavesDataPrintView(View):
             return response
         else:
             messages.warning(request, r'Nothing to print...')
-            kwargs = {'employee_id': employee_id}
 
-            return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[employee_id]))
 
 
 class LeavesDataPdf(View):
     '''class representing the view for sending leaves date as pdf file'''
     def get(self, request, employee_id:int)->HttpResponseRedirect:
-        kwargs = {'employee_id': employee_id}
         # convert html file (evidence/leave_data_{}.html.format(employee_id) to pdf file
         html = leavehtml2pdf(employee_id, now().year)
         # create pdf file and save on templates/pdf/leves_data_{}.pdf'.format(employee_id)
@@ -271,7 +265,7 @@ class LeavesDataPdf(View):
         else:
             messages.warning(request, r'Nothing to send...')
 
-        return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[employee_id]))
 
 
 class MonthlyPayrollView(View):
@@ -360,7 +354,7 @@ class MonthlyPayrollPrintView(View):
         else:
             messages.warning(request, r'Nothing to print...')
 
-            return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
+        return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
 
 
 class SendPayrollPdf(View):
@@ -461,9 +455,7 @@ class AccountPaymentEraseView(View):
         else:
             messages.info(request, r'Nothing to erase...')
 
-        kwargs = {'employee_id': employee_id}
-
-        return HttpResponseRedirect(reverse('evidence:account_payment', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('evidence:account_payment', args=[employee_id]))
 
 
 class EmployeeCurrentComplexDataView(View):
@@ -521,7 +513,6 @@ class PlotChart(View):
 
     def post(self, request, employee_id:int)->HttpResponseRedirect:
         year = int(request.POST['plot_year'])
-        kwargs = {'employee_id': employee_id}
         plot_chart(employee_id, year)
 
-        return HttpResponseRedirect(reverse('evidence:employee_complex_data', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('evidence:employee_complex_data', args=[employee_id]))
