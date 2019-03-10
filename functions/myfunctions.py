@@ -239,7 +239,7 @@ def tree(directory:Path):
 		print(f'{spacer} + {path.name}')
 
 
-def remgarbage(*paths):
+def remgarbage(*paths:Path):
 	'''removes attachment pdf file'''
 	patterns = ('leaves_data_*.pdf', 'payroll_*.pdf', 'cashregister_*.pdf', 'cashaccept_*.pdf')
 	for path in paths:

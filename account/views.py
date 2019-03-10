@@ -93,6 +93,7 @@ def exit(request)->HttpResponseRedirect:
                 logout(request)
 
             return HttpResponseRedirect(r'https://www.google.pl/')
+
         except ConnectionError as error:
                 print(f'Connection error... Error code: {error}')
 
