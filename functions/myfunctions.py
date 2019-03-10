@@ -230,7 +230,7 @@ def leavehtml2pdf(employee_id: int, year: int):
 		return False
 
 
-def tree(directory):
+def tree(directory:Path):
 	'''listing whole tree for passed directory as instance of class WindowsPath'''
 	print(f'+ {directory}')
 	for path in sorted(directory.rglob('*')):
