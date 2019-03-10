@@ -80,22 +80,19 @@ def exit(request)->HttpResponseRedirect:
     paths = (Path(r'templates/pdf'), Path(os.path.expanduser('~')).joinpath('Downloads'))
     args = (settings.ARCHIVE_FILE, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
 
-    if check_internet_connection():
-        try:
-            if socket.gethostname() == 'OFFICELAPTOP':
-                backup()
-                mkfixture(settings.ROOT_BACKUP)
-                make_archives(settings.ARCHIVE_NAME, settings.ROOT_BACKUP, settings.ARCHIVE_FILE)
+    if socket.gethostname() == 'OFFICELAPTOP':
+        backup()
+        mkfixture(settings.ROOT_BACKUP)
+        make_archives(settings.ARCHIVE_NAME, settings.ROOT_BACKUP, settings.ARCHIVE_FILE)
+        remgarbage(*paths)
+
+        if check_internet_connection():
+            try:
                 uploadFileFTP(*args)
+            except:
+                return render(request, '500.html', {'error': ConnectionError.__doc__})
 
-            if request.user.is_authenticated:
-                remgarbage(*paths)
-                logout(request)
+        if request.user.is_authenticated:
+            logout(request)
 
-            return HttpResponseRedirect(r'https://www.google.pl/')
-
-        except ConnectionError as error:
-                print(f'Connection error... Error code: {error}')
-
-    else:
-        return render(request, '500.html', {'error': ConnectionError.__doc__})
+    return HttpResponseRedirect(r'https://www.google.pl/')
