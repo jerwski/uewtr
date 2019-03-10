@@ -87,12 +87,11 @@ def exit(request)->HttpResponseRedirect:
         remgarbage(*paths)
 
         if check_internet_connection():
-            try:
-                uploadFileFTP(*args)
-            except:
-                return render(request, '500.html', {'error': ConnectionError.__doc__})
+            uploadFileFTP(*args)
+        else:
+            return render(request, '500.html', {'error': ConnectionError.__doc__})
 
-        if request.user.is_authenticated:
-            logout(request)
+    if request.user.is_authenticated:
+        logout(request)
 
     return HttpResponseRedirect(r'https://www.google.pl/')
