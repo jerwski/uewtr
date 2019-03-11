@@ -8,6 +8,7 @@ import pdfkit
 
 # django core
 from django.urls import reverse
+from django.conf import settings
 from django.contrib import messages
 from django.db.models import Sum, Q
 from django.views.generic import View
@@ -24,8 +25,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # my function
 from functions.myfunctions import (payrollhtml2pdf, leavehtml2pdf, plot_chart,
-                                   sendPayroll, sendLeavesData, initial_leave_form,
-                                   initial_worktime_form, initial_account_form)
+                                   sendemail, initial_leave_form, initial_worktime_form, initial_account_form)
 from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
 
 
@@ -246,7 +246,7 @@ class LeavesDataPrintView(View):
         return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[employee_id]))
 
 
-class LeavesDataPdf(View):
+class SendLeavesDataPdf(View):
     '''class representing the view for sending leaves date as pdf file'''
     def get(self, request, employee_id:int)->HttpResponseRedirect:
         # convert html file (evidence/leave_data_{}.html.format(employee_id) to pdf file
@@ -259,8 +259,14 @@ class LeavesDataPdf(View):
         pdf = pdfkit.from_string(html, pdfile, options=options)
 
         if pdf:
-            # send e-mail with attached payroll in pdf format
-            sendLeavesData(employee_id)
+            # send e-mail with attached leaves_data in pdf format
+            worker = Employee.objects.get(pk=employee_id)
+            data = {'subject': f'list of leave for {worker} ({date.today().year})r.',
+                    'message': f'List of leave in attachment {worker} za {date.today().year}r.',
+                    'sender': settings.EMAIL_HOST_USER,
+                    'recipient':  ['projekt@unikolor.com'],
+                    'attachments': [pdfile]}
+            sendemail(**data)
             messages.info(request, f'The file <<{pdfile}>> was sending....')
         else:
             messages.warning(request, r'Nothing to send...')
@@ -357,7 +363,7 @@ class MonthlyPayrollPrintView(View):
         return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
 
 
-class SendPayrollPdf(View):
+class SendMonthlyPayrollPdf(View):
     '''class representing the view for sending monthly payroll as pdf file'''
     def get(self, request, month:int, year:int)->HttpResponseRedirect:
         # convert html file (evidence/monthly_payroll_pdf.html) to pdf file
@@ -372,7 +378,12 @@ class SendPayrollPdf(View):
             pdfile = f'templates/pdf/payroll_{month}_{year}.pdf'
             pdfkit.from_string(html, pdfile, options=options)
             # send e-mail with attached payroll in pdf format
-            sendPayroll(month, year)
+            email_data = {'subject': f'payrol for {month}/{year} r.',
+                          'message': f'Payroll in attachment {month}-{year}...',
+                          'sender': settings.EMAIL_HOST_USER,
+                          'recipient':  ['projekt@unikolor.com'],
+                          'attachments': [pdfile]}
+            sendemail(**email_data)
             messages.info(request, f'The file <<{pdfile}>> was sending....')
         else:
             messages.warning(request, r'Nothing to send...')

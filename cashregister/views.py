@@ -1,5 +1,6 @@
 # django library
 from django.urls import reverse
+from django.conf import settings
 from django.shortcuts import render
 from django.contrib import messages
 from django.utils.timezone import now
@@ -10,7 +11,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 import pdfkit
 
 # my functions
-from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendCashRegister, cashaccept2pdf
+from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf
 
 # my models
 from cashregister.models import Company, CashRegister
@@ -201,8 +202,13 @@ class CashRegisterSendView(View):
                        'orientation': 'portrait','no-outline': None, 'quiet': ''}
             pdfile = f'templates/pdf/cashregister_{company}_{month}_{year}.pdf'
             pdfkit.from_string(html, pdfile, options=options)
-            # send e-mail with attached pdfile
-            sendCashRegister(company_id, month, year)
+            # send e-mail with attached cash register as file in pdf format
+            data = {'subject': f'cash register for {month}/{year} r.',
+                    'message': f'Cash Register for {company} on {month}/{year} in attachment ...',
+                    'sender': settings.EMAIL_HOST_USER,
+                    'recipient': ['biuro.hossa@wp.pl'],
+                    'attachments': [pdfile]}
+            sendemail(**data)
             messages.info(request, f'Cash register for {company} on {month}/{year} was sending....')
         else:
             messages.warning(request, r'Nothing to send...')

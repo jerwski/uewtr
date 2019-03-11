@@ -17,9 +17,9 @@ urlpatterns = [
     path('account/payment/<int:employee_id>/', login_required(views.AccountPaymentView.as_view()), name='account_payment'),
     path('account/payment/erase/<int:employee_id>/<str:account_date>/<str:account_value>/', login_required(views.AccountPaymentEraseView.as_view()), name='account_recorder_erase'),
     path('monthly/payroll/print/<int:month>/<int:year>/', login_required(views.MonthlyPayrollPrintView.as_view()),name='monthly_payroll_print'),
-    path('monthly/payroll/pdf/send/<int:month>/<int:year>/', login_required(views.SendPayrollPdf.as_view()), name='monthly_payroll_pdf'),
+    path('monthly/payroll/pdf/send/<int:month>/<int:year>/', login_required(views.SendMonthlyPayrollPdf.as_view()), name='monthly_payroll_pdf'),
     path('leaves_data/print/<int:employee_id>/', login_required(views.LeavesDataPrintView.as_view()),name='leaves_data_print'),
-    path('leaves_data/pdf/send/<int:employee_id>/', login_required(views.LeavesDataPdf.as_view()),name='leaves_data_pdf'),
+    path('leaves_data/pdf/send/<int:employee_id>/', login_required(views.SendLeavesDataPdf.as_view()), name='leaves_data_pdf'),
     path('complex/data/<int:employee_id>/', login_required(views.EmployeeCurrentComplexDataView.as_view()), name='employee_complex_data'),
     path('chart/<int:employee_id>/', login_required(views.PlotChart.as_view()), name='plot_chart'),
 ]

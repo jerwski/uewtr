@@ -17,7 +17,6 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 
 # django library
-from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
 from django.db.models import Case, Count, IntegerField, Max, Q, Sum, Value, When
@@ -35,48 +34,11 @@ from employee.templatetags.utility_tags import money_format
 # Create your functions here
 
 
-def sendemail(subject: str, message: str, sender: int, recipient: list, attachment: str):
+def sendemail(subject:str, message:str, sender:int, recipient:list, attachments:list):
 	email = EmailMessage(subject, message, sender, recipient)
-	email.attach_file(attachment)
+	for attachment in attachments:
+		email.attach_file(attachment)
 	email.send(fail_silently=True)
-
-
-def sendPayroll(month: int, year: int):
-	'''send e-mail with attached payroll in pdf format'''
-	try:
-		subject = f'payrol for {month}/{year} r.'
-		message = f'Payroll in attachment {month}-{year}...'
-		sender, recipient = settings.EMAIL_HOST_USER, ['projekt@unikolor.com']
-		attachment = Path(f'templates/pdf/payroll_{month}_{year}.pdf')
-		sendemail(subject, message, sender, recipient, attachment)
-	except:
-		raise ConnectionError
-
-
-def sendLeavesData(employee_id: int):
-	'''send e-mail with attached leave data in pdf format for specific employee'''
-	try:
-		worker = Employee.objects.get(pk=employee_id)
-		subject = f'list of leave for {worker} ({date.today().year})r.'
-		message = f'List of leave in attachment {worker} za {date.today().year}r.'
-		sender, recipient = settings.EMAIL_HOST_USER, ['projekt@unikolor.com']
-		attachment = Path(f'templates/pdf/leaves_data_{employee_id}.pdf')
-		sendemail(subject, message, sender, recipient, attachment)
-	except:
-		raise ConnectionError
-
-
-def sendCashRegister(company_id: int, month: int, year: int):
-	'''send e-mail with attached cash register in pdf format'''
-	try:
-		company = Company.objects.get(pk=company_id)
-		subject = f'cash register for {month}/{year} r.'
-		message = f'Cash Register for {company} on {month}/{year} in attachment ...'
-		sender, recipient = settings.EMAIL_HOST_USER, ['biuro.hossa@wp.pl']
-		attachment = Path(f'templates/pdf/cashregister_{company}_{month}_{year}.pdf')
-		sendemail(subject, message, sender, recipient, attachment)
-	except:
-		raise ConnectionError
 
 
 def initial_worktime_form(work_hours: int) -> dict:
