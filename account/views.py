@@ -97,7 +97,8 @@ def exit(request)->HttpResponseRedirect:
         finally:
             if request.user.is_authenticated:
                 logout(request)
-    else:
+
+    elif socket.gethostname() == 'HOMELAPTOP':
         if request.user.is_authenticated:
             logout(request)
         if check_internet_connection():
