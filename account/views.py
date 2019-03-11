@@ -89,6 +89,7 @@ def exit(request)->HttpResponseRedirect:
         try:
             if check_internet_connection():
                 uploadFileFTP(*args)
+                return HttpResponseRedirect(r'https://www.google.pl/')
             else:
                 return render(request, '500.html', {'error': ConnectionError.__doc__})
         except:
