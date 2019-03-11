@@ -86,12 +86,21 @@ def exit(request)->HttpResponseRedirect:
         make_archives(settings.ARCHIVE_NAME, settings.ROOT_BACKUP, settings.ARCHIVE_FILE)
         remgarbage(*paths)
 
+        try:
+            if check_internet_connection():
+                uploadFileFTP(*args)
+            else:
+                return render(request, '500.html', {'error': ConnectionError.__doc__})
+        except:
+            pass
+
+        finally:
+            if request.user.is_authenticated:
+                logout(request)
+    else:
+        if request.user.is_authenticated:
+            logout(request)
         if check_internet_connection():
-            uploadFileFTP(*args)
+            return HttpResponseRedirect(r'https://www.google.pl/')
         else:
             return render(request, '500.html', {'error': ConnectionError.__doc__})
-
-    if request.user.is_authenticated:
-        logout(request)
-
-    return HttpResponseRedirect(r'https://www.google.pl/')
