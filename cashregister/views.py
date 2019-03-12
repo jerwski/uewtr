@@ -203,12 +203,12 @@ class CashRegisterSendView(View):
             pdfile = f'templates/pdf/cashregister_{company}_{month}_{year}.pdf'
             pdfkit.from_string(html, pdfile, options=options)
             # send e-mail with attached cash register as file in pdf format
-            data = {'subject': f'cash register for {month}/{year} r.',
+            mail = {'subject': f'cash register for {month}/{year} r.',
                     'message': f'Cash Register for {company} on {month}/{year} in attachment ...',
                     'sender': settings.EMAIL_HOST_USER,
                     'recipient': ['biuro.hossa@wp.pl'],
                     'attachments': [pdfile]}
-            sendemail(**data)
+            sendemail(**mail)
             messages.info(request, f'Cash register for {company} on {month}/{year} was sending....')
         else:
             messages.warning(request, r'Nothing to send...')

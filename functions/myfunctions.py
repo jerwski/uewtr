@@ -211,6 +211,14 @@ def remgarbage(*paths:Path):
 					file.unlink()
 
 
+# TODO: create class to send jpk files
+def jpk_sender(directory:Path):
+	for file in Path.iterdir(directory):
+		if file.match('jpk_fa_*.xml'):
+			d = datetime.fromtimestamp(file.stat().st_mtime)
+			print(f'Created date: {d.date()}, Creatred time: {d.time()}')
+
+
 def cashregisterdata(company_id: int, month: int, year: int) -> dict:
 	'''return data from cash register'''
 	registerdata, saldo = defaultdict(float), 0
