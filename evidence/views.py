@@ -261,12 +261,12 @@ class SendLeavesDataPdf(View):
         if pdf:
             # send e-mail with attached leaves_data in pdf format
             worker = Employee.objects.get(pk=employee_id)
-            data = {'subject': f'list of leave for {worker} ({date.today().year})r.',
+            mail = {'subject': f'list of leave for {worker} ({date.today().year})r.',
                     'message': f'List of leave in attachment {worker} za {date.today().year}r.',
                     'sender': settings.EMAIL_HOST_USER,
                     'recipient':  ['projekt@unikolor.com'],
                     'attachments': [pdfile]}
-            sendemail(**data)
+            sendemail(**mail)
             messages.info(request, f'The file <<{pdfile}>> was sending....')
         else:
             messages.warning(request, r'Nothing to send...')
@@ -377,13 +377,13 @@ class SendMonthlyPayrollPdf(View):
             # create pdf file
             pdfile = f'templates/pdf/payroll_{month}_{year}.pdf'
             pdfkit.from_string(html, pdfile, options=options)
-            # send e-mail with attached payroll in pdf format
-            email_data = {'subject': f'payrol for {month}/{year} r.',
-                          'message': f'Payroll in attachment {month}-{year}...',
-                          'sender': settings.EMAIL_HOST_USER,
-                          'recipient':  ['projekt@unikolor.com'],
-                          'attachments': [pdfile]}
-            sendemail(**email_data)
+            # send e-mail with attached payroll as file in pdf format
+            mail = {'subject': f'payrol for {month}/{year} r.',
+                    'message': f'Payroll in attachment {month}-{year}...',
+                    'sender': settings.EMAIL_HOST_USER,
+                    'recipient':  ['projekt@unikolor.com'],
+                    'attachments': [pdfile]}
+            sendemail(**mail)
             messages.info(request, f'The file <<{pdfile}>> was sending....')
         else:
             messages.warning(request, r'Nothing to send...')

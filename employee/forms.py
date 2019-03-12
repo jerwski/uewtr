@@ -44,8 +44,6 @@ class EmployeeExtendedDataForm(forms.ModelForm):
     end_contract = forms.DateField(required=False, label='Date of end contract', widget=DatePicker(options=options, attrs=attrs))
     overtime = forms.ChoiceField(label="Select the contract type...", required=True,
                                  widget=RadioSelectButtonGroup, choices=RATINGS, initial=0)
-
-
     class Meta:
         model = EmployeeData
         fields = ('worker', 'birthday', 'postal', 'city', 'street', 'house', 'flat',

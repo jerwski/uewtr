@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 # my views
 from account import views
 
+# Create your Uniform Resource Locator here.
+
 app_name = 'account'
 
 urlpatterns = [

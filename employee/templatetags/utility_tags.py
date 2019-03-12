@@ -6,7 +6,9 @@ from django import template
 
 register = template.Library()
 
-###FILTRY###
+# Create your tags and filters here.
+
+###FILTER###
 @register.filter()
 def day_since(value):
     ''' Zwraca liczbę dni między aktualną datą a podaną wartością.'''
@@ -27,7 +29,7 @@ def day_since(value):
         # podano przyszłą datę zwracam jako sformatowaną
         return value.__format__('%B %d. %Y')
 
-###FILTRY###
+###FILTER###
 @register.filter()
 def money_format(value):
     """ Zwraca sformatowaną wartość pieniężną np.: 1,234.65 PLN """
@@ -38,7 +40,7 @@ def money_format(value):
 
     return f'{value:,.2f} PLN'
 
-###FILTRY###
+###FILTER###
 # usuwa polskie znaki diakrytyczne
 import unicodedata
 @register.filter()
