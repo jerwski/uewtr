@@ -40,7 +40,7 @@ class AdminView(View):
             user = request.user.username
             context = {'user': user}
             employee = Employee.objects.filter(status=True).first()
-
+            # TODO: rozwiązać problem z pierwszym startem (załaduj całą bazę)
             if employee:
                 employee_id = employee.id
                 context.__setitem__('employee_id', employee_id)
