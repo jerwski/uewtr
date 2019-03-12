@@ -166,7 +166,7 @@ class CashRegisterPrintView(View):
         html = cashregisterhtml2pdf(company_id, month, year)
 
         if html:
-            # create pdf file as attachment
+            # create cash register as pdf file attachment
             options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in',
                        'margin-bottom': '0.4in', 'margin-left': '0.8in', 'encoding': "UTF-8",
                        'orientation': 'portrait','no-outline': None, 'quiet': ''}

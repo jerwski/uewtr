@@ -213,6 +213,7 @@ def remgarbage(*paths:Path):
 
 # TODO: create class to send jpk files
 def jpk_sender(directory:Path):
+	# checking create time for jpk files
 	for file in Path.iterdir(directory):
 		if file.match('jpk_fa_*.xml'):
 			d = datetime.fromtimestamp(file.stat().st_mtime)
