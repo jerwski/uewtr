@@ -4,19 +4,22 @@ from datetime import datetime
 # django core
 from django import template
 
-register = template.Library()
 
 # Create your tags and filters here.
 
+
+register = template.Library()
+
+
 ###FILTER###
 @register.filter()
-def day_since(value):
-    ''' Zwraca liczbę dni między aktualną datą a podaną wartością.'''
+def day_since(target_date):
+    ''' Returns the number of days between the current date and the target date'''
     today = datetime.now().date()
-    if isinstance(value,datetime):
-        val = value.date()
+    if isinstance(target_date, datetime):
+        val = target_date.date()
     else:
-        val = datetime.strptime(value,'%Y-%m-%d').date()
+        val = datetime.strptime(target_date,'%Y-%m-%d').date()
 
     diff = today - val
     if diff.days > 1:
@@ -26,13 +29,13 @@ def day_since(value):
     elif diff.days == 0:
         return 'dzisiaj'
     else:
-        # podano przyszłą datę zwracam jako sformatowaną
-        return value.__format__('%B %d. %Y')
+        return target_date.__format__('%B %d. %Y')
+
 
 ###FILTER###
 @register.filter()
 def money_format(value):
-    """ Zwraca sformatowaną wartość pieniężną np.: 1,234.65 PLN """
+    """ Returns the formatted monetary value e.g. 1,234.65 PLN """
     if value == None:
         value = 0
     elif isinstance(value, str):
@@ -40,8 +43,9 @@ def money_format(value):
 
     return f'{value:,.2f} PLN'
 
+
 ###FILTER###
-# usuwa polskie znaki diakrytyczne
+# removes Polish diacritics
 import unicodedata
 @register.filter()
 def npds(txt):
