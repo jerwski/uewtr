@@ -40,31 +40,6 @@
           <a class="btn btn-outline-danger" href="{% url 'account:exit' %}">Exit</a>
         </div>
       </div>
-
-{#      <div class="col-sm-12 text-center">#}
-{#        <div class="btn-group btn-group">#}
-{#          {% if request.user.is_superuser %}#}
-{#            <a class="btn btn-outline-primary" href="{% url 'account:register' %}">Create user</a>#}
-{#            <a class="btn btn-outline-success" href="{% url 'employee:employee_basicdata' %}">Add/Change employee data</a>#}
-{#            <a class="btn btn-outline-dark" href="{% url 'evidence:working_time_recorder_add' employee_id %}">Work evidence</a>#}
-{#            <a class="btn btn-outline-warning" href="/admin/">Admin Data Base</a>#}
-{#          {% else %}#}
-{#            <a class="btn btn-outline-primary disabled" href="{% url 'account:register' %}">Create user</a>#}
-{#            <a class="btn btn-outline-success disabled" href="{% url 'employee:employee_basicdata' %}">Add/Change employee data</a>#}
-{#            <a class="btn btn-outline-dark disabled" href="{% url 'evidence:working_time_recorder_add' employee_id %}">Work evidence</a>#}
-{#            <a class="btn btn-outline-warning disabled" href="/admin/">Admin Data Base</a>#}
-{#          {% endif %}#}
-{#          <a class="btn btn-outline-info" href="{% url 'cashregister:cash_register' %}">Cash register</a>#}
-{#          {% if zip2ftp %}#}
-{#            <a class="btn btn-outline-secondary" href="{% url 'account:invoices_backup' %}">Archive Invoices</a>#}
-{#          {% endif %}#}
-{#          {% if request.user.is_authenticated %}#}
-{#            <a href="{% url 'logout' %}" class="btn btn-md btn-outline-dark">Logout</a>#}
-{#          {% endif %}#}
-{#          <a class="btn btn-outline-danger" href="{% url 'account:exit' %}">Exit</a>#}
-{#        </div>#}
-{#      </div>#}
-
     </div>
     <div class="row mt-1">
       <div class="col text-center">

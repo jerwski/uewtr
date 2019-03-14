@@ -34,4 +34,3 @@ class CashRegisterForm(forms.ModelForm):
     class Meta:
         model = CashRegister
         fields = ['company', 'symbol', 'contents', 'income', 'expenditure']
-        widgets = {'contents': forms.Textarea(attrs={'cols': 30, 'rows': 3})}
