@@ -88,10 +88,8 @@ def make_archives(archive_name, root_backup, archive_file):
 
 def invoices_backup():
     '''create compressed in zip format archive file with invoices'''
-    root = Path(os.path.expanduser('~'))
-    root_backup= root.joinpath('Desktop/Invoice_backup')
-    base_dir = root.joinpath('Desktop/zip2ftp')
-    base_name = base_dir.joinpath('invoices')
+    root_backup = Path('~/Desktop/Invoice_backup').expanduser()
+    base_name = Path('~/Desktop/zip2ftp/invoices').expanduser()
     backup_file = base_name.with_suffix('.zip')
     make_archives(base_name, root_backup, backup_file)
     if check_internet_connection():
@@ -158,6 +156,7 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
                         print(f'\n{"*"*22}\nStart read fixtures...\n{"*"*42}')
                         readfixture(request, settings.ROOT_BACKUP)
                         print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
+                        messages.info(request, f'\nDatabase is up to date...')
                     else:
                         messages.info(request, f'\nSince the last archiving, the archival file {archive_file.name} remains unchanged...')
                 else:
@@ -171,8 +170,8 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
 
                 return True
 
-        except ConnectionError as error:
-            messages.error(request, f'Connection error: {error}')
+        except ConnectionRefusedError as error:
+            messages.error(request, f'Someting wrong: {error}')
 
             return False
     else:

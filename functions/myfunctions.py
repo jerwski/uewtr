@@ -1,5 +1,6 @@
 # matplotlib library
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
@@ -17,6 +18,7 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 
 # django library
+from django.utils.timezone import now
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
 from django.db.models import Case, Count, IntegerField, Max, Q, Sum, Value, When
@@ -34,8 +36,9 @@ from employee.templatetags.utility_tags import money_format
 # Create your functions here
 
 
-def sendemail(subject:str, message:str, sender:int, recipient:list, attachments:list):
+def sendemail(subject: str, message: str, sender: int, recipient: list, attachments: list):
 	email = EmailMessage(subject, message, sender, recipient)
+
 	for attachment in attachments:
 		email.attach_file(attachment)
 	email.send(fail_silently=True)
@@ -45,18 +48,18 @@ def initial_worktime_form(work_hours: int) -> dict:
 	'''return initial data for WorkEvidenceForm'''
 	hours = dict(zip([12, 14, 16, 18, 6], [6, 6, 6, 6, 22]))
 
-	if date.today().isoweekday() == 1:
-		if work_hours == 1:
+	if date.today().isoweekday()==1:
+		if work_hours==1:
 			start_date = date.today() - timedelta(days=2)
 			end_date = date.today() - timedelta(days=2)
-		elif work_hours == 6:
+		elif work_hours==6:
 			start_date = date.today() - timedelta(days=3)
 			end_date = date.today() - timedelta(days=2)
 		else:
 			start_date = date.today() - timedelta(days=3)
 			end_date = date.today() - timedelta(days=3)
 	else:
-		if work_hours == 6:
+		if work_hours==6:
 			start_date = date.today() - timedelta(days=1)
 			end_date = date.today()
 		else:
@@ -85,7 +88,7 @@ def initial_leave_form(employee_id: int) -> dict:
 	worker = Employee.objects.get(pk=employee_id)
 	leave_date = date.today() - timedelta(days=1)
 	initial = {'worker': worker, 'leave_date': leave_date}
-	if worker.leave == 1:
+	if worker.leave==1:
 		initial.__setitem__('leave_flag', ['paid_leave', ])
 	else:
 		initial.__setitem__('leave_flag', ['unpaid_leave', ])
@@ -97,10 +100,8 @@ def erase_records(employee_id: int) -> dict:
 	context = dict()
 	worker = Employee.objects.get(pk=employee_id)
 	opt1, opt2 = {'worker': worker, 'then': Value(1)}, {'default': Value(0), 'output_field': IntegerField()}
-	db = {EmployeeData._meta.verbose_name: EmployeeData,
-	      WorkEvidence._meta.verbose_name: WorkEvidence,
-	      EmployeeLeave._meta.verbose_name: EmployeeLeave,
-	      AccountPayment._meta.verbose_name: AccountPayment,
+	db = {EmployeeData._meta.verbose_name: EmployeeData, WorkEvidence._meta.verbose_name: WorkEvidence,
+	      EmployeeLeave._meta.verbose_name: EmployeeLeave, AccountPayment._meta.verbose_name: AccountPayment,
 	      EmployeeHourlyRate._meta.verbose_name: EmployeeHourlyRate, }
 
 	for model_name, model in db.items():
@@ -135,7 +136,7 @@ def plot_chart(employee_id: int, year: int):
 		if 0 < v < 300:
 			ax.set_xlim(0, max(list(income.values())) * 1.25)
 			plt.text(v + len(str(v)), k, money_format(v), ha='left', va='center', fontsize=10, fontweight='bold')
-		elif v != 0:
+		elif v!=0:
 			plt.text(v - len(str(v)), k, money_format(v), ha='right', va='center', fontsize=10, fontweight='bold')
 	imgdata = BytesIO()
 	fig.savefig(imgdata, format='png')
@@ -153,7 +154,7 @@ def payrollhtml2pdf(month: int, year: int) -> bool:
 	# building complex query for actual list of employee
 	day = calendar.monthrange(year, month)[1]
 	query = Q(employeedata__end_contract__lt=date(year, month, 1)) | Q(
-		employeedata__start_contract__gt=date(year, month, day))
+			employeedata__start_contract__gt=date(year, month, day))
 	employees = employees.exclude(query).order_by('surname')
 	if employees.exists():
 		# create data for payroll as associative arrays for all employees
@@ -161,12 +162,12 @@ def payrollhtml2pdf(month: int, year: int) -> bool:
 		# create defaultdict with summary payment
 		amountpay = defaultdict(float)
 		for item in payroll.values():
-			if item['accountpay'] != item['brutto']:
+			if item['accountpay']!=item['brutto']:
 				for k, v in item.items():
 					amountpay[k] += v
 
-		context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay),
-		           'year': year, 'month': month, 'total_work_hours': total_work_hours}
+		context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay), 'year': year, 'month': month,
+		           'total_work_hours': total_work_hours}
 
 		template = get_template('evidence/monthly_payroll_pdf.html')
 		html = template.render(context)
@@ -192,7 +193,7 @@ def leavehtml2pdf(employee_id: int, year: int):
 		return False
 
 
-def tree(directory:Path):
+def tree(directory: Path):
 	'''listing whole tree for passed directory as instance of class WindowsPath'''
 	print(f'+ {directory}')
 	for path in sorted(directory.rglob('*')):
@@ -201,23 +202,26 @@ def tree(directory:Path):
 		print(f'{spacer} + {path.name}')
 
 
-def remgarbage(*paths:Path):
+def remgarbage(*paths: Path):
 	'''removes attachment pdf file'''
 	patterns = ('leaves_data_*.pdf', 'payroll_*.pdf', 'cashregister_*.pdf', 'cashaccept_*.pdf')
-	for path in paths:
-		for file in Path.iterdir(path):
-			for pattern in patterns:
-				if file.match(pattern):
-					file.unlink()
+	find = (file for path in paths for file in Path.iterdir(path) for pattern in patterns if file.match(pattern))
+	for file in find:
+		file.unlink()
 
 
-# TODO: create class to send jpk files
-def jpk_sender(directory:Path):
-	# checking create time for jpk files
-	for file in Path.iterdir(directory):
-		if file.match('jpk_fa_*.xml'):
-			d = datetime.fromtimestamp(file.stat().st_mtime)
-			print(f'Created date: {d.date()}, Creatred time: {d.time()}')
+def jpk_files(path: Path):
+	'''find all .jpk files created in present month and year'''
+	files = []
+	year, month = now().year, now().month
+	for file in path.rglob('JPK/0001/*.xml'):
+		created = datetime.fromtimestamp(file.stat().st_ctime)
+		if file.match('jpk_fa_*.xml') and created.date().year==year and created.date().month==month:
+			files.append(file.as_posix())
+		else:
+			file.unlink()
+
+	return files
 
 
 def cashregisterdata(company_id: int, month: int, year: int) -> dict:
