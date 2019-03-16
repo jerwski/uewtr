@@ -161,6 +161,8 @@ class CashRegisterView(View):
 
 
 class CashRegisterDelete(View):
+	'''class enabling deleting records in the cash report'''
+
 	def get(self, request, company_id:int, record:int) -> HttpResponseRedirect:
 		record = CashRegister.objects.get(pk=record)
 		if record:
@@ -237,6 +239,7 @@ class CashRegisterSendView(View):
 
 
 class CashRegisterAcceptView(View):
+	'''class enabling printing cash accept from the cash report'''
 
 	def get(self, request, company_id:int, record:int) -> HttpResponse:
 		html = cashaccept2pdf(record)
