@@ -14,5 +14,6 @@ urlpatterns = [
     path('admin-site/', views.AdminView.as_view(), name='admin_site'),
     path('load-invoices-backup-file/', login_required(views.Invoices2Ftp.as_view()), name='invoices_backup', ),
 	path('send/JPK/', login_required(views.JPK2Accountancy.as_view()), name='send_jpk_files'),
+	path('load-database/', login_required(views.RestoreDataBase.as_view()), name='load-database'),
     path('exit/', views.exit, name='exit'),
 ]

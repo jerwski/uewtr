@@ -1,6 +1,7 @@
 # standard library
 import socket
 from pathlib import Path
+from datetime import datetime
 
 # django library
 from django.conf import settings
@@ -10,6 +11,7 @@ from django.urls import reverse_lazy
 from django.utils.timezone import now
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
+from django.core.management import call_command
 from django.views.generic import CreateView, View
 
 # my models
@@ -41,11 +43,13 @@ class AdminView(View):
 			user = request.user.username
 			context = {'user': user}
 			employee = Employee.objects.filter(status=True).first()
-			# TODO: rozwiązać problem z pierwszym startem (załaduj całą bazę)
 			if employee:
 				employee_id = employee.id
-				context.__setitem__('employee_id', employee_id)
+				context.update({'employee_id': employee_id, 'nodata': False})
 			else:
+				backup = Path(r'backup_json/db.json')
+				created = datetime.fromtimestamp(backup.stat().st_ctime)
+				context.update({'nodata': True, 'backup': str(backup), 'created': created})
 				return render(request, '500.html', context)
 
 			if list(Path(r'E:/Fakturowanie').rglob(r'JPK/0001/jpk_fa_*.xml')):
@@ -58,6 +62,18 @@ class AdminView(View):
 				getArchiveFilefromFTP(request, *args)
 
 			return render(request, 'account/admin.html', context)
+
+		return HttpResponseRedirect(reverse_lazy('login'))
+
+
+class RestoreDataBase(View):
+	'''class that allows restoring all records to the database from last saved backup file'''
+	def get(self, request):
+		try:
+			call_command('loaddata', settings.ARCHIVE_ROOT)
+			messages.info(request, f'Database have been restored...\n')
+		except FileNotFoundError as error:
+			messages.error(request, f'Backup file <<{settings.ARCHIVE_ROOT}>> doesn\'t exist... => Error code: {error}')
 
 		return HttpResponseRedirect(reverse_lazy('login'))
 
@@ -127,6 +143,7 @@ def exit(request)->HttpResponseRedirect:
 
 	elif socket.gethostname() == 'HOMELAPTOP':
 		if request.user.is_authenticated:
+			backup()
 			remgarbage(*paths)
 			logout(request)
 		if check_internet_connection():

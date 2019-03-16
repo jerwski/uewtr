@@ -6,63 +6,63 @@
 
 
 {% block content %}
-    <div class="container">
-        <div class="row p-2">
-            <div class="col-8 offset-2 p-2 bgbisque">
-                <pre class="text-center text-danger display-4">L O G I N   F O R M</pre>
-                {% if request.user.is_authenticated %}
-                    <p class="text-center font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
-                {% else %}
-                    <p class="small text-center">To login please fill both fields with correct data...<br>If you are for the first time, notify the admin...</p>
-                {% endif %}
-                <div class="form-control-lg">
-                    <form method="POST">{% csrf_token %}
-                        <div class="form-row">
-                            <div class="col-lg-6">
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">User</div>
-                                    </div>
-                                    <input id="user" type="text" class="form-control" name="username" placeholder="User name">
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">Password</div>
-                                    </div>
-                                    <input id="password" type="password" class="form-control" name="password" placeholder="Password">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <br><h1>Unikolor Working Time Recorder</h1>
-                            <img src="{% static 'images/mainboard/logoUNI.png' %}">
-                            <p class="footer text-secondary text-center"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
-                        </div>
-                        <div class="btn-group p-3 float-left" >
-                            {% if request.user.is_authenticated %}
-                                <a href="{% url 'password_change' %}" class="btn btn-md btn-outline-danger">Password change?</a>
-                                <a href="{% url 'password_reset' %}" class="btn btn-md btn-outline-dark">Password reset?</a>
-                            {% else %}
-                                <a href="mailto:biuro@unikolor.com?Subject=Create User account&body=Please create my user login" target="_top" class="btn btn-md btn-outline-success">Notify the Admin</a>
-                                <a href="{% url 'password_reset' %}" class="btn btn-md btn-outline-dark">Password reset?</a>
-                            {% endif %}
-                        </div>
-                        <div class="btn-group p-3 float-right" >
-                            <a href="{% url 'account:exit' %}" class="btn btn-md btn-outline-danger">Exit</a>
-                            <a href="/admin/" class="btn btn-md btn-outline-primary">Admin</a>
-                            {% if request.user.is_authenticated %}
-                                <a href="{% url 'account:admin_site' %}" class="btn btn-md btn-outline-dark">Dashboard</a>
-                                <a href="{% url 'logout' %}" class="btn btn-md btn-outline-success">Logout</a>
-                            {% else %}
-                                <a href="{% url 'account:admin_site' %}" class="btn btn-md btn-outline-dark disabled">Dashboard</a>
-                                <button type="submit" class="btn btn-sm btn-outline-success">Login</button>
-                            {% endif %}
-                        </div>
-                    </form>
+  <div class="container">
+    <div class="row p-2">
+      <div class="col-8 offset-2 p-2 bgbisque">
+        <pre class="text-center text-danger display-4">L O G I N   F O R M</pre>
+        {% if request.user.is_authenticated %}
+          <p class="text-center font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
+        {% else %}
+          <p class="small text-center text-secondary">To login please fill both fields with correct data...<br>If you are for the first time, notify the admin or create a superuser...</p>
+        {% endif %}
+        <div class="form-control-lg">
+          <form method="POST">{% csrf_token %}
+            <div class="form-row">
+              <div class="col-lg-6">
+                <div class="input-group mb-2">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">User</div>
+                  </div>
+                  <input id="user" type="text" class="form-control" name="username" placeholder="User name">
                 </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="input-group mb-2">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">Password</div>
+                  </div>
+                  <input id="password" type="password" class="form-control" name="password" placeholder="Password">
+                </div>
+              </div>
             </div>
+            <div class="text-center">
+              <br><h1>Unikolor Working Time Recorder</h1>
+              <img src="{% static 'images/mainboard/logoUNI.png' %}">
+              <p class="footer text-secondary text-center"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
+            </div>
+            <div class="btn-group p-3 float-left" >
+              {% if request.user.is_authenticated %}
+                <a href="{% url 'password_change' %}" class="btn btn-md btn-outline-danger">Password change?</a>
+                <a href="{% url 'password_reset' %}" class="btn btn-md btn-outline-dark">Password reset?</a>
+              {% else %}
+                <a href="mailto:biuro@unikolor.com?Subject=Create User account&body=Please create my user login" target="_top" class="btn btn-md btn-outline-success">Notify the Admin</a>
+                <a href="{% url 'password_reset' %}" class="btn btn-md btn-outline-dark">Password reset?</a>
+              {% endif %}
+            </div>
+            <div class="btn-group p-3 float-right" >
+              <a href="{% url 'account:exit' %}" class="btn btn-md btn-outline-danger">Exit</a>
+              <a href="/admin/" class="btn btn-md btn-outline-primary">Admin</a>
+              {% if request.user.is_authenticated %}
+                <a href="{% url 'account:admin_site' %}" class="btn btn-md btn-outline-dark">Dashboard</a>
+                <a href="{% url 'logout' %}" class="btn btn-md btn-outline-success">Logout</a>
+              {% else %}
+                <a href="{% url 'account:admin_site' %}" class="btn btn-md btn-outline-dark disabled">Dashboard</a>
+                <button type="submit" class="btn btn-sm btn-outline-success">Login</button>
+              {% endif %}
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 {% endblock %}
