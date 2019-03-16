@@ -11,6 +11,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 import pdfkit
 
 # my functions
+from functions.archive import check_internet_connection
 from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf
 
 # my models
@@ -203,30 +204,34 @@ class CashRegisterSendView(View):
 	'''class representing the view for sending cash register as pdf file'''
 
 	def get(self, request, company_id:int) -> HttpResponseRedirect:
-		company = Company.objects.get(pk=company_id)
 
-		if now().month==1:
-			month, year = 12, now().year - 1
+		if check_internet_connection():
+			company = Company.objects.get(pk=company_id)
+
+			if now().month==1:
+				month, year = 12, now().year - 1
+			else:
+				month, year = now().month - 1, now().year
+
+			html = cashregisterhtml2pdf(company_id, month, year)
+
+			if html:
+				# create pdf file and save on templates/pdf/cashregister_{company}_{month}_{year}.pdf
+				options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
+				           'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None,
+				           'quiet': ''}
+				pdfile = f'templates/pdf/cashregister_{company}_{month}_{year}.pdf'
+				pdfkit.from_string(html, pdfile, options=options)
+				# send e-mail with attached cash register as file in pdf format
+				mail = {'subject': f'cash register for {month}/{year} r.',
+				        'message': f'Cash Register for {company} on {month}/{year} in attachment ...',
+				        'sender': settings.EMAIL_HOST_USER, 'recipient': ['biuro.hossa@wp.pl'], 'attachments': [pdfile]}
+				sendemail(**mail)
+				messages.info(request, f'Cash register for {company} on {month}/{year} was sending....')
+			else:
+				messages.warning(request, r'Nothing to send...')
 		else:
-			month, year = now().month - 1, now().year
-
-		html = cashregisterhtml2pdf(company_id, month, year)
-
-		if html:
-			# create pdf file and save on templates/pdf/cashregister_{company}_{month}_{year}.pdf
-			options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
-			           'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None,
-			           'quiet': ''}
-			pdfile = f'templates/pdf/cashregister_{company}_{month}_{year}.pdf'
-			pdfkit.from_string(html, pdfile, options=options)
-			# send e-mail with attached cash register as file in pdf format
-			mail = {'subject': f'cash register for {month}/{year} r.',
-			        'message': f'Cash Register for {company} on {month}/{year} in attachment ...',
-			        'sender': settings.EMAIL_HOST_USER, 'recipient': ['biuro.hossa@wp.pl'], 'attachments': [pdfile]}
-			sendemail(**mail)
-			messages.info(request, f'Cash register for {company} on {month}/{year} was sending....')
-		else:
-			messages.warning(request, r'Nothing to send...')
+			messages.error(request, 'No internet connection...')
 
 		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 

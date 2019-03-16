@@ -8,10 +8,10 @@
     <p class="text-primary display-4">Administration Dashboard</p>
     {% if user.is_authenticated %}
       <p class="text-center font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p><br>
-      {% if error %}
-        <p class="text-center text-danger font-weight-bold font-italic lead">Internet isn't available...</p><br>
-        <p class="text-info text-danger font-italic lead">Causation: {{ error }}</p>
-      {% endif %}
+    {% endif %}
+    {% if error %}
+      <p class="text-center text-danger font-weight-bold font-italic lead">Internet isn't available...</p><br>
+      <p class="text-info text-danger font-italic lead">Causation: {{ error }}</p>
     {% endif %}
     {% if nodata %}
       <p class="text-center text-danger font-weight-bold font-italic lead">There aren't any records in database! Load last saved backup!</p><br>

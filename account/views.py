@@ -94,25 +94,28 @@ class Invoices2Ftp(View):
 class JPK2Accountancy(View):
 	'''class to send JPK files to accountancy'''
 	def get(self, request):
-		files = jpk_files(Path(r'E:/Fakturowanie/'))
+		if check_internet_connection():
+			files = jpk_files(Path(r'E:/Fakturowanie/'))
 
-		if files:
-			stamp = now().strftime("%A %d %B %Y %H%M%S.%f")
-			companies = Company.objects.filter(status=1).order_by('company').values_list('company', flat=True)
-			# send e-mail with attached cash register as file in pdf format
-			if now().month == 1:
-				month, year = 12, now().year - 1
-			else:
-				month, year = now().month - 1, now().year
-			mail = {'subject': f'pliki JPK za okres {month}/{year}',
-			        'message': f'W załączniku pliki JPK dla {list(companies)} za okres {month}/{year}r.',
-			        'sender' : settings.EMAIL_HOST_USER, 'recipient': ['biuro.hossa@wp.pl'], 'attachments': files}
-			sendemail(**mail)
-			messages.info(request, f'JPK files for {list(companies)} on {month}/{year} was sending to accountancy....')
+			if files:
+				stamp = now().strftime("%A %d %B %Y %H%M%S.%f")
+				companies = Company.objects.filter(status=1).order_by('company').values_list('company', flat=True)
+				# send e-mail with attached cash register as file in pdf format
+				if now().month == 1:
+					month, year = 12, now().year - 1
+				else:
+					month, year = now().month - 1, now().year
+				mail = {'subject': f'pliki JPK za okres {month}/{year}',
+				        'message': f'W załączniku pliki JPK dla {list(companies)} za okres {month}/{year}r.',
+				        'sender' : settings.EMAIL_HOST_USER, 'recipient': ['biuro.hossa@wp.pl'], 'attachments': files}
+				sendemail(**mail)
+				messages.info(request, f'JPK files for {list(companies)} on {month}/{year} was sending to accountancy....')
 
-			for nr, file in enumerate(files,1):
-				file, parent, suffix = Path(file), Path(file).parent, Path(file).suffix
-				file.rename(parent/f'sent{nr}{stamp}{suffix}')
+				for nr, file in enumerate(files,1):
+					file, parent, suffix = Path(file), Path(file).parent, Path(file).suffix
+					file.rename(parent/f'sent{nr}{stamp}{suffix}')
+		else:
+			messages.error(request, 'No internet connection...')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 

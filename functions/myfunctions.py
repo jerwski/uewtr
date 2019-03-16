@@ -30,6 +30,8 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # my functions
 from functions.payment import total_payment, workingdays
+
+# utility tags
 from employee.templatetags.utility_tags import money_format
 
 
@@ -41,7 +43,7 @@ def sendemail(subject: str, message: str, sender: int, recipient: list, attachme
 
 	for attachment in attachments:
 		email.attach_file(attachment)
-	email.send(fail_silently=True)
+		email.send(fail_silently=True)
 
 
 def initial_worktime_form(work_hours: int) -> dict:
