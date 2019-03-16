@@ -5,6 +5,24 @@
 
 {% block title %}Add/Change employee hourly rate{% endblock %}
 
+{% block header %}
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+  $( function() {
+    var contentsTags = {{ tags|safe }};
+    var symbolTags = {{ symbols|safe }};
+    $( "#autocpl" ).autocomplete({
+      source: contentsTags
+    });
+    $( "#autosym" ).autocomplete({
+      source: symbolTags
+    });
+  } );
+  </script>
+{% endblock %}
+
 {% block content %}
   <div class="container-fluid">
     <div class="row ml-3 mr-3 mt-2 bgbisque">

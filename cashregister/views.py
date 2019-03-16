@@ -1,3 +1,6 @@
+# standard library
+import json
+
 # django library
 from django.urls import reverse
 from django.conf import settings
@@ -82,8 +85,10 @@ class CashRegisterView(View):
     '''class implementing the method of adding records to the Cash Register'''
     def get(self, request, company_id:int=None)->HttpResponseRedirect:
         check = CashRegister.objects.filter(company_id=company_id)
+        tags = CashRegister.objects.order_by('contents').distinct('contents').values_list('contents', flat=True)
+        symbols = CashRegister.objects.order_by('symbol').distinct('symbol').values_list('symbol', flat=True)
         companies = Company.objects.filter(status__range=[1,3]).order_by('company')
-        context = {'companies': companies}
+        context = {'companies': companies, 'tags': list(tags), 'symbols': list(symbols)}
 
         if company_id:
             month, year = now().month, now().year

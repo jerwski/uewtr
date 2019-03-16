@@ -29,7 +29,8 @@ class CompanyAddForm(forms.ModelForm):
 class CashRegisterForm(forms.ModelForm):
     queryset = Company.objects.filter(status__range=[1,3])
     company = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset)
-    contents = forms.CharField(widget=forms.Textarea(attrs={'cols': 30, 'rows': 3}), label='Kontekst')
+    symbol = forms.CharField(widget=forms.TextInput(attrs={'id': 'autosym'}))
+    contents = forms.CharField(widget=forms.Textarea(attrs={'cols': 30, 'rows': 3, 'id': 'autocpl'}), label='Kontekst')
 
     class Meta:
         model = CashRegister
