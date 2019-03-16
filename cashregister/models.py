@@ -36,7 +36,7 @@ class Company(models.Model):
 class CashRegister(models.Model):
     company = models.ForeignKey(Company, on_delete=models.DO_NOTHING)
     created = models.DateTimeField(auto_now_add=True)
-    symbol = models.CharField(max_length=100)
+    symbol = models.CharField(max_length=200)
     contents = models.CharField(max_length=250, validators=[from_transfer])
     income = models.FloatField(default=0.00, validators=[positive_value])
     expenditure = models.FloatField(default=0.00, validators=[positive_value])
@@ -50,3 +50,6 @@ class CashRegister(models.Model):
 
     def cash_accept(self):
         return reverse('cashregister:cash_accept', args=[self.company.id, self.id])
+
+    def cashregister_delete(self):
+        return reverse('cashregister:cash_register_delete', args=[self.company.id, self.id])

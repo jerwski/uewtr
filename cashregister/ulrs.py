@@ -17,4 +17,5 @@ urlpatterns = [
     path('change_company/<int:company_id>/', login_required(views.CompanyAddView.as_view()), name='change_company'),
     path('register/cashaccept/<int:company_id>/<int:record>/', login_required(views.CashRegisterAcceptView.as_view()), name='cash_accept'),
     path('register/print/<int:company_id>/', login_required(views.CashRegisterPrintView.as_view()), name='print_register'),
+	path('record/delete/<int:company_id>/<int:record>/', login_required(views.CashRegisterDelete.as_view()), name='cash_register_delete')
 ]

@@ -1,5 +1,4 @@
 # standard library
-import os
 import socket
 from pathlib import Path
 

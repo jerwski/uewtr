@@ -6,7 +6,7 @@
 {% block title %}Add/Change employee hourly rate{% endblock %}
 
 {% block header %}
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css">
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script>
@@ -68,14 +68,14 @@
           <form action="." method="POST">{% csrf_token %}
             {% bootstrap_field form.company %}
             <div class="row ml-5">
-              <div class="col-sm-4">
-                <div class="input-group">
+              <div class="col-4">
+                <div class="input-group mb-2">
                   <div class="input-group-prepend">
                     <span class="input-group-text bg-info text-white font-weight-normal">Podmiot&nbsp;</span>
                   </div>
                   {% bootstrap_field form.symbol form_group_class='form-inline' show_label=False placeholder='Firma, osoba...' %}
                 </div>
-                <div class="input-group">
+                <div class="input-group mb-2">
                   <div class="input-group-prepend">
                     <span class="input-group-text bg-success text-white font-weight-normal" id="income">Przychód</span>
                   </div>
@@ -88,16 +88,19 @@
                   {% bootstrap_field form.expenditure form_group_class='form-inline' show_label=False placeholder='Wypłata z kasy...' %}
                 </div>
               </div>
-              <div class="col-sm-7">
+              <div class="col-7">
                 {% bootstrap_field form.contents size='small' label_class='text-info font-weight-bold' placeholder='Numer faktury, rachunku, dokumentu lub treść operacji...' %}
-              </div>
-            </div>
-            <div class="row p-1">
-              <div class="col-sm-12 btn-sm">
-                <button type="submit" class="btn btn-outline-success btn-block">Confirm new entry
+                <button type="submit" class="btn btn-outline-success btn-block mb-2">Confirm new entry
                   for {{ company|upper }}</button>
               </div>
             </div>
+{#            {% if request.POST %}#}
+{#              <div class="row ml-5">#}
+{#                <div class="col-sm-11 btn-sm">#}
+{#                  <a href="{% url 'cashregister:cash_register' employee_id account_date account_value %}" class="btn btn-danger btn-block"><em class="font-weight-bold blink">Erase entered cash register...</em></a>#}
+{#                </div>#}
+{#              </div>#}
+{#            {% endif %}#}
           </form>
 
           <div class="row">
@@ -136,9 +139,10 @@
               <th width="10%">Data</th>
               <th width="25%">Firma, osoba</th>
               <th width="24%">Nr faktury, dokumentu, treść operacji</th>
-              <th class="text-center" width="14%">Wpłata</th>
-              <th class="text-center" width="14%">Wypłata</th>
+              <th class="text-center" width="11%">Wpłata</th>
+              <th class="text-center" width="11%">Wypłata</th>
               <th class="text-center" width="11%">KP/KW</th>
+              <th class="text-center" width="6%"></th>
             </tr>
             </thead>
           </table>
@@ -152,12 +156,12 @@
                   <td width="10%">{{ record.created|date:'d-m-Y' }}</td>
                   <td width="25%">{{ record.symbol }}</td>
                   <td width="24%">{{ record.contents }}</td>
-                  <td class="text-right" width="14%">
+                  <td class="text-right" width="11%">
                     {% if record.income > 0 %}
                       <a href="{{ record.cash_accept }}">{{ record.income|money_format }}</a>
                     {% else %}-----{% endif %}
                   </td>
-                  <td class="text-right" width="14%">
+                  <td class="text-right" width="11%">
                     {% if record.expenditure > 0 %}
                       <a href="{{ record.cash_accept }}">{{ record.expenditure|money_format }}</a>
                     {% else %}-----{% endif %}
@@ -170,6 +174,13 @@
                         KW {{ record.cashaccept }}/{{ record.created|date:'m/Y' }}
                       {% endif %}
                     {% else %}-----{% endif %}
+                  </td>
+                  <td class="text-right" width="24%">
+                    {% if record.cashaccept %}
+                      <a href="#" class="badge badge-secondary">Usuń</a>
+                    {% else %}
+                      <a href="{{ record.cashregister_delete }}" class="badge badge-danger">Usuń</a>
+                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}
