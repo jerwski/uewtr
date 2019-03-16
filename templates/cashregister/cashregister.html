@@ -89,18 +89,11 @@
                 </div>
               </div>
               <div class="col-7">
-                {% bootstrap_field form.contents size='small' label_class='text-info font-weight-bold' placeholder='Numer faktury, rachunku, dokumentu lub treść operacji...' %}
+                {% bootstrap_field form.contents size='small' label_class='text-info font-weight-bold' placeholder='Numer faktury, rachunku, dokumentu lub treść operacji... (wykluczono treść: z przeniesienia)' %}
                 <button type="submit" class="btn btn-outline-success btn-block mb-2">Confirm new entry
                   for {{ company|upper }}</button>
               </div>
             </div>
-{#            {% if request.POST %}#}
-{#              <div class="row ml-5">#}
-{#                <div class="col-sm-11 btn-sm">#}
-{#                  <a href="{% url 'cashregister:cash_register' employee_id account_date account_value %}" class="btn btn-danger btn-block"><em class="font-weight-bold blink">Erase entered cash register...</em></a>#}
-{#                </div>#}
-{#              </div>#}
-{#            {% endif %}#}
           </form>
 
           <div class="row">

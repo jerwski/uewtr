@@ -85,7 +85,7 @@ class CashRegisterView(View):
 
 	def get(self, request, company_id:int=None) -> HttpResponseRedirect:
 		check = CashRegister.objects.filter(company_id=company_id)
-		tags = CashRegister.objects.order_by('contents').distinct('contents').values_list('contents', flat=True)
+		tags = CashRegister.objects.order_by('contents').distinct('contents').exclude(contents='z przeniesienia').values_list('contents', flat=True)
 		symbols = CashRegister.objects.order_by('symbol').distinct('symbol').values_list('symbol', flat=True)
 		companies = Company.objects.filter(status__range=[1, 3]).order_by('company')
 		context = {'companies': companies, 'tags': list(tags), 'symbols': list(symbols)}

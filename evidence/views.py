@@ -16,8 +16,7 @@ from django.utils.timezone import now
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 
 # my forms
-from evidence.forms import (WorkEvidenceForm, EmployeeLeaveForm, AccountPaymentForm,
-							PeriodCurrentComplexDataForm, PeriodMonthlyPayrollForm)
+from evidence.forms import WorkEvidenceForm, EmployeeLeaveForm, AccountPaymentForm, PeriodCurrentComplexDataForm, PeriodMonthlyPayrollForm
 
 # my models
 from employee.models import Employee, EmployeeData
@@ -25,9 +24,8 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # my function
 from functions.archive import check_internet_connection
-from functions.myfunctions import (payrollhtml2pdf, leavehtml2pdf, plot_chart,
-								   sendemail, initial_leave_form, initial_worktime_form, initial_account_form)
 from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
+from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form
 
 
 # Create your views here.
