@@ -30,7 +30,7 @@
               <button type="button" class="btn btn-outline-info btn-block" data-dismiss="modal">Close</button>
             </div>
             <div class="col-md-6 btn">
-              <button type="submit" class="btn btn-outline-success btn-block">Show chart</button>
+              <button id="closemod" type="submit" class="btn btn-outline-success btn-block">Show chart</button>
             </div>
           </div>
         </form>
@@ -38,3 +38,10 @@
     </div>
   </div>
 </div>
+
+<script>
+  $('#closemod').click(function() {
+   $('#leaveModal').modal('hide');
+});
+</script>
+

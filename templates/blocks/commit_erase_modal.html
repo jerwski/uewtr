@@ -16,8 +16,14 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
-            <a href="{% url 'employee:employee_erase_all_records' employee_id %}" class="btn btn-outline-danger">Yes I do delete...</a>
+            <a id="closemod" href="{% url 'employee:employee_erase_all_records' employee_id %}" class="btn btn-outline-danger">Yes I do delete...</a>
           </div>
         </div>
       </div>
     </div>
+
+<script>
+  $('#closemod').click(function() {
+   $('#leaveModal').modal('hide');
+});
+</script>
