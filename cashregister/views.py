@@ -167,7 +167,7 @@ class CashRegisterView(View):
 
 class CashRegisterDelete(View):
 	'''class enabling deleting records in the cash report'''
-	# TODO: create class to serial print cash register and cash accept
+
 	def get(self, request, company_id:int, record:int) -> HttpResponseRedirect:
 		record = CashRegister.objects.get(pk=record)
 		if record:
@@ -179,7 +179,7 @@ class CashRegisterDelete(View):
 
 class CashRegisterPrintView(View):
 	'''class representing the view of monthly cash register print'''
-
+	# TODO: create class to serial print cash register and cash accept
 	def get(self, request, company_id:int) -> HttpResponse:
 		'''convert html cashregister_pdf for each companies to pdf'''
 		if now().month==1:
