@@ -5,46 +5,46 @@
 
 
 {% block content %}
-    <div class="container">
-        <div class="row mt-3">
-            <div class="col-sm-8 offset-sm-2 bgbisque">
-                <pre class="text-center text-danger lead mt-2">C R E A T E   U S E R   F O R M</pre>
-                <form class="small" method="POST">{% csrf_token %}
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                {% bootstrap_field form.username size='medium' %}
-                                {% bootstrap_field form.first_name size='medium' %}
-                                {% bootstrap_field form.last_name size='medium' %}
-                                {% bootstrap_field form.email size='medium' %}
-                            </div>
-                            <div class="row footer text-secondary">
-                                <div class="col">
-                                    <p>Copyright UNIKOLOR Jerzy Wygonowski</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                {% bootstrap_field form.password1 size='medium' %}
-                                {% bootstrap_field form.password2 size='medium' %}
-                                {% bootstrap_field form.is_staff size='medium' %}
-                                {% bootstrap_field form.is_superuser size='medium' %}
-                            </div>
-                            <div class="row text-center mb-2">
-                                <div class="col">
-                                    <div class="btn-group btn-sm" role="group">
-                                        <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                                        <a href="{% url 'login' %}" class="btn btn-outline-dark">Back to Login</a>
-                                        <a href="/admin/" class="btn btn-outline-primary">Admin</a>
-                                        <button type="submit" class="btn btn-outline-success">Register</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col-sm-8 offset-sm-2 bgbisque">
+        <pre class="text-center text-danger lead mt-2">C R E A T E   U S E R   F O R M</pre>
+        <form class="small" method="POST">{% csrf_token %}
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                {% bootstrap_field form.username size='medium' %}
+                {% bootstrap_field form.first_name size='medium' %}
+                {% bootstrap_field form.last_name size='medium' %}
+                {% bootstrap_field form.email size='medium' %}
+              </div>
+              <div class="row footer text-secondary">
+                <div class="col">
+                  <p>Copyright UNIKOLOR Jerzy Wygonowski</p>
+                </div>
+              </div>
             </div>
-        </div>
+            <div class="col-6">
+              <div class="form-group">
+                {% bootstrap_field form.password1 size='medium' %}
+                {% bootstrap_field form.password2 size='medium' %}
+                {% bootstrap_field form.is_staff size='medium' %}
+                {% bootstrap_field form.is_superuser size='medium' %}
+              </div>
+              <div class="row text-center mb-2">
+                <div class="col">
+                  <div class="btn-group btn-sm" role="group">
+                    <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-dark">Back to Login</a>
+                    <a href="/admin/" class="btn btn-outline-primary">Admin</a>
+                    <button type="submit" class="btn btn-outline-success">Register</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 {% endblock %}
