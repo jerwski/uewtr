@@ -144,18 +144,23 @@ class CashRegisterView(View):
 				form.save(commit=False)
 				data = form.cleaned_data
 				income, expenditure = [data[key] for key in ('income', 'expenditure')]
-				if income > 0 and expenditure > 0:
-					msg = f'One of the fields (income {income:.2f}PLN or expenditure {expenditure:.2f}PLN)  must be zero!'
+				if income != 0 and expenditure != 0:
+					msg = f'One of the fields (income {income:.2f}PLN or expenditure {expenditure:.2f}PLN) must be zero and second have to be positive value!'
 					messages.warning(request, msg)
 					return render(request, 'cashregister/cashregister.html', context)
 				elif income or expenditure:
-					form.save(commit=True)
 					if income > 0:
+						form.save(commit=True)
 						msg = f'Succesful register new record in {company} (income={income:.2f}PLN)'
 						messages.success(request, msg)
 					elif expenditure > 0:
-						msg = f'Succesful register new record in {company} (expenditure={expenditure:.2f}PLN)'
-						messages.success(request, msg)
+						if registerdata['status'] - expenditure > 0:
+							form.save(commit=True)
+							msg = f'Succesful register new record in {company} (expenditure={expenditure:.2f}PLN)'
+							messages.success(request, msg)
+						else:
+							msg = f"Expenditure ({expenditure:.2f}PLN) is greater than the cash register status ({registerdata['status']:.2f}PLN)!"
+							messages.warning(request, msg)
 
 		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 
@@ -243,7 +248,7 @@ class CashRegisterAcceptView(View):
 
 	def get(self, request, company_id:int, record:int) -> HttpResponse:
 		html = cashaccept2pdf(record)
-
+		# TODO: KP/KW as badge with get_absolute_url
 		if html:
 			# create pdf file and save on templates/pdf/cashaccept_{record}.pdf
 			options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',

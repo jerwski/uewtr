@@ -13,8 +13,9 @@
         <p class="h1 font-weight-normal">Working Time Recorder</p>
         <p class="text-info font-weight-bold font-italic">Application to handle employee working time in small business</p>
       </div>
-      <div class="col">
-        <p class="footer text-secondary text-sm-right">Copyright UNIKOLOR Jerzy Wygonowski</p>
+      <div class="col text-right">
+        <img src="{% static 'images/mainboard/logoUNI.png' %}" width="92%">
+        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
         {% include 'blocks/alert.html' %}
       </div>
     </div>
@@ -49,30 +50,31 @@
 
       <div class="col-sm-6">
         <p class="lead text-center bgburlywood"><strong class="text-danger">{% if company_id %}CHANGE{% else %}ADD{% endif %} COMPANY DATA</strong></p>
-        <div class="form-control-lg">
+{#        <div class="form-control-lg">#}
           <form action="." method="POST">{% csrf_token %}
             <div class="row">
               <div class="col-sm-12">
-                {% bootstrap_field form.company size='small' label_class='text-info font-italic' %}
+                {% bootstrap_field form.company size='small' label_class='text-info font-italic font-weight-bold' %}
               </div>
             </div>
             <div class="row">
               <div class="col-6">
-                {% bootstrap_field form.nip size='small' label_class='text-info font-italic' %}
-                {% bootstrap_field form.street size='small' label_class='text-info font-italic' %}
-                {% bootstrap_field form.phone size='small' label_class='text-info font-italic' %}
+                {% bootstrap_field form.nip size='small' label_class='text-info font-italic font-weight-bold' %}
+                {% bootstrap_field form.street size='small' label_class='text-info font-italic font-weight-bold' %}
+                {% bootstrap_field form.phone size='small' label_class='text-info font-italic font-weight-bold' %}
               </div>
               <div class="col-6">
-                {% bootstrap_field form.postal size='small' label_class='text-info font-italic' %}
-                {% bootstrap_field form.city size='small' label_class='text-info font-italic' %}
-                {% bootstrap_field form.account size='small' label_class='text-info font-italic' %}
+                {% bootstrap_field form.postal size='small' label_class='text-info font-italic font-weight-bold' %}
+                {% bootstrap_field form.city size='small' label_class='text-info font-italic font-weight-bold' %}
+                {% bootstrap_field form.account size='small' label_class='text-info font-italic font-weight-bold' %}
               </div>
             </div>
             <div class="row text-center">
               <div class="col-sm-12 mb-1">
-                {% bootstrap_field form.status label_class='text-info font-italic' %}
+                {% bootstrap_field form.status label_class='text-info font-italic font-weight-bold' %}
               </div>
             </div>
+            <hr>
             <div class="row text-center">
               <div class="col-sm-12">
                 <div class="btn btn-sm btn-group mb-2" role="group">
@@ -87,7 +89,7 @@
               </div>
             </div>
           </form>
-        </div>
+{#        </div>#}
       </div>
     </div>
   </div>

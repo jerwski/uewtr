@@ -35,11 +35,11 @@ class Company(models.Model):
 
 class CashRegister(models.Model):
     company = models.ForeignKey(Company, on_delete=models.DO_NOTHING)
-    created = models.DateTimeField(auto_now_add=True)
-    symbol = models.CharField(max_length=200)
-    contents = models.CharField(max_length=250, validators=[from_transfer])
-    income = models.FloatField(default=0.00, validators=[positive_value])
-    expenditure = models.FloatField(default=0.00, validators=[positive_value])
+    created = models.DateTimeField(auto_now_add=True,)
+    symbol = models.CharField(max_length=200,)
+    contents = models.CharField(max_length=250,)
+    income = models.FloatField(default=0.0,)
+    expenditure = models.FloatField(default=0.0,)
     cashaccept = models.SmallIntegerField(null=True, blank=True)
 
     class Meta:

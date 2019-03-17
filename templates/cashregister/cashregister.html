@@ -79,13 +79,13 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text bg-success text-white font-weight-normal" id="income">Przychód</span>
                   </div>
-                  {% bootstrap_field form.income form_group_class='form-inline' show_label=False placeholder='Wpłata do kasy...' %}
+                  {% bootstrap_field form.income form_group_class='form-inline' show_label=False %}
                 </div>
                 <div class="input-group">
                   <div class="input-group-prepend">
                     <span class="input-group-text bg-danger text-white font-weight-normal" id="expenditure">Rozchód&nbsp;</span>
                   </div>
-                  {% bootstrap_field form.expenditure form_group_class='form-inline' show_label=False placeholder='Wypłata z kasy...' %}
+                  {% bootstrap_field form.expenditure form_group_class='form-inline' show_label=False %}
                 </div>
               </div>
               <div class="col-7">
@@ -151,12 +151,12 @@
                   <td width="24%">{{ record.contents }}</td>
                   <td class="text-right" width="11%">
                     {% if record.income > 0 %}
-                      <a href="{{ record.cash_accept }}">{{ record.income|money_format }}</a>
+                      <a href="{{ record.cash_accept }}" onclick="setTimeout('window.location.reload()', 2500)">{{ record.income|money_format }}</a>
                     {% else %}-----{% endif %}
                   </td>
                   <td class="text-right" width="11%">
                     {% if record.expenditure > 0 %}
-                      <a href="{{ record.cash_accept }}">{{ record.expenditure|money_format }}</a>
+                      <a href="{{ record.cash_accept }}" onclick="setTimeout('window.location.reload()', 2500)">{{ record.expenditure|money_format }}</a>
                     {% else %}-----{% endif %}
                   </td>
                   <td class="text-right text-secondary" width="11%">
@@ -170,7 +170,7 @@
                   </td>
                   <td class="text-right" width="24%">
                     {% if record.cashaccept %}
-                      <a href="#" class="badge badge-secondary">Usuń</a>
+                      <a href="{{ record.cash_accept }}" class="badge badge-primary">Drukuj</a>
                     {% else %}
                       <a href="{{ record.cashregister_delete }}" class="badge badge-danger">Usuń</a>
                     {% endif %}
