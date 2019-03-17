@@ -248,7 +248,6 @@ class CashRegisterAcceptView(View):
 
 	def get(self, request, company_id:int, record:int) -> HttpResponse:
 		html = cashaccept2pdf(record)
-		# TODO: KP/KW as badge with get_absolute_url
 		if html:
 			# create pdf file and save on templates/pdf/cashaccept_{record}.pdf
 			options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
