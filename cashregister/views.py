@@ -28,7 +28,7 @@ class CompanyAddView(View):
 	'''class implementing the method of adding/changing basic data for the new or existing company'''
 
 	def get(self, request, company_id:int = None) -> render:
-		companies = Company.objects.filter(status__range=[1, 3]).order_by('company')
+		companies = Company.objects.order_by('company')
 		if company_id:
 			company = Company.objects.get(pk=company_id)
 			fields = list(company.__dict__.keys())[2:-2]
