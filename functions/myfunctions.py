@@ -14,6 +14,9 @@ import num2words
 import calendar
 from io import BytesIO
 from pathlib import Path
+from random import shuffle
+from itertools import islice
+from collections import deque
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 
@@ -322,3 +325,26 @@ def cashaccept2pdf(record: int, number=1):
 	html = template.render(context)
 
 	return html
+
+
+# quiz
+def quizdata(file:Path=Path('latin.txt')):
+	with file.open('r', encoding='utf-8') as file:
+		lat2pl=deque(line.rstrip(' \n').split(' – ') for line in file if not line.startswith('=='))
+
+	return lat2pl
+
+
+def quizset(iterable):
+
+	while len(iterable) >= 4:
+		shuffle(iterable)
+		quizquery=list(islice(iterable,4))
+		query, answer = quizquery[0]
+		answers = [item[1].capitalize() for item in quizquery]
+		shuffle(answers)
+		iterable.popleft()
+
+		return query.capitalize(), answer.capitalize(), answers
+	else:
+		return None

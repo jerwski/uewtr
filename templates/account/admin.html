@@ -6,8 +6,8 @@
 {% block header %}
   <div class="jumbotron text-center">
     <p class="text-primary display-4">Administration Dashboard</p>
-    <p class="text-center font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
-    <p class="text-center text-secondary font-italic lead">Feci, quod potui, faciant meliora potentes...</p>
+    <p class="font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
+    <p class="text-secondary font-italic lead">Feci, quod potui, faciant meliora potentes...</p>
   </div>
 {% endblock %}
 
@@ -41,7 +41,7 @@
     </div>
     <div class="row mt-1">
       <div class="col text-center">
-        <img src="{% static 'images/mainboard/logoUNI.png' %}">
+        <a href="{% url 'account:quiz' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}"></a>
         <p class="footer text-secondary"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
         <p>{% include 'blocks/start_message.html' %}</p>
       </div>

@@ -2,9 +2,6 @@
 from django.db import models
 from django.urls import reverse
 
-# validators
-from validators.my_validator import positive_value, from_transfer
-
 # Create your models here.
 
 

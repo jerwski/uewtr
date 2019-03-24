@@ -15,5 +15,7 @@ urlpatterns = [
     path('load-invoices-backup-file/', login_required(views.Invoices2Ftp.as_view()), name='invoices_backup', ),
 	path('send/JPK/', login_required(views.JPK2Accountancy.as_view()), name='send_jpk_files'),
 	path('load-database/', login_required(views.RestoreDataBase.as_view()), name='load-database'),
+	path('quiz/', login_required(views.QuizView.as_view()), name='quiz'),
+	path('quiz/<int:quiz_id>/', login_required(views.QuizView.as_view()), name='quiz'),
     path('exit/', views.exit, name='exit'),
 ]

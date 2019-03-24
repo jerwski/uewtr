@@ -7,14 +7,15 @@ from datetime import datetime
 from django.conf import settings
 from django.shortcuts import render
 from django.contrib import messages
-from django.urls import reverse_lazy
 from django.utils.timezone import now
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
 from django.core.management import call_command
 from django.views.generic import CreateView, View
 
 # my models
+from account.models import Quiz
 from employee.models import Employee
 from cashregister.models import Company
 
@@ -22,7 +23,7 @@ from cashregister.models import Company
 from account.forms import UserCreateForm
 
 # my function
-from functions.myfunctions import remgarbage, sendemail, jpk_files
+from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset
 from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection, invoices_backup
 
 
@@ -118,6 +119,48 @@ class JPK2Accountancy(View):
 			messages.error(request, 'No internet connection...')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
+
+
+class QuizView(View):
+	def get(self, request, quiz_id:int=None)->render:
+		user = request.user
+		queryset = quizdata()
+		context = {'user': user}
+		if quiz_id == None:
+			start_play = now()
+			quiz = Quiz.objects.create(player=user, start_play = start_play, set_of_questions=0, points=0)
+			context.update({'start_play': start_play, 'quiz_id': quiz.id})
+		else:
+			query, answer, answers = quizset(queryset)
+			quiz = Quiz.objects.get(pk=quiz_id)
+			points, set_of_questions = quiz.points, quiz.set_of_questions
+			set_of_questions += 1
+			defaults = {'query': query, 'set_of_questions': set_of_questions,
+			            'answer': answer, 'answers': ';'.join(answers)}
+			Quiz.objects.filter(pk=quiz_id).update(**defaults)
+			data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'answer': answer,
+			        'answers': answers, 'set_of_questions': set_of_questions}
+			context.update(data)
+
+		return render(request, 'account/quiz.html', context)
+
+	def post(self, request, quiz_id:int)->render:
+		your_answer = request.POST['your_answer']
+		quiz = Quiz.objects.get(pk=quiz_id)
+		points = quiz.points
+		query, answer, answers, set_of_questions = quiz.query, quiz.answer, quiz.answers.split(';'), quiz.set_of_questions
+		context = {'query': query, 'answer': answer, 'answers': answers,
+		           'set_of_questions': set_of_questions, 'quiz_id': quiz_id, 'points': points}
+
+		if your_answer == answer:
+			points += 5
+			context.__setitem__('points', points)
+			Quiz.objects.filter(pk=quiz_id).update(points=points, end_play=now())
+
+			return HttpResponseRedirect(reverse('account:quiz', args=[quiz_id]))
+
+		else:
+			return render(request, 'account/quiz.html', context)
 
 
 def exit(request)->HttpResponseRedirect:
