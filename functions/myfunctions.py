@@ -328,8 +328,8 @@ def cashaccept2pdf(record: int, number=1):
 
 
 # quiz
-def quizdata(file:Path=Path('latin.txt')):
-	with file.open('r', encoding='utf-8') as file:
+def quizdata(file:Path=Path('latin.txt'), encoding='utf-8'):
+	with file.open('r', encoding=encoding) as file:
 		lat2pl=deque(line.rstrip(' \n').split(' – ') for line in file if not line.startswith('=='))
 
 	return lat2pl
@@ -345,6 +345,6 @@ def quizset(iterable):
 		shuffle(answers)
 		iterable.popleft()
 
-		return query.capitalize(), answer.capitalize(), answers
+		return query, answer.capitalize(), answers
 	else:
 		return None

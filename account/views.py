@@ -134,12 +134,18 @@ class QuizView(View):
 			query, answer, answers = quizset(queryset)
 			quiz = Quiz.objects.get(pk=quiz_id)
 			points, set_of_questions = quiz.points, quiz.set_of_questions
+
+			if set_of_questions:
+				percent = 20 * points / set_of_questions
+			else:
+				percent = 0
+
 			set_of_questions += 1
 			defaults = {'query': query, 'set_of_questions': set_of_questions,
 			            'answer': answer, 'answers': ';'.join(answers)}
 			Quiz.objects.filter(pk=quiz_id).update(**defaults)
 			data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'answer': answer,
-			        'answers': answers, 'set_of_questions': set_of_questions}
+			        'answers': answers, 'set_of_questions': set_of_questions, 'percent': percent}
 			context.update(data)
 
 		return render(request, 'account/quiz.html', context)
@@ -149,7 +155,8 @@ class QuizView(View):
 		quiz = Quiz.objects.get(pk=quiz_id)
 		points = quiz.points
 		query, answer, answers, set_of_questions = quiz.query, quiz.answer, quiz.answers.split(';'), quiz.set_of_questions
-		context = {'query': query, 'answer': answer, 'answers': answers,
+		percent = 20 * points / set_of_questions
+		context = {'query': query, 'answer': answer, 'answers': answers, 'percent': percent,
 		           'set_of_questions': set_of_questions, 'quiz_id': quiz_id, 'points': points}
 
 		if your_answer == answer:
