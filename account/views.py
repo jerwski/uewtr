@@ -133,7 +133,13 @@ class QuizView(View):
 		else:
 			query, answer, answers = quizset(queryset)
 			quiz = Quiz.objects.get(pk=quiz_id)
-			points, set_of_questions = quiz.points, quiz.set_of_questions
+			points, set_of_questions =quiz.points, quiz.set_of_questions
+			start_play, end_play = quiz.start_play, quiz.end_play
+
+			if end_play:
+				playtime = str(end_play - start_play)
+			else:
+				playtime = '0:00:00'
 
 			if set_of_questions:
 				percent = 20 * points / set_of_questions
@@ -144,7 +150,7 @@ class QuizView(View):
 			defaults = {'query': query, 'set_of_questions': set_of_questions,
 			            'answer': answer, 'answers': ';'.join(answers)}
 			Quiz.objects.filter(pk=quiz_id).update(**defaults)
-			data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'answer': answer,
+			data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'answer': answer, 'playtime': playtime,
 			        'answers': answers, 'set_of_questions': set_of_questions, 'percent': percent}
 			context.update(data)
 
@@ -153,10 +159,17 @@ class QuizView(View):
 	def post(self, request, quiz_id:int)->render:
 		your_answer = request.POST['your_answer']
 		quiz = Quiz.objects.get(pk=quiz_id)
-		points = quiz.points
-		query, answer, answers, set_of_questions = quiz.query, quiz.answer, quiz.answers.split(';'), quiz.set_of_questions
+		points, set_of_questions = quiz.points, quiz.set_of_questions
+		query, answer, answers = quiz.query, quiz.answer, quiz.answers.split(';')
+		start_play, end_play = quiz.start_play, quiz.end_play
+
+		if end_play:
+			playtime = str(end_play - start_play)
+		else:
+			playtime = '0:00:00'
+
 		percent = 20 * points / set_of_questions
-		context = {'query': query, 'answer': answer, 'answers': answers, 'percent': percent,
+		context = {'query': query, 'answer': answer, 'answers': answers, 'percent': percent, 'playtime': playtime,
 		           'set_of_questions': set_of_questions, 'quiz_id': quiz_id, 'points': points}
 
 		if your_answer == answer:
