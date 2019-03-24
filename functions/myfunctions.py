@@ -14,10 +14,9 @@ import num2words
 import calendar
 from io import BytesIO
 from pathlib import Path
-from random import shuffle
-from itertools import islice
 from collections import deque
 from collections import defaultdict
+from random import shuffle, choices, randrange
 from datetime import date, datetime, timedelta
 
 # django library
@@ -330,20 +329,18 @@ def cashaccept2pdf(record: int, number=1):
 # quiz
 def quizdata(file:Path=Path('latin.txt'), encoding='utf-8'):
 	with file.open('r', encoding=encoding) as file:
-		lat2pl=deque(line.rstrip(' \n').split(' – ') for line in file if not line.startswith('=='))
+		quiz_data=deque(line.rstrip(' \n').split(' – ') for line in file if not line.startswith('=='))
 
-	return lat2pl
+	return quiz_data
 
 
 def quizset(iterable):
 
 	while len(iterable) >= 4:
 		shuffle(iterable)
-		quizquery=list(islice(iterable,4))
-		query, answer = quizquery[0]
-		answers = [item[1].capitalize() for item in quizquery]
-		shuffle(answers)
-		iterable.popleft()
+		query, answer = iterable.popleft()
+		answers = [item[1].capitalize() for item in choices(iterable, k=3)]
+		answers.insert(randrange(0,4), answer.capitalize())
 
 		return query, answer.capitalize(), answers
 	else:
