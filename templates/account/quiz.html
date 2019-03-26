@@ -12,7 +12,7 @@
     <div class="jumbotron text-center">
       <h2 class="text-primary font-weight-normal">Latin sentences</h2>
       <p class="font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
-      <div class="btn-group mt-2 mb-3">
+      <div class="btn btn-group btn-group-sm mb-2">
         <a class="btn btn-outline-danger" href="{% url 'account:exit' %}">Exit</a>
         <a class="btn btn-outline-dark" href="{% url 'login' %}">Reset</a>
         {% if request.user.is_authenticated %}
@@ -29,6 +29,7 @@
       <div class="col text-center">
         {% if quiz_id %}
           <h3 class="text-success font-weight-normal">{{ query }}</h3>
+          <p class="text-secondary small">Questions pool: {{ poll }}</p>
           <form action="{% url 'account:quiz' quiz_id %}" method="POST">{% csrf_token %}
             {% for answer in answers %}
               <div class="form-check custom-control custom-radio offset-4 text-left font-weight-bold">

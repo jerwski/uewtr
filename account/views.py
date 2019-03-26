@@ -41,6 +41,8 @@ class AdminView(View):
 	'''class implementing the method of view application's dashboard'''
 	def get(self, request)->HttpResponseRedirect:
 		if request.user.is_superuser or request.user.is_staff:
+			global _queryset
+			_queryset = quizdata()
 			user = request.user.username
 			context = {'user': user}
 			employee = Employee.objects.filter(status=True).first()
@@ -122,18 +124,18 @@ class JPK2Accountancy(View):
 
 
 class QuizView(View):
+
 	def get(self, request, quiz_id:int=None)->render:
 		user = request.user
-		queryset = quizdata()
 		context = {'user': user}
 		if quiz_id == None:
 			start_play = now()
 			quiz = Quiz.objects.create(player=user, start_play = start_play, set_of_questions=0, points=0)
 			context.update({'start_play': start_play, 'quiz_id': quiz.id})
 		else:
-			query, answer, answers = quizset(queryset)
+			query, answer, answers = quizset(_queryset)
 			quiz = Quiz.objects.get(pk=quiz_id)
-			points, set_of_questions =quiz.points, quiz.set_of_questions
+			points, set_of_questions = quiz.points, quiz.set_of_questions
 			start_play, end_play = quiz.start_play, quiz.end_play
 
 			if end_play:
@@ -150,7 +152,7 @@ class QuizView(View):
 			defaults = {'query': query, 'set_of_questions': set_of_questions,
 			            'answer': answer, 'answers': ';'.join(answers)}
 			Quiz.objects.filter(pk=quiz_id).update(**defaults)
-			data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'answer': answer, 'playtime': playtime,
+			data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'playtime': playtime, 'poll': len(_queryset),
 			        'answers': answers, 'set_of_questions': set_of_questions, 'percent': percent}
 			context.update(data)
 
@@ -169,17 +171,19 @@ class QuizView(View):
 			playtime = '0:00:00'
 
 		percent = 20 * points / set_of_questions
-		context = {'query': query, 'answer': answer, 'answers': answers, 'percent': percent, 'playtime': playtime,
+		context = {'query': query, 'answers': answers, 'percent': percent, 'playtime': playtime,
 		           'set_of_questions': set_of_questions, 'quiz_id': quiz_id, 'points': points}
 
 		if your_answer == answer:
 			points += 5
-			context.__setitem__('points', points)
 			Quiz.objects.filter(pk=quiz_id).update(points=points, end_play=now())
 
 			return HttpResponseRedirect(reverse('account:quiz', args=[quiz_id]))
 
 		else:
+			points -= 3
+			context.__setitem__('points', points)
+			Quiz.objects.filter(pk=quiz_id).update(points=points, end_play=now())
 			return render(request, 'account/quiz.html', context)
 
 

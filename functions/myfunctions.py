@@ -105,8 +105,8 @@ def erase_records(employee_id: int) -> dict:
 	worker = Employee.objects.get(pk=employee_id)
 	opt1, opt2 = {'worker': worker, 'then': Value(1)}, {'default': Value(0), 'output_field': IntegerField()}
 	db = {EmployeeData._meta.verbose_name: EmployeeData, WorkEvidence._meta.verbose_name: WorkEvidence,
-	      EmployeeLeave._meta.verbose_name: EmployeeLeave, AccountPayment._meta.verbose_name: AccountPayment,
-	      EmployeeHourlyRate._meta.verbose_name: EmployeeHourlyRate, }
+		  EmployeeLeave._meta.verbose_name: EmployeeLeave, AccountPayment._meta.verbose_name: AccountPayment,
+		  EmployeeHourlyRate._meta.verbose_name: EmployeeHourlyRate, }
 
 	for model_name, model in db.items():
 		records = model.objects.aggregate(rec=Sum(Case(When(**opt1), **opt2)))
@@ -135,7 +135,7 @@ def plot_chart(employee_id: int, year: int):
 	labels = ax.get_xticklabels()
 	plt.setp(labels, rotation=45, horizontalalignment='right')
 	ax.set(xlabel='Value [PLN]', ylabel='Months',
-	       title=f'Incomes in {year} year for {worker} (total {total_income:,.2f} PLN)')
+		   title=f'Incomes in {year} year for {worker} (total {total_income:,.2f} PLN)')
 	for k, v in income.items():
 		if 0 < v < 300:
 			ax.set_xlim(0, max(list(income.values())) * 1.25)
@@ -152,7 +152,7 @@ def plot_chart(employee_id: int, year: int):
 def payrollhtml2pdf(month: int, year: int) -> bool:
 	'''convert html file (evidence/monthly_payroll_pdf.html) to pdf file'''
 	heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota', 'Niedziela', 'Zaliczka',
-	         'Do wypłaty', 'Data i podpis']
+			 'Do wypłaty', 'Data i podpis']
 	total_work_hours = len(list(workingdays(year, month))) * 8
 	employees = Employee.objects.all()
 	# building complex query for actual list of employee
@@ -171,7 +171,7 @@ def payrollhtml2pdf(month: int, year: int) -> bool:
 					amountpay[k] += v
 
 		context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay), 'year': year, 'month': month,
-		           'total_work_hours': total_work_hours}
+				   'total_work_hours': total_work_hours}
 
 		template = get_template('evidence/monthly_payroll_pdf.html')
 		html = template.render(context)
@@ -243,8 +243,8 @@ def cashregisterdata(company_id: int, month: int, year: int) -> dict:
 
 		if not register.filter(created__month=month, created__year=year) and saldo > 0:
 			transfer = {'company_id': company_id,
-			            'symbol': f'RK {lastdate.created.date().month}/{lastdate.created.date().year}',
-			            'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
+						'symbol': f'RK {lastdate.created.date().month}/{lastdate.created.date().year}',
+						'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
 			CashRegister.objects.create(**transfer)
 
 	registerdata['saldo'] = saldo
@@ -334,12 +334,18 @@ def quizdata(file:Path=Path('latin.txt'), encoding='utf-8'):
 	return quiz_data
 
 
+# upper first letter
+def upperfirst(string:str):
+
+	return string[:1].upper() + string[1:]
+
+
 def quizset(iterable):
 
 	while len(iterable) >= 4:
 		shuffle(iterable)
 		query, answer = iterable.popleft()
-		answers = [item[1].capitalize() for item in choices(iterable, k=3)]
+		answers = [upperfirst(item[1]) for item in choices(iterable, k=3)]
 		answers.insert(randrange(0,4), answer.capitalize())
 
 		return query, answer.capitalize(), answers
