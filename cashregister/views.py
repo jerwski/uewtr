@@ -117,7 +117,7 @@ class CashRegisterView(View):
 	def post(self, request, company_id:int=None) -> HttpResponseRedirect:
 		form = CashRegisterForm(data=request.POST)
 		check = CashRegister.objects.filter(company_id=company_id)
-		companies = Company.objects.filter(status__range=[1, 3]).order_by('company')
+		companies = Company.objects.filter(status__in=[1,2,3]).order_by('company')
 		context = {'form': form, 'companies': companies}
 
 		if company_id:

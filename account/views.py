@@ -182,7 +182,7 @@ class QuizView(View):
 
 		else:
 			points -= 3
-			context.__setitem__('points', points)
+			context.update({'points': points, 'poll': len(_queryset)})
 			Quiz.objects.filter(pk=quiz_id).update(points=points, end_play=now())
 			return render(request, 'account/quiz.html', context)
 

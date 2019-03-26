@@ -22,14 +22,14 @@
       {% if set_of_questions %}
         <h3 class="text-dark">Query number: <em class="text-danger font-weight-bold">{{ set_of_questions }}</em>&nbsp;&nbsp;&nbsp;Your points: <em class="text-success font-weight-bold">{{ points }}</em>&nbsp;&nbsp;&nbsp;Percent of good answers: <em class="text-primary font-weight-bold">{{ percent|floatformat:2 }}%</em>&nbsp;&nbsp;&nbsp;Your time: <em class="text-info font-weight-bold">{{ playtime }}</em></h3>
       {% else %}
-        <p class="text-secondary font-italic lead">Please select Next button to start the quiz...</p>
+        <p class="text-danger font-italic lead">Please select **Next query** button to start the quiz...</p>
       {% endif %}
     </div>
     <div class="row">
       <div class="col text-center">
         {% if quiz_id %}
           <h3 class="text-success font-weight-normal">{{ query }}</h3>
-          <p class="text-secondary small">Questions pool: {{ poll }}</p>
+          {% if query %}<p class="text-secondary small">Questions pool: {{ poll }}</p>{% endif %}
           <form action="{% url 'account:quiz' quiz_id %}" method="POST">{% csrf_token %}
             {% for answer in answers %}
               <div class="form-check custom-control custom-radio offset-4 text-left font-weight-bold">
@@ -37,21 +37,21 @@
                 <label class="custom-control-label text-primary" for="answer_{{ forloop.counter }}">{{ answer }}</label>
               </div>
             {% endfor %}
-            <div class="btn btn-lg p-3">
+            <div class="col-6 btn mt-2">
               {% if query %}
-                <button type="submit" class="btn btn-outline-success">Confirm</button>
+                <button type="submit" class="btn btn-success mr-5">Confirm the selection</button>
               {% else %}
-                <button type="submit" class="btn btn-outline-success" disabled>Confirm</button>
+                <button type="submit" class="btn btn-success mr-5" disabled>Confirm the selection</button>
               {% endif %}
-              <a class="btn btn-outline-primary" href="{% url 'account:quiz' quiz_id %}">Next query</a>
+              <a class="btn btn-primary ml-5" href="{% url 'account:quiz' quiz_id %}">Next query...</a>
             </div>
           </form>
         {% endif %}
       </div>
     </div>
     <div class="row">
-      <div class="col text-center">
-        <img src="{% static 'images/quiz/gotowork.png' %}" width="15%">
+      <div class="col text-center mt-4">
+        <img src="{% static 'images/quiz/gotowork.png' %}" width="13%">
         <p class="footer text-secondary"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
       </div>
     </div>

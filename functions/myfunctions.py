@@ -346,8 +346,8 @@ def quizset(iterable):
 		shuffle(iterable)
 		query, answer = iterable.popleft()
 		answers = [upperfirst(item[1]) for item in choices(iterable, k=3)]
-		answers.insert(randrange(0,4), answer.capitalize())
+		answers.insert(randrange(0,4), upperfirst(answer))
 
-		return query, answer.capitalize(), answers
+		return query, upperfirst(answer), answers
 	else:
 		return None
