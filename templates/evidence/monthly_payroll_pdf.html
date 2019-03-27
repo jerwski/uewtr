@@ -5,44 +5,44 @@
 
 {% block content %}
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <p class="text-primary lead text-center font-weight-bold bg-warning">Lista płac za miesiąc: {{ month }}/{{ year }}r.  Ilość godzin: {{ total_work_hours }}. Wypłaty razem: {{ amountpay.brutto|money_format }}</p>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <p class="text-primary lead text-center font-weight-bold bg-warning">Lista płac za miesiąc: {{ month }}/{{ year }}r.  Ilość godzin: {{ total_work_hours }}. Wypłaty razem: {{ amountpay.brutto|money_format }}</p>
 
-                <table class="table table-bordered table-striped font-weight-light">
-                    <thead class="text-center bg-info">
-                        <tr>
-                            {% for head in heads %}<th>{{ head }}</th>{% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for name, data in payroll.items %}
-                            {% if data.salary > 0 %}
-                                <tr class="text-right text-dark">
-                                    <td class="text-left font-italic">{{ name }}</td>
-                                    <td>{{ data.brutto|money_format }}</td>
-                                    <td>{{ data.basicpay|money_format }}</td>
-                                    <td>{{ data.leavepay|money_format }}</td>
-                                    <td>{{ data.overhourspay|money_format }}</td>
-                                    <td>{{ data.satpay|money_format }}</td>
-                                    <td>{{ data.sunpay|money_format }}</td>
-                                    <td>{{ data.accountpay|money_format }}</td>
-                                    <td>{{ data.salary|money_format }}</td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                        <tr><td class="text-success text-right font-weight-bold font-italic">TOTAL:</td>
-                        {% for value in amountpay.values %}
-                            <td class="text-success text-right font-italic font-weight-bold">{{ value|money_format }}</td>
-                        {% endfor %}
-                        </tr>
-                    </tbody>
-                </table>
-                <p class="footer text-secondary text-sm-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
-            </div>
-        </div>
+        <table class="table table-bordered table-striped font-weight-light">
+          <thead class="text-center bg-info">
+          <tr>
+            {% for head in heads %}<th>{{ head }}</th>{% endfor %}
+          </tr>
+          </thead>
+          <tbody>
+          {% for name, data in payroll.items %}
+            {% if data.salary > 0 %}
+              <tr class="text-right text-dark">
+                <td class="text-left font-italic">{{ name }}</td>
+                <td>{{ data.brutto|money_format }}</td>
+                <td>{{ data.basicpay|money_format }}</td>
+                <td>{{ data.leavepay|money_format }}</td>
+                <td>{{ data.overhourspay|money_format }}</td>
+                <td>{{ data.satpay|money_format }}</td>
+                <td>{{ data.sunpay|money_format }}</td>
+                <td>{{ data.accountpay|money_format }}</td>
+                <td>{{ data.salary|money_format }}</td>
+                <td>&nbsp;</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+          <tr><td class="text-success text-right font-weight-bold font-italic">TOTAL:</td>
+          {% for value in amountpay.values %}
+            <td class="text-success text-right font-italic font-weight-bold">{{ value|money_format }}</td>
+          {% endfor %}
+          </tr>
+          </tbody>
+        </table>
+        <p class="footer text-secondary text-sm-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+      </div>
     </div>
+  </div>
 
 {% endblock %}

@@ -6,168 +6,169 @@
 
 
 {% block content %}
-<div class="container">
-    <div class="row m-3 bgbisque">
-        {% include 'blocks/header.html' %}
-        <div class="col-sm-4">
-            <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
-            <table class="table table-hover table-sm">
-                <tbody>
-                {% for employee in employees %}
-                    <tr>
-                        {% if employee_id == employee.id %}
-                            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
-                        {% else %}
-                            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-sm-8">
-            {% if worker.status %}
-                <p class="text-center text-danger lead font-weight-normal bg-warning">WORK EVIDENCE FOR: {{ worker|upper }}</p>
-                <div class="row">
-                    <div class="col-2">
-                        <div class="btn btn-group-sm btn-group-vertical" role="group">
-                            <a href="{% url 'evidence:working_time_recorder_add' employee_id %}" class="btn btn-sm btn-outline-secondary font-weight-bold">Insert hours</a>
-                            <a href="{% url 'evidence:working_time_recorder_add' employee_id 12 %}" class="btn btn-sm btn-outline-info font-weight-bold">6:00-12:00</a>
-                            <a href="{% url 'evidence:working_time_recorder_add' employee_id 14 %}" class="btn btn-sm btn-outline-success font-weight-bold">6:00-14:00</a>
-                            <a href="{% url 'evidence:working_time_recorder_add' employee_id 16 %}" class="btn btn-sm btn-outline-primary font-weight-bold">6:00-16:00</a>
-                            <a href="{% url 'evidence:working_time_recorder_add' employee_id 18 %}" class="btn btn-sm btn-outline-danger font-weight-bold">6:00-18:00</a>
-                            <a href="{% url 'evidence:working_time_recorder_add' employee_id 6 %}" class="btn btn-sm btn-outline-dark font-weight-bold">22:00-6:00</a>
-                        </div>
-                    </div>
-                    <div class="col-10">
-                        <form action="{% url 'evidence:working_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
-                            {% bootstrap_field form.worker %}
-                            <div class="row mt-4">
-                                <div class='col-6'>
-                                    <div class="form-group">
-                                        {% bootstrap_field form.start_work size='small' label_class='text-primary font-weight-bold' placeholder='Pick date and time start job' %}
-                                    </div>
-                                </div>
-                                <div class='col-6'>
-                                    <div class="form-group">
-                                        {% bootstrap_field form.end_work size='small' label_class='text-primary font-weight-bold' placeholder='Pick date and time end job' %}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <div class="btn-sm mb-2">
-                                        <button type="submit" class="btn btn-outline-success btn-block font-weight-bold">Confirm</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
 
-                {% if start_work > end_work %}
-                    <p class="text-danger lead font-weight-normal mt-3">The start date is later than the end date! Please correct it!</p>
-                {% elif start_work >= end_work %}
-                    <p class="text-danger lead font-weight-normal mt-3">The start date is the same like the end date! Please correct it!</p>
-                {% else %}
-                    {% if flag_work or flag_leave %}
-                        <p class="text-danger lead font-weight-normal mt-3">Record for this day ({{ start_work|date:'l, d F Y' }}) is existing in database! Please check it or correct!</p>
-                        <div class="row">
-                            <div class="col">
-                                <div class="btn-sm mb-2">
-                                    <a class="btn btn-primary btn-block font-weight-bold" href="/admin/">Admin Data Base</a>
-                                </div>
-                            </div>
-                        </div>
-                    {% else %}
-                        {% if jobhours %}
-                            <p class="text-center text-primary font-weight-bold">For <em class="text-danger">{{ worker }}</em> adding <em class="text-danger">{{ jobhours|floatformat:2 }}</em> hour{{ total_hours|pluralize:'s' }}.</p>
-                            <p class="text-center text-primary font-weight-bold"><em>{{ start_work|date:'r' }} - {{ end_work|date:'r' }}</em></p>
-                            <div class="row">
-                                <div class="col-md-6 btn-sm mb-2">
-                                     <a href="{% url 'account:admin_site' %}" class="btn btn-sm btn-outline-dark btn-block">Back to the dashboard</a>
-                                </div>
-                                <div class="col-md-6 btn-sm mb-lg-4">
-                                    {% if jobhours != 8 %}
-                                        <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase expanded jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
-                                    {% else %}
-                                        <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase standard jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endif %}
-                {% endif %}
-                <div class="row p-sm-1">
-                    <div class="col-md-12">
-                        <table class="table table-hover table-sm p-2">
-                            <thead class="bg-info">
-                                <tr><th>TOTAL PAYMENT FOR:</th><th class="text-white">{{ worker }}</th><th class="text-right" width="8%">RATE:</th><th class="text-white" width="18%">{{ rate|floatformat:2 }} PLN/h</th><th width="10%">HOURS:</th><th class="text-white" width="10%">{{ total_hours|floatformat:2 }}</th></tr>
-                            </thead>
-                        </table>
-                        <table class="table table-hover table-sm">
-                            <tbody>
-                                <tr><td class="text-right">Total hours:</td><td class="text-danger font-weight-bold">{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</td><td class="text-right">Brutto income:</td><td class="text-danger font-weight-bold">{{ brutto|money_format }}</td></tr>
-                                <tr><td class="text-right">Basic payment (100%):</td><td class="text-danger font-weight-bold">{{ basicpay|money_format }}</td><td class="text-right">Leave payment (100%):</td><td class="text-danger font-weight-bold">{{ leavepay|money_format }}</td></tr>
-                                <tr><td class="text-right">Saturday payment (100%):</td><td class="text-danger font-weight-bold">{{ satpay|money_format }}</td><td class="text-right">Sunday payment (200%):</td><td class="text-danger font-weight-bold">{{ sunpay|money_format }}</td></tr>
-                                {% if overhours %}
-                                    <tr><td class="text-right">Overhours (50%):</td><td class="text-danger font-weight-bold">{{ overhourspay|money_format }}</td><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td></tr>
-                                {% else %}
-                                    <tr><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td></tr>
-                                {% endif %}
-                                <tr class="text-white font-weight-bold bg-info"><td>&nbsp;</td><td class="text-right">NETTO INCOME:</td><td>{{ salary|money_format }}</td><td>&nbsp;</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+<div class="container">
+  <div class="row m-3 bgbisque">
+    {% include 'blocks/header.html' %}
+    <div class="col-sm-3">
+      <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
+      <table class="table table-hover table-sm">
+        <tbody>
+        {% for employee in employees %}
+          <tr>
+            {% if employee_id == employee.id %}
+              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
             {% else %}
-                <p class="text-center text-danger lead font-weight-normal bg-warning">{{ worker|upper }} IS DEACTIVE</p>
-                <p class="text-center text-danger lead font-weight-bold">{{ worker|upper }} isn't employee or is deactive. You can't add any evidence.</p>
+              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
             {% endif %}
-            {% if request.method == 'GET' %}
-                <div class="row">
-                    <div class="col-sm-12 btn-sm mb-2">
-                        <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
     </div>
+    <div class="col-sm-9">
+      {% if worker.status %}
+        <p class="text-center text-danger lead font-weight-normal bg-warning">WORK EVIDENCE FOR: {{ worker|upper }}</p>
+        <div class="row">
+          <div class="col-3 text-center">
+            <div class="btn btn-group-sm btn-group-vertical" role="group">
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id %}" class="btn btn-sm btn-outline-secondary font-weight-bold">Insert hours</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 12 %}" class="btn btn-sm btn-outline-info font-weight-bold">6:00-12:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 14 %}" class="btn btn-sm btn-outline-success font-weight-bold">6:00-14:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 16 %}" class="btn btn-sm btn-outline-primary font-weight-bold">6:00-16:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 18 %}" class="btn btn-sm btn-outline-danger font-weight-bold">6:00-18:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 6 %}" class="btn btn-sm btn-outline-dark font-weight-bold">22:00-6:00</a>
+            </div>
+          </div>
+          <div class="col-9">
+            <form action="{% url 'evidence:working_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
+              {% bootstrap_field form.worker %}
+              <div class="row mt-4">
+                <div class='col-6'>
+                  <div class="form-group">
+                    {% bootstrap_field form.start_work size='small' label_class='text-primary font-weight-bold' placeholder='Pick date and time start job' %}
+                  </div>
+                </div>
+                <div class='col-6'>
+                  <div class="form-group">
+                    {% bootstrap_field form.end_work size='small' label_class='text-primary font-weight-bold' placeholder='Pick date and time end job' %}
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col">
+                  <div class="btn-sm mb-2">
+                    <button type="submit" class="btn btn-outline-success btn-block font-weight-bold">Confirm</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {% if start_work > end_work %}
+          <p class="text-danger lead font-weight-normal mt-3">The start date is later than the end date! Please correct it!</p>
+        {% elif start_work >= end_work %}
+          <p class="text-danger lead font-weight-normal mt-3">The start date is the same like the end date! Please correct it!</p>
+        {% else %}
+          {% if flag_work or flag_leave %}
+            <p class="text-danger lead font-weight-normal mt-3">Record for this day ({{ start_work|date:'l, d F Y' }}) is existing in database! Please check it or correct!</p>
+            <div class="row">
+              <div class="col">
+                <div class="btn-sm mb-2">
+                  <a class="btn btn-primary btn-block font-weight-bold" href="/admin/">Admin Data Base</a>
+                </div>
+              </div>
+            </div>
+          {% else %}
+            {% if jobhours %}
+              <p class="text-center text-primary font-weight-bold">For <em class="text-danger">{{ worker }}</em> adding <em class="text-danger">{{ jobhours|floatformat:2 }}</em> hour{{ total_hours|pluralize:'s' }}.</p>
+              <p class="text-center text-primary font-weight-bold"><em>{{ start_work|date:'r' }} - {{ end_work|date:'r' }}</em></p>
+              <div class="row">
+                <div class="col-md-6 btn-sm mb-2">
+                  <a href="{% url 'account:admin_site' %}" class="btn btn-sm btn-outline-dark btn-block">Back to the dashboard</a>
+                </div>
+                <div class="col-md-6 btn-sm mb-lg-4">
+                  {% if jobhours != 8 %}
+                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase expanded jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
+                  {% else %}
+                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase standard jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+        <div class="row p-sm-1">
+          <div class="col-md-12">
+            <table class="table table-hover table-sm p-2">
+              <thead class="bg-info">
+              <tr><th>TOTAL PAYMENT FOR:</th><th class="text-white">{{ worker }}</th><th class="text-right" width="8%">RATE:</th><th class="text-white" width="18%">{{ rate|floatformat:2 }} PLN/h</th><th width="10%">HOURS:</th><th class="text-white" width="10%">{{ total_hours|floatformat:2 }}</th></tr>
+              </thead>
+            </table>
+            <table class="table table-hover table-sm">
+              <tbody>
+              <tr><td class="text-right">Total hours:</td><td class="text-danger font-weight-bold">{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</td><td class="text-right">Brutto income:</td><td class="text-danger font-weight-bold">{{ brutto|money_format }}</td></tr>
+              <tr><td class="text-right">Basic payment (100%):</td><td class="text-danger font-weight-bold">{{ basicpay|money_format }}</td><td class="text-right">Leave payment (100%):</td><td class="text-danger font-weight-bold">{{ leavepay|money_format }}</td></tr>
+              <tr><td class="text-right">Saturday payment (100%):</td><td class="text-danger font-weight-bold">{{ satpay|money_format }}</td><td class="text-right">Sunday payment (200%):</td><td class="text-danger font-weight-bold">{{ sunpay|money_format }}</td></tr>
+              {% if overhours %}
+                <tr><td class="text-right">Overhours (50%):</td><td class="text-danger font-weight-bold">{{ overhourspay|money_format }}</td><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td></tr>
+              {% else %}
+                <tr><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td></tr>
+              {% endif %}
+              <tr class="text-white font-weight-bold bg-info"><td>&nbsp;</td><td class="text-right">NETTO INCOME:</td><td>{{ salary|money_format }}</td><td>&nbsp;</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% else %}
+        <p class="text-center text-danger lead font-weight-normal bg-warning">{{ worker|upper }} IS DEACTIVE</p>
+        <p class="text-center text-danger lead font-weight-bold">{{ worker|upper }} isn't employee or is deactive. You can't add any evidence.</p>
+      {% endif %}
+      {% if request.method == 'GET' %}
+        <div class="row">
+          <div class="col-sm-10 offset-1 btn-sm mb-2">
+            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 
-
 {% if work_hours == False %}
-    <script type="text/javascript">
-        $(function () {
-            $('#id_start_work').datetimepicker();
-            $('#id_end_work').datetimepicker();
-            $("#id_start_work").on("change.datetimepicker", function (e) {
-                $('#id_end_work').datetimepicker('minDate', e.date);
-            });
-            $("#id_end_work").on("change.datetimepicker", function (e) {
-                $('#id_start_work').datetimepicker('maxDate', e.date);
-            });
-        });
-    </script>
+  <script type="text/javascript">
+    $(function () {
+      $('#id_start_work').datetimepicker();
+      $('#id_end_work').datetimepicker();
+      $("#id_start_work").on("change.datetimepicker", function (e) {
+      $('#id_end_work').datetimepicker('minDate', e.date);
+      });
+      $("#id_end_work").on("change.datetimepicker", function (e) {
+      $('#id_start_work').datetimepicker('maxDate', e.date);
+      });
+    });
+  </script>
 {% endif %}
 
-    <!-- blinkin after hideTime: seconds-->
-    <script>
-        $('.blink').each(function() {
-          var elem = $(this);
-          // count the blinks
-          var count = 1;
-          var intervalId = setInterval(function() {
-            if (elem.css('visibility') == 'hidden') {
-                elem.css('visibility', 'visible');
-                // increment counter when showing to count # of blinks and stop when visible
-                if (count++ === 3) {
-                    clearInterval(intervalId);
-                }
-            } else {
-                elem.css('visibility', 'hidden');
-            }
-          }, 200);
-        });
-    </script>
+  <!-- blinkin after hideTime: seconds-->
+  <script>
+    $('.blink').each(function() {
+      var elem = $(this);
+      // count the blinks
+      var count = 1;
+      var intervalId = setInterval(function() {
+         if (elem.css('visibility') == 'hidden') {
+            elem.css('visibility', 'visible');
+            // increment counter when showing to count # of blinks and stop when visible
+            if (count++ === 3) {
+              clearInterval(intervalId);
+              }
+          } else {
+              elem.css('visibility', 'hidden');
+          }
+       }, 200);
+    });
+  </script>
+
 {% endblock %}

@@ -4,66 +4,69 @@
 {% block title %}Add/Change extended data of employee{% endblock %}
 
 {% block content %}
-<div class="container">
+
+  <div class="container">
     <div class="row m-3 bgbisque">
-        {% include 'blocks/header.html' %}
-        <div class="col-5">
-            <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
-            <table class="table table-hover table-sm">
-                <tbody>
-                {% for employee in employees %}
-                    <tr>
-                        {% if employee_id == employee.id %}
-                            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
-                        {% else %}
-                            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+      {% include 'blocks/header.html' %}
+      <div class="col-5">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
+        <table class="table table-hover table-sm">
+          <tbody>
+          {% for employee in employees %}
+            <tr>
+            {% if employee_id == employee.id %}
+              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
+            {% else %}
+              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
+            {% endif %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
-        <div class="col-7">
-            <p class="text-center text-danger lead font-weight-normal bg-warning">{{ employee|upper }} - CHANGE EXTENDED DATA</p>
-            <form action="{% url 'employee:employee_extendeddata' employee_id %}" method="POST">{% csrf_token %}
-                <div class="row">
-                    <div class="col-6">
-                        {% bootstrap_field form.worker size='small' label_class='text-info font-italic font-weight-bold' %}
-                        {% bootstrap_field form.birthday size='small' label_class='text-info font-italic font-weight-bold' %}
-                        {% bootstrap_field form.phone size='small' label_class='text-info font-italic font-weight-bold' %}
-                        {% bootstrap_field form.workplace size='small' label_class='text-info font-italic font-weight-bold' %}
-                        {% bootstrap_field form.start_contract size='small' label_class='text-info font-italic font-weight-bold' %}
-                        {% bootstrap_field form.end_contract size='small' label_class='text-info font-italic font-weight-bold' %}
-                    </div>
-                    <div class="col-6">
-                        {% bootstrap_field form.postal size='small' label_class='text-info font-italic font-weight-bold' %}
-                        {% bootstrap_field form.city size='small' label_class='text-info font-italic font-weight-bold' %}
-                        {% bootstrap_field form.street size='small' label_class='text-info font-italic font-weight-bold' %}
-                        {% bootstrap_field form.house size='small' label_class='text-info font-italic font-weight-bold' %}
-                        {% bootstrap_field form.flat size='small' label_class='text-info font-italic font-weight-bold' %}
-                    </div>
-                </div>
+      <div class="col-7">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">{{ employee|upper }} - CHANGE EXTENDED DATA</p>
 
-                <div class="row text-center">
-                    <div class="col-sm-12 mb-1">
-                        {% bootstrap_field form.overtime label_class='text-info font-italic font-weight-bold' %}
-                    </div>
-                </div>
+        <form action="{% url 'employee:employee_extendeddata' employee_id %}" method="POST">{% csrf_token %}
+          <div class="row">
+            <div class="col-6">
+              {% bootstrap_field form.worker size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.birthday size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.phone size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.workplace size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.start_contract size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.end_contract size='small' label_class='text-info font-italic font-weight-bold' %}
+            </div>
+            <div class="col-6">
+              {% bootstrap_field form.postal size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.city size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.street size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.house size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.flat size='small' label_class='text-info font-italic font-weight-bold' %}
+            </div>
+          </div>
 
-                <div class="row text-center">
-                    <div class="col-sm-12">
-                        <div class="btn btn-sm btn-group mb-2" role="group">
-                            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                            <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
-                            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
-                            <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Back to add/change basic data</a>
-                            <button type="submit" class="btn btn-outline-success">Confirm</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
+          <div class="row text-center">
+            <div class="col-sm-12 mb-1">
+              {% bootstrap_field form.overtime label_class='text-info font-italic font-weight-bold' %}
+            </div>
+          </div>
+
+          <div class="row text-center">
+            <div class="col-sm-12">
+              <div class="btn btn-sm btn-group mb-2" role="group">
+                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
+                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+                <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Back to add/change basic data</a>
+                <button type="submit" class="btn btn-outline-success">Confirm</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
-</div>
+  </div>
+
 {% endblock %}

@@ -1,56 +1,56 @@
 <!-- search table-->
-    <script>
-        $(document).ready(function(){
-            $("#myInput").on("keyup", function() {var value =
-                $(this).val().toLowerCase();
-            $("#searchTable").find("tr").filter(function() {
-                $(this).toggle(
-                    $(this).text().toLowerCase().indexOf(value) > -1)})
-            ;})
-            ;});
-    </script>
+  <script>
+    $(document).ready(function(){
+    $("#myInput").on("keyup", function() {var value =
+      $(this).val().toLowerCase();
+        $("#searchTable").find("tr").filter(function() {
+          $(this).toggle(
+            $(this).text().toLowerCase().indexOf(value) > -1)})
+        ;})
+    ;});
+  </script>
 
 <!-- open tooltip with HTML context-->
-    <script>
-        $(document).ready(function(){
-            $('[data-toggle="tooltip"]').tooltip({
-                title: "<p><strong>Caution!</strong><br><em>You have to<br>login first.</em></p>", html: true, placement: "right"})
-            ;});
-    </script>
+  <script>
+    $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip({
+        title: "<p><strong>Caution!</strong><br><em>You have to<br>login first.</em></p>", html: true, placement: "right"})
+      ;});
+  </script>
 
 <!-- open mysend with info about absence e-mails-->
-    <script>
-        $(document).ready(function(){
-            $('#mysend').tooltip({
-                title: "<p><em>Nothing to send...</em></p>", html: true, placement: "right"})
-            ;});
-    </script>
+  <script>
+    $(document).ready(function(){
+      $('#mysend').tooltip({
+        title: "<p><em>Nothing to send...</em></p>", html: true, placement: "right"})
+      ;});
+  </script>
 
 <!-- hide message after hideTime: seconds-->
-    <script>
-        function hideAfterSomeTime(hideTime) {
-	        // 10000 = 10 seconds
-	        window.setTimeout("document.getElementById('alertButton').style.display='none'", (hideTime)?hideTime:3500);
-        }
-    </script>
+  <script>
+    function hideAfterSomeTime(hideTime) {
+	  // 10000 = 10 seconds
+	  window.setTimeout("document.getElementById('alertButton').style.display='none'", (hideTime)?hideTime:3500);
+    }
+  </script>
 
 <!-- show message after hideTime: seconds-->
-    <script>
-        $(document).ready(function showAfterTime() {
-            $("#after-time-msg").delay(2000).fadeIn(500);
-        });
-    </script>
+  <script>
+    $(document).ready(function showAfterTime() {
+      $("#after-time-msg").delay(2000).fadeIn(500);
+    });
+  </script>
 
 <!-- toggle between income and expendiure fields-->
-<script>
-$(document).ready(function(){
-  $("#income").click(function(){
-    $('[id="id_expenditure"]').hide();
-    $('[id="id_income"]').show();
-  });
-  $("#expenditure").click(function(){
-    $('[id="id_expenditure"]').show();
-    $('[id="id_income"]').hide();
-  });
-});
-</script>
+  <script>
+    $(document).ready(function(){
+      $("#income").click(function(){
+        $('[id="id_expenditure"]').hide();
+        $('[id="id_income"]').show();
+      });
+    $("#expenditure").click(function(){
+      $('[id="id_expenditure"]').show();
+      $('[id="id_income"]').hide();
+      });
+    });
+  </script>

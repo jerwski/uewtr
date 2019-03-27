@@ -7,99 +7,96 @@
 {% block content %}
 
 <div class="container">
-    <div class="row m-3" style="background-color: bisque">
-    {% include 'blocks/header.html' %}
-        <div class="col-sm-4">
-            <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
-            <table class="table table-hover table-sm">
-                <tbody>
-                {% for employee in employees %}
-                    <tr>
-                        {% if employee_id == employee.id %}
-                            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
-                        {% else %}
-                            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-sm-8">
-            {% if worker.status %}
-                <p class="text-center text-danger lead font-weight-normal bg-warning">ADVANCE FOR: {{ worker|upper }}</p>
-
-                <form action="{% url 'evidence:account_payment' employee_id %}" method="POST">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-6">
-                            {% bootstrap_field form.worker size='medium' %}
-                            {% bootstrap_field form.account_date size='medium' label_class='text-primary font-weight-bold' %}
-                        </div>
-                        <div class="col-6">
-                            {% bootstrap_field form.account_value size='medium' label_class='text-primary font-weight-bold' placeholder='The account should be min. 10 PLN' %}
-                        </div>
-                    </div>
-                    {% bootstrap_field form.notice size='medium' label_class='text-primary font-weight-bold' placeholder='Please indicate the circumstances of the down payment...' %}
-                    <div class="btn-sm mb-2">
-                        <button type="submit" class="btn btn-outline-success btn-block">Confirm the down payment</button>
-                    </div>
-                </form>
-
-                {% if request.POST %}
-                    {% if salary >= advances %}
-                        <p class="text-justify text-danger lead font-weight-normal">Granted an advance payment of: <em class="font-weight-bold">{{ account_value|money_format }}</em></p>
-                        <div class="btn-sm mb-lg-4">
-                            <a href="{% url 'evidence:account_recorder_erase' employee_id account_date account_value %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the down payment ({{ account_value|money_format }})</em></a>
-                        </div>
-                    {% else %}
-                        <p class="text-justify text-danger lead font-weight-normal">The sum of advances <em class="font-weight-bold">{{ advances|money_format }}</em> is greater than the income earned so far <em class="font-weight-bold">{{ salary|money_format }}</em>. The advance can not be paid!</p>
-                    {% endif %}
-                {% else %}
-                    <table class="table table-hover table-sm">
-                        <thead class="bg-info">
-                        <tr><th class="text-center text-white">TOTAL ADVANCE INFO</th></tr>
-                        </thead>
-                    </table>
-                    <table class="table table-hover table-sm">
-                        <tbody>
-                        <tr><td width="50%">Worker:</td><td class="text-danger font-weight-bold">{{ worker }}</td></tr>
-                        <tr><td width="50%">Total advance:</td><td class="text-danger font-weight-bold">{{ total_account|money_format }}</td></tr>
-                        <tr><td>Netto income:</td><td class="text-danger font-weight-bold">{{ salary|money_format }}</td></tr>
-                        </tbody>
-                    </table>
-                {% endif %}
-            {% else %}
-                <p class="text-center text-danger lead font-weight-normal bg-warning">ADVANCE</p>
-                <p class="text-justify text-danger lead font-weight-normal">You can't add any advance for <em class="font-weight-bold">{{ worker }}</em> because the employee is no longer employed.</p>
-            {% endif %}
-            <div class="btn-sm mb-2">
-                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
-            </div>
-        </div>
+  <div class="row m-3" style="background-color: bisque">
+  {% include 'blocks/header.html' %}
+    <div class="col-sm-4">
+      <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
+      <table class="table table-hover table-sm">
+        <tbody>
+        {% for employee in employees %}
+          <tr>
+          {% if employee_id == employee.id %}
+            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
+          {% else %}
+            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
+          {% endif %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
     </div>
+    <div class="col-sm-8">
+      {% if worker.status %}
+        <p class="text-center text-danger lead font-weight-normal bg-warning">ADVANCE FOR: {{ worker|upper }}</p>
+
+        <form action="{% url 'evidence:account_payment' employee_id %}" method="POST">{% csrf_token %}
+          <div class="row">
+            <div class="col-6">
+              {% bootstrap_field form.worker size='medium' %}
+              {% bootstrap_field form.account_date size='medium' label_class='text-primary font-weight-bold' %}
+            </div>
+            <div class="col-6">
+              {% bootstrap_field form.account_value size='medium' label_class='text-primary font-weight-bold' placeholder='The account should be min. 10 PLN' %}
+            </div>
+          </div>
+          {% bootstrap_field form.notice size='medium' label_class='text-primary font-weight-bold' placeholder='Please indicate the circumstances of the down payment...' %}
+          <div class="btn-sm mb-2">
+            <button type="submit" class="btn btn-outline-success btn-block">Confirm the down payment</button>
+          </div>
+        </form>
+
+        {% if request.POST %}
+          {% if salary >= advances %}
+            <p class="text-justify text-danger lead font-weight-normal">Granted an advance payment of: <em class="font-weight-bold">{{ account_value|money_format }}</em></p>
+            <div class="btn-sm mb-lg-4">
+              <a href="{% url 'evidence:account_recorder_erase' employee_id account_date account_value %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the down payment ({{ account_value|money_format }})</em></a>
+            </div>
+          {% else %}
+            <p class="text-justify text-danger lead font-weight-normal">The sum of advances <em class="font-weight-bold">{{ advances|money_format }}</em> is greater than the income earned so far <em class="font-weight-bold">{{ salary|money_format }}</em>. The advance can not be paid!</p>
+          {% endif %}
+        {% else %}
+          <table class="table table-hover table-sm">
+            <thead class="bg-info">
+              <tr><th class="text-center text-white">TOTAL ADVANCE INFO</th></tr>
+            </thead>
+          </table>
+          <table class="table table-hover table-sm">
+            <tbody>
+              <tr><td width="50%">Worker:</td><td class="text-danger font-weight-bold">{{ worker }}</td></tr>
+              <tr><td width="50%">Total advance:</td><td class="text-danger font-weight-bold">{{ total_account|money_format }}</td></tr>
+              <tr><td>Netto income:</td><td class="text-danger font-weight-bold">{{ salary|money_format }}</td></tr>
+            </tbody>
+          </table>
+        {% endif %}
+      {% else %}
+        <p class="text-center text-danger lead font-weight-normal bg-warning">ADVANCE</p>
+        <p class="text-justify text-danger lead font-weight-normal">You can't add any advance for <em class="font-weight-bold">{{ worker }}</em> because the employee is no longer employed.</p>
+      {% endif %}
+      <div class="btn-sm mb-2">
+        <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
+      </div>
+    </div>
+  </div>
 </div>
 
-    <!-- blinkin after hideTime: seconds-->
-    <script>
-        $('.blink').each(function() {
-            var elem = $(this);
-            // count the blinks
-            var count = 1;
-            var intervalId = setInterval(function() {
-                if (elem.css('visibility') == 'hidden') {
-                    elem.css('visibility', 'visible');
-                    // increment counter when showing to count # of blinks and stop when visible
-                    if (count++ === 3) {
-                        clearInterval(intervalId);
-
-                    }
-
-                } else {
-                    elem.css('visibility', 'hidden');
-                }
-            }, 200);
-            });
-    </script>
+  <!-- blinkin after hideTime: seconds-->
+  <script>
+    $('.blink').each(function() {
+      var elem = $(this);
+      // count the blinks
+      var count = 1;
+      var intervalId = setInterval(function() {
+      if (elem.css('visibility') == 'hidden') {
+        elem.css('visibility', 'visible');
+        // increment counter when showing to count # of blinks and stop when visible
+        if (count++ === 3) {
+          clearInterval(intervalId);
+          }
+      } else {
+        elem.css('visibility', 'hidden');
+        }
+      }, 200);
+    });
+  </script>
 
 {% endblock%}

@@ -5,63 +5,64 @@
 
 
 {% block content %}
-<div class="container">
-    <div class="row m-3 bgbisque">
-        {% include 'blocks/header.html' %}
-        <div class="col-sm-5">
-            <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
-            <table class="table table-hover table-sm">
-                <tbody>
-                    <tr><td>Name:</td><td class="text-danger font-weight-bold">{{ employee.name }}</td></tr>
-                    <tr><td>Pesel:</td><td class="text-danger font-weight-bold">{{ employee.name.pesel }}</td></tr>
-                    {% if employee.name.status == True %}
-                        <tr><td>Active:</td><td class="text-danger font-weight-bold">Yes</td></tr>
-                    {% else %}
-                        <tr><td>Active:</td><td class="text-danger font-weight-bold">No</td></tr>
-                    {% endif %}
-                    <tr><td>Birthday:</td><td class="text-danger font-weight-bold">{{ employee.birthday }}</td></tr>
-                    <tr><td>Address:</td><td class="text-danger font-weight-bold">{{ employee.postal }} {{ employee.city }}</td></tr>
-                    {% if employee.flat %}
-                        <tr><td>Street:</td><td class="text-danger font-weight-bold">{{ employee.street }} {{ employee.house }}/{{ employee.flat }}</td></tr>
-                    {% else %}
-                        <tr><td>Street:</td><td class="text-danger font-weight-bold">{{ employee.street }} {{ employee.house }}</td></tr>
-                    {% endif %}
-                    <tr><td>Phone:</td><td class="text-danger font-weight-bold">{{ employee.phone }}</td></tr>
-                    <tr><td>Workplace:</td><td class="text-danger font-weight-bold">{{ employee.workplace }}</td></tr>
-                    <tr><td>Contract from:</td><td class="text-danger font-weight-bold">{{ employee.start_contract|date:'d F Y' }}</td></tr>
-                    {% if employee.end_contract %}
-                        <tr><td>Contract to:</td><td class="text-danger font-weight-bold">{{ employee.start_contract }}</td></tr>
-                    {% endif %}
-                    {% if employee.overtime == 1 %}
-                        <tr><td>Overtime:</td><td class="text-danger font-weight-bold">Weekly overtime</td></tr>
-                    {% elif employee.overtime == 2 %}
-                        <tr><td>Overtime:</td><td class="text-danger font-weight-bold">Saturday overtime</td></tr>
-                    {% else %}
-                        <tr><td>Overtime:</td><td class="text-danger font-weight-bold">Clear contract</td></tr>
-                    {% endif %}
-                </tbody>
-            </table>
-            <div class="btn-sm btn-group mb-1 float-left" role="group">
-                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                <a href="{% url 'logout' %}" class="btn btn-outline-dark">Logout</a>
-                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-success">Dashboard</a>
-                <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
-            </div>
-        </div>
 
-        <div class="col-sm-7">
-            <p class="text-center text-danger lead font-weight-normal bg-warning">ADD NEW HOURLY RATE</p>
-            <form action="{% url 'employee:employee_add_hourly_rate' employee_id %}" method="POST">
-                {% csrf_token %}
-                {% for field in form %}
-                    {% bootstrap_field field size='large' form_group_class="lead" placeholder='Please insert value of hourly rate' %}
-                {% endfor %}
-                <div class="btn-sm mt-3 mb-2">
-                    <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
-                </div>
-            </form>
+  <div class="container">
+    <div class="row m-3 bgbisque">
+    {% include 'blocks/header.html' %}
+      <div class="col-sm-5">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
+        <table class="table table-hover table-sm">
+          <tbody>
+          <tr><td>Name:</td><td class="text-danger font-weight-bold">{{ employee.name }}</td></tr>
+          <tr><td>Pesel:</td><td class="text-danger font-weight-bold">{{ employee.name.pesel }}</td></tr>
+          {% if employee.name.status == True %}
+            <tr><td>Active:</td><td class="text-danger font-weight-bold">Yes</td></tr>
+          {% else %}
+            <tr><td>Active:</td><td class="text-danger font-weight-bold">No</td></tr>
+          {% endif %}
+          <tr><td>Birthday:</td><td class="text-danger font-weight-bold">{{ employee.birthday }}</td></tr>
+          <tr><td>Address:</td><td class="text-danger font-weight-bold">{{ employee.postal }} {{ employee.city }}</td></tr>
+          {% if employee.flat %}
+            <tr><td>Street:</td><td class="text-danger font-weight-bold">{{ employee.street }} {{ employee.house }}/{{ employee.flat }}</td></tr>
+          {% else %}
+            <tr><td>Street:</td><td class="text-danger font-weight-bold">{{ employee.street }} {{ employee.house }}</td></tr>
+          {% endif %}
+          <tr><td>Phone:</td><td class="text-danger font-weight-bold">{{ employee.phone }}</td></tr>
+          <tr><td>Workplace:</td><td class="text-danger font-weight-bold">{{ employee.workplace }}</td></tr>
+          <tr><td>Contract from:</td><td class="text-danger font-weight-bold">{{ employee.start_contract|date:'d F Y' }}</td></tr>
+          {% if employee.end_contract %}
+            <tr><td>Contract to:</td><td class="text-danger font-weight-bold">{{ employee.start_contract }}</td></tr>
+          {% endif %}
+          {% if employee.overtime == 1 %}
+            <tr><td>Overtime:</td><td class="text-danger font-weight-bold">Weekly overtime</td></tr>
+          {% elif employee.overtime == 2 %}
+            <tr><td>Overtime:</td><td class="text-danger font-weight-bold">Saturday overtime</td></tr>
+          {% else %}
+            <tr><td>Overtime:</td><td class="text-danger font-weight-bold">Clear contract</td></tr>
+          {% endif %}
+          </tbody>
+        </table>
+        <div class="btn-sm btn-group mb-1 float-left" role="group">
+          <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+          <a href="{% url 'logout' %}" class="btn btn-outline-dark">Logout</a>
+          <a href="{% url 'account:admin_site' %}" class="btn btn-outline-success">Dashboard</a>
+          <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
         </div>
+      </div>
+
+      <div class="col-sm-7">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">ADD NEW HOURLY RATE</p>
+
+        <form action="{% url 'employee:employee_add_hourly_rate' employee_id %}" method="POST">{% csrf_token %}
+          {% for field in form %}
+            {% bootstrap_field field size='large' form_group_class="lead" placeholder='Please insert value of hourly rate' %}
+          {% endfor %}
+          <div class="btn-sm mt-3 mb-2">
+            <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
+          </div>
+        </form>
+      </div>
     </div>
-</div>
+  </div>
 
 {% endblock %}

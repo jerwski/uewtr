@@ -9,137 +9,138 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+
+  <div class="container">
     <div class="row m-3" style="background-color: bisque">
-        {% include 'blocks/header.html' %}
-        <div class="col-sm-4">
-            <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
-            <table class="table table-sm table-hover">
-                <tbody>
-                {% for employee in employees %}
-                    <tr>
-                        {% if employee_id == employee.id %}
-                            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
-                        {% else %}
-                            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-sm-8">
-            {% if worker.status %}
-                <p class="text-center text-danger lead font-weight-normal bg-warning">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
-                <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
-                    {% bootstrap_field form.worker %}
-                    <div class="row">
-                        <div class="col-4 ml-2">
-                            {% bootstrap_field form.leave_date size='medium' label_class='text-info font-italic font-weight-bold' %}
-                        </div>
-                        <div class="col-md-7">
-                            {% bootstrap_field form.leave_flag label_class='text-info font-italic font-weight-bold' %}
-                        </div>
-                    </div>
-                    <div class="btn-sm mb-2">
-                        <button type="submit" class="btn btn-outline-success btn-block">Confirm the leave day you entered</button>
-                    </div>
-                </form>
+    {% include 'blocks/header.html' %}
+      <div class="col-sm-4">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
+        <table class="table table-sm table-hover">
+          <tbody>
+          {% for employee in employees %}
+            <tr>
+              {% if employee_id == employee.id %}
+                <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
+              {% else %}
+                <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="col-sm-8">
+        {% if worker.status %}
+          <p class="text-center text-danger lead font-weight-normal bg-warning">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
 
-                {% if flag_leave %}
-                    <p class="text-justify text-danger lead font-weight-normal">Selected date: <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> exist on datebase as leave day! </p>
-                {% elif flag_work %}
-                    <p class="text-justify text-danger lead font-weight-normal">Selected date: <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> exist on datebase as work day!</p>
-                {% elif name_holiday %}
-                    <p class="text-justify text-danger lead font-weight-normal">Selected date: <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> is a holiday <em class="font-weight-bold">({{ name_holiday }})</em></p>
-                {% elif flag_weekend %}
-                    <p class="text-justify text-danger lead font-weight-normal">You've been trying add leave day on <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em>!<br>It's impossible!</p>
-                {% else %}
-                    {% if leave_flag == 'unpaid_leave' %}
-                        <p class="text-justify text-danger lead font-weight-normal">CAUTION: You've been adding <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em> one day of unpaid leave!</p>
-                        <div class="btn-sm mb-2">
-                            <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the unpaid leave day you entered</em></a>
-                        </div>
-                    {% elif leave_flag == 'paid_leave' %}
-                        <p class="text-justify text-danger lead font-weight-normal">CAUTION: You've been adding <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em> one day of paid leave!</p>
-                        <div class="btn-sm mb-2">
-                            <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the paid leave day you entered</em></a>
-                        </div>
-                    {% elif leave_flag == 'maternity_leave' %}
-                        <p class="text-justify text-danger lead font-weight-normal">CAUTION: You've been adding <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em> one day of maternity leave!</p>
-                        <div class="btn-sm mb-2">
-                            <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the materinty leave day you entered</em></a>
-                        </div>
-                    {% endif %}
-                {% endif %}
-
-                <table class="table table-hover table-sm">
-                    <thead class="bg-info">
-                    <tr><th class="text-center text-white">TOTAL LEAVES INFO FOR {{ worker|upper }} IN {% now 'Y' %} YEAR</th></tr>
-                    </thead>
-                </table>
-                <table class="table table-hover table-sm">
-                    <tbody>
-                    <tr><td width="30%">Total leave in {% now 'Y' %} year:</td><td class="text-danger font-weight-bold">{{ total_leaves|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
-                        {% if remaining_leave < 0 %}
-                            <td width="20%">Days of leave exceeded by:</td><td class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
-                        {% elif remaining_leave < 26 %}
-                            <td>Remaining leave:</td><td class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td></tr>
-                        {% endif %}
-                    {% if leaves_pl %}
-                        <tr><td>Date of paid leave:</td><td class="text-danger font-italic"  colspan="3">
-                            {% for date in leaves_pl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
-                    {% endif %}
-                    {% if leaves_ml %}
-                        <tr><td>Date of maternity leave:</td><td class="text-danger font-italic"  colspan="3">
-                            {% for date in leaves_ml %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
-                    {% endif %}
-                    {% if leaves_upl %}
-                        <tr><td>Date of unpaid leave:</td><td class="text-danger font-italic"  colspan="3">
-                            {% for date in leaves_upl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
-                    {% endif %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="text-center text-danger lead font-weight-normal bg-warning">LEAVE EVIDENCE</p>
-                <p class="text-justify text-danger lead font-weight-normal">You can't add any leave day for <em class="font-weight-bold">{{ worker }}</em> because the employee is no longer employed or deactivated.</p>
-            {% endif %}
-        <div class="row text-center">
-            <div class="col-12">
-                <div class="btn btn-group">
-                    <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                    <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
-                    {% include 'blocks/leave_print_modal.html' %}
-                    {% if total_leaves > 0 %}
-                        <a href="{% url 'evidence:leaves_data_pdf' employee_id %}" class="btn btn-outline-info">Send current employee leave set</a>
-                    {% endif %}
-                    <a class="btn btn-outline-primary" href="/admin/">Admin Data Base</a>
-                </div>
+          <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
+            {% bootstrap_field form.worker %}
+            <div class="row">
+              <div class="col-4 ml-2">
+                {% bootstrap_field form.leave_date size='medium' label_class='text-info font-italic font-weight-bold' %}
+              </div>
+              <div class="col-md-7">
+                {% bootstrap_field form.leave_flag label_class='text-info font-italic font-weight-bold' %}
+              </div>
             </div>
-        </div>
+            <div class="btn-sm mb-2">
+              <button type="submit" class="btn btn-outline-success btn-block">Confirm the leave day you entered</button>
+            </div>
+          </form>
 
+          {% if flag_leave %}
+            <p class="text-justify text-danger lead font-weight-normal">Selected date: <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> exist on datebase as leave day! </p>
+          {% elif flag_work %}
+            <p class="text-justify text-danger lead font-weight-normal">Selected date: <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> exist on datebase as work day!</p>
+          {% elif name_holiday %}
+            <p class="text-justify text-danger lead font-weight-normal">Selected date: <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em> is a holiday <em class="font-weight-bold">({{ name_holiday }})</em></p>
+          {% elif flag_weekend %}
+            <p class="text-justify text-danger lead font-weight-normal">You've been trying add leave day on <em class="font-weight-bold">{{ leave_date|date:'l, d F Y' }}</em>!<br>It's impossible!</p>
+          {% else %}
+            {% if leave_flag == 'unpaid_leave' %}
+              <p class="text-justify text-danger lead font-weight-normal">CAUTION: You've been adding <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em> one day of unpaid leave!</p>
+              <div class="btn-sm mb-2">
+                <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the unpaid leave day you entered</em></a>
+              </div>
+            {% elif leave_flag == 'paid_leave' %}
+              <p class="text-justify text-danger lead font-weight-normal">CAUTION: You've been adding <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em> one day of paid leave!</p>
+              <div class="btn-sm mb-2">
+                <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the paid leave day you entered</em></a>
+              </div>
+            {% elif leave_flag == 'maternity_leave' %}
+              <p class="text-justify text-danger lead font-weight-normal">CAUTION: You've been adding <em class="font-weight-bold">({{ leave_date|date:'l, d F Y' }})</em> one day of maternity leave!</p>
+              <div class="btn-sm mb-2">
+                <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the materinty leave day you entered</em></a>
+              </div>
+            {% endif %}
+          {% endif %}
+
+          <table class="table table-hover table-sm">
+            <thead class="bg-info">
+              <tr><th class="text-center text-white">TOTAL LEAVES INFO FOR {{ worker|upper }} IN {% now 'Y' %} YEAR</th></tr>
+            </thead>
+          </table>
+          <table class="table table-hover table-sm">
+            <tbody>
+              <tr><td width="30%">Total leave in {% now 'Y' %} year:</td><td class="text-danger font-weight-bold">{{ total_leaves|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
+              {% if remaining_leave < 0 %}
+                <td width="20%">Days of leave exceeded by:</td><td class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
+              {% elif remaining_leave < 26 %}
+                <td>Remaining leave:</td><td class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td></tr>
+              {% endif %}
+              {% if leaves_pl %}
+                <tr><td>Date of paid leave:</td><td class="text-danger font-italic"  colspan="3">
+                  {% for date in leaves_pl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
+              {% endif %}
+              {% if leaves_ml %}
+                <tr><td>Date of maternity leave:</td><td class="text-danger font-italic"  colspan="3">
+                  {% for date in leaves_ml %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
+              {% endif %}
+              {% if leaves_upl %}
+                <tr><td>Date of unpaid leave:</td><td class="text-danger font-italic"  colspan="3">
+                  {% for date in leaves_upl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="text-center text-danger lead font-weight-normal bg-warning">LEAVE EVIDENCE</p>
+          <p class="text-justify text-danger lead font-weight-normal">You can't add any leave day for <em class="font-weight-bold">{{ worker }}</em> because the employee is no longer employed or deactivated.</p>
+        {% endif %}
+        <div class="row text-center">
+          <div class="col-12">
+            <div class="btn btn-group">
+              <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+              {% include 'blocks/leave_print_modal.html' %}
+              {% if total_leaves > 0 %}
+                <a href="{% url 'evidence:leaves_data_pdf' employee_id %}" class="btn btn-outline-info">Send current employee leave set</a>
+              {% endif %}
+              <a class="btn btn-outline-primary" href="/admin/">Admin Data Base</a>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
-    <!-- blinkin after hideTime: seconds-->
-    <script>
-        $('.blink').each(function() {
-          var elem = $(this);
-          // count the blinks
-          var count = 1;
-          var intervalId = setInterval(function() {
-            if (elem.css('visibility') == 'hidden') {
-                elem.css('visibility', 'visible');
-                // increment counter when showing to count # of blinks and stop when visible
-                if (count++ === 3) {
-                    clearInterval(intervalId);
-                }
-            } else {
-                elem.css('visibility', 'hidden');
-            }
-          }, 200);
-        });
-    </script>
+  <!-- blinkin after hideTime: seconds-->
+  <script>
+    $('.blink').each(function() {
+      var elem = $(this);
+      // count the blinks
+      var count = 1;
+      var intervalId = setInterval(function() {
+      if (elem.css('visibility') == 'hidden') {
+        elem.css('visibility', 'visible');
+        // increment counter when showing to count # of blinks and stop when visible
+        if (count++ === 3) {
+          clearInterval(intervalId);
+          }
+        } else {
+          elem.css('visibility', 'hidden');
+          }
+        }, 200);
+      });
+  </script>
 
 {% endblock %}
