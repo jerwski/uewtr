@@ -22,7 +22,7 @@
       {% if set_of_questions %}
         <h3 class="text-dark">Query number: <em class="text-danger font-weight-bold">{{ set_of_questions }}</em>&nbsp;&nbsp;&nbsp;Your points: <em class="text-success font-weight-bold">{{ points }}</em>&nbsp;&nbsp;&nbsp;Percent of good answers: <em class="text-primary font-weight-bold">{{ percent|floatformat:2 }}%</em>&nbsp;&nbsp;&nbsp;Your time: <em class="text-info font-weight-bold">{{ playtime }}</em></h3>
       {% else %}
-        <p class="text-danger font-italic lead">Please select **Next query** button to start the quiz...</p>
+        <p class="text-danger font-italic lead">Please select **Start the quiz** button...</p>
       {% endif %}
     </div>
     <div class="row">
@@ -40,10 +40,11 @@
             <div class="col-6 btn mt-2">
               {% if query %}
                 <button type="submit" class="btn btn-success mr-5">Confirm the selection</button>
+                <a class="btn btn-primary ml-5" href="{% url 'account:quiz' quiz_id %}">Next query...</a>
               {% else %}
                 <button type="submit" class="btn btn-success mr-5" disabled>Confirm the selection</button>
+                <a class="btn btn-primary ml-5" href="{% url 'account:quiz' quiz_id %}">Start the quiz</a>
               {% endif %}
-              <a class="btn btn-primary ml-5" href="{% url 'account:quiz' quiz_id %}">Next query...</a>
             </div>
           </form>
         {% endif %}
