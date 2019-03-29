@@ -32,7 +32,7 @@
         {% if worker.status %}
           <form action="." method="POST">{% csrf_token %}
             <div class="row">
-              <div class="col-7 mt-1">
+              <div class="col-8 mt-1">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
                     <div class="input-group-text bg-info">Select date</div>
@@ -43,7 +43,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-5">
+              <div class="col-4">
                 <div class="btn-sm" role="group">
                   <button id="btnGroupDropHolidays" type="button" class="btn btn-outline-danger btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Holidays in the {{ choice_date|date:'Y' }} year </button>
                   <div class="dropdown-menu" aria-labelledby="btnGroupDropHolidays">
