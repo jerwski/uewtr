@@ -128,11 +128,8 @@ class QuizView(View):
 	def get(self, request, quiz_id:int=None)->render:
 		user = request.user
 		context = {'user': user}
-		if quiz_id == None:
-			start_play = now()
-			quiz = Quiz.objects.create(player=user, start_play = start_play, set_of_questions=0, points=0)
-			context.update({'start_play': start_play, 'quiz_id': quiz.id})
-		else:
+
+		if quiz_id:
 			query, answer, answers = quizset(_queryset)
 			quiz = Quiz.objects.get(pk=quiz_id)
 			points, set_of_questions = quiz.points, quiz.set_of_questions
@@ -155,6 +152,11 @@ class QuizView(View):
 			data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'playtime': playtime, 'poll': len(_queryset),
 			        'answers': answers, 'set_of_questions': set_of_questions, 'percent': percent}
 			context.update(data)
+
+		else:
+			start_play = now()
+			quiz = Quiz.objects.create(player=user, start_play=start_play, set_of_questions=0, points=0)
+			context.update({'start_play': start_play, 'quiz_id': quiz.id})
 
 		return render(request, 'account/quiz.html', context)
 
