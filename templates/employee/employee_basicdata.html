@@ -101,12 +101,12 @@
           </div>
 
           <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 text-center">
               {% if new_employee %}
                 <button type="submit" class="btn btn-outline-success btn-block mt-2">Confirm</button>
               {% else %}
                 {% if status %}
-                  <div class="btn-sm btn-group btn-group-sm mt-1" role="group">
+                  <div class="btn-group btn-group-sm mt-1" role="group">
                     <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
                     <a href="{% url 'employee:employee_hourly_rate' employee_id %}" class="btn btn-outline-primary">Update rate</a>
                     <button type="submit" class="btn btn-outline-success">Confirm</button>
@@ -115,7 +115,7 @@
                     {% include 'blocks/erase_modal.html' %}
                   </div>
                 {% else %}
-                  <div class="btn btn-group mt-1" role="group">
+                  <div class="btn-group btn-group-sm mt-1" role="group">
                     <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
                     <button type="submit" class="btn btn-outline-success">Confirm changes</button>
                   </div>

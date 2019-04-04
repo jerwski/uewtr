@@ -3,7 +3,7 @@
 {% load utility_tags %}
 {% load staticfiles %}
 
-{% block title %}Add/Change employee hourly rate{% endblock %}
+{% block title %}Cash register{% endblock %}
 
 {% block header %}
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css">
@@ -27,13 +27,15 @@
 
   <div class="container-fluid">
     <div class="row ml-3 mr-3 mt-2 bgbisque">
-      <div class="col-sm-2"></div>
+      <div class="col-sm-2 mt-2 text-center">
+        <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="50%"></a>
+        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
+      </div>
       <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
         <p class="h1 font-weight-normal">Company Cash Register</p>
         <p class="text-info font-weight-bold font-italic">Application to handle company cash register</p>
       </div>
-      <div class="col-sm-2">
-        <p class="footer text-secondary text-sm-right">Copyright UNIKOLOR Jerzy Wygonowski</p>
+      <div class="col-sm-2 mt-2">
         {% include 'blocks/alert.html' %}
       </div>
     </div>

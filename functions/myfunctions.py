@@ -11,6 +11,8 @@ from PIL import Image
 import num2words
 
 # standard library
+import os
+import shutil
 import calendar
 from io import BytesIO
 from pathlib import Path
@@ -40,8 +42,8 @@ from employee.templatetags.utility_tags import money_format
 # Create your functions here
 
 
-def sendemail(subject: str, message: str, sender: int, recipient: list, attachments: list):
-	email = EmailMessage(subject, message, sender, recipient)
+def sendemail(subject: str, message: str, sender: int, recipient: list, attachments: list, cc=None):
+	email = EmailMessage(subject, message, sender, recipient, cc)
 
 	for attachment in attachments:
 		email.attach_file(attachment)
@@ -351,3 +353,17 @@ def quizset(iterable):
 		return query, upperfirst(answer), answers
 	else:
 		return None
+
+
+def dirdata():
+	usage = dict()
+	drives = [chr(x) + ":" for x in range(65, 90) if os.path.exists(chr(x) + ":")]
+	for drive in drives:
+		usage.__setitem__(drive,shutil.disk_usage(drive)._asdict())
+
+	for key, value in usage.items():
+		percent = value['used'] * 100 / value['total']
+		usage[key].update({'percent': percent})
+
+	return usage
+

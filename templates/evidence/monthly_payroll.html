@@ -25,13 +25,19 @@
           <a class="btn btn-outline-danger d-print-none" href="{% url 'account:exit' %}">Exit</a>
         </div>
         <hr class="small">
+
         <form action="{% url 'evidence:monthly_payroll_view' %}" method="POST">{% csrf_token %}
           {% bootstrap_field form.choice_date label_class='text-primary font-weight-bold' %}
           <div class="btn-sm">
             <button type="submit" class="btn btn-outline-success btn-block">Confirm selected date</button>
           </div>
         </form>
-        {% include 'blocks/alert.html' %}
+
+        <hr class="small">
+        <div class="col text-center">
+          <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="92%"></a>
+          <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
+        </div>
       </div>
       <div class="col-10">
         {% if amountpay.brutto %}
@@ -78,7 +84,6 @@
             <p class="text-center text-danger lead font-weight-bold font-italic">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>
           </div>
         {% endif %}
-        <p class="footer text-secondary text-sm-left"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
       </div>
     </div>
   </div>

@@ -29,9 +29,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.AdminView.as_view()),
     path('account/', include('account.urls', namespace='account')),
+	path('accountancy/', include('accountancy.urls', namespace='accountancy')),
     path('employee/', include('employee.urls', namespace='employee')),
     path('evidence/', include('evidence.urls', namespace='evidence')),
-    path('cashregister/', include('cashregister.ulrs', namespace='cashregister')),
+    path('cashregister/', include('cashregister.urls', namespace='cashregister')),
     path(r'favicon/.ico', RedirectView.as_view(url='/static/images/favicon.ico')),
 ]
 

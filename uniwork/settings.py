@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'employee.apps.EmployeeConfig',
     'evidence.apps.EvidenceConfig',
+    'accountancy.apps.AccountancyConfig',
     'cashregister.apps.CashregisterConfig',
     'bootstrap4',
     'tempus_dominus',

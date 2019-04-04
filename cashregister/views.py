@@ -51,6 +51,7 @@ class CompanyAddView(View):
 			employee = Company.objects.get(pk=company_id)
 			fields = list(employee.__dict__.keys())[2:-2]
 			old_values = Company.objects.filter(pk=company_id).values(*fields)[0]
+			old_values['status'] = str(old_values['status'])
 		else:
 			old_values = {'nip': request.POST['nip']}
 

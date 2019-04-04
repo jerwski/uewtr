@@ -23,7 +23,7 @@ from cashregister.models import Company
 from account.forms import UserCreateForm
 
 # my function
-from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset
+from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset, dirdata
 from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection, invoices_backup
 
 
@@ -45,6 +45,7 @@ class AdminView(View):
 			_queryset = quizdata()
 			user = request.user.username
 			context = {'user': user}
+			context.update({'usage':dirdata()})
 			employee = Employee.objects.filter(status=True).first()
 			if employee:
 				employee_id = employee.id
@@ -102,17 +103,17 @@ class JPK2Accountancy(View):
 
 			if files:
 				stamp = now().strftime("%A %d %B %Y %H%M%S.%f")
-				companies = Company.objects.filter(status=1).order_by('company').values_list('company', flat=True)
 				# send e-mail with attached cash register as file in pdf format
 				if now().month == 1:
 					month, year = 12, now().year - 1
 				else:
 					month, year = now().month - 1, now().year
 				mail = {'subject': f'pliki JPK za okres {month}/{year}',
-				        'message': f'W załączniku pliki JPK dla {list(companies)} za okres {month}/{year}r.',
-				        'sender' : settings.EMAIL_HOST_USER, 'recipient': ['biuro.hossa@wp.pl'], 'attachments': files}
+				        'message': f'W załączniku pliki JPK za okres {month}/{year}r.',
+				        'sender' : settings.EMAIL_HOST_USER, 'recipient': ['biuro.hossa@wp.pl'],
+				        'attachments': files, 'cc': ['projekt@unikolor.com']}
 				sendemail(**mail)
-				messages.info(request, f'JPK files for {list(companies)} on {month}/{year} was sending to accountancy....')
+				messages.info(request, f'JPK files on {month}/{year} was sending to accountancy....')
 
 				for nr, file in enumerate(files,1):
 					file, parent, suffix = Path(file), Path(file).parent, Path(file).suffix

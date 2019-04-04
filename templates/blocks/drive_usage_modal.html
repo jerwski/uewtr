@@ -1,0 +1,31 @@
+
+  <!-- Small modal -->
+  <a class="text-primary display-4" href="drive_usage_modal.html" data-toggle="modal" data-target=".usage-modal">Administration Dashboard</a>
+    <!-- Modal -->
+    <div class="modal fade usage-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-warning">
+            <h5 class="modal-title" id="alertModal">Drives usage</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {% for key, value in usage.items %}
+              <div class="row">
+                <div class="col mb-3 text-center">
+                  <p class="small">Drive {{ key }} total={{ value.total }} used={{ value.used }} free={{ value.free }}</p>
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ value.percent|floatformat:2 }}%" aria-valuenow="{{ value.used }}" aria-valuemin="0" aria-valuemax="{{ value.total }}">{{ value.percent|floatformat:2 }}%</div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
