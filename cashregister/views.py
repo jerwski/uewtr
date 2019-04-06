@@ -34,18 +34,18 @@ class CompanyAddView(View):
 			fields = list(company.__dict__.keys())[2:-2]
 			initial = Company.objects.filter(pk=company_id).values(*fields)[0]
 			form = CompanyAddForm(initial=initial)
-			context = {'form': form, 'company_id': company_id, 'companies': companies, }
+			context = {'form': form, 'company_id': company_id, 'companies': companies}
 
 		else:
 			form = CompanyAddForm()
-			context = {'form': form, 'companies': companies, }
+			context = {'form': form, 'companies': companies}
 
 		return render(request, 'cashregister/company_add.html', context)
 
 	def post(self, request, company_id:int = None) -> HttpResponseRedirect:
 		companies = Company.objects.all().order_by('company')
 		form = CompanyAddForm(data=request.POST)
-		context = {'form': form, 'companies': companies, }
+		context = {'form': form, 'companies': companies}
 
 		if company_id:
 			employee = Company.objects.get(pk=company_id)

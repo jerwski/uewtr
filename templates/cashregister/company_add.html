@@ -30,17 +30,17 @@
           </div>
         </div>
         <table class="table table-hover table-sm">
-          <thead class="text-info font-weight-bold"><tr><th>Company</th><th>City</th></tr></thead>
+          <thead class="text-info font-weight-bold"><tr><th>Company</th><th>NIP</th></tr></thead>
             <tbody id="searchTable">
             {% for company in companies %}
               <tr>
                 {% if request.path == '/cashregister/add_company/' %}
-                  <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
+                  <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
                 {% else %}
                   {% if company_id == company.id %}
-                    <td><a class="font-weight-normal text-danger" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
+                    <td><a class="font-weight-normal text-danger" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
                   {% else %}
-                    <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.city }}</td>
+                    <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
                   {% endif %}
                 {% endif %}
               </tr>
@@ -82,7 +82,7 @@
                 <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
                 <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
                 {% if company_id %}
-                  <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Back to add company</a>
+                  <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Add company</a>
                 {% endif %}
                 <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
                 <button type="submit" class="btn btn-outline-success">Confirm</button>

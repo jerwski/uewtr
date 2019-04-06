@@ -234,11 +234,12 @@ def cashregisterdata(company_id: int, month: int, year: int) -> dict:
 	'''return data from cash register'''
 	registerdata, saldo = defaultdict(float), 0
 	register = CashRegister.objects.filter(company_id=company_id)
+	check = register.exclude(created__month__gte=month, created__year__gte=year)
 
-	if register.exclude(created__month__gte=month, created__year__gte=year):
-		lastdate = register.exclude(created__month__gte=month, created__year__gte=year).latest('created')
-		check = {'created__month': lastdate.created.date().month, 'created__year': lastdate.created.date().year}
-		lastdata = register.filter(**check)
+	if check:
+		lastdate = check.latest('created')
+		options = {'created__month': lastdate.created.date().month, 'created__year': lastdate.created.date().year}
+		lastdata = register.filter(**options)
 		incomes = lastdata.aggregate(inc=Sum('income'))
 		expenditures = lastdata.aggregate(exp=Sum('expenditure'))
 		saldo = incomes['inc'] - expenditures['exp']
