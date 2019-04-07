@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load bootstrap4 %}
+
+
+{% block title %}{% if customer_id %}Change{% else %}Add{% endif %} Company Data{% endblock %}
+
+{% block content %}
+
+  <div class="container">
+    <div class="row m-3">
+      <div class="col text-left">
+        <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" width="92%"></a>
+        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
+      </div>
+      <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
+        <p class="h1 font-weight-normal">Working Time Recorder</p>
+        <p class="text-info font-weight-bold font-italic">Application to handle employee working time in small business</p>
+      </div>
+      <div class="col">{% include 'blocks/alert.html' %}</div>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <p class="lead text-center bgburlywood"><strong class="text-danger">REGISTERED CUSTOMERS</strong></p>
+        <div class="input-group">
+          <input class="form-control" id="myInput" type="text" placeholder="Search customer..." aria-label="Filtering table" aria-describedby="basic-addon">
+          <div class="input-group-append">
+            <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Search customer..."></span>
+          </div>
+        </div>
+        <table class="table table-hover table-sm ">
+          <thead class="text-info font-weight-bold"><tr><th>CUSTOMER</th><th>NIP</th></tr></thead>
+        </table>
+        <div class="table-scroll">
+          <table class="table table-hover table-sm ">
+            <tbody id="searchTable">
+            {% for customer in customers %}
+              <tr>
+                {% if request.path == '/cashregister/add_customer/' %}
+                  <td><a class="font-weight-normal" href="{{ customer.get_absolute_url }}">{{ customer }}</a></td><td>{{ customer.city }}</td>
+                {% else %}
+                  {% if customer_id == customer.id %}
+                    <td><a class="font-weight-normal text-danger" href="{{ customer.get_absolute_url }}">{{ customer }}</a></td><td>{{ customer.nip }}</td>
+                  {% else %}
+                    <td><a class="font-weight-normal" href="{{ customer.get_absolute_url }}">{{ customer }}</a></td><td>{{ customer.nip }}</td>
+                  {% endif %}
+                {% endif %}
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-sm-6">
+        <p class="lead text-center bgburlywood"><strong class="text-danger">{% if customer_id %}CHANGE{% else %}ADD{% endif %} CUSTOMER DATA</strong></p>
+
+        <form action="." method="POST">{% csrf_token %}
+          <div class="row">
+            <div class="col-sm-12">
+              {% bootstrap_field form.customer size='small' label_class='text-info font-italic font-weight-bold' %}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              {% bootstrap_field form.nip size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.street size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.phone size='small' label_class='text-info font-italic font-weight-bold' %}
+            </div>
+            <div class="col-6">
+              {% bootstrap_field form.postal size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.city size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.email size='small' label_class='text-info font-italic font-weight-bold' %}
+            </div>
+          </div>
+          <div class="row text-center">
+            <div class="col-sm-12 mb-1">
+              {% bootstrap_field form.status label_class='text-info font-italic font-weight-bold' %}
+            </div>
+          </div>
+          <hr>
+          <div class="row text-center">
+            <div class="col-sm-12">
+              <div class="btn-group btn-group-sm mb-2" role="group">
+                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+                {% if customer_id %}
+                  <a href="{% url 'accountancy:add_customer' %}" class="btn btn-outline-primary">Back to add customer</a>
+                {% endif %}
+                <a href="#" class="btn btn-outline-info">Release outside</a>
+                <button type="submit" class="btn btn-outline-success">Confirm</button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
