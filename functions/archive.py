@@ -25,9 +25,8 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 def check_internet_connection()->bool:
 	try:
-		host1 = 'https://github.com/login'
-		host2 = 'https://api.github.com/user'
-		req = requests.get(host1, auth=(settings.USER_GITHUB, settings.PASSWORD_HL))
+		host= 'https://github.com/login'
+		req = requests.get(host, auth=(settings.USER_GITHUB, settings.PASSWORD_HL))
 		if req.status_code==200:
 			return True
 		else:
