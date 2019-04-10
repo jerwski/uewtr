@@ -189,3 +189,7 @@ FTP = get_setting('FTP')
 FTP_DIR = get_setting('FTP_DIR')
 FTP_USER = get_setting('FTP_USER')
 FTP_LOGIN = get_setting('FTP_LOGIN')
+
+# GitHub
+USER_GITHUB = get_setting('USER_GITHUB')
+PASSWORD_HL = get_setting('PASSWORD_HL')

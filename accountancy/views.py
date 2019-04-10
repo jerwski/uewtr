@@ -6,12 +6,13 @@ from django.contrib import messages
 from django.utils.timezone import now
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import Case, Count, IntegerField, Max, Q, Sum, Value, When
 
 # my models
-from accountancy.models import Customer
+from accountancy.models import Customer, Products, ReleaseOutside, ReleaseOutsideProduct
 
 # my forms
-from accountancy.forms import CustomerAddForm
+from accountancy.forms import CustomerAddForm, ReleasedOutsideForm
 
 
 # Create your views here.
@@ -74,89 +75,38 @@ class CustomerAddView(View):
 		else:
 			return render(request, 'accountancy/customer_add.html', context)
 
+
 class ReleaseOutsideView(View):
 	'''class implementing the method of adding records to the Release Outside'''
-	#
-	# def get(self, request, company_id:int=None) -> HttpResponseRedirect:
-	# 	check = CashRegister.objects.filter(company_id=company_id)
-	# 	tags = CashRegister.objects.order_by('contents').distinct('contents').exclude(contents='z przeniesienia').values_list('contents', flat=True)
-	# 	symbols = CashRegister.objects.order_by('symbol').distinct('symbol').values_list('symbol', flat=True)
-	# 	companies = Company.objects.filter(status__range=[1, 3]).order_by('company')
-	# 	context = {'companies': companies, 'tags': list(tags), 'symbols': list(symbols)}
-	#
-	# 	if company_id:
-	# 		month, year = now().month, now().year
-	# 		company = Company.objects.get(pk=company_id)
-	# 		registerdata = cashregisterdata(company_id, month, year)
-	# 		context.update(dict(registerdata))
-	# 		records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
-	# 		form = CashRegisterForm(initial={'company': company})
-	# 		context.update({'form': form, 'company': company, 'company_id': company_id,
-	# 		                'records': records.order_by('-created')})
-	#
-	# 		if now().month==1:
-	# 			month, year = 12, now().year - 1
-	# 		else:
-	# 			month, year = now().month - 1, now().year
-	#
-	# 		previous = check.filter(created__month=month, created__year=year)
-	#
-	# 		if previous:
-	# 			context.__setitem__('previous', True)
-	# 		else:
-	# 			context.__setitem__('previous', False)
-	#
-	# 	return render(request, 'cashregister/cashregister.html', context)
-	#
-	# def post(self, request, company_id:int=None) -> HttpResponseRedirect:
-	# 	form = CashRegisterForm(data=request.POST)
-	# 	check = CashRegister.objects.filter(company_id=company_id)
-	# 	companies = Company.objects.filter(status__in=[1,2,3]).order_by('company')
-	# 	context = {'form': form, 'companies': companies}
-	#
-	# 	if company_id:
-	# 		month, year = now().month, now().year
-	# 		company = Company.objects.get(pk=company_id)
-	# 		registerdata = cashregisterdata(company_id, month, year)
-	# 		context.update(dict(registerdata))
-	# 		records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
-	# 		context.update({'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
-	#
-	# 		if now().month==1:
-	# 			month, year = 12, now().year - 1
-	# 		else:
-	# 			month, year = now().month - 1, now().year
-	#
-	# 		previous = check.filter(created__month=month, created__year=year)
-	#
-	# 		if previous:
-	# 			context.__setitem__('previous', True)
-	# 		else:
-	# 			context.__setitem__('previous', False)
-	#
-	# 		if form.is_valid():
-	# 			form.save(commit=False)
-	# 			data = form.cleaned_data
-	# 			income, expenditure = [data[key] for key in ('income', 'expenditure')]
-	# 			if income != 0 and expenditure != 0:
-	# 				msg = f'One of the fields (income {income:.2f}PLN or expenditure {expenditure:.2f}PLN) must be zero and second have to be positive value!'
-	# 				messages.warning(request, msg)
-	# 				return render(request, 'cashregister/cashregister.html', context)
-	# 			elif income or expenditure:
-	# 				if income > 0:
-	# 					form.save(commit=True)
-	# 					msg = f'Succesful register new record in {company} (income={income:.2f}PLN)'
-	# 					messages.success(request, msg)
-	# 				elif expenditure > 0:
-	# 					if registerdata['status'] - expenditure > 0:
-	# 						form.save(commit=True)
-	# 						msg = f'Succesful register new record in {company} (expenditure={expenditure:.2f}PLN)'
-	# 						messages.success(request, msg)
-	# 					else:
-	# 						msg = f"Expenditure ({expenditure:.2f}PLN) is greater than the cash register status ({registerdata['status']:.2f}PLN)!"
-	# 						messages.warning(request, msg)
-	#
-	# 	return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
+
+	def get(self, request, released_id:int=None) -> HttpResponseRedirect:
+		user = request.user
+		# TODO: set last number of released
+		check = {'created__year': now().year, 'created__month': now().month}
+		last_released = ReleaseOutside.objects.filter(**check).aggregate(Max('number'))
+		if last_released['number__max']:
+			number = f"{last_released['number__max'] + 1}/{now().year}"
+		else:
+			number = 1
+
+		form = ReleasedOutsideForm(initial={'number': number})
+		context = {'form': form}
+
+		return render(request, 'accountancy/customer_add.html', context)
+
+
+	def post(self, request, released_id:int=None) -> HttpResponseRedirect:
+		form = ReleasedOutsideForm(data=request.POST)
+		context = {'form': form}
+
+		if form.is_valid():
+			form.save(commit=False)
+			data = form.cleaned_data
+			form.save(commit=True)
+			msg = f'Let show me: {data}!'
+			messages.warning(request, msg)
+
+		return HttpResponseRedirect(reverse('accountancy:add_customer', args=[context]))
 
 
 class ReleaseOutsideDelete(View):

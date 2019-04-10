@@ -1,8 +1,8 @@
 # standard library
+import requests
 from ftplib import FTP
 from pathlib import Path
 from datetime import date
-import http.client as client
 from collections import OrderedDict
 from shutil import make_archive, unpack_archive
 
@@ -24,14 +24,15 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 
 def check_internet_connection()->bool:
-	'''checks whether the internet is connected'''
-	connect = client.HTTPConnection("www.google.com", timeout=5)
 	try:
-		connect.request("HEAD", "/")
-		connect.close()
-		return True
+		host1 = 'https://github.com/login'
+		host2 = 'https://api.github.com/user'
+		req = requests.get(host1, auth=(settings.USER_GITHUB, settings.PASSWORD_HL))
+		if req.status_code==200:
+			return True
+		else:
+			return False
 	except:
-		connect.close()
 		return False
 
 

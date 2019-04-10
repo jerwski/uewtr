@@ -17,7 +17,6 @@ from django.views.generic import CreateView, View
 # my models
 from account.models import Quiz
 from employee.models import Employee
-from cashregister.models import Company
 
 # my forms
 from account.forms import UserCreateForm
@@ -61,9 +60,12 @@ class AdminView(View):
 			if Path('~/Desktop/zip2ftp/invoices.zip').expanduser().is_file():
 				context.__setitem__('upload', True)
 
-			if socket.gethostname() == 'HOMELAPTOP':
+			if socket.gethostname() == 'HOMELAPTOP' and check_internet_connection():
 				args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
 				getArchiveFilefromFTP(request, *args)
+			else:
+				msg = 'Your data base is not up to date! Check internet connection!'
+				messages.error(request, msg)
 
 			return render(request, 'account/admin.html', context)
 
