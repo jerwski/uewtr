@@ -34,7 +34,7 @@ class CustomerAddForm(forms.ModelForm):
 		fields = ['customer', 'nip', 'street', 'city', 'postal', 'phone', 'email', 'status']
 
 
-class AccountancyDocumentForm(forms.Form):
+class AccountancyDocumentForm(forms.ModelForm):
 	KLIENTA = 0
 	CB774GU = 1
 	KURIER = 2
@@ -53,3 +53,19 @@ class AccountancyDocumentForm(forms.Form):
 	class Meta:
 		model = AccountancyDocument
 		fields = ['company', 'customer', 'number', 'conveyance', 'waybill', 'date_of_shipment', 'invoice', 'order']
+
+
+class AccountancyDocumentProductsForm(forms.ModelForm):
+	SZTUK = 0
+	KOMPLET = 1
+	TYSIĄC = 2
+	ARKUSZ = 3
+	LITR = 4
+	UNITS = ((SZTUK, 'szt.'), (KOMPLET, 'kpl.'), (TYSIĄC, 'tys.'), (ARKUSZ, 'ark.'), (LITR, 'ltr.'))
+	queryset = AccountancyDocument.objects.all()
+	document = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset)
+	unit = forms.ChoiceField(widget=forms.Select(), choices=UNITS, initial=1)
+
+	class Meta:
+		model = AccountancyProducts
+		fields = ['document', 'product', 'quanity', 'unit']
