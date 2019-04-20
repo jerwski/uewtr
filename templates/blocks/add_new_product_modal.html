@@ -1,0 +1,51 @@
+{% load bootstrap4 %}
+
+  <script>
+  $( function() {
+    var names = {{ products_name|safe }};
+    $( "#id_name" ).autocomplete({
+      source: names
+    });
+    });
+  </script>
+
+<!-- Modal for adding product to accountancy document -->
+  <button id="new_product_Button" type="button" class="btn btn-sm btn-block btn-outline-info" data-toggle="modal" data-target="#new_product_Modal">Add new product</button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="new_product_Modal" tabindex="-1" role="dialog" aria-labelledby="new_product" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h6 class="modal-title" id="leaveModal">Add new product...</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url 'accountancy:new_product' company_id document_id %}" method="POST">{% csrf_token %}
+
+            {% for field in new_product_form %}
+              <div class="form-group">
+                {% bootstrap_field field size='small' label_class='text-info font-italic font-weight-normal' %}
+              </div>
+            {% endfor %}
+            <div class="modal-footer">
+              <div class="col-md-6 btn">
+                <button type="button" class="btn btn-outline-info btn-block" data-dismiss="modal">Close</button>
+              </div>
+              <div class="col-md-6 btn">
+                <button id="productsubmit" type="submit" class="btn btn-outline-success btn-block">Confirm</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  $('#productsubmit').click(function() {
+   $('#leaveModal').modal('hide');
+});
+</script>

@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load utility_tags %}
+{% load staticfiles %}
+
+{% block title %}Add Product{% endblock %}
+
+{% block header %}
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+  $( function() {
+    var products = {{ products_name|safe }};
+    $( "#product" ).autocomplete({
+      source: products
+    });
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+
+  <div class="container-fluid">
+    <div class="row ml-3 mr-3 mt-2 bgbisque">
+      <div class="col-sm-2 mt-2 text-center">
+        <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="50%"></a>
+        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
+      </div>
+      <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
+        <p class="h1 font-weight-normal">Company Accountancy</p>
+        <p class="text-info font-weight-bold font-italic">Application to handle company accountancy</p>
+      </div>
+      <div class="col-sm-2 mt-2">
+        {% include 'blocks/alert.html' %}
+      </div>
+    </div>
+    <div class="row ml-3 mr-3 mb-2 bgbisque">
+      <div class="col-sm-3">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">CURRENT CONTRACTOR</p>
+
+        <table class="table table-hover table-sm">
+          <tbody>
+            <tr>
+              <td><a class="text-danger" href="{{ company.get_absolute_url }}">{{ company }}</a></td>
+            </tr>
+            <tr>
+              <td>{{ company.postal }} {{ company.city }}</td>
+            </tr>
+            <tr>
+              <td>{{ company.street }}</td>
+            </tr>
+            <tr>
+              <td>NIP: {{ company.nip }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="row mt-4">
+          <div class="col">
+            <div class="btn-sm mb-2">
+              <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary btn-block">Add/change
+                company</a>
+              <a href="{% url 'accountancy:add_customer' %}" class="btn btn-outline-danger btn-block">Add/change
+                customer</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-9">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD TO ACCOUNTANCY DOCUMENT FOR <strong>{{ customer|upper }}</strong></p>
+        <div class="row">
+          <div class="col-10">
+            <form action="." method="POST">{% csrf_token %}
+              <div class="row">
+                <div class="col-8">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text bg-info text-white" id="id_product">Product</span>
+                    </div>
+                    <input type="text" class="form-control" name="product" id="product" placeholder="Nazwa artykułu" aria-label="Nazwa artykułu" aria-describedby="id_product" required>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text bg-info text-white" id="id_quanity">Quanity</span>
+                    </div>
+                    <input type="number" class="form-control" name="quanity" min="0" step="any" required id="id_quanity" placeholder="Ilość" aria-label="Quanity" aria-describedby="id_quanity">
+                    <input type="hidden"  name="document" value="{{ document_id }}" readonly id="id_document">
+                  </div>
+                </div>
+              </div>
+              <div class="row text-center">
+                <div class="col-12">
+                  <button type="submit" class="btn btn-success btn-sm btn-block mt-2 mb-2">Add record to {{ document }}</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-2 text-left">
+            {% include 'blocks/add_new_product_modal.html' %}
+            <a href="{% url 'accountancy:add_product' company_id customer_id document_id %}" class="btn btn-sm btn-outline-danger btn-block mt-2 mb-2">Clear</a>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <input class="form-control" id="myInput" type="text" placeholder="Search records..." aria-label="Filtering table" aria-describedby="basic-addon">
+          <div class="input-group-append">
+            <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px"></span>
+          </div>
+        </div>
+        <table class="table table-borderless table-info table-sm" style="width:100%">
+          <colgroup>
+            <col span="1" style="width:5%">
+            <col span="1" style="width:55%">
+            <col span="1" style="width:5%">
+            <col span="1" style="width:10%">
+            <col span="1" style="width:15%">
+            <col span="1" style="width:15%">
+          </colgroup>
+          <thead class="text-left">
+            <tr class="font-weight-light small">
+              <th>Nr</th>
+              <th>Nazwa produktu</th>
+              <th>J.m.</th>
+              <th>Ilość</th>
+              <th>Wartość brutto PLN</th>
+              <th>Operacja</th>
+            </tr>
+          </thead>
+        </table>
+        <div class="scrollit">
+          <table class="table table-sm table-hover" style="width:100%">
+            <colgroup>
+              <col span="1" style="width:5%">
+              <col span="1" style="width:55%">
+              <col span="1" style="width:5%">
+              <col span="1" style="width:10%">
+              <col span="1" style="width:15%">
+              <col span="1" style="width:15%">
+            </colgroup>
+
+            <tbody class="small" id="searchTable">
+              {% for product in products %}
+                <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"
+                    {% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ product.product }}</td>
+                  {% if product.product.unit == 0 %}
+                    <td>szt.</td>
+                  {% elif product.product.unit == 1 %}
+                    <td>kpl.</td>
+                  {% elif product.product.unit == 3 %}
+                    <td>ark.</td>
+                  {% elif product.product.unit == 4 %}
+                    <td>ltr.</td>
+                  {% elif product.product.unit == 5 %}
+                    <td>rola</td>
+                  {% endif %}
+                  <td>{{ product.quanity }}</td>
+                  <td>{{ product.get_cost|floatformat:2 }}</td>
+                  <td><a href="{{ product.product_delete }}" class="badge badge-danger">Usuń</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if total_quanity %}
+          <p class="offset-6 text-primary font-weight-bold font-italic">Total quanity: {{ total_quanity }}&nbsp;&nbsp;&nbsp;Total cost: {{ total_cost|money_format }}</p>
+        {% endif %}
+        <div class="row text-center">
+          <div class="col-12">
+            <div class="btn btn-group mt-2 mb-2">
+              <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+              <a href="#" class="btn btn-outline-success">Print WZ</a>
+              <a href="#" class="btn btn-outline-info">Send WZ</a>
+              <a href="#" class="btn btn-outline-success disabled">Print invoice</a>
+              <a href="#" class="btn btn-outline-info disabled">Send invoice</a>
+              <a class="btn btn-outline-secondary" href="/admin/">Admin Data Base</a>
+              <a class="btn btn-outline-primary" href="{% url 'accountancy:accountancy' %}">Accountancy</a>
+              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load utility_tags %}
+{% load staticfiles %}
+
+{% block title %}Accountancy - Select Customer{% endblock %}
+
+{% block content %}
+
+  <div class="container-fluid">
+    <div class="row ml-3 mr-3 mt-2 bgbisque">
+      <div class="col-sm-2 mt-2 text-center">
+        <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="50%"></a>
+        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
+      </div>
+      <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
+        <p class="h1 font-weight-normal">Company Accountancy</p>
+        <p class="text-info font-weight-bold font-italic">Application to handle company accountancy</p>
+      </div>
+      <div class="col-sm-2 mt-2">
+        {% include 'blocks/alert.html' %}
+      </div>
+    </div>
+    <div class="row ml-3 mr-3 mb-2 bgbisque">
+      <div class="col-sm-4">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">COMPANIES</p>
+        <table class="table table-hover table-sm">
+          <tbody>
+          {% for company in companies %}
+            <tr>
+              {% if company_id == company.id %}
+                <td><a class="text-danger" href="{{ company.create_doc }}">{{ company }}</a></td>
+              {% else %}
+                <td><a href="{{ company.create_doc }}">{{ company }}</a></td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        <div class="row mt-4">
+          <div class="col">
+            <div class="btn-sm mb-2">
+              <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-info btn-block">Add/change
+                company</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-8">
+        {% if company_id %}
+          <p class="text-center text-danger lead font-weight-normal bg-warning">SELECT CUSTOMER FOR <strong>{{ company }}</strong></p>
+
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Search..."></span>
+            </div>
+            <input class="form-control" id="myInput" type="text" placeholder="Wyszukaj odbiorcę wpisując nazwę, nip, kod, miasto, ulicę lub adres e-mail..." aria-label="Filtering table" aria-describedby="basic-addon">
+            <div class="input-group-append">
+              <a href="{% url 'accountancy:add_customer' %}" class="btn btn-info">Add/change
+                customer</a>
+            </div>
+          </div>
+          <div class="scrollit">
+            <table class="table table-sm table-hover">
+              <tbody class="small" id="searchTable">
+                {% for customer in customers %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><a href="{% url 'accountancy:accountancy' company_id customer.id %}">{{ customer }}</a></td>
+                    <td>{{ customer.nip }}</td>
+                    <td>{{ customer.postal }}&nbsp;{{ customer.city }}</td>
+                    <td>{{ customer.street }}</td>
+                    <td>{{ customer.phone }}</td>
+                    <td>{{ customer.email }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          {% if company_id and customer_id %}
+            <div class="row">
+              <div class="col-4">
+                <table class="table table-sm table-hover">
+                  <tbody class="small text-info font-weight-light font-italic">
+                    <tr><th class="text-secondary font-italic">Odbiorca:</th><th>{{ customer }}</th></tr>
+                    <tr><th class="text-secondary font-italic">Adres:</th><th>{{ customer.postal }}&nbsp;{{ customer.city }}</th></tr>
+                    <tr><th class="text-secondary font-italic">ul.</th><th>{{ customer.street }}</th></tr>
+                    <tr><th class="text-secondary font-italic">tel.:</th><th>{{ customer.phone }}</th></tr>
+                    <tr><th class="text-secondary font-italic">email:</th><th>{{ customer.email }}</th></tr>
+                  </tbody>
+                </table>
+                <div class="btn btn-sm btn-group mt-2 mb-2">
+                  <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                  <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+                  <a class="btn btn-outline-primary" href="/admin/">Admin</a>
+                </div>
+              </div>
+              <div class="col-8">
+                <form action="." method="POST">{% csrf_token %}
+                  {% bootstrap_field form.company %}{% bootstrap_field form.customer %}
+                  <div class="row">
+                    <div class="col-4">
+                      {% bootstrap_field form.number size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                    </div>
+                    <div class="col-4">
+                      {% bootstrap_field form.conveyance size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                    </div>
+                    <div class="col-4">
+                      {% bootstrap_field form.waybill size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-4">
+                      {% bootstrap_field form.date_of_shipment size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                    </div>
+                    <div class="col-4">
+                      {% bootstrap_field form.invoice size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                    </div>
+                    <div class="col-4">
+                      {% bootstrap_field form.order size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                    </div>
+                  </div>
+                  <div class="row text-center">
+                    <div class="col-12 mt-3">
+                      <button type="submit" class="btn btn-block btn-outline-success">Add product to contractor {{ company|upper }}</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+          <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD FOR {{ company }}</p>
+          <div class="row">
+            <div class="col text-center">
+              <p class="text-danger lead font-weight-bold font-italic">Please select company to create accountancy document...</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
