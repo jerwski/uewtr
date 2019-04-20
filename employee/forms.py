@@ -21,6 +21,7 @@ class EmployeeBasicDataForm(forms.ModelForm):
     '''class representing a form to create/change and save the basic data of employee'''
     forename = forms.CharField(max_length=100)
     surname = forms.CharField(max_length=100)
+    pesel = forms.CharField(min_length=11, max_length=11)
 
     class Meta:
         model = Employee

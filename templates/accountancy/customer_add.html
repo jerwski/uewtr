@@ -88,7 +88,7 @@
                 {% if customer_id %}
                   <a href="{% url 'accountancy:add_customer' %}" class="btn btn-outline-primary">Back to add customer</a>
                 {% endif %}
-                <a href="#" class="btn btn-outline-info">Release outside</a>
+                <a href="{% url 'accountancy:accountancy' %}" class="btn btn-outline-info">Accountancy</a>
                 <button type="submit" class="btn btn-outline-success">Confirm</button>
               </div>
             </div>

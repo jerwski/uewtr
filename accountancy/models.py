@@ -1,9 +1,13 @@
 # django core
 from django.db import models
 from django.urls import reverse
+from django.utils.timezone import now
 
 # my models
 from cashregister.models import Company
+
+# my validators
+from validators.my_validator import positive_value
 
 # Create your models here.
 
@@ -31,10 +35,11 @@ class Customer(models.Model):
 
 
 class Products(models.Model):
-	name = models.CharField(max_length=200, db_index=True)
+	name = models.CharField(max_length=200, db_index=True, unique=True)
 	slug = models.SlugField(max_length=200, db_index=True)
+	unit = models.PositiveSmallIntegerField(blank=True)
 	netto = models.DecimalField(max_digits=10, decimal_places=2)
-	vat = models.DecimalField(max_digits=4, decimal_places=2, default=23)
+	vat = models.DecimalField(max_digits=4, decimal_places=2)
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -55,15 +60,21 @@ class Products(models.Model):
 
 class AccountancyDocument(models.Model):
 	company = models.ForeignKey(Company, limit_choices_to={'status__range': [1, 3]}, on_delete=models.DO_NOTHING)
-	customer = models.ForeignKey(Customer, limit_choices_to={'status__range': [1, 3]}, on_delete=models.DO_NOTHING)
-	number = models.SmallIntegerField(unique_for_month=True,)
-	conveyance = models.CharField(max_length=25, verbose_name='Środek transportu')
-	waybill = models.CharField(max_length=100, verbose_name='Nr listu przewozowego')
-	date_of_shipment = models.DateField(verbose_name='Data wysyłki')
-	invoice = models.CharField(max_length=250, verbose_name='Nr faktury')
+	customer = models.ForeignKey(Customer, limit_choices_to={'status__range': [1, 3]}, on_delete=models.DO_NOTHING, verbose_name='Klient')
+	number = models.SmallIntegerField(verbose_name='Nr porządkowy dokumentu')
+	conveyance = models.CharField(max_length=25,)
+	waybill = models.CharField(max_length=100, blank=True, verbose_name='Nr listu przewozowego')
+	date_of_shipment = models.DateField()
+	invoice = models.CharField(max_length=250, verbose_name='Numer faktury')
 	order = models.CharField(max_length=250, verbose_name='Zamówienie')
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		ordering = ['-number']
+
+	def __str__(self):
+		return f'accountancy document number: {self.number}/{now().month}/{now().year}'
 
 	def get_total_cost(self):
 		total_cost = sum(item.get_cost() for item in self.products.all())
@@ -71,11 +82,20 @@ class AccountancyDocument(models.Model):
 
 
 class AccountancyProducts(models.Model):
-	document = models.ForeignKey(AccountancyDocument, related_name='products', on_delete=models.DO_NOTHING)
+	document = models.ForeignKey(AccountancyDocument, related_name='products', on_delete=models.CASCADE)
 	product = models.ForeignKey(Products, on_delete=models.DO_NOTHING)
-	quanity = models.PositiveIntegerField()
-	unit = models.CharField(max_length=25,)
+	quanity = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Ilość', validators=[positive_value])
+	created = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		ordering = ['product']
+
+	def __str__(self):
+		return self.product
 
 	def get_cost(self):
 		worth = self.product.get_brutto() * self.quanity
 		return worth
+
+	def product_delete(self):
+		return reverse('accountancy:delete_product', args=[self.id, self.document.company_id, self.document_id])

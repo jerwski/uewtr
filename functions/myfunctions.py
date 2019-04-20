@@ -31,6 +31,7 @@ from django.db.models import Case, Count, IntegerField, Max, Q, Sum, Value, When
 from cashregister.models import Company, CashRegister
 from employee.models import Employee, EmployeeData, EmployeeHourlyRate
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
+from accountancy.models import AccountancyDocument, AccountancyProducts
 
 # my functions
 from functions.payment import total_payment, workingdays
@@ -368,3 +369,20 @@ def dirdata():
 
 	return usage
 
+
+def last_relased_accountancy_document(company_id:int=None):
+	check = {'company_id': company_id, 'created__year': now().year, 'created__month': now().month}
+	documents = AccountancyDocument.objects.filter(**check)
+
+	for document in documents:
+		if not AccountancyProducts.objects.filter(document_id=document.id):
+			document.delete()
+
+	number = AccountancyDocument.objects.filter(**check).aggregate(Max('number'))
+
+	if number['number__max']:
+		number = number['number__max'] + 1
+	else:
+		number = 1
+
+	return number

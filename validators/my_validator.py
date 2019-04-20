@@ -8,9 +8,9 @@ def check_pesel(digit:str):
         raise ValidationError('Pesel need to eleven digits...', code='invalid')
 
 
-def positive_value(value:float):
-    if int(value) < 0:
-        raise ValidationError('The value %(value)s must be greater than or equal to zero...', params={'value': value})
+def positive_value(value):
+    if value < 0:
+        raise ValidationError('The value %(value)s must be greater than or equal to zero...', code='invalid')
 
 
 def from_transfer(contents:str):
