@@ -153,12 +153,24 @@ class AccountancyProductsAddView(View):
 
 	def post(self, request, company_id:int=None, customer_id:int=None, document_id:int=None):
 		document = AccountancyDocument.objects.get(pk=document_id)
+		products_name = Products.objects.order_by('name').values_list('name', flat=True)
+		
 		if request.POST:
 			name = request.POST['product']
-			product = Products.objects.get(name=name)
 			quanity = request.POST['quanity']
-			data = {'document': document, 'product': product, 'quanity': quanity}
-			AccountancyProducts.objects.create(**data)
+			quanity = float(quanity)
+			
+			if name in products_name and quanity > 0:
+				product = Products.objects.get(name=name)
+				data = {'document': document, 'product': product, 'quanity': quanity}
+				AccountancyProducts.objects.create(**data)
+			else:
+				if name not in products_name:
+					msg = f'Product <<{name}>> in not rejestred. Please use "Add new product" button on the right side form.'
+					messages.warning(request, msg)
+				elif quanity <= 0:
+					msg = f'Quanity <<{quanity}>> need be grower than zero value'
+					messages.warning(request, msg)
 
 		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, customer_id, document_id]))
 
@@ -182,7 +194,7 @@ class AccountancyProductDelete(View):
 		record = AccountancyProducts.objects.get(pk=record)
 		if record:
 			record.delete()
-			msg = f'Succesful erase record <<{record.product}, {record.quanity}>> in Cash register for {record.document.company}.'
+			msg = f'Succesful erase record <<name:{record.product}, quanity:{record.quanity}>> in Cash register for {record.document.company}.'
 			messages.info(request, msg)
 		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, customer_id, document_id]))
 
