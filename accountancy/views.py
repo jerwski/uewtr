@@ -84,9 +84,11 @@ class AccountancyDocumentView(View):
 	'''class implementing the method of create the accountancy document'''
 
 	def get(self, request, company_id:int=None, customer_id:int=None) -> HttpResponse:
+		context = {'company_id': company_id, 'customer_id': customer_id}
 		companies = Company.objects.filter(status__range=[1, 3])
 		customers = Customer.objects.filter(status__range=[1, 3])
-		context = {'companies': companies, 'customers': customers, 'company_id': company_id, 'customer_id': customer_id}
+		documents = AccountancyDocument.objects.filter(company_id=company_id, customer_id=customer_id, created__year=now().year)
+		context.update({'companies': companies, 'customers': customers, 'documents': documents})
 		number = last_relased_accountancy_document(company_id)
 
 		initial = {'number': number,
@@ -176,23 +178,37 @@ class NewProductAddView(View):
 class AccountancyProductDelete(View):
 	'''class enabling deleting records in the cash report'''
 
-	def get(self, request, record:int=None, company_id:int=None, document_id:int=None) -> HttpResponseRedirect:
+	def get(self, request, record:int=None, company_id:int=None, customer_id:int=None, document_id:int=None) -> HttpResponseRedirect:
 		record = AccountancyProducts.objects.get(pk=record)
 		if record:
 			record.delete()
-			msg = f'Succesful erase record <<{record.product}, {record.quanity} in Cash register for {record.document.company}.'
+			msg = f'Succesful erase record <<{record.product}, {record.quanity}>> in Cash register for {record.document.company}.'
 			messages.info(request, msg)
-		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, document_id]))
+		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, customer_id, document_id]))
 
 
 
-class AccountancyDocumentDelete(View):
-	'''class enabling deleting records in the release outside'''
-	#
-	# def get(self, request, company_id:int, record:int) -> HttpResponseRedirect:
-	# 	record = CashRegister.objects.get(pk=record)
-	# 	if record:
-	# 		record.delete()
-	# 		msg = f'Succesful erase record <<{record.symbol}, {record.contents} in Cash register for {record.company}.'
-	# 		messages.info(request, msg)
-	# 	return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
+class AccountancyDocumentPrintView(View):
+	'''class enabling printing selected document'''
+	
+	def post(self, request, document_id:int=None) -> HttpResponse:
+		'''convert html accountancy document  to pdf'''
+		# year = int(request.POST['leave_year'])
+		# html = leavehtml2pdf(document_id, year)
+		#
+		# if html:
+		# 	# create pdf file
+		# 	options = {'page-size'  : 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in', 'margin-bottom': '0.1in',
+		# 	           'margin-left': '0.1in', 'encoding': "UTF-8", 'orientation': 'landscape', 'no-outline': None,
+		# 	           'quiet'      : '', }
+		#
+		# 	pdf = pdfkit.from_string(html, False, options=options)
+		# 	filename = f'leaves_data_{employee_id}.pdf'
+		#
+		# 	response = HttpResponse(pdf, content_type='application/pdf')
+		# 	response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+		# 	return response
+		# else:
+		# 	messages.warning(request, r'Nothing to print...')
+		#
+		# return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[employee_id]))

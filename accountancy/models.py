@@ -28,18 +28,18 @@ class Customer(models.Model):
 		ordering = ['customer']
 
 	def __str__(self):
-		return f'{self.customer}'
+		return self.customer
 
 	def get_absolute_url(self):
 		return reverse('accountancy:change_customer', args=[self.id])
 
 
 class Products(models.Model):
-	name = models.CharField(max_length=200, db_index=True, unique=True)
+	name = models.CharField(max_length=200, db_index=True, unique=True, verbose_name='Nazwa Produktu')
 	slug = models.SlugField(max_length=200, db_index=True)
-	unit = models.PositiveSmallIntegerField(blank=True)
-	netto = models.DecimalField(max_digits=10, decimal_places=2)
-	vat = models.DecimalField(max_digits=4, decimal_places=2)
+	unit = models.PositiveSmallIntegerField(blank=True,)
+	netto = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Wartośc netto')
+	vat = models.DecimalField(max_digits=4, decimal_places=2, verbose_name='Stawka podatku VAT')
 	created = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -74,7 +74,7 @@ class AccountancyDocument(models.Model):
 		ordering = ['-number']
 
 	def __str__(self):
-		return f'accountancy document number: {self.number}/{now().month}/{now().year}'
+		return f'{self.number}/{now().month}/{now().year}'
 
 	def get_total_cost(self):
 		total_cost = sum(item.get_cost() for item in self.products.all())
@@ -91,11 +91,12 @@ class AccountancyProducts(models.Model):
 		ordering = ['product']
 
 	def __str__(self):
-		return self.product
+		return f'{self.product}'
 
 	def get_cost(self):
 		worth = self.product.get_brutto() * self.quanity
 		return worth
 
 	def product_delete(self):
-		return reverse('accountancy:delete_product', args=[self.id, self.document.company_id, self.document_id])
+		args = [self.id, self.document.company_id, self.document.customer_id, self.document_id]
+		return reverse('accountancy:delete_product', args=args)

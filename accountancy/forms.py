@@ -32,7 +32,7 @@ class NewProductAddForm(forms.ModelForm):
 	UNITS = ((SZTUK, 'szt.'), (KOMPLET, 'kpl.'), (TYSIĄC, 'tys.'), (ARKUSZ, 'ark.'), (LITR, 'ltr.'), (ROLA, 'rola'))
 
 	vat = forms.ChoiceField(label='Stawka VAT', required=True, widget=forms.Select, choices=VAT, initial=23)
-	unit = forms.ChoiceField(widget=forms.Select(), choices=UNITS, initial=1, label='J.m.')
+	unit = forms.ChoiceField(widget=forms.Select(), choices=UNITS, initial=1, label='Jednostka masy')
 
 	class Meta:
 		model = Products
