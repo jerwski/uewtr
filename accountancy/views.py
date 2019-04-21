@@ -194,7 +194,7 @@ class AccountancyProductDelete(View):
 		record = AccountancyProducts.objects.get(pk=record)
 		if record:
 			record.delete()
-			msg = f'Succesful erase record <<name:{record.product}, quanity:{record.quanity}>> in Cash register for {record.document.company}.'
+			msg = f'Succesful erase record <<name:{record.product}, quanity:{record.quanity}>> in accountancy document <<{record.document}>> for {record.document.company}.'
 			messages.info(request, msg)
 		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, customer_id, document_id]))
 
