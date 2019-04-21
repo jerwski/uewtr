@@ -40,10 +40,12 @@
           </tbody>
         </table>
         <div class="row mt-2">
-          <div class="col">
-            <div class="btn-sm mb-2">
-              <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-info btn-block">Add/change
-                company</a>
+          <div class="col text-center">
+            <div class="btn btn-sm btn-group">
+              <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+              <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-info">Add/change
+                  company</a>
+              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the dashboard</a>
             </div>
           </div>
         </div>
@@ -75,7 +77,7 @@
 
       <div class="col-sm-8">
         {% if company_id %}
-          <p class="text-center text-danger lead font-weight-normal bg-warning">SELECT CUSTOMER FOR <strong>{{ company }}</strong></p>
+          <p class="text-center text-danger lead font-weight-normal bg-warning">SELECT CUSTOMER FOR CONTRACTOR <strong>{{ company }}</strong></p>
 
           <div class="input-group">
             <div class="input-group-prepend">
@@ -117,11 +119,6 @@
                     <tr><th class="text-secondary font-italic">email:</th><th>{{ customer.email }}</th></tr>
                   </tbody>
                 </table>
-                <div class="btn btn-sm btn-group mt-2 mb-2">
-                  <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                  <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
-                  <a class="btn btn-outline-primary" href="/admin/">Admin</a>
-                </div>
               </div>
               <div class="col-8">
                 <form action="." method="POST">{% csrf_token %}
@@ -150,7 +147,7 @@
                   </div>
                   <div class="row text-center">
                     <div class="col-12 mt-3">
-                      <button type="submit" class="btn btn-block btn-outline-success">Add product to contractor {{ company|upper }}</button>
+                      <button type="submit" class="btn btn-block btn-outline-success">Add product to customer {{ customer|upper }}</button>
                     </div>
                   </div>
                 </form>
