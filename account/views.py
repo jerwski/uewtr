@@ -39,8 +39,6 @@ class RegisterView(CreateView):
 class AdminView(View):
 	'''class implementing the method of view application's dashboard'''
 	def get(self, request)->HttpResponseRedirect:
-		session=request.session.get('id')
-		print(session)
 		if request.user.is_superuser or request.user.is_staff:
 			global _queryset
 			_queryset = quizdata()
@@ -62,9 +60,11 @@ class AdminView(View):
 			if Path('~/Desktop/zip2ftp/invoices.zip').expanduser().is_file():
 				context.__setitem__('upload', True)
 
-			if socket.gethostname() == 'HOMELAPTOP' and check_internet_connection():
+			if socket.gethostname() == 'HOMELAPTOP':
 				args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
-				getArchiveFilefromFTP(request, *args)
+				if request.session.get('check_update', True):
+					getArchiveFilefromFTP(request, *args)
+					request.session['check_update'] = False
 			else:
 				msg = 'Your data base is not up to date! Check internet connection!'
 				messages.error(request, msg)
