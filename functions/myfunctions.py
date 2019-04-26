@@ -222,7 +222,7 @@ def jpk_files(path: Path):
 	files = []
 	year, month = now().year, now().month
 	for file in path.rglob('JPK/0001/*.xml'):
-		created = datetime.fromtimestamp(file.stat().st_ctime)
+		created = datetime.fromtimestamp(file.stat().st_mtime)
 		if file.match('jpk_fa_*.xml') and created.date().year==year and created.date().month==month:
 			files.append(file.as_posix())
 		else:

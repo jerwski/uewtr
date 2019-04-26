@@ -11,6 +11,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.core.management import call_command
+from django.db.models.query import EmptyQuerySet
 from django.core.serializers import serialize, BadSerializer
 
 
@@ -37,8 +38,7 @@ def check_internet_connection()->bool:
 
 def backup():
 	'''total backup of database'''
-	check = Employee.objects.all()
-	if check.exists():
+	if not isinstance(Employee.objects.all(), EmptyQuerySet):
 		try:
 			with settings.ARCHIVE_ROOT.open('w') as jsonfile:
 				call_command('dumpdata', indent=4, stdout=jsonfile)
