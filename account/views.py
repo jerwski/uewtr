@@ -59,15 +59,12 @@ class AdminView(View):
 				context.__setitem__('jpk', True)
 			if Path('~/Desktop/zip2ftp/invoices.zip').expanduser().is_file():
 				context.__setitem__('upload', True)
-
-			if socket.gethostname() == 'HOMELAPTOP':
-				args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
-				if request.session.get('check_update', True):
+				
+			if request.session.get('check_update', True):
+				if socket.gethostname() == 'HOMELAPTOP':
+					args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
 					getArchiveFilefromFTP(request, *args)
 					request.session['check_update'] = False
-			else:
-				msg = 'Your data base is not up to date! Check internet connection!'
-				messages.error(request, msg)
 
 			return render(request, 'account/admin.html', context)
 
