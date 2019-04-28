@@ -1,5 +1,5 @@
 # standard library
-import requests
+import urllib3
 from ftplib import FTP
 from pathlib import Path
 from datetime import date
@@ -26,13 +26,14 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 def check_internet_connection()->bool:
 	try:
-		host= 'https://github.com/login'
-		req = requests.get(host, auth=(settings.USER_GITHUB, settings.PASSWORD_HL))
-		if req.status_code==200:
+		host= 'www.unikolor.com'
+		http = urllib3.PoolManager()
+		req = http.request('GET', host)
+		if req.status==200:
 			return True
 		else:
 			return False
-	except:
+	except ConnectionRefusedError:
 		return False
 
 
