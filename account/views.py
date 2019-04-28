@@ -65,6 +65,9 @@ class AdminView(View):
 					args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
 					getArchiveFilefromFTP(request, *args)
 					request.session['check_update'] = False
+				else:
+					msg = f'User: {user}, Host name: {socket.gethostname()}, Host addres: {socket.gethostbyname("localhost")}'
+					messages.info(request, msg)
 
 			return render(request, 'account/admin.html', context)
 
