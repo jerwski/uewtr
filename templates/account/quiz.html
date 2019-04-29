@@ -23,7 +23,7 @@
         {% endif %}
       </div>
       {% if set_of_questions %}
-        <h3 class="text-dark">Query number: <em class="text-danger font-weight-bold">{{ set_of_questions }}</em>&nbsp;&nbsp;&nbsp;Your points: <em class="text-success font-weight-bold">{{ points }}</em>&nbsp;&nbsp;&nbsp;Percent of good answers: <em class="text-primary font-weight-bold">{{ percent|floatformat:2 }}%</em>&nbsp;&nbsp;&nbsp;Your time: <em class="text-info font-weight-bold">{{ playtime }}</em></h3>
+        <h3 class="text-dark">Query number: <em class="text-danger font-weight-bold">{{ set_of_questions }}</em>&nbsp;&nbsp;&nbsp;Your points: <em class="text-success font-weight-bold">{{ points }}</em>&nbsp;&nbsp;&nbsp;Percent of good answers: <em class="text-primary font-weight-bold">{{ percent|floatformat:0 }}%</em>&nbsp;&nbsp;&nbsp;Your time: <em class="text-info font-weight-bold">{{ playtime }}</em></h3>
       {% else %}
         <p class="text-danger font-italic lead">Please select **Start the quiz** button...</p>
       {% endif %}

@@ -141,7 +141,8 @@ class QuizView(View):
 			start_play, end_play = quiz.start_play, quiz.end_play
 
 			if end_play:
-				playtime = str(end_play - start_play)
+				playtime = end_play - start_play
+				playtime = str(playtime).split('.')[0]
 			else:
 				playtime = '0:00:00'
 
@@ -173,7 +174,8 @@ class QuizView(View):
 		start_play, end_play = quiz.start_play, quiz.end_play
 
 		if end_play:
-			playtime = str(end_play - start_play)
+			playtime = end_play - start_play
+			playtime = str(playtime).split('.')[0]
 		else:
 			playtime = '0:00:00'
 
