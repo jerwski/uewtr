@@ -5,9 +5,9 @@
 
 {% block content %}
 
-  <div class="container">
-    <div class="row m-3 bgbisque">
-      {% include 'blocks/header.html' %}
+  <div class="container bgbisque">
+  {% include 'blocks/header.html' %}
+    <div class="row m-2">
       <div class="col-5">
         <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
         <table class="table table-hover table-sm">
@@ -48,14 +48,14 @@
           </div>
 
           <div class="row text-center">
-            <div class="col-sm-12 mb-1">
+            <div class="col-sm-12">
               {% bootstrap_field form.overtime label_class='text-info font-italic font-weight-bold' %}
             </div>
           </div>
 
           <div class="row text-center">
-            <div class="col-sm-12">
-              <div class="btn btn-sm btn-group mb-2" role="group">
+            <div class="col mt-2 mb-2">
+              <div class="btn btn-sm btn-group" role="group">
                 <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
                 <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
                 <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>

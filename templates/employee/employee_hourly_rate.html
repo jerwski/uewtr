@@ -7,9 +7,9 @@
 
 {% block content %}
 
-  <div class="container">
-    <div class="row m-3 bgbisque">
-      {% include 'blocks/header.html' %}
+  <div class="container bgbisque">
+  {% include 'blocks/header.html' %}
+    <div class="row m-3">
       <div class="col-sm-5">
         <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEE</p>
         <table class="table table-hover table-sm">
@@ -67,12 +67,17 @@
         {% if last_exist_hourly_rate %}
           <p class="text-primary mt-3">For employee <em class="text-danger font-weight-bold">{{ worker }}</em> last hourly rate <em class="text-danger font-weight-bold">{{ last_exist_hourly_rate }}</em> is the same like entered. Please insert new one or back to the Dashboard.</p>
         {% endif %}
-        <div class="offset-1 btn-sm btn-group mt-2" role="group">
-          <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-          <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
-          <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the Dashboard</a>
-          <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
+        <div class="row text-center">
+          <div class="col-1"></div>
+          <div class="col-10 btn-sm btn-group mt-2" role="group">
+            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
+            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the Dashboard</a>
+            <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
+          </div>
+          <div class="col-1"></div>
         </div>
+
       </div>
     </div>
   </div>

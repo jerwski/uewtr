@@ -174,7 +174,7 @@ class CashRegisterDelete(View):
 		record = CashRegister.objects.get(pk=record)
 		if record:
 			record.delete()
-			msg = f'Succesful erase record <<{record.symbol}, {record.contents} in Cash register for {record.company}.'
+			msg = f'Succesful erase record <<{record.symbol}, {record.contents} in Cash register for {record.company}'
 			messages.info(request, msg)
 		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 

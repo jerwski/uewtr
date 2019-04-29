@@ -17,8 +17,7 @@
         <p class="h1 font-weight-normal">Working Time Recorder</p>
         <p class="text-info font-weight-bold font-italic">Application to handle employee working time in small business</p>
       </div>
-      <div class="col-sm-2 mt-2">{% include 'blocks/alert.html' %}</div>
-
+      <div class="col-sm-2 mt-2 text-right">{% include 'blocks/alert.html' %}</div>
     </div>
     <div class="row">
       <div class="col-sm-6">
@@ -78,15 +77,15 @@
           <hr>
           <div class="row text-center">
             <div class="col-sm-12">
-              <div class="btn btn-sm btn-group mb-2" role="group">
-                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+              <div class="btn btn-group mb-2" role="group">
+                <a href="{% url 'account:exit' %}" class="btn btn-sm btn-outline-danger">Exit</a>
+                <a href="{% url 'account:admin_site' %}" class="btn btn-sm btn-outline-dark">Dashboard</a>
                 {% if company_id %}
-                  <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Add company</a>
+                  <a href="{% url 'cashregister:add_company' %}" class="btn btn-sm btn-outline-primary">Add company</a>
                 {% endif %}
-                <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
-                <a href="{% url 'accountancy:accountancy' %}" class="btn btn-outline-danger">Accountancy</a>
-                <button type="submit" class="btn btn-outline-success">Confirm</button>
+                <a href="{% url 'cashregister:cash_register' %}" class="btn btn-sm btn-outline-info">Cash register</a>
+                <a href="{% url 'accountancy:accountancy' %}" class="btn btn-sm btn-outline-danger">Accountancy</a>
+                <button type="submit" class="btn btn-sm btn-outline-success">Confirm</button>
               </div>
             </div>
           </div>

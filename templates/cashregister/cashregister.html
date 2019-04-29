@@ -35,7 +35,7 @@
         <p class="h1 font-weight-normal">Company Cash Register</p>
         <p class="text-info font-weight-bold font-italic">Application to handle company cash register</p>
       </div>
-      <div class="col-sm-2 mt-2">
+      <div class="col-sm-2 mt-2 text-right">
         {% include 'blocks/alert.html' %}
       </div>
     </div>
@@ -93,20 +93,25 @@
               </div>
               <div class="col-7">
                 {% bootstrap_field form.contents size='small' label_class='text-info font-weight-bold' placeholder='Numer faktury, rachunku, dokumentu lub treść operacji... (wykluczono treść: z przeniesienia)' %}
-                <button type="submit" class="btn btn-outline-success btn-block mb-2">Confirm new entry
-                  for {{ company|upper }}</button>
+                <button type="submit" class="btn btn-outline-success btn-block mb-2">Confirm new entry for {{ company|upper }}</button>
               </div>
             </div>
           </form>
 
           <div class="row">
             <table class="table table-sm table-hover">
+              <colgroup>
+                <col span="1" style="width:25%">
+                <col span="1" style="width:25%">
+                <col span="1" style="width:25%">
+                <col span="1" style="width:25%">
+              </colgroup>
               <thead class="text-center">
               <tr class="font-weight-bold small">
-                <th class="text-primary" width="25%">Z przeniesienia</th>
-                <th class="text-success" width="25%">Przychód</th>
-                <th class="text-danger" width="25%">Rozchód</th>
-                <th class="text-info" width="25%">Stan kasy</th>
+                <th class="text-primary">Z przeniesienia</th>
+                <th class="text-success">Przychód</th>
+                <th class="text-danger">Rozchód</th>
+                <th class="text-info">Stan kasy</th>
               </tr>
               </thead>
               <tbody>
@@ -124,45 +129,64 @@
             <input class="form-control" id="myInput" type="text" placeholder="Search records..."
                    aria-label="Filtering table" aria-describedby="basic-addon">
             <div class="input-group-append">
-              <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}"
-                                                                   width="24px"></span>
+              <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px"></span>
             </div>
           </div>
           <table class="table table-borderless table-info table-sm">
+            <colgroup>
+              <col span="1" style="width:3%">
+              <col span="1" style="width:10%">
+              <col span="1" style="width:25%">
+              <col span="1" style="width:24%">
+              <col span="1" style="width:11%">
+              <col span="1" style="width:11%">
+              <col span="1" style="width:11%">
+              <col span="1" style="width:6%">
+            </colgroup>
             <thead class="text-left">
             <tr class="font-weight-light small">
-              <th width="3%">Nr</th>
-              <th width="10%">Data</th>
-              <th width="25%">Firma, osoba</th>
-              <th width="24%">Nr faktury, dokumentu, treść operacji</th>
-              <th class="text-center" width="11%">Wpłata</th>
-              <th class="text-center" width="11%">Wypłata</th>
-              <th class="text-center" width="11%">KP/KW</th>
-              <th class="text-center" width="6%"></th>
+              <th>Nr</th>
+              <th>Data</th>
+              <th>Firma, osoba</th>
+              <th>Nr faktury, dokumentu, treść operacji</th>
+              <th class="text-center">Wpłata</th>
+              <th class="text-center">Wypłata</th>
+              <th class="text-center">KP/KW</th>
+              <th class="text-center"></th>
             </tr>
             </thead>
           </table>
           <div class="scrollit">
             <table class="table table-sm table-hover">
+              <colgroup>
+                <col span="1" style="width:3%">
+                <col span="1" style="width:10%">
+                <col span="1" style="width:25%">
+                <col span="1" style="width:24%">
+                <col span="1" style="width:11%">
+                <col span="1" style="width:11%">
+                <col span="1" style="width:11%">
+                <col span="1" style="width:6%">
+              </colgroup>
               <tbody class="small" id="searchTable">
               {% for record in records %}
                 <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"
                     {% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
-                  <td width="3%">{{ forloop.counter }}</td>
-                  <td width="10%">{{ record.created|date:'d-m-Y' }}</td>
-                  <td width="25%">{{ record.symbol }}</td>
-                  <td width="24%">{{ record.contents }}</td>
-                  <td class="text-right" width="11%">
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ record.created|date:'d-m-Y' }}</td>
+                  <td>{{ record.symbol }}</td>
+                  <td>{{ record.contents }}</td>
+                  <td class="text-right">
                     {% if record.income > 0 %}
                       <a href="{{ record.cash_accept }}" onclick="setTimeout('window.location.reload()', 2500)">{{ record.income|money_format }}</a>
                     {% else %}-----{% endif %}
                   </td>
-                  <td class="text-right" width="11%">
+                  <td class="text-right">
                     {% if record.expenditure > 0 %}
                       <a href="{{ record.cash_accept }}" onclick="setTimeout('window.location.reload()', 2500)">{{ record.expenditure|money_format }}</a>
                     {% else %}-----{% endif %}
                   </td>
-                  <td class="text-right text-secondary" width="11%">
+                  <td class="text-right text-secondary">
                     {% if record.cashaccept %}
                       {% if record.income %}
                         KP {{ record.cashaccept }}/{{ record.created|date:'m/Y' }}
@@ -171,7 +195,7 @@
                       {% endif %}
                     {% else %}-----{% endif %}
                   </td>
-                  <td class="text-right" width="24%">
+                  <td class="text-right">
                     {% if record.cashaccept %}
                       <a href="{{ record.cash_accept }}" class="badge badge-primary">Drukuj</a>
                     {% else %}

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 {% load bootstrap4 %}
 {% load utility_tags %}
 
@@ -6,20 +7,37 @@
 
 {% block content %}
 
-  <div class="container">
-    <div class="row m-2" style="background-color: bisque">
-      {% include 'blocks/header.html' %}
-      <div class="col-sm-3">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">EMPLOYED EMPLOYEES</p>
+  <div class="container-fluid">
+    <div class="row ml-3 mr-3 mt-2 bgbisque">
+      <div class="col-sm-2 text-center">
+        <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="58%"></a>
+        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
+      </div>
+      <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
+        <p class="h1 font-weight-normal">Working Time Recorder</p>
+        <p class="text-info font-weight-bold font-italic">Application to handle employee working time in small business</p>
+        {% include 'blocks/small_upper_buttons.html' %}
+      </div>
+      <div class="col-sm-2 mt-2 text-right">
+        {% include 'blocks/alert.html' %}
+      </div>
+    </div>
+    <div class="row ml-3 mr-3 mb-2 bgbisque">
+      <div class="col-sm-2">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">EMPLOYED WORKERS</p>
 
         <table class="table table-sm table-hover">
+          <colgroup>
+            <col span="1" style="width:5%">
+            <col span="1" style="width:95%">
+          </colgroup>
           <tbody>
           {% for employee in employees %}
             <tr>
               {% if employee_id == employee.id %}
-                <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.employee_complex_data }}">{{ employee }}</a></td>
+                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.employee_complex_data }}">{{ employee }}</a></td>
               {% else %}
-                <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_complex_data }}">{{ employee }}</a></td>
+                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_complex_data }}">{{ employee }}</a></td>
               {% endif %}
             </tr>
           {% endfor %}
@@ -27,7 +45,7 @@
         </table>
       </div>
 
-      <div class="col-sm-9">
+      <div class="col-sm-6">
         <p class="text-center text-danger lead font-weight-normal bg-warning">CURRENT DATA: {{ worker|upper }}</p>
         {% if worker.status %}
           <form action="." method="POST">{% csrf_token %}
@@ -45,7 +63,7 @@
               </div>
               <div class="col-4">
                 <div class="btn-sm" role="group">
-                  <button id="btnGroupDropHolidays" type="button" class="btn btn-outline-danger btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Holidays in the {{ choice_date|date:'Y' }} year </button>
+                  <button id="btnGroupDropHolidays" type="button" class="btn btn-outline-danger btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Holidays in {{ choice_date|date:'Y' }} year </button>
                   <div class="dropdown-menu" aria-labelledby="btnGroupDropHolidays">
                     <table class="table table-sm table-hover">
                       <tbody>
@@ -129,6 +147,53 @@
           </div>
         </div>
       </div>
+      <div class="col-sm-4 text-center">
+        <p class="text-center text-danger lead font-weight-normal bg-warning">Working days for {{ choice_date|date:'m/Y' }}</p>
+
+        <div class="input-group">
+          <input class="form-control" id="myInput" type="text" placeholder="Search..." aria-label="Filtering table" aria-describedby="basic-addon">
+          <div class="input-group-append">
+            <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Search..."></span>
+          </div>
+        </div>
+        <table class="table table-hover table-sm" style="width:100%">
+          <colgroup>
+            <col span="1" style="width:10%">
+            <col span="1" style="width:32%">
+            <col span="1" style="width:12%">
+            <col span="1" style="width:12%">
+            <col span="1" style="width:34%">
+          </colgroup>
+          <thead>
+            <tr class="text-primary">
+              <th>Nr</th><th class="text-right">Data</th><th class="text-left">Start</th><th class="text-left">End</th><th>Number of hours</th>
+            </tr>
+          </thead>
+        </table>
+        <div class="table-scroll">
+          <table class="table table-hover table-sm" style="width:100%">
+              <colgroup>
+              <col span="1" style="width:10%">
+              <col span="1" style="width:36%">
+              <col span="1" style="width:10%">
+              <col span="1" style="width:10%">
+              <col span="1" style="width:34%">
+            </colgroup>
+            <tbody id="searchTable">
+            {% for hours in work_hours %}
+              <tr>
+                <td class="text-secondary">{{ forloop.counter }}</td>
+                <td class="text-right">{{ hours.start_work|date:'d l' }}</td>
+                <td class="text-danger">{{ hours.start_work|time:'H:i' }}</td>
+                <td class="text-danger">{{ hours.end_work|time:'H:i' }}</td>
+                <td class="text-right text-info">{{ hours.jobhours|floatformat:2 }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 

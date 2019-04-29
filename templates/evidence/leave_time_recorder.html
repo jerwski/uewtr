@@ -10,10 +10,10 @@
 
 {% block content %}
 
-  <div class="container">
-    <div class="row m-3" style="background-color: bisque">
+  <div class="container bgbisque">
     {% include 'blocks/header.html' %}
-      <div class="col-sm-4">
+    <div class="row m-3">
+      <div class="col-sm-3">
         <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
         <table class="table table-sm table-hover">
           <tbody>
@@ -29,22 +29,26 @@
           </tbody>
         </table>
       </div>
-      <div class="col-sm-8">
+      <div class="col-sm-9">
         {% if worker.status %}
           <p class="text-center text-danger lead font-weight-normal bg-warning">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
 
           <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
-            {% bootstrap_field form.worker %}
-            <div class="row">
-              <div class="col-4 ml-2">
+            <div class="row text-center">
+              <div class="col-4 offset-1">
+                {% bootstrap_field form.worker %}
                 {% bootstrap_field form.leave_date size='medium' label_class='text-info font-italic font-weight-bold' %}
               </div>
-              <div class="col-md-7">
+              <div class="col-7">
                 {% bootstrap_field form.leave_flag label_class='text-info font-italic font-weight-bold' %}
               </div>
             </div>
-            <div class="btn-sm mb-2">
-              <button type="submit" class="btn btn-outline-success btn-block">Confirm the leave day you entered</button>
+            <div class="row">
+              <div class="col">
+                <div class="btn-sm mb-2">
+                  <button type="submit" class="btn btn-outline-success btn-block">Confirm the leave day you entered</button>
+                </div>
+              </div>
             </div>
           </form>
 

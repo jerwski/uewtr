@@ -29,7 +29,7 @@ def check_internet_connection()->bool:
 		host= 'www.unikolor.com'
 		http = urllib3.PoolManager()
 		req = http.request('GET', host)
-		if req.status==200:
+		if req.status == 200:
 			return True
 		else:
 			return False
