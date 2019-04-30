@@ -40,8 +40,6 @@ class AdminView(View):
 	'''class implementing the method of view application's dashboard'''
 	def get(self, request)->HttpResponseRedirect:
 		if request.user.is_superuser or request.user.is_staff:
-			global _queryset
-			_queryset = quizdata()
 			user = request.user.username
 			context = {'user': user}
 			context.update({'usage':dirdata()})
@@ -61,6 +59,8 @@ class AdminView(View):
 				context.__setitem__('upload', True)
 				
 			if request.session.get('check_update', True):
+				global _queryset
+				_queryset = quizdata()
 				if socket.gethostname() == 'HOMELAPTOP':
 					args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
 					getArchiveFilefromFTP(request, *args)
