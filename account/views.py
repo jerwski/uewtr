@@ -42,22 +42,9 @@ class AdminView(View):
 		if request.user.is_superuser or request.user.is_staff:
 			user = request.user.username
 			context = {'user': user}
-			context.update({'usage':dirdata()})
+			context.update({'usage': dirdata()})
 			employee = Employee.objects.filter(status=True).first()
-			if employee:
-				employee_id = employee.id
-				context.update({'employee_id': employee_id, 'nodata': False})
-			else:
-				backup = Path(r'backup_json/db.json')
-				created = datetime.fromtimestamp(backup.stat().st_ctime)
-				context.update({'nodata': True, 'backup': str(backup), 'created': created})
-				return render(request, '500.html', context)
-
-			if list(Path(r'E:/Fakturowanie').rglob(r'JPK/0001/jpk_fa_*.xml')):
-				context.__setitem__('jpk', True)
-			if Path('~/Desktop/zip2ftp/invoices.zip').expanduser().is_file():
-				context.__setitem__('upload', True)
-				
+			
 			if request.session.get('check_update', True):
 				global _queryset
 				_queryset = quizdata()
@@ -68,6 +55,20 @@ class AdminView(View):
 					msg = f'User: {user}, Host name: {socket.gethostname()}, Host addres: {socket.gethostbyname("localhost")}'
 					messages.info(request, msg)
 				request.session['check_update'] = False
+			
+			if employee:
+				employee_id = employee.id
+				context.update({'employee_id': employee_id, 'nodata': False})
+			else:
+				backup = Path(r'backup_json/db.json')
+				created = datetime.fromtimestamp(backup.stat().st_mtime)
+				context.update({'nodata': True, 'backup': str(backup), 'created': created})
+				return render(request, '500.html', context)
+
+			if list(Path(r'E:/Fakturowanie').rglob(r'JPK/0001/jpk_fa_*.xml')):
+				context.__setitem__('jpk', True)
+			if Path('~/Desktop/zip2ftp/invoices.zip').expanduser().is_file():
+				context.__setitem__('upload', True)
 
 			return render(request, 'account/admin.html', context)
 

@@ -358,10 +358,8 @@ def quizset(iterable):
 
 
 def dirdata():
-	usage = dict()
-	drives = [chr(x) + ":" for x in range(65, 90) if os.path.exists(chr(x) + ":")]
-	for drive in drives:
-		usage.__setitem__(drive, shutil.disk_usage(drive)._asdict())
+	drives = [chr(x)+':' for x in range(65,90) if os.path.exists(chr(x)+':')]
+	usage = {drive: shutil.disk_usage(drive)._asdict() for drive in drives}
 
 	for key, value in usage.items():
 		percent = value['used'] * 100 / value['total']
