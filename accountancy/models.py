@@ -5,6 +5,7 @@ from django.utils.timezone import now
 
 # my models
 from cashregister.models import Company
+from account.models import CreationModificationDateMixin
 
 # my validators
 from validators.my_validator import positive_value
@@ -12,7 +13,7 @@ from validators.my_validator import positive_value
 # Create your models here.
 
 
-class Customer(models.Model):
+class Customer(CreationModificationDateMixin):
 	customer = models.CharField(max_length=240,)
 	nip = models.CharField(max_length=13,)
 	street = models.CharField(blank=True, max_length=100,)
@@ -21,8 +22,6 @@ class Customer(models.Model):
 	phone = models.CharField(blank=True, max_length=20,)
 	email = models.EmailField(blank=True,)
 	status = models.IntegerField(default=1,)
-	created = models.DateTimeField(auto_now_add=True,)
-	updated = models.DateTimeField(auto_now=True,)
 
 	class Meta:
 		ordering = ['customer']
@@ -34,31 +33,41 @@ class Customer(models.Model):
 		return reverse('accountancy:change_customer', args=[self.id])
 
 
-class Products(models.Model):
+class Products(CreationModificationDateMixin):
+	ZW = 0
+	VAT5 = 5
+	VAT8 = 8
+	VAT23 = 23
+	VAT = ((VAT5, '5%'), (VAT8, '8%'), (VAT23, '23%'), (ZW, 'Zwolniony'))
+	
+	SZTUK = 0
+	KOMPLET = 1
+	TYSIĄC = 2
+	ARKUSZ = 3
+	LITR = 4
+	ROLA = 5
+	UNITS = ((SZTUK, 'szt.'), (KOMPLET, 'kpl.'), (TYSIĄC, 'tys.'), (ARKUSZ, 'ark.'), (LITR, 'ltr.'), (ROLA, 'rola'))
+	
 	name = models.CharField(max_length=200, db_index=True, unique=True, verbose_name='Nazwa Produktu')
-	slug = models.SlugField(max_length=200, db_index=True)
-	unit = models.PositiveSmallIntegerField(blank=True,)
-	netto = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Wartośc netto')
-	vat = models.DecimalField(max_digits=4, decimal_places=2, verbose_name='Stawka podatku VAT')
-	created = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)
+	unit = models.PositiveSmallIntegerField(blank=True, choices=UNITS, verbose_name='Jednostka masy')
+	netto = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Wartość netto')
+	vat = models.DecimalField(max_digits=4, decimal_places=2, choices=VAT, default=VAT23, verbose_name='Stawka podatku VAT')
 
 	class Meta:
 		ordering = ('name',)
-		indexes = [models.Index(fields=['id', 'slug']),]
 
 	def __str__(self):
 		return self.name
 
 	def get_absolute_url(self):
-		return reverse('accountancy:change_customer', args=[self.id, self.slug])
+		return reverse('accountancy:change_customer', args=[self.id])
 
 	def get_brutto(self):
 		brutto = self.netto * (1 + self.vat / 100)
 		return brutto
 
 
-class AccountancyDocument(models.Model):
+class AccountancyDocument(CreationModificationDateMixin):
 	company = models.ForeignKey(Company, limit_choices_to={'status__range': [1, 3]}, on_delete=models.DO_NOTHING)
 	customer = models.ForeignKey(Customer, limit_choices_to={'status__range': [1, 3]}, on_delete=models.DO_NOTHING, verbose_name='Klient')
 	number = models.SmallIntegerField(verbose_name='Nr porządkowy dokumentu')
@@ -67,8 +76,6 @@ class AccountancyDocument(models.Model):
 	date_of_shipment = models.DateField()
 	invoice = models.CharField(max_length=250, verbose_name='Numer faktury')
 	order = models.CharField(max_length=250, verbose_name='Zamówienie')
-	created = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)
 
 	class Meta:
 		ordering = ['-number']
@@ -81,11 +88,10 @@ class AccountancyDocument(models.Model):
 		return total_cost
 
 
-class AccountancyProducts(models.Model):
+class AccountancyProducts(CreationModificationDateMixin):
 	document = models.ForeignKey(AccountancyDocument, related_name='products', on_delete=models.CASCADE)
 	product = models.ForeignKey(Products, on_delete=models.DO_NOTHING)
 	quanity = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Ilość', validators=[positive_value])
-	created = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
 		ordering = ['product']

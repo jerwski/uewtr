@@ -152,6 +152,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+DJANGO_WATCHMAN_TIMEOUT = 1
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 LANGUAGE_CODE = get_setting('LANGUAGE_CODE')

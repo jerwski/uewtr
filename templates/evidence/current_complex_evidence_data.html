@@ -149,51 +149,54 @@
       </div>
       <div class="col-sm-4 text-center">
         <p class="text-center text-danger lead font-weight-normal bg-warning">Working days for {{ choice_date|date:'m/Y' }}</p>
-
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Search..."></span>
+        {% if work_hours %}
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Search..."></span>
+            </div>
+            <input class="form-control" id="myInput" type="text" placeholder="Search..." aria-label="Filtering table" aria-describedby="basic-addon">
+            <div class="input-group-append">
+              <a class="btn btn-outline-success" href="/admin/">Admin</a>
+            </div>
           </div>
-          <input class="form-control" id="myInput" type="text" placeholder="Search..." aria-label="Filtering table" aria-describedby="basic-addon">
-          <div class="input-group-append">
-            <a class="btn btn-outline-success" href="/admin/">Admin</a>
-          </div>
-        </div>
-        <table class="table table-hover table-sm" style="width:100%">
-          <colgroup>
-            <col span="1" style="width:10%">
-            <col span="1" style="width:32%">
-            <col span="1" style="width:12%">
-            <col span="1" style="width:12%">
-            <col span="1" style="width:34%">
-          </colgroup>
-          <thead>
-            <tr class="text-primary">
-              <th>Nr</th><th class="text-right">Data</th><th class="text-left">Start</th><th class="text-left">End</th><th>Number of hours</th>
-            </tr>
-          </thead>
-        </table>
-        <div class="table-scroll">
           <table class="table table-hover table-sm" style="width:100%">
-              <colgroup>
+            <colgroup>
               <col span="1" style="width:10%">
-              <col span="1" style="width:36%">
-              <col span="1" style="width:10%">
-              <col span="1" style="width:10%">
+              <col span="1" style="width:32%">
+              <col span="1" style="width:12%">
+              <col span="1" style="width:12%">
               <col span="1" style="width:34%">
             </colgroup>
-            <tbody id="searchTable">
-            {% for hours in work_hours %}
-              <tr>
-                <td class="text-secondary">{{ forloop.counter }}</td>
-                <td class="text-right">{{ hours.start_work|date:'d l' }}</td>
-                <td class="text-danger">{{ hours.start_work|time:'H:i' }}</td>
-                <td class="text-danger">{{ hours.end_work|time:'H:i' }}</td>
-                <td class="text-right text-info">{{ hours.jobhours|floatformat:2 }}</td>
+            <thead>
+              <tr class="text-primary">
+                <th>Nr</th><th class="text-right">Data</th><th class="text-left">Start</th><th class="text-left">End</th><th>Number of hours</th>
               </tr>
-            {% endfor %}
-            </tbody>
+            </thead>
           </table>
+          <div class="table-scroll">
+            <table class="table table-hover table-sm" style="width:100%">
+                <colgroup>
+                <col span="1" style="width:10%">
+                <col span="1" style="width:36%">
+                <col span="1" style="width:10%">
+                <col span="1" style="width:10%">
+                <col span="1" style="width:34%">
+              </colgroup>
+              <tbody id="searchTable">
+              {% for hours in work_hours %}
+                <tr>
+                  <td class="text-secondary">{{ forloop.counter }}</td>
+                  <td class="text-right">{{ hours.start_work|date:'d l' }}</td>
+                  <td class="text-danger">{{ hours.start_work|time:'H:i' }}</td>
+                  <td class="text-danger">{{ hours.end_work|time:'H:i' }}</td>
+                  <td class="text-right text-info">{{ hours.jobhours|floatformat:2 }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+          <p class="text-justify text-danger font-weight-bold font-italic">For selected date <mark>{{ choice_date|date:'m/Y' }}</mark> there aren't register working days in database. Please select another date...</p>
+          {% endif %}
         </div>
       </div>
 

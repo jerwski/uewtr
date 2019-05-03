@@ -10,12 +10,12 @@
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script>
-  $( function() {
-    var products = {{ products_name|safe }};
-    $( "#product" ).autocomplete({
-      source: products
-    });
-    });
+    $( function() {
+      var products = {{ products_name|safe }};
+      $( "#product" ).autocomplete({
+        source: products
+      });
+      });
   </script>
 {% endblock %}
 
@@ -125,9 +125,9 @@
               <th>Nr</th>
               <th>Nazwa produktu</th>
               <th>J.m.</th>
-              <th>Ilość</th>
-              <th>Wartość brutto PLN</th>
-              <th>Operacja</th>
+              <th class="text-right">Ilość</th>
+              <th class="text-right">Wartość brutto PLN</th>
+              <th class="text-center">Operacja</th>
             </tr>
           </thead>
         </table>
@@ -159,9 +159,9 @@
                   {% elif product.product.unit == 5 %}
                     <td>rola</td>
                   {% endif %}
-                  <td>{{ product.quanity }}</td>
-                  <td>{{ product.get_cost|floatformat:2 }}</td>
-                  <td><a href="{{ product.product_delete }}" class="badge badge-danger">Usuń</a></td>
+                  <td class="text-right">{{ product.quanity }}</td>
+                  <td class="text-right">{{ product.get_cost|floatformat:2 }}</td>
+                  <td class="text-center"><a href="{{ product.product_delete }}" class="badge badge-danger">Usuń</a></td>
                 </tr>
               {% endfor %}
             </tbody>

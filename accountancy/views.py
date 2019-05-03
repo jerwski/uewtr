@@ -49,7 +49,7 @@ class CustomerAddView(View):
 			employee = Customer.objects.get(pk=customer_id)
 			fields = list(employee.__dict__.keys())[2:-2]
 			old_values = Customer.objects.filter(pk=customer_id).values(*fields)[0]
-			old_values['status'] = str(old_values['status'])
+			old_values['pk'] = customer_id
 		else:
 			old_values = {'nip': request.POST['nip']}
 
@@ -166,7 +166,7 @@ class AccountancyProductsAddView(View):
 				AccountancyProducts.objects.create(**data)
 			else:
 				if name not in products_name:
-					msg = f'Product <<{name}>> in not rejestred. Please use "Add new product" button on the right side form.'
+					msg = f'Products <<{name}>> in not rejestred. Please use "Add new product" button on the right side form.'
 					messages.warning(request, msg)
 				elif quanity <= 0:
 					msg = f'Quanity <<{quanity}>> need be grower than zero value'
@@ -178,13 +178,13 @@ class AccountancyProductsAddView(View):
 class NewProductAddView(View):
 	'''class implementing the method of adding new product'''
 
-	def post(self, request, company_id:int=None, document_id:int=None) -> HttpResponseRedirect:
+	def post(self, request, company_id:int=None, customer_id:int=None, document_id:int=None) -> HttpResponseRedirect:
 		form = NewProductAddForm(data=request.POST)
 
 		if form.is_valid():
 			form.save()
 
-		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, document_id]))
+		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, customer_id, document_id]))
 
 
 class AccountancyProductDelete(View):

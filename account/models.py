@@ -15,3 +15,12 @@ class Quiz(models.Model):
 	start_play = models.DateTimeField(null=True,)
 	end_play = models.DateTimeField(null=True,)
 	points = models.SmallIntegerField(null=True,)
+
+
+class CreationModificationDateMixin(models.Model):
+	""" Abstract base class with a creation and modification date and time"""
+	class Meta:
+		abstract = True
+		
+	created = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
