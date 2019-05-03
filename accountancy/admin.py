@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 # my models
-from accountancy.models import Customer, Products, AccountancyDocument, AccountancyProducts
+from accountancy.models import Customer, Product, AccountancyDocument, AccountancyProducts
 
 # my functions
 from functions.archive import export_as_json
@@ -24,9 +24,9 @@ class CustomerAdmin(admin.ModelAdmin):
 	actions = [export_as_json]
 	
 
-@admin.register(Products)
-class ProductsAdmin(admin.ModelAdmin):
-	fieldsets = (('Products', {'fields': ('name', 'unit', 'netto', 'vat')})),
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+	list_display = ('name', 'unit', 'netto', 'vat')
 
 	actions = [export_as_json]
 	

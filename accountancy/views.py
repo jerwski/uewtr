@@ -10,7 +10,7 @@ from django.db.models import Case, Count, IntegerField, Max, Q, Sum, Value, When
 
 # my models
 from cashregister.models import Company
-from accountancy.models import Customer, Products, AccountancyDocument, AccountancyProducts
+from accountancy.models import Customer, Product, AccountancyDocument, AccountancyProducts
 
 # my forms
 from accountancy.forms import CustomerAddForm, AccountancyDocumentForm, NewProductAddForm
@@ -135,7 +135,7 @@ class AccountancyProductsAddView(View):
 	'''class enabling adding products into accountancy document'''
 
 	def get(self, request, company_id:int=None, customer_id:int=None, document_id:int=None) -> HttpResponse:
-		products_name = Products.objects.order_by('name').values_list('name', flat=True)
+		products_name = Product.objects.order_by('name').values_list('name', flat=True)
 		company = Company.objects.get(pk=company_id)
 		customer = Customer.objects.get(pk=customer_id)
 		document = AccountancyDocument.objects.get(pk=document_id)
@@ -153,7 +153,7 @@ class AccountancyProductsAddView(View):
 
 	def post(self, request, company_id:int=None, customer_id:int=None, document_id:int=None):
 		document = AccountancyDocument.objects.get(pk=document_id)
-		products_name = Products.objects.order_by('name').values_list('name', flat=True)
+		products_name = Product.objects.order_by('name').values_list('name', flat=True)
 		
 		if request.POST:
 			name = request.POST['product']
@@ -161,7 +161,7 @@ class AccountancyProductsAddView(View):
 			quanity = float(quanity)
 			
 			if name in products_name and quanity > 0:
-				product = Products.objects.get(name=name)
+				product = Product.objects.get(name=name)
 				data = {'document': document, 'product': product, 'quanity': quanity}
 				AccountancyProducts.objects.create(**data)
 			else:

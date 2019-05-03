@@ -33,12 +33,12 @@ class Customer(CreationModificationDateMixin):
 		return reverse('accountancy:change_customer', args=[self.id])
 
 
-class Products(CreationModificationDateMixin):
+class Product(CreationModificationDateMixin):
 	ZW = 0
 	VAT5 = 5
 	VAT8 = 8
 	VAT23 = 23
-	VAT = ((VAT5, '5%'), (VAT8, '8%'), (VAT23, '23%'), (ZW, 'Zwolniony'))
+	VAT = ((VAT23, '23%'), (VAT5, '5%'), (VAT8, '8%'), (ZW, 'Zwolniony'))
 	
 	SZTUK = 0
 	KOMPLET = 1
@@ -90,7 +90,7 @@ class AccountancyDocument(CreationModificationDateMixin):
 
 class AccountancyProducts(CreationModificationDateMixin):
 	document = models.ForeignKey(AccountancyDocument, related_name='products', on_delete=models.CASCADE)
-	product = models.ForeignKey(Products, on_delete=models.DO_NOTHING)
+	product = models.ForeignKey(Product, on_delete=models.DO_NOTHING)
 	quanity = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Ilość', validators=[positive_value])
 
 	class Meta:

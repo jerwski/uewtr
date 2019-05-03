@@ -3,7 +3,7 @@ from django import forms
 
 # my views
 from cashregister.models import Company
-from accountancy.models import Customer, Products, AccountancyDocument, AccountancyProducts
+from accountancy.models import Customer, Product, AccountancyDocument, AccountancyProducts
 
 # bootstrap4 widget
 from bootstrap4.widgets import RadioSelectButtonGroup
@@ -31,11 +31,11 @@ class NewProductAddForm(forms.ModelForm):
 	ROLA = 5
 	UNITS = ((SZTUK, 'szt.'), (KOMPLET, 'kpl.'), (TYSIĄC, 'tys.'), (ARKUSZ, 'ark.'), (LITR, 'ltr.'), (ROLA, 'rola'))
 	
-	vat = forms.ChoiceField(label='Stawka VAT', required=True, widget=forms.Select, choices=VAT, initial=23)
+	vat = forms.ChoiceField(label='Stawka VAT', required=True, widget=forms.Select, choices=VAT, initial=VAT23)
 	unit = forms.ChoiceField(widget=forms.Select(), choices=UNITS, initial=1)
 
 	class Meta:
-		model = Products
+		model = Product
 		fields = ['name', 'unit', 'netto', 'vat']
 
 
