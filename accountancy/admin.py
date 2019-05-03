@@ -18,7 +18,6 @@ export_as_json.short_description = 'Export selected records to json file'
 class CustomerAdmin(admin.ModelAdmin):
 	list_display = ('customer', 'nip', 'street', 'city', 'postal', 'phone', 'email', 'status')
 	list_filter = ('customer',)
-	list_editable = ('status',)
 	ordering = ['customer']
 	
 	actions = [export_as_json]

@@ -46,7 +46,7 @@ class CustomerAddForm(forms.ModelForm):
 	LIQUIDATION = 3
 	STATUS_CHOICE = ((CLOSED, 'Closed'), (OPERATING, 'Operating'), (SUSPENDED,'Suspended'), (LIQUIDATION, 'Liquidation'))
 
-	status = forms.ChoiceField(label="Select the status type...", required=True, widget=RadioSelectButtonGroup, choices=STATUS_CHOICE, initial=1)
+	status = forms.ChoiceField(label="Select the status type...", required=True, widget=RadioSelectButtonGroup, choices=STATUS_CHOICE, initial=OPERATING)
 
 	class Meta:
 		model = Customer

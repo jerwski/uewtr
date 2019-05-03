@@ -14,6 +14,13 @@ from validators.my_validator import positive_value
 
 
 class Customer(CreationModificationDateMixin):
+	CLOSED = 0
+	OPERATING = 1
+	SUSPENDED = 2
+	LIQUIDATION = 3
+	STATUS_CHOICE = (
+	(CLOSED, 'Closed'), (OPERATING, 'Operating'), (SUSPENDED, 'Suspended'), (LIQUIDATION, 'Liquidation'))
+	
 	customer = models.CharField(max_length=240,)
 	nip = models.CharField(max_length=13,)
 	street = models.CharField(blank=True, max_length=100,)
@@ -21,7 +28,7 @@ class Customer(CreationModificationDateMixin):
 	postal = models.CharField(blank=True, max_length=10, verbose_name='Postal code')
 	phone = models.CharField(blank=True, max_length=20,)
 	email = models.EmailField(blank=True,)
-	status = models.IntegerField(default=1,)
+	status = models.IntegerField(choices=STATUS_CHOICE, default=OPERATING)
 
 	class Meta:
 		ordering = ['customer']
