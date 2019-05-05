@@ -57,6 +57,11 @@ class Employee(models.Model):
 
 class EmployeeData(models.Model):
     '''class representing an extented data table of employee'''
+    NO_OVERTIME = 0
+    WEEKLY_OVERTIME = 1
+    SATURDAT_OVERTIME = 2
+    RATINGS = [(NO_OVERTIME, 'Clear contract'), (WEEKLY_OVERTIME, 'Weekly overtime'), (SATURDAT_OVERTIME, 'Saturday overtime')]
+    
     worker = models.ForeignKey(Employee, on_delete=models.CASCADE)
     birthday = models.DateField(null=True,)
     postal = models.CharField(max_length=100,)
@@ -68,7 +73,7 @@ class EmployeeData(models.Model):
     workplace = models.CharField(max_length=100, )
     start_contract = models.DateField(null=True,)
     end_contract = models.DateField(null=True, blank=True)
-    overtime = models.IntegerField()
+    overtime = models.IntegerField(choices=RATINGS, default=NO_OVERTIME)
 
     class Meta:
         ordering = ['worker']

@@ -125,10 +125,10 @@ def holiday_payment(employee_id:int, year:int, month:int)->float:
 def overhours_payment(employee_id:int, year:int, month:int)->float:
     '''returns the employee's income for overtimes in a given year and month'''
     overhourspay, basic_work_hours = 0, 0
-    worker_exdata = EmployeeData.objects.get(worker_id=employee_id)
+    worker_exdata = EmployeeData.objects.filter(worker_id=employee_id)
     rate= worker_rate(employee_id, year, month)
 
-    if worker_exdata.overtime:
+    if worker_exdata.exists() and worker_exdata.filter(overtime__in=[1,2]):
         # setting the overtime rate
         rate = rate/2
         # returns the number of working hours in a given month
@@ -139,10 +139,10 @@ def overhours_payment(employee_id:int, year:int, month:int)->float:
         exclude_sundays = Q(start_work__week_day=1) & Q(end_work__week_day=1)
         exclude_holidays = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
 
-        if worker_exdata.overtime == 1:
+        if worker_exdata.filter(overtime=1):
             # returns the number of hours worked without Holidyas Saturdays and Sundays in a given year and month
             basic_work_hours = WorkEvidence.objects.filter(mainquery&filterquery).exclude(exclude_holidays)
-        elif worker_exdata.overtime == 2:
+        elif worker_exdata.filter(overtime=2):
             # returns the number of hours worked on Saturdays but no Sundays and Holidays in a given year and month
             basic_work_hours = WorkEvidence.objects.filter(mainquery).exclude(exclude_sundays)
             basic_work_hours = basic_work_hours.exclude(exclude_holidays)

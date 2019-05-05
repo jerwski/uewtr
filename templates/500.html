@@ -15,10 +15,11 @@
       <p class="text-info text-danger font-italic lead">Causation: {{ error }}</p>
     {% endif %}
     {% if nodata %}
-      <p class="text-center text-danger font-weight-bold font-italic lead">There aren't any records in database! Load last saved backup!</p><br>
+      <p class="text-center text-danger font-weight-bold font-italic lead">Cheerio <kbd>{{ user }}</kbd><br>There aren't any records in database! Load last saved backup or input data for first employee...</p><br>
       <p class="text-info text-danger font-italic lead">Backup file: {{ backup }}<br>Created: {{ created|date:'r' }}</p>
       <div class="btn-group btn-group-lg">
         <a class="btn btn-outline-primary" href="{% url 'account:load-database' %}">Load last saved database backup</a>
+        <a class="btn btn-outline-success" href="{% url 'employee:employee_basicdata' %}">Add first employee data</a>
         <a class="btn btn-outline-danger" href="{% url 'account:exit' %}">Exit</a>
       </div>
     {% else %}

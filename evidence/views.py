@@ -286,8 +286,13 @@ class MonthlyPayrollView(View):
 				 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
 		form = PeriodMonthlyPayrollForm(initial={'choice_date': choice_date})
 		employees = Employee.objects.all()
-		employee_id = employees.filter(employeedata__end_contract__isnull=True, status=True).first()
-		employee_id = employee_id.id
+		employee_id = employees.filter(employeedata__end_contract__isnull=True)
+		
+		if employee_id.filter(status=True).exists():
+			employee_id = employee_id.first().id
+		else:
+			employee_id = employee_id.first().id
+			
 		total_work_hours = len(list(workingdays(year, month))) * 8
 		employees = employees.exclude(employeedata__end_contract__lt=date(year, month, 1)).order_by('surname')
 
@@ -311,8 +316,13 @@ class MonthlyPayrollView(View):
 		heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
 				 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
 		employees = Employee.objects.all()
-		employee_id = employees.filter(employeedata__end_contract__isnull=True, status=True).first()
-		employee_id = employee_id.id
+		employee_id = employees.filter(employeedata__end_contract__isnull=True)
+		
+		if employee_id.filter(status=True).exists():
+			employee_id = employee_id.first().id
+		else:
+			employee_id = employee_id.first().id
+			
 		choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
 		form = PeriodMonthlyPayrollForm(data={'choice_date':choice_date})
 

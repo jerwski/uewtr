@@ -43,7 +43,7 @@ class AdminView(View):
 			user = request.user.username
 			context = {'user': user}
 			context.update({'usage': dirdata()})
-			employee = Employee.objects.filter(status=True).first()
+			employee = Employee.objects.all()
 			
 			if request.session.get('check_update', True):
 				global _queryset
@@ -57,7 +57,7 @@ class AdminView(View):
 				request.session['check_update'] = False
 			
 			if employee:
-				employee_id = employee.id
+				employee_id = employee.first().id
 				context.update({'employee_id': employee_id, 'nodata': False})
 			else:
 				backup = Path(r'backup_json/db.json')

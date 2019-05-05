@@ -9,7 +9,9 @@
   <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
     <p class="h1 font-weight-normal">Working Time Recorder</p>
     <p class="text-info font-weight-bold font-italic">Application to handle employee working time in small business</p>
-    {% include 'blocks/small_upper_buttons.html' %}
+    {% if not new_employee %}
+      {% include 'blocks/small_upper_buttons.html' %}
+    {% endif %}
   </div>
   <div class="col-sm-2 mt-2 text-right">
     {% include 'blocks/alert.html' %}
