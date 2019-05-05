@@ -56,8 +56,11 @@ class AdminView(View):
 					messages.info(request, msg)
 				request.session['check_update'] = False
 			
-			if employee:
-				employee_id = employee.first().id
+			if employee.exists():
+				if employee.filter(status=True):
+					employee_id = employee.filter(status=True).first().id
+				else:
+					employee_id =employee.first().id
 				context.update({'employee_id': employee_id, 'nodata': False})
 			else:
 				backup = Path(r'backup_json/db.json')

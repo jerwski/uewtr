@@ -289,7 +289,7 @@ class MonthlyPayrollView(View):
 		employee_id = employees.filter(employeedata__end_contract__isnull=True)
 		
 		if employee_id.filter(status=True).exists():
-			employee_id = employee_id.first().id
+			employee_id = employee_id.filter(status=True).first().id
 		else:
 			employee_id = employee_id.first().id
 			
@@ -319,7 +319,7 @@ class MonthlyPayrollView(View):
 		employee_id = employees.filter(employeedata__end_contract__isnull=True)
 		
 		if employee_id.filter(status=True).exists():
-			employee_id = employee_id.first().id
+			employee_id = employee_id.filter(status=True).first().id
 		else:
 			employee_id = employee_id.first().id
 			
