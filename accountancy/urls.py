@@ -14,6 +14,7 @@ urlpatterns = [
 	path('<int:company_id>/', login_required(views.AccountancyDocumentView.as_view()), name='accountancy'),
 	path('<int:company_id>/<int:customer_id>/', login_required(views.AccountancyDocumentView.as_view()), name='accountancy'),
 	path('<int:company_id>/<int:customer_id>/<int:document_id>/', login_required(views.AccountancyDocumentView.as_view()), name='accountancy'),
+	path('edit_product/<int:company_id>/<int:customer_id>/<int:document_id>/<int:product_id>/', login_required(views.AccountancyProductsAddView.as_view()), name='edit_product'),
 	path('add_product/<int:company_id>/<int:customer_id>/<int:document_id>/', login_required(views.AccountancyProductsAddView.as_view()), name='add_product'),
 	path('new_product/<int:company_id>/<int:customer_id>/<int:document_id>/', login_required(views.NewProductAddView.as_view()), name='new_product'),
 	path('delete_product/<int:record>/<int:company_id>/<int:customer_id>/<int:document_id>/', login_required(views.AccountancyProductDelete.as_view()), name='delete_product'),

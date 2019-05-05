@@ -1,7 +1,7 @@
 {% load bootstrap4 %}
 
 <!-- Modal for adding product to accountancy document -->
-  <button id="new_product_Button" type="button" class="btn btn-sm btn-block btn-outline-info" data-toggle="modal" data-target="#new_product_Modal">Add new product</button>
+  <button id="new_product_Button" type="button" class="btn btn-sm btn-block btn-outline-info" data-toggle="modal" data-target="#new_product_Modal" {% if product_id %}disabled{% endif %}>Add new product</button>
 
   <!-- Modal -->
   <div class="modal fade" id="new_product_Modal" tabindex="-1" role="dialog" aria-labelledby="new_product" aria-hidden="true">
@@ -46,13 +46,9 @@
   </div>
 
   <script>
-      $(document).ready(function(){
-      $("#new_product_Button").click(function(){
-        $("#myModal").modal({backdrop: true});
-      });
-    });
-
+    $(document).ready(function(){
       $('#productsubmit').click(function() {
        $('#new_product_Modal').modal('hide');
+      });
     });
   </script>

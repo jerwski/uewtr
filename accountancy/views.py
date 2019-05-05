@@ -1,12 +1,10 @@
 # django library
 from django.urls import reverse
-from django.conf import settings
 from django.shortcuts import render
 from django.contrib import messages
 from django.utils.timezone import now
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseRedirect
-from django.db.models import Case, Count, IntegerField, Max, Q, Sum, Value, When
 
 # my models
 from cashregister.models import Company
@@ -49,7 +47,6 @@ class CustomerAddView(View):
 			employee = Customer.objects.get(pk=customer_id)
 			fields = list(employee.__dict__.keys())[2:-2]
 			old_values = Customer.objects.filter(pk=customer_id).values(*fields)[0]
-			old_values['pk'] = customer_id
 		else:
 			old_values = {'nip': request.POST['nip']}
 
@@ -134,35 +131,46 @@ class AccountancyDocumentView(View):
 class AccountancyProductsAddView(View):
 	'''class enabling adding products into accountancy document'''
 
-	def get(self, request, company_id:int=None, customer_id:int=None, document_id:int=None) -> HttpResponse:
-		products_name = Product.objects.order_by('name').values_list('name', flat=True)
+	def get(self, request, company_id:int=None, customer_id:int=None, document_id:int=None, product_id:int=None) -> HttpResponse:
 		company = Company.objects.get(pk=company_id)
 		customer = Customer.objects.get(pk=customer_id)
 		document = AccountancyDocument.objects.get(pk=document_id)
 		context = {'company': company, 'customer': customer, 'document':document}
 		products = AccountancyProducts.objects.filter(document_id=document_id).order_by('-created')
-		total_cost = sum(product.get_cost() for product in products)
-		total_quanity = products.aggregate(Sum('quanity'))
-		context.update({'products': products, 'products_name': list(products_name),
-		                'total_quanity': total_quanity['quanity__sum'], 'total_cost': total_cost})
-		new_product_form = NewProductAddForm()
+		products_name = Product.objects.order_by('name').values_list('name', flat=True)
+		context.update({'products': products, 'products_name': list(products_name)})
+		if product_id:
+			product = Product.objects.get(pk=product_id)
+			initial = {'name': product.name, 'unit': product.unit, 'netto': product.netto, 'vat': int(product.vat)}
+			new_product_form = NewProductAddForm(initial=initial)
+			context.update({'product_id': product_id, 'product': product})
+		else:
+			new_product_form = NewProductAddForm()
 		context.update({'new_product_form': new_product_form, 'company_id': company_id,
 		                'customer_id': customer_id, 'document_id': document_id})
 
 		return render(request, 'accountancy/accountancy_document_add_product.html', context)
 
-	def post(self, request, company_id:int=None, customer_id:int=None, document_id:int=None):
+	def post(self, request, company_id:int=None, customer_id:int=None, document_id:int=None, product_id:int=None):
 		document = AccountancyDocument.objects.get(pk=document_id)
 		products_name = Product.objects.order_by('name').values_list('name', flat=True)
 		
-		if request.POST:
+		if product_id:
+			updated, unit, netto, vat = now(), request.POST['unit'], request.POST['netto'], request.POST['vat']
+			update = {'updated': updated, 'unit': unit, 'netto': netto, 'vat': vat}
+			Product.objects.filter(name=request.POST['name']).update(**update)
+			update.pop('unit')
+			kwargs = update
+			AccountancyProducts.objects.filter(document=document).update(**kwargs)
+		else:
 			name = request.POST['product']
 			quanity = request.POST['quanity']
 			quanity = float(quanity)
 			
 			if name in products_name and quanity > 0:
 				product = Product.objects.get(name=name)
-				data = {'document': document, 'product': product, 'quanity': quanity}
+				netto, vat = product.netto, product.vat
+				data = {'document': document, 'product': product, 'quanity': quanity, 'netto': netto, 'vat': vat}
 				AccountancyProducts.objects.create(**data)
 			else:
 				if name not in products_name:
@@ -180,10 +188,13 @@ class NewProductAddView(View):
 
 	def post(self, request, company_id:int=None, customer_id:int=None, document_id:int=None) -> HttpResponseRedirect:
 		form = NewProductAddForm(data=request.POST)
-
+		
 		if form.is_valid():
 			form.save()
-
+		else:
+			msg = f'Either product exist in database or form is not valid...'
+			messages.warning(request, msg)
+			
 		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, customer_id, document_id]))
 
 
@@ -194,7 +205,7 @@ class AccountancyProductDelete(View):
 		record = AccountancyProducts.objects.get(pk=record)
 		if record:
 			record.delete()
-			msg = f'Succesful erase record <<name:{record.product}, quanity:{record.quanity}>> in accountancy document <<{record.document}>> for {record.document.company}.'
+			msg = f'Succesful erase record <<name: {record.product}, quanity: {record.quanity}>> in accountancy document <<{record.document}>> for {record.document.company}.'
 			messages.info(request, msg)
 		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, customer_id, document_id]))
 

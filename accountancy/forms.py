@@ -1,4 +1,6 @@
 # django library
+from decimal import Decimal
+
 from django import forms
 
 # my views
@@ -17,10 +19,10 @@ from tempus_dominus.widgets import DatePicker
 
 
 class NewProductAddForm(forms.ModelForm):
-	ZW = 0
-	VAT5 = 5
-	VAT8 = 8
-	VAT23 = 23
+	ZW = Decimal('0')
+	VAT5 = Decimal('5')
+	VAT8 = Decimal('8')
+	VAT23 = Decimal('23')
 	VAT = ((VAT5,'5%'), (VAT8, '8%'), (VAT23, '23%'), (ZW, 'Zwolniony'))
 
 	SZTUK = 0
@@ -31,7 +33,7 @@ class NewProductAddForm(forms.ModelForm):
 	ROLA = 5
 	UNITS = ((SZTUK, 'szt.'), (KOMPLET, 'kpl.'), (TYSIĄC, 'tys.'), (ARKUSZ, 'ark.'), (LITR, 'ltr.'), (ROLA, 'rola'))
 	
-	vat = forms.ChoiceField(label='Stawka VAT', required=True, widget=forms.Select, choices=VAT, initial=VAT23)
+	vat = forms.ChoiceField(label='Stawka VAT', required=True, widget=forms.Select, choices=VAT, initial=23)
 	unit = forms.ChoiceField(widget=forms.Select(), choices=UNITS, initial=1)
 
 	class Meta:

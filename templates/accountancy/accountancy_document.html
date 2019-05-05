@@ -65,7 +65,7 @@
                 <tr>
                   <td class="text-primary">{{ document }}</td>
                   <td>{{ document.created|date:'d-m-Y' }} ({{ document.created|day_since }})</td>
-                  <td class="text-danger text-right">{{ document.get_total_cost|money_format }}</td>
+                  <td class="text-danger text-right">{{ document.get_total_brutto_absolute|money_format }}</td>
                 </tr>
               {% endfor %}
               </tbody>
@@ -83,7 +83,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Search..."></span>
             </div>
-            <input class="form-control" id="myInput" type="text" placeholder="Wyszukaj odbiorcę wpisując nazwę, nip, kod, miasto, ulicę lub adres e-mail..." aria-label="Filtering table" aria-describedby="basic-addon">
+            <input class="form-control" id="myInput" type="text" placeholder="Wyszukaj odbiorcę wpisując nazwę, nip, kod, miasto, ulicę lub adres e-mail... albo dodaj odbiorcę" aria-label="Filtering table" aria-describedby="basic-addon">
             <div class="input-group-append">
               <a href="{% url 'accountancy:add_customer' %}" class="btn btn-info">Add/change
                 customer</a>

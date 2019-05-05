@@ -58,7 +58,7 @@ class Product(CreationModificationDateMixin):
 	name = models.CharField(max_length=200, db_index=True, unique=True, verbose_name='Nazwa Produktu')
 	unit = models.PositiveSmallIntegerField(blank=True, choices=UNITS, verbose_name='Jednostka masy')
 	netto = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Wartość netto')
-	vat = models.DecimalField(max_digits=4, decimal_places=2, choices=VAT, default=VAT23, verbose_name='Stawka podatku VAT')
+	vat = models.DecimalField(max_digits=4, decimal_places=2, choices=VAT, default=23, verbose_name='Stawka podatku VAT')
 
 	class Meta:
 		ordering = ('name',)
@@ -68,10 +68,12 @@ class Product(CreationModificationDateMixin):
 
 	def get_absolute_url(self):
 		return reverse('accountancy:change_customer', args=[self.id])
+	
+	def product_vat(self):
+		return self.netto * self.vat / 100
 
-	def get_brutto(self):
-		brutto = self.netto * (1 + self.vat / 100)
-		return brutto
+	def product_brutto(self):
+		return self.netto * (1 + self.vat / 100)
 
 
 class AccountancyDocument(CreationModificationDateMixin):
@@ -89,27 +91,53 @@ class AccountancyDocument(CreationModificationDateMixin):
 
 	def __str__(self):
 		return f'{self.number}/{now().month}/{now().year}'
+	
+	def get_total_netto(self):
+		total_vat = sum(item.get_netto() for item in self.products.all())
+		return total_vat
+	
+	def get_total_vat(self):
+		total_vat = sum(item.get_vat() for item in self.products.all())
+		return total_vat
 
-	def get_total_cost(self):
-		total_cost = sum(item.get_cost() for item in self.products.all())
+	def get_total_brutto(self):
+		total_cost = sum(item.get_brutto() for item in self.products.all())
 		return total_cost
+	
+	def get_total_quanity(self):
+		total_quanity = sum(item.quanity for item in self.products.all())
+		return total_quanity
+	
+	def get_total_brutto_absolute(self):
+		return sum(item.netto * (1 + item.vat/100) * item.quanity for item in self.products.all())
 
 
 class AccountancyProducts(CreationModificationDateMixin):
 	document = models.ForeignKey(AccountancyDocument, related_name='products', on_delete=models.CASCADE)
 	product = models.ForeignKey(Product, on_delete=models.DO_NOTHING)
 	quanity = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='Ilość', validators=[positive_value])
+	netto= models.DecimalField(max_digits=10, decimal_places=2, null=True)
+	vat = models.DecimalField(max_digits=4, decimal_places=2, null=True)
 
 	class Meta:
 		ordering = ['product']
 
 	def __str__(self):
 		return f'{self.product}'
+	
+	def get_netto(self):
+		return self.product.netto * self.quanity
+	
+	def get_vat(self):
+		return self.product.product_vat() * self.quanity
 
-	def get_cost(self):
-		worth = self.product.get_brutto() * self.quanity
-		return worth
-
+	def get_brutto(self):
+		return self.product.product_brutto() * self.quanity
+	
 	def product_delete(self):
 		args = [self.id, self.document.company_id, self.document.customer_id, self.document_id]
 		return reverse('accountancy:delete_product', args=args)
+	
+	def product_edit(self):
+		args = [self.document.company_id, self.document.customer_id, self.document_id, self.product.id]
+		return reverse('accountancy:edit_product', args=args)

@@ -41,7 +41,7 @@ def backup():
 	'''total backup of database'''
 	if not isinstance(Employee.objects.all(), EmptyQuerySet):
 		try:
-			with settings.ARCHIVE_ROOT.open('w') as jsonfile:
+			with settings.ARCHIVE_ROOT.open('w', encoding='utf-8') as jsonfile:
 				call_command('dumpdata', indent=4, stdout=jsonfile)
 		except FileNotFoundError as error:
 			print(f'Something wrong... Error: {error}')
@@ -52,7 +52,7 @@ def mkfixture(root_backup):
 	year = date.today().year
 	querys = {'employee': Employee.objects.all(),
 			  'employee data': EmployeeData.objects.all(),
-			  'employee hourly rate': EmployeeHourlyRate.objects.filter(update__year=year),
+			  'employee hourly rate': EmployeeHourlyRate.objects.all(),
 			  'work evidence': WorkEvidence.objects.filter(start_work__year=year),
 			  'employee leave': EmployeeLeave.objects.filter(leave_date__year=year),
 			  'account payment': AccountPayment.objects.filter(account_date__year=year),

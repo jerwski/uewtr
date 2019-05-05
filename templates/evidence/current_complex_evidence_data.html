@@ -150,6 +150,14 @@
       <div class="col-sm-4 text-center">
         <p class="text-center text-danger lead font-weight-normal bg-warning">Working days for {{ choice_date|date:'m/Y' }}</p>
         {% if work_hours %}
+          <div class="row text-primary font-weight-bold font-italic">
+            <div class="col-6">
+              <p>Working day{{ work_hours|length|pluralize:'s' }}: {{ work_hours|length }}</p>
+            </div>
+            <div class="col-6">
+              <p>Working hour{{ total_hours|pluralize:'s' }}: {{ total_hours|floatformat:2 }}</p>
+            </div>
+          </div>
           <div class="input-group">
             <div class="input-group-prepend">
               <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Search..."></span>
