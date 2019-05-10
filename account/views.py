@@ -96,9 +96,14 @@ class Invoices2Ftp(View):
 		backup_file = Path('~/Desktop/zip2ftp/invoices.zip').expanduser()
 		ftp_invoice_dir = r'Invoice_backup'
 		args = (backup_file, ftp_invoice_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
-		if socket.gethostname() == 'OFFICELAPTOP' and invoices_backup():
-			uploadFileFTP(*args)
-			messages.info(request, f'\nInvoices archive is safe...')
+		if socket.gethostname() == 'OFFICELAPTOP':
+			if invoices_backup():
+				uploadFileFTP(*args)
+				messages.info(request, f'\nInvoices archive is safe...')
+			else:
+				messages.info(request, f'\nArchive files are indentical...')
+		else:
+			messages.info(request, f'\nYou have not permission to make a invoices backup...')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
