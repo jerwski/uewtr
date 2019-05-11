@@ -1,7 +1,11 @@
 # django core
 from django.core.exceptions import ValidationError
 
+
 # Create your validators here
+
+
+contents_variants = ('z przeniesienia', 'Z przeniesienia', 'Z Przeniesienia', 'Z PRZENIESIENIA', 'z Przeniesienia')
 
 def check_pesel(digit:str):
     if len(digit) != 11:
@@ -14,6 +18,5 @@ def positive_value(value):
 
 
 def from_transfer(contents:str):
-    variants = ('z przeniesienia', 'Z przeniesienia', 'Z Przeniesienia', 'Z PRZENIESIENIA')
-    if contents in variants:
-        raise  ValidationError('%(contenst)s is not allowed! Use any other...', params={'contents': contents})
+    if contents in contents_variants:
+        raise  ValidationError('%(contenst)s is not allowed! Use any other...', code='invalid', params={'contents': contents})

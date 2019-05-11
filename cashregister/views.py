@@ -20,6 +20,9 @@ from cashregister.models import Company, CashRegister
 # my forms
 from cashregister.forms import CompanyAddForm, CashRegisterForm
 
+# my validators
+from validators.my_validator import contents_variants
+
 
 # Create your views here.
 
@@ -117,7 +120,6 @@ class CashRegisterView(View):
 
 	def post(self, request, company_id:int=None) -> HttpResponseRedirect:
 		form = CashRegisterForm(data=request.POST)
-		print(request.POST)
 		check = CashRegister.objects.filter(company_id=company_id)
 		companies = Company.objects.filter(status__in=[1,2,3]).order_by('company')
 		context = {'form': form, 'companies': companies}
@@ -163,6 +165,11 @@ class CashRegisterView(View):
 						else:
 							msg = f"Expenditure ({expenditure:.2f}PLN) is greater than the cash register status ({registerdata['status']:.2f}PLN)!"
 							messages.warning(request, msg)
+			else:
+				contents = request.POST['contents']
+				if contents in contents_variants:
+					msg = f'<<{contents}>> is not allowed! Use any other...'
+					messages.info(request, msg)
 
 		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 
