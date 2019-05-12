@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="row ml-3 mr-3 mb-2 bgbisque">
-      <div class="col-sm-2">
+      <div class="col-3">
         <p class="text-center text-danger lead font-weight-normal bg-warning">EMPLOYED WORKERS</p>
 
         <table class="table table-sm table-hover">
@@ -45,7 +45,7 @@
         </table>
       </div>
 
-      <div class="col-sm-6">
+      <div class="col-6">
         <p class="text-center text-danger lead font-weight-normal bg-warning">CURRENT DATA: {{ worker|upper }}</p>
         {% if worker.status %}
           <form action="." method="POST">{% csrf_token %}
@@ -147,15 +147,15 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-4 text-center">
+      <div class="col-3 text-center">
         <p class="text-center text-danger lead font-weight-normal bg-warning">Working days for {{ choice_date|date:'m/Y' }}</p>
         {% if work_hours %}
           <div class="row text-primary font-weight-bold font-italic">
             <div class="col-6">
-              <p>Working day{{ work_hours|length|pluralize:'s' }}: {{ work_hours|length }}</p>
+              <p>Work day{{ work_hours|length|pluralize:'s' }}: {{ work_hours|length }}</p>
             </div>
             <div class="col-6">
-              <p>Working hour{{ total_hours|pluralize:'s' }}: {{ total_hours|floatformat:2 }}</p>
+              <p>Work hour{{ total_hours|pluralize:'s' }}: {{ total_hours|floatformat:2 }}</p>
             </div>
           </div>
           <div class="input-group">
@@ -169,26 +169,26 @@
           </div>
           <table class="table table-hover table-sm" style="width:100%">
             <colgroup>
-              <col span="1" style="width:10%">
-              <col span="1" style="width:32%">
+              <col span="1" style="width:4%">
+              <col span="1" style="width:42%">
               <col span="1" style="width:12%">
               <col span="1" style="width:12%">
-              <col span="1" style="width:34%">
+              <col span="1" style="width:30%">
             </colgroup>
             <thead>
               <tr class="text-primary">
-                <th>Nr</th><th class="text-right">Data</th><th class="text-left">Start</th><th class="text-left">End</th><th>Number of hours</th>
+                <th>Nr</th><th>Data</th><th class="text-center">Start</th><th class="text-center">End</th><th>Hours</th>
               </tr>
             </thead>
           </table>
           <div class="table-scroll">
             <table class="table table-hover table-sm" style="width:100%">
                 <colgroup>
+                <col span="1" style="width:4%">
+                <col span="1" style="width:42%">
                 <col span="1" style="width:10%">
-                <col span="1" style="width:36%">
                 <col span="1" style="width:10%">
-                <col span="1" style="width:10%">
-                <col span="1" style="width:34%">
+                <col span="1" style="width:30%">
               </colgroup>
               <tbody id="searchTable">
               {% for hours in work_hours %}
@@ -197,7 +197,7 @@
                   <td class="text-right">{{ hours.start_work|date:'d l' }}</td>
                   <td class="text-danger">{{ hours.start_work|time:'H:i' }}</td>
                   <td class="text-danger">{{ hours.end_work|time:'H:i' }}</td>
-                  <td class="text-right text-info">{{ hours.jobhours|floatformat:2 }}</td>
+                  <td class="text-right text-info font-weight-bold">{{ hours.jobhours|floatformat:2 }}</td>
                 </tr>
               {% endfor %}
               </tbody>

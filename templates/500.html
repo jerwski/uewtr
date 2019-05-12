@@ -16,7 +16,7 @@
     {% endif %}
     {% if nodata %}
       <p class="text-center text-danger font-weight-bold font-italic lead">Cheerio <kbd>{{ user }}</kbd><br>There aren't any records in database! Load last saved backup or input data for first employee...</p><br>
-      <p class="text-info text-danger font-italic lead">Backup file: {{ backup }}<br>Created: {{ created|date:'r' }}</p>
+      <p class="text-info text-danger font-italic lead font-weight-bold">Backup file: <kbd>{{ backup }}</kbd><br>Created: <kbd>{{ created|date:'r' }}</kbd></p>
       <div class="btn-group btn-group-lg">
         <a class="btn btn-outline-primary" href="{% url 'account:load-database' %}">Load last saved database backup</a>
         <a class="btn btn-outline-success" href="{% url 'employee:employee_basicdata' %}">Add first employee data</a>
@@ -35,7 +35,7 @@
     <div class="row">
       <div class="col-3"></div>
         <div class="col-6">
-          <img src="{% static 'images/mainboard/logoUNI.png' %}" alt="logo">
+          <img src="{% static 'images/mainboard/logoUNI.png' %}" alt="logo"  width="50%">
           <p class="footer text-secondary text-center"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
           {% include 'blocks/alert.html' %}
         </div>
