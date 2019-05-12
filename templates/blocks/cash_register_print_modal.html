@@ -1,0 +1,72 @@
+{% load staticfiles %}
+<!-- Modal for data to will be erase if you want -->
+  {% if cr_set %}
+    <button id="crButton" type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#crModal">Print selected cahs register</button>
+  {% endif %}
+
+  <!-- Modal -->
+  <div class="modal fade" id="crModal" tabindex="-1" role="dialog" aria-labelledby="myCRModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h6 class="modal-title">Cash registers for {{ company }}</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url 'cashregister:print_register' company_id %}" method="POST">{% csrf_token %}
+            <div class="input-group">
+              <input class="form-control" id="myCR" type="text" placeholder="Search cash register..." aria-label="Filtering table" aria-describedby="basic-addon">
+              <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Lupa"></span>
+              </div>
+            </div>
+            <div class="scrollit">
+              <table class="table table-sm table-hover">
+                <tbody class="small" id="CRTable">
+                {% for nr in cr_set %}
+                  <tr><td>
+                    <div class="form-check custom-control custom-radio ml-5 text-left">
+                      <input type="radio" id="{{ nr }}" name="cr_number" class="custom-control-input" value="{{ nr }}" required>
+                      <label class="custom-control-label text-primary" for="{{ nr }}">{{ nr }}</label>
+                    </div>
+                  </td></tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <div class="col-1"></div>
+              <div class="col-3 btn">
+                <button type="button" class="btn btn-outline-info btn-block" data-dismiss="modal">Close</button>
+              </div>
+              <div class="col-7 btn">
+                <button id="crsub" type="submit" class="btn btn-outline-success btn-block">Print selected cash register</button>
+              </div>
+              <div class="col-1"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  $('#crsub').click(function() {
+   $('#crModal').modal('hide');
+});
+</script>
+
+
+<!-- search table-->
+  <script>
+    $(document).ready(function(){
+    $("#myCR").on("keyup", function() {var value =
+      $(this).val().toLowerCase();
+        $("#CRTable").find("tr").filter(function() {
+          $(this).toggle(
+            $(this).text().toLowerCase().indexOf(value) > -1)})
+        ;})
+    ;});
+  </script>
