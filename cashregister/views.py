@@ -12,7 +12,7 @@ import pdfkit
 
 # my functions
 from functions.archive import check_internet_connection
-from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf
+from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf, cashregister2attachment
 
 # my models
 from cashregister.models import Company, CashRegister
@@ -101,8 +101,10 @@ class CashRegisterView(View):
 			context.update(dict(registerdata))
 			records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
 			form = CashRegisterForm(initial={'company': company})
+			cr_data = CashRegister.objects.filter(company_id=company_id).exclude(contents='z przeniesienia')
+			cr_set = sorted(set(f'{item.created.month}/{item.created.year}' for item in cr_data))
 			context.update({'form': form, 'company': company, 'company_id': company_id,
-			                'records': records.order_by('-created')})
+			                'cr_set': cr_set, 'records': records.order_by('-created')})
 
 			if now().month==1:
 				month, year = 12, now().year - 1
@@ -130,7 +132,10 @@ class CashRegisterView(View):
 			registerdata = cashregisterdata(company_id, month, year)
 			context.update(dict(registerdata))
 			records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
-			context.update({'company': company, 'company_id': company_id, 'records': records.order_by('-created')})
+			cr_data = CashRegister.objects.filter(company_id=company_id).exclude(contents='z przeniesienia')
+			cr_set = sorted(set(f'{item.created.month}/{item.created.year}' for item in cr_data))
+			context.update({'company': company, 'company_id': company_id,
+			                'cr_set': cr_set, 'records': records.order_by('-created')})
 
 			if now().month==1:
 				month, year = 12, now().year - 1
@@ -188,9 +193,8 @@ class CashRegisterDelete(View):
 
 class CashRegisterPrintView(View):
 	'''class representing the view of monthly cash register print'''
-	# TODO: create class to serial print cash register and cash accept
 	def get(self, request, company_id:int) -> HttpResponse:
-		'''convert html cashregister_pdf for each companies to pdf'''
+		'''convert html cashregister_pdf for selected company to pdf'''
 		if now().month==1:
 			month, year = 12, now().year - 1
 		else:
@@ -200,15 +204,25 @@ class CashRegisterPrintView(View):
 
 		if html:
 			# create cash register as pdf file attachment
-			options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
-			           'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None,
-			           'quiet': ''}
+			response = cashregister2attachment(html, company_id, month, year)
 
-			pdf = pdfkit.from_string(html, False, options=options)
-			filename = f'cashregister_{company_id}_{year}_{month}.pdf'
+			return response
+		else:
+			messages.warning(request, r'Nothing to print...')
 
-			response = HttpResponse(pdf, content_type='application/pdf')
-			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
+
+	def post(self, request, company_id:int) -> HttpResponse:
+		'''convert html cashregister_pdf for selected cash register to pdf'''
+		data = request.POST['cr_number']
+		month, year = int(data.split('/')[0]), int(data.split('/')[1])
+
+		html = cashregisterhtml2pdf(company_id, month, year)
+
+		if html:
+			# create cash register as pdf file attachment
+			response = cashregister2attachment(html, company_id, month, year)
+
 			return response
 		else:
 			messages.warning(request, r'Nothing to print...')

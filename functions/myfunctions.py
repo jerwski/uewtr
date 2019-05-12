@@ -1,3 +1,9 @@
+# django library
+from django.http import HttpResponse
+
+# pdfkit library
+import pdfkit
+
 # matplotlib library
 import matplotlib
 
@@ -43,7 +49,7 @@ from employee.templatetags.utility_tags import money_format
 # Create your functions here
 
 
-def sendemail(subject: str, message: str, sender: int, recipient: list, attachments: list, cc=None):
+def sendemail(subject:str, message:str, sender:int, recipient:list, attachments:list, cc=None):
 	email = EmailMessage(subject, message, sender, recipient, cc)
 
 	for attachment in attachments:
@@ -51,7 +57,7 @@ def sendemail(subject: str, message: str, sender: int, recipient: list, attachme
 		email.send(fail_silently=True)
 
 
-def initial_worktime_form(work_hours: int) -> dict:
+def initial_worktime_form(work_hours:int) -> dict:
 	'''return initial data for WorkEvidenceForm'''
 	hours = dict(zip([12, 14, 16, 18, 6], [6, 6, 6, 6, 22]))
 
@@ -81,7 +87,7 @@ def initial_worktime_form(work_hours: int) -> dict:
 	return initial
 
 
-def initial_account_form(employee_id: int) -> dict:
+def initial_account_form(employee_id:int) -> dict:
 	'''return initial date for AccountPaymentForm'''
 	worker = Employee.objects.get(pk=employee_id)
 	account_date = date.today() - timedelta(days=int(date.today().day))
@@ -90,7 +96,7 @@ def initial_account_form(employee_id: int) -> dict:
 	return initial
 
 
-def initial_leave_form(employee_id: int) -> dict:
+def initial_leave_form(employee_id:int) -> dict:
 	'''return initial leave_flag for EmployeeLeaveForm'''
 	worker = Employee.objects.get(pk=employee_id)
 	leave_date = date.today() - timedelta(days=1)
@@ -103,7 +109,7 @@ def initial_leave_form(employee_id: int) -> dict:
 	return initial
 
 
-def erase_records(employee_id: int) -> dict:
+def erase_records(employee_id:int) -> dict:
 	context = dict()
 	worker = Employee.objects.get(pk=employee_id)
 	opt1, opt2 = {'worker': worker, 'then': Value(1)}, {'default': Value(0), 'output_field': IntegerField()}
@@ -118,7 +124,7 @@ def erase_records(employee_id: int) -> dict:
 	return context
 
 
-def data_chart(employee_id: int, year: int) -> tuple:
+def data_chart(employee_id:int, year:int) -> tuple:
 	'''return data for Annual chart income for passed employee_id'''
 	_, *month_name = list(calendar.month_name)
 	brutto_income = [total_payment(employee_id, year, month)['brutto'] for month in range(1, 13)]
@@ -127,7 +133,7 @@ def data_chart(employee_id: int, year: int) -> tuple:
 	return income, total_income
 
 
-def plot_chart(employee_id: int, year: int):
+def plot_chart(employee_id:int, year:int):
 	worker = Employee.objects.get(pk=employee_id)
 	income, total_income = data_chart(employee_id, year)
 	plt.style.use('dark_background')
@@ -152,7 +158,7 @@ def plot_chart(employee_id: int, year: int):
 	chart.show()
 
 
-def payrollhtml2pdf(month: int, year: int) -> bool:
+def payrollhtml2pdf(month:int, year:int) -> bool:
 	'''convert html file (evidence/monthly_payroll_pdf.html) to pdf file'''
 	heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota', 'Niedziela', 'Zaliczka',
 			 'Do wypłaty', 'Data i podpis']
@@ -183,7 +189,7 @@ def payrollhtml2pdf(month: int, year: int) -> bool:
 		return False
 
 
-def leavehtml2pdf(employee_id: int, year: int):
+def leavehtml2pdf(employee_id:int, year:int):
 	'''convert html annuall leave time for each employee in current year to pdf'''
 	month_name = list(calendar.month_name)[1:]
 	worker = Employee.objects.get(pk=employee_id)
@@ -200,7 +206,7 @@ def leavehtml2pdf(employee_id: int, year: int):
 		return False
 
 
-def tree(directory: Path):
+def tree(directory:Path):
 	'''listing whole tree for passed directory as instance of class WindowsPath'''
 	print(f'+ {directory}')
 	for path in sorted(directory.rglob('*')):
@@ -209,7 +215,7 @@ def tree(directory: Path):
 		print(f'{spacer} + {path.name}')
 
 
-def remgarbage(*paths: Path):
+def remgarbage(*paths:Path):
 	'''removes attachment pdf file'''
 	patterns = ('leaves_data_*.pdf', 'payroll_*.pdf', 'cashregister_*.pdf', 'cashaccept_*.pdf')
 	find = (file for path in paths for file in Path.iterdir(path) for pattern in patterns if file.match(pattern))
@@ -217,7 +223,7 @@ def remgarbage(*paths: Path):
 		file.unlink()
 
 
-def jpk_files(path: Path):
+def jpk_files(path:Path):
 	'''find all .jpk files created in present month and year'''
 	files = []
 	year, month = now().year, now().month
@@ -231,7 +237,7 @@ def jpk_files(path: Path):
 	return files
 
 
-def cashregisterdata(company_id: int, month: int, year: int) -> dict:
+def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 	'''return data from cash register'''
 	registerdata, saldo = defaultdict(float), 0
 	register = CashRegister.objects.filter(company_id=company_id)
@@ -263,7 +269,7 @@ def cashregisterdata(company_id: int, month: int, year: int) -> dict:
 	return registerdata
 
 
-def cashregisterhtml2pdf(company_id: int, month: int, year: int):
+def cashregisterhtml2pdf(company_id:int, month:int, year:int):
 	'''convert html cash register for last month to pdf'''
 	company = Company.objects.get(pk=company_id)
 	cashregister = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
@@ -282,7 +288,20 @@ def cashregisterhtml2pdf(company_id: int, month: int, year: int):
 		return False
 
 
-def cashaccept2pdf(record: int, number=1):
+def cashregister2attachment(html, company_id:int, month:int, year:int):
+	options = {'page-size'  : 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
+	           'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None, 'quiet': ''}
+
+	pdf = pdfkit.from_string(html, False, options=options)
+	filename = f'cashregister_{company_id}_{year}_{month}.pdf'
+
+	response = HttpResponse(pdf, content_type='application/pdf')
+	response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+
+	return response
+
+
+def cashaccept2pdf(record:int, number=1):
 	'''convert html cash pay/accept for given record to pdf'''
 	data = CashRegister.objects.get(pk=record)
 	context = {'data': data}

@@ -144,29 +144,33 @@ class QuizView(View):
 		context = {'user': user}
 
 		if quiz_id:
-			query, answer, answers = quizset(_queryset)
-			quiz = Quiz.objects.get(pk=quiz_id)
-			points, set_of_questions = quiz.points, quiz.set_of_questions
-			start_play, end_play = quiz.start_play, quiz.end_play
-
-			if end_play:
-				playtime = end_play - start_play
-				playtime = str(playtime).split('.')[0]
-			else:
-				playtime = '0:00:00'
-
-			if set_of_questions:
-				percent = 20 * points / set_of_questions
-			else:
-				percent = 0
-
-			set_of_questions += 1
-			defaults = {'query': query, 'set_of_questions': set_of_questions,
-			            'answer': answer, 'answers': ';'.join(answers)}
-			Quiz.objects.filter(pk=quiz_id).update(**defaults)
-			data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'playtime': playtime, 'poll': len(_queryset),
-			        'answers': answers, 'set_of_questions': set_of_questions, 'percent': percent}
-			context.update(data)
+			try:
+				query, answer, answers = quizset(_queryset)
+				quiz = Quiz.objects.get(pk=quiz_id)
+				points, set_of_questions = quiz.points, quiz.set_of_questions
+				start_play, end_play = quiz.start_play, quiz.end_play
+	
+				if end_play:
+					playtime = end_play - start_play
+					playtime = str(playtime).split('.')[0]
+				else:
+					playtime = '0:00:00'
+	
+				if set_of_questions:
+					percent = 20 * points / set_of_questions
+				else:
+					percent = 0
+	
+				set_of_questions += 1
+				defaults = {'query': query, 'set_of_questions': set_of_questions,
+				            'answer': answer, 'answers': ';'.join(answers)}
+				Quiz.objects.filter(pk=quiz_id).update(**defaults)
+				data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'playtime': playtime, 'poll': len(_queryset),
+				        'answers': answers, 'set_of_questions': set_of_questions, 'percent': percent}
+				context.update(data)
+			except:
+				logout(request)
+				return HttpResponseRedirect(reverse_lazy('login'))
 
 		else:
 			start_play = now()
