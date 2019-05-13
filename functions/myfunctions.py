@@ -107,7 +107,7 @@ def initial_worktime_form(work_hours:int) -> dict:
 def initial_account_form(employee_id:int) -> dict:
 	'''return initial date for AccountPaymentForm'''
 	worker = Employee.objects.get(pk=employee_id)
-	account_date = date.today() - timedelta(days=int(date.today().day))
+	account_date = now().date() - timedelta(days=int(now().date().day))
 	initial = {'worker': worker, 'account_date': account_date}
 
 	return initial
@@ -116,7 +116,7 @@ def initial_account_form(employee_id:int) -> dict:
 def initial_leave_form(employee_id:int) -> dict:
 	'''return initial leave_flag for EmployeeLeaveForm'''
 	worker = Employee.objects.get(pk=employee_id)
-	leave_date = date.today() - timedelta(days=1)
+	leave_date = now().date() - timedelta(days=1)
 	initial = {'worker': worker, 'leave_date': leave_date}
 	if worker.leave==1:
 		initial.__setitem__('leave_flag', ['paid_leave', ])
