@@ -33,7 +33,7 @@ from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, se
 
 class WorkingTimeRecorderView(View):
 	'''class implementing the method of adding working time for specific employee'''
-	def get(self, request, employee_id:int, work_hours:int=0)->render:
+	def get(self, request, employee_id:int, work_hours:int=None)->render:
 		worker = Employee.objects.get(pk=employee_id)
 		initial = {'worker': worker}
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')

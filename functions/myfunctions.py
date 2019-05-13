@@ -62,7 +62,7 @@ def initial_worktime_form(work_hours:int) -> dict:
 	hours = dict(zip([12, 14, 16, 18, 6], [6, 6, 6, 6, 22]))
 
 	if date.today().isoweekday()==1:
-		if work_hours==1:
+		if work_hours==12:
 			start_date = date.today() - timedelta(days=2)
 			end_date = date.today() - timedelta(days=2)
 		elif work_hours==6:
