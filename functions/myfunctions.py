@@ -60,29 +60,46 @@ def sendemail(subject:str, message:str, sender:int, recipient:list, attachments:
 def initial_worktime_form(work_hours:int) -> dict:
 	'''return initial data for WorkEvidenceForm'''
 	hours = dict(zip([12, 14, 16, 18, 6], [6, 6, 6, 6, 22]))
+	start, end = now().date(), now().date()
 
-	if date.today().isoweekday()==1:
+	if start.isoweekday()==1:
 		if work_hours==12:
-			start_date = date.today() - timedelta(days=2)
-			end_date = date.today() - timedelta(days=2)
+			start = start - timedelta(days=2)
+			end = end - timedelta(days=2)
 		elif work_hours==6:
-			start_date = date.today() - timedelta(days=3)
-			end_date = date.today() - timedelta(days=2)
+			start = start - timedelta(days=3)
+			end = end - timedelta(days=2)
 		else:
-			start_date = date.today() - timedelta(days=3)
-			end_date = date.today() - timedelta(days=3)
+			start = start - timedelta(days=3)
+			end = end - timedelta(days=3)
 	else:
 		if work_hours==6:
-			start_date = date.today() - timedelta(days=1)
-			end_date = date.today()
+			start = start - timedelta(days=1)
+			end = end
+		elif work_hours==12:
+			if start.isoweekday()==0:
+				start = start - timedelta(days=1)
+				end = end - timedelta(days=1)
+			elif start.isoweekday()==2:
+				start = start - timedelta(days=3)
+				end = end - timedelta(days=3)
+			elif start.isoweekday()==3:
+				start = start - timedelta(days=4)
+				end = end - timedelta(days=4)
+			elif start.isoweekday()==4:
+				start = start - timedelta(days=5)
+				end = end - timedelta(days=5)
+			elif start.isoweekday()==5:
+				start = start - timedelta(days=6)
+				end = end - timedelta(days=6)
 		else:
-			start_date = date.today() - timedelta(days=1)
-			end_date = date.today() - timedelta(days=1)
+			start = start - timedelta(days=1)
+			end = end - timedelta(days=1)
 
-	start_date = datetime(start_date.year, start_date.month, start_date.day, hours[work_hours], 0)
-	end_date = datetime(end_date.year, end_date.month, end_date.day, work_hours, 0)
+	start_work = datetime(start.year, start.month, start.day, hours[work_hours], 0)
+	end_work = datetime(end.year, end.month, end.day, work_hours, 0)
 
-	initial = {'start_work': start_date, 'end_work': end_date}
+	initial = {'start_work': start_work, 'end_work': end_work}
 
 	return initial
 
