@@ -58,8 +58,11 @@ def sendemail(subject:str, message:str, sender:int, recipient:list, attachments:
 
 
 def initial_worktime_form(work_hours:int) -> dict:
-	'''return initial data for WorkEvidenceForm
-	12=06:00-12:00, 14=12=06:00-14:00, 16=06:00-16:00, 18=06:00-18:00, 6=22:00-06:00'''
+	'''
+	return initial data for WorkEvidenceForm,
+	args; 12=>06:00-12:00, 14=>12=06:00-14:00,
+	16=>06:00-16:00, 18=>06:00-18:00, 6=>22:00-06:00
+	'''
 	hours = dict(zip([12, 14, 16, 18, 6], [6, 6, 6, 6, 22]))
 	start, end = now().date(), now().date()
 
