@@ -12,7 +12,7 @@ import pdfkit
 
 # my functions
 from functions.archive import check_internet_connection
-from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf, cashregister2attachment
+from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf, make_attachment
 
 # my models
 from cashregister.models import Company, CashRegister
@@ -204,7 +204,8 @@ class CashRegisterPrintView(View):
 
 		if html:
 			# create cash register as pdf file attachment
-			response = cashregister2attachment(html, company_id, month, year)
+			filename = f'cashregister_{company_id}_{year}_{month}.pdf'
+			response = make_attachment(html, filename)
 
 			return response
 		else:
@@ -221,7 +222,8 @@ class CashRegisterPrintView(View):
 
 		if html:
 			# create cash register as pdf file attachment
-			response = cashregister2attachment(html, company_id, month, year)
+			filename = f'cashregister_{company_id}_{year}_{month}.pdf'
+			response = make_attachment(html, filename)
 
 			return response
 		else:
@@ -273,13 +275,8 @@ class CashRegisterAcceptView(View):
 		html = cashaccept2pdf(record)
 		if html:
 			# create pdf file and save on templates/pdf/cashaccept_{record}.pdf
-			options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
-			           'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None,
-			           'quiet': ''}
-			pdf = pdfkit.from_string(html, False, options=options)
 			filename = f'cashaccept_{record}.pdf'
-			response = HttpResponse(pdf, content_type='application/pdf')
-			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+			response = make_attachment(html, filename)
 			return response
 		else:
 			messages.warning(request, r'Nothing to print...')

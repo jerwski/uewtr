@@ -309,12 +309,11 @@ def cashregisterhtml2pdf(company_id:int, month:int, year:int):
 		return False
 
 
-def cashregister2attachment(html, company_id:int, month:int, year:int):
+def make_attachment(html, filename):
 	options = {'page-size'  : 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
 	           'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None, 'quiet': ''}
 
 	pdf = pdfkit.from_string(html, False, options=options)
-	filename = f'cashregister_{company_id}_{year}_{month}.pdf'
 
 	response = HttpResponse(pdf, content_type='application/pdf')
 	response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
