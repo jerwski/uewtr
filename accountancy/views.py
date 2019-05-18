@@ -152,16 +152,22 @@ class AccountancyProductsAddView(View):
 		return render(request, 'accountancy/accountancy_document_add_product.html', context)
 
 	def post(self, request, company_id:int=None, customer_id:int=None, document_id:int=None, product_id:int=None):
+		updated = now()
 		document = AccountancyDocument.objects.get(pk=document_id)
 		products_name = Product.objects.order_by('name').values_list('name', flat=True)
 		
 		if product_id:
-			updated, unit, netto, vat = now(), request.POST['unit'], request.POST['netto'], request.POST['vat']
-			update = {'updated': updated, 'unit': unit, 'netto': netto, 'vat': vat}
-			Product.objects.filter(name=request.POST['name']).update(**update)
-			update.pop('unit')
-			kwargs = update
-			AccountancyProducts.objects.filter(document=document).update(**kwargs)
+			name, unit, netto, vat = request.POST['name'], request.POST['unit'], request.POST['netto'], request.POST['vat']
+			update = {'name': name, 'updated': updated, 'unit': unit, 'netto': netto, 'vat': vat}
+			try:
+				Product.objects.filter(pk=product_id).update(**update)
+				product = Product.objects.get(pk=product_id)
+				kwargs = {'product': product, 'updated': updated, 'netto': netto, 'vat': vat}
+				AccountancyProducts.objects.filter(document=document, product_id=product_id).update(**kwargs)
+				messages.info(request, f'Product <<{product}>> has been updated...')
+			except:
+				msg = f'Product <<{name}>> exist in database. Name of product need to be unique.'
+				messages.info(request, msg)
 		else:
 			name = request.POST['product']
 			quanity = request.POST['quanity']
@@ -202,11 +208,13 @@ class AccountancyProductDelete(View):
 	'''class enabling deleting records in the cash report'''
 
 	def get(self, request, record:int=None, company_id:int=None, customer_id:int=None, document_id:int=None) -> HttpResponseRedirect:
-		record = AccountancyProducts.objects.get(pk=record)
-		if record:
+		try:
+			record = AccountancyProducts.objects.get(pk=record)
 			record.delete()
 			msg = f'Succesful erase record <<name: {record.product}, quanity: {record.quanity}>> in accountancy document <<{record.document}>> for {record.document.company}.'
 			messages.info(request, msg)
+		except:
+			messages.info(request, 'Something\'s wrong')
 		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, customer_id, document_id]))
 
 

@@ -176,8 +176,8 @@
               <col span="1" style="width:30%">
             </colgroup>
             <thead>
-              <tr class="text-primary">
-                <th>Nr</th><th>Data</th><th class="text-center">Start</th><th class="text-center">End</th><th>Hours</th>
+              <tr class="text-dark">
+                <th>Nr</th><th>Data</th><th class="text-center">Start</th><th class="text-center">End</th><th class="text-center">Hours</th>
               </tr>
             </thead>
           </table>
@@ -194,9 +194,15 @@
               {% for hours in work_hours %}
                 <tr>
                   <td class="text-secondary">{{ forloop.counter }}</td>
-                  <td class="text-right">{{ hours.start_work|date:'d l' }}</td>
-                  <td class="text-danger">{{ hours.start_work|time:'H:i' }}</td>
-                  <td class="text-danger">{{ hours.end_work|time:'H:i' }}</td>
+                  {% if hours.start_work|date:'w' == '0' %}
+                    <td class="text-right text-danger">{{ hours.start_work|date:'d l' }}</td>
+                  {% elif hours.start_work|date:'w' == '6' %}
+                    <td class="text-right text-primary">{{ hours.start_work|date:'d l' }}</td>
+                  {% else %}
+                    <td class="text-right">{{ hours.start_work|date:'d l' }}</td>
+                  {% endif %}
+                  <td class="text-success">{{ hours.start_work|time:'H:i' }}</td>
+                  <td class="text-success">{{ hours.end_work|time:'H:i' }}</td>
                   <td class="text-right text-info font-weight-bold">{{ hours.jobhours|floatformat:2 }}</td>
                 </tr>
               {% endfor %}

@@ -67,7 +67,7 @@ class Product(CreationModificationDateMixin):
 		return self.name
 
 	def get_absolute_url(self):
-		return reverse('accountancy:change_customer', args=[self.id])
+		return reverse('accountancy:add_product', args=[self.id])
 	
 	def product_vat(self):
 		return self.netto * self.vat / 100

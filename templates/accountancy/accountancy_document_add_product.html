@@ -79,7 +79,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text bg-info text-white" id="id_product">Product</span>
                     </div>
-                    <input type="text" class="form-control" name="product" id="product" placeholder="Nazwa artykułu" aria-label="Nazwa artykułu" aria-describedby="id_product" required {% if product_id %}disabled{% endif %}>
+                    <input type="text" class="form-control" name="product" id="product" placeholder="Nazwa artykułu" aria-label="Nazwa artykułu" aria-describedby="id_product" required {% if product_id %}disabled{% endif %} {% if product %}value="{{ product }}"{% endif %}>
                   </div>
                 </div>
                 <div class="col-4">
