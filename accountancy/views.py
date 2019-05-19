@@ -209,8 +209,6 @@ class NewProductAddView(View):
 			messages.warning(request, f'Product exist in database...')
 
 		return HttpResponseRedirect(reverse('accountancy:add_product', args=args))
-			
-
 
 
 class AccountancyProductDelete(View):
