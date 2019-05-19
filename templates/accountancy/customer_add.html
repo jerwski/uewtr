@@ -9,15 +9,15 @@
 
   <div class="container">
     <div class="row m-3">
-      <div class="col text-left">
+      <div class="col-2 text-left">
         <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" width="92%"></a>
         <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
       </div>
-      <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
+      <div class="col-8 mb-3 mt-2 text-center text-dark">
         <p class="h1 font-weight-normal">Working Time Recorder</p>
         <p class="text-info font-weight-bold font-italic">Application to handle employee working time in small business</p>
       </div>
-      <div class="col">{% include 'blocks/alert.html' %}</div>
+      <div class="col-2 text-right">{% include 'blocks/alert.html' %}</div>
 
     </div>
     <div class="row">
@@ -86,7 +86,7 @@
                 <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
                 <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
                 {% if customer_id %}
-                  <a href="{% url 'accountancy:add_customer' %}" class="btn btn-outline-primary">Back to add customer</a>
+                  <a href="{% url 'accountancy:add_customer' %}" class="btn btn-outline-primary">Add new customer</a>
                 {% endif %}
                 <a href="{% url 'accountancy:accountancy' %}" class="btn btn-outline-info">Accountancy</a>
                 <button type="submit" class="btn btn-outline-success">Confirm</button>

@@ -27,7 +27,7 @@ class CustomerAddView(View):
 		customers = Customer.objects.order_by('customer')
 		if customer_id:
 			customer = Customer.objects.get(pk=customer_id)
-			fields = list(customer.__dict__.keys())[2:-2]
+			fields = list(customer.__dict__.keys())[4:]
 			initial = Customer.objects.filter(pk=customer_id).values(*fields)[0]
 			form = CustomerAddForm(initial=initial)
 			context = {'form': form, 'customer_id': customer_id, 'customers': customers, }
@@ -39,14 +39,16 @@ class CustomerAddView(View):
 		return render(request, 'accountancy/customer_add.html', context)
 
 	def post(self, request, customer_id:int = None) -> HttpResponseRedirect:
+		args = [customer_id]
 		customers = Customer.objects.all().order_by('customer')
 		form = CustomerAddForm(data=request.POST)
 		context = {'form': form, 'customers': customers, }
 
 		if customer_id:
-			employee = Customer.objects.get(pk=customer_id)
-			fields = list(employee.__dict__.keys())[2:-2]
+			customer = Customer.objects.get(pk=customer_id)
+			fields = list(customer.__dict__.keys())[4:]
 			old_values = Customer.objects.filter(pk=customer_id).values(*fields)[0]
+			old_values['status'] = str(old_values['status'])
 		else:
 			old_values = {'nip': request.POST['nip']}
 
@@ -54,9 +56,9 @@ class CustomerAddView(View):
 			new_values = form.cleaned_data
 
 			if new_values!=old_values:
-
 				try:
 					obj, created = Customer.objects.update_or_create(defaults=new_values, **old_values)
+					args = [obj.id]
 
 					if created:
 						msg = f'Successful created new customer {obj}'
@@ -65,14 +67,14 @@ class CustomerAddView(View):
 						msg = f'Successful update data for customer {obj}'
 						messages.success(request, msg)
 
-					return HttpResponseRedirect(reverse('accountancy:change_customer', args=[obj.id]))
-
 				except Customer.DoesNotExist:
-					messages.warning(request, r'Somthing wrong... try again!')
+					messages.warning(request, r'Somthing wrong...')
 
 			else:
 				messages.info(request, r'Nothing to change!')
-				return HttpResponseRedirect(reverse('accountancy:change_customer', args=[customer_id]))
+
+			return HttpResponseRedirect(reverse('accountancy:change_customer', args=args))
+
 		else:
 			return render(request, 'accountancy/customer_add.html', context)
 
