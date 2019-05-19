@@ -72,14 +72,14 @@
         <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD TO ACCOUNTANCY DOCUMENT FOR <strong>{{ customer|upper }}</strong></p>
         <div class="row">
           <div class="col-10">
-            <form action="." method="POST">{% csrf_token %}
+            <form action="{% url 'accountancy:add_product' company_id customer_id document_id %}" method="POST">{% csrf_token %}
               <div class="row">
                 <div class="col-8">
                   <div class="input-group input-group-sm">
                     <div class="input-group-prepend">
                       <span class="input-group-text bg-info text-white" id="id_product">Product</span>
                     </div>
-                    <input type="text" class="form-control" name="product" id="product" placeholder="Nazwa artykułu" aria-label="Nazwa artykułu" aria-describedby="id_product" required {% if product_id %}disabled{% endif %} {% if product %}value="{{ product }}"{% endif %}>
+                    <input type="text" class="form-control" name="product" id="product" placeholder="Nazwa artykułu" aria-label="Nazwa artykułu" aria-describedby="id_product" required {% if product_id %}disabled{% endif %} {% if new_name %}value="{{ new_name }}"{% endif %}>
                   </div>
                 </div>
                 <div class="col-4">
@@ -220,7 +220,7 @@
           </div>
           {% if document.get_total_quanity %}
             <p class="mt-3 font-weight-bold font-italic text-center"><em class="text-secondary">Total quanity: {{ document.get_total_quanity|floatformat:2 }}</em>&nbsp;&nbsp;&nbsp;<em class="text-primary">Total netto: {{ document.get_total_netto|money_format }}</em>&nbsp;&nbsp;&nbsp;<em class="text-danger">Total VAT: {{ document.get_total_vat|money_format }}</em>&nbsp;&nbsp;&nbsp;<em class="text-info">Total brutto: {{ document.get_total_brutto|money_format }}</em></p>
-        {% endif %}
+          {% endif %}
         {% endif %}
         <div class="row text-center">
           <div class="col">

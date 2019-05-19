@@ -111,6 +111,9 @@ class AccountancyDocument(CreationModificationDateMixin):
 	def get_total_brutto_absolute(self):
 		return sum(item.netto * (1 + item.vat/100) * item.quanity for item in self.products.all())
 
+	def edit_document(self):
+		return reverse('accountancy:add_product', args=[self.company_id, self.customer_id, self.id])
+
 
 class AccountancyProducts(CreationModificationDateMixin):
 	document = models.ForeignKey(AccountancyDocument, related_name='products', on_delete=models.CASCADE)

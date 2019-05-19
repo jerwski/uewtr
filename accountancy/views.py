@@ -131,7 +131,7 @@ class AccountancyDocumentView(View):
 class AccountancyProductsAddView(View):
 	'''class enabling adding products into accountancy document'''
 
-	def get(self, request, company_id:int=None, customer_id:int=None, document_id:int=None, product_id:int=None) -> HttpResponse:
+	def get(self, request, company_id:int=None, customer_id:int=None, document_id:int=None, product_id:int=None, new_id:int=None) -> HttpResponse:
 		company = Company.objects.get(pk=company_id)
 		customer = Customer.objects.get(pk=customer_id)
 		document = AccountancyDocument.objects.get(pk=document_id)
@@ -146,23 +146,27 @@ class AccountancyProductsAddView(View):
 			context.update({'product_id': product_id, 'product': product})
 		else:
 			new_product_form = NewProductAddForm()
+
+		if new_id:
+			new_product = Product.objects.get(pk=new_id)
+			context.__setitem__('new_name', new_product.name)
+
 		context.update({'new_product_form': new_product_form, 'company_id': company_id,
 		                'customer_id': customer_id, 'document_id': document_id})
 
 		return render(request, 'accountancy/accountancy_document_add_product.html', context)
 
-	def post(self, request, company_id:int=None, customer_id:int=None, document_id:int=None, product_id:int=None):
-		updated = now()
+	def post(self, request, company_id:int=None, customer_id:int=None, document_id:int=None, product_id:int=None) -> HttpResponse:
 		document = AccountancyDocument.objects.get(pk=document_id)
 		products_name = Product.objects.order_by('name').values_list('name', flat=True)
 		
 		if product_id:
 			name, unit, netto, vat = request.POST['name'], request.POST['unit'], request.POST['netto'], request.POST['vat']
-			update = {'name': name, 'updated': updated, 'unit': unit, 'netto': netto, 'vat': vat}
+			update = {'name': name, 'updated': now(), 'unit': unit, 'netto': netto, 'vat': vat}
 			try:
 				Product.objects.filter(pk=product_id).update(**update)
 				product = Product.objects.get(pk=product_id)
-				kwargs = {'product': product, 'updated': updated, 'netto': netto, 'vat': vat}
+				kwargs = {'product': product, 'updated': now(), 'netto': netto, 'vat': vat}
 				AccountancyProducts.objects.filter(document=document, product_id=product_id).update(**kwargs)
 				messages.info(request, f'Product <<{product}>> has been updated...')
 			except:
@@ -196,12 +200,17 @@ class NewProductAddView(View):
 		form = NewProductAddForm(data=request.POST)
 		
 		if form.is_valid():
-			form.save()
+			new_product = form.save()
+			new_id = new_product.id
+			args=[company_id, customer_id, document_id, new_id]
+
 		else:
-			msg = f'Either product exist in database or form is not valid...'
-			messages.warning(request, msg)
+			args = [company_id, customer_id, document_id]
+			messages.warning(request, f'Product exist in database...')
+
+		return HttpResponseRedirect(reverse('accountancy:add_product', args=args))
 			
-		return HttpResponseRedirect(reverse('accountancy:add_product', args=[company_id, customer_id, document_id]))
+
 
 
 class AccountancyProductDelete(View):

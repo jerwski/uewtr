@@ -63,7 +63,7 @@
               <tbody class="small" id="searchTable">
               {% for document in documents %}
                 <tr>
-                  <td class="text-primary">{{ document }}</td>
+                  <td class="text-primary"><a href="{{ document.edit_document }}">{{ document }}</a></td>
                   <td>{{ document.created|date:'d-m-Y' }} ({{ document.created|day_since }})</td>
                   <td class="text-danger text-right">{{ document.get_total_brutto_absolute|money_format }}</td>
                 </tr>
