@@ -33,7 +33,7 @@ from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, se
 
 class WorkingTimeRecorderView(View):
 	'''class implementing the method of adding working time for specific employee'''
-	def get(self, request, employee_id:int, work_hours:int=None)->render:
+	def get(self, request, employee_id:int, work_hours:int=None) -> render:
 		worker = Employee.objects.get(pk=employee_id)
 		initial = {'worker': worker}
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
@@ -54,7 +54,7 @@ class WorkingTimeRecorderView(View):
 
 		return render(request, 'evidence/working_time_recorder.html', context)
 
-	def post(self, request, employee_id:int)->render:
+	def post(self, request, employee_id:int) -> render:
 		form = WorkEvidenceForm(data=request.POST)
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
 
@@ -104,7 +104,7 @@ class WorkingTimeRecorderView(View):
 
 class WorkingTimeRecorderEraseView(View):
 	'''class implementing the method of erase last added working time record for specific employee'''
-	def get(self, request, employee_id:int, start_work:str, end_work:str)->HttpResponseRedirect:
+	def get(self, request, employee_id:int, start_work:str, end_work:str) -> HttpResponseRedirect:
 		check = WorkEvidence.objects.filter(worker_id=employee_id, start_work=start_work, end_work=end_work)
 
 		if check.exists():
@@ -117,7 +117,7 @@ class WorkingTimeRecorderEraseView(View):
 
 class LeaveTimeRecorderView(View):
 	'''class implementing the method of adding leave time for specific employee'''
-	def get(self, request, employee_id:int)->render:
+	def get(self, request, employee_id:int) -> render:
 		initial=initial_leave_form(employee_id)
 		form = EmployeeLeaveForm(initial=initial)
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
@@ -139,7 +139,7 @@ class LeaveTimeRecorderView(View):
 
 		return render(request, 'evidence/leave_time_recorder.html', context)
 
-	def post(self, request, employee_id:int)->render:
+	def post(self, request, employee_id:int) -> render:
 		name_holiday, flag_weekend = False, False
 		form = EmployeeLeaveForm(data=request.POST)
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
@@ -208,7 +208,7 @@ class LeaveTimeRecorderView(View):
 
 class LeaveTimeRecorderEraseView(View):
 	'''class implementing the method of erase last added leave time record for specific employee'''
-	def get(self, request, employee_id:int, leave_date:date)->HttpResponseRedirect:
+	def get(self, request, employee_id:int, leave_date:date) -> HttpResponseRedirect:
 		check = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date=leave_date)
 
 		if check.exists():
@@ -222,7 +222,7 @@ class LeaveTimeRecorderEraseView(View):
 
 class LeavesDataPrintView(View):
 	'''class representing the view of annual leaves days print'''
-	def post(self, request, employee_id:int)->HttpResponse:
+	def post(self, request, employee_id:int) -> HttpResponseRedirect:
 		'''convert html annuall leave time for each employee in current year to pdf'''
 		year = int(request.POST['leave_year'])
 		html = leavehtml2pdf(employee_id, year)
@@ -247,7 +247,7 @@ class LeavesDataPrintView(View):
 
 class SendLeavesDataPdf(View):
 	'''class representing the view for sending leaves date as pdf file'''
-	def get(self, request, employee_id:int)->HttpResponseRedirect:
+	def get(self, request, employee_id:int) -> HttpResponseRedirect:
 		# convert html file (evidence/leave_data_{}.html.format(employee_id) to pdf file
 		html = leavehtml2pdf(employee_id, now().year)
 		# create pdf file and save on templates/pdf/leves_data_{}.pdf'.format(employee_id)
@@ -279,7 +279,7 @@ class SendLeavesDataPdf(View):
 
 class MonthlyPayrollView(View):
 	'''class representing the view of monthly payroll'''
-	def get(self, request)->render:
+	def get(self, request) -> render:
 		month, year = now().month, now().year
 		choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
 		heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
@@ -312,7 +312,7 @@ class MonthlyPayrollView(View):
 
 		return render(request, 'evidence/monthly_payroll.html', context)
 
-	def post(self,request)->render:
+	def post(self,request) -> render:
 		heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
 				 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
 		employees = Employee.objects.all()
@@ -354,7 +354,7 @@ class MonthlyPayrollView(View):
 
 class MonthlyPayrollPrintView(View):
 	'''class representing the view of monthly payroll print'''
-	def get(self, request, month:int, year:int):
+	def get(self, request, month:int, year:int) -> HttpResponseRedirect:
 		'''send montly payroll as pdf attachmnet on browser'''
 		html = payrollhtml2pdf(month, year)
 
@@ -378,7 +378,7 @@ class MonthlyPayrollPrintView(View):
 
 class SendMonthlyPayrollPdf(View):
 	'''class representing the view for sending monthly payroll as pdf file'''
-	def get(self, request, month:int, year:int)->HttpResponseRedirect:
+	def get(self, request, month:int, year:int) -> HttpResponseRedirect:
 		# convert html file (evidence/monthly_payroll_pdf.html) to pdf file
 		if check_internet_connection():
 			html = payrollhtml2pdf(month, year)
@@ -408,7 +408,7 @@ class SendMonthlyPayrollPdf(View):
 
 class AccountPaymentView(View):
 	'''class representing the view of payment on account'''
-	def get(self, request, employee_id:int)->render:
+	def get(self, request, employee_id:int) -> render:
 		month, year = now().month, now().year
 		initial=initial_account_form(employee_id)
 		form = AccountPaymentForm(initial=initial)
@@ -430,7 +430,7 @@ class AccountPaymentView(View):
 
 		return render(request, 'evidence/account_payment.html', context)
 
-	def post(self, request, employee_id:int)->render:
+	def post(self, request, employee_id:int) -> render:
 		form = AccountPaymentForm(data=request.POST)
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
 
@@ -470,7 +470,7 @@ class AccountPaymentView(View):
 
 class AccountPaymentEraseView(View):
 	'''class implementing the method of erase last added working time record for specific employee'''
-	def get(self, request, employee_id:int, account_date:date, account_value:float)->HttpResponseRedirect:
+	def get(self, request, employee_id:int, account_date:date, account_value:float) -> HttpResponseRedirect:
 		data = {'worker_id': employee_id, 'account_date': account_date, 'account_value': account_value}
 		check = AccountPayment.objects.filter(**data)
 
@@ -486,7 +486,7 @@ class AccountPaymentEraseView(View):
 
 class EmployeeCurrentComplexDataView(View):
 	'''class representing employee complex data view'''
-	def get(self, request, employee_id:int)->render:
+	def get(self, request, employee_id:int) -> render:
 		choice_date = now()
 		month, year = choice_date.month, choice_date.year
 		choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
@@ -509,7 +509,7 @@ class EmployeeCurrentComplexDataView(View):
 
 		return render(request, r'evidence/current_complex_evidence_data.html', context)
 
-	def post(self, request, employee_id:int)->render:
+	def post(self, request, employee_id:int) -> render:
 		choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
 		month, year = choice_date.month, choice_date.year
 		form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
@@ -539,7 +539,7 @@ class EmployeeCurrentComplexDataView(View):
 
 class PlotChart(View):
 
-	def post(self, request, employee_id:int)->HttpResponseRedirect:
+	def post(self, request, employee_id:int) -> HttpResponseRedirect:
 		year = int(request.POST['plot_year'])
 		plot_chart(employee_id, year)
 

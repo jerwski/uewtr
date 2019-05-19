@@ -210,7 +210,7 @@ def payrollhtml2pdf(month:int, year:int) -> bool:
 		return False
 
 
-def leavehtml2pdf(employee_id:int, year:int):
+def leavehtml2pdf(employee_id:int, year:int) -> bool:
 	'''convert html annuall leave time for each employee in current year to pdf'''
 	month_name = list(calendar.month_name)[1:]
 	worker = Employee.objects.get(pk=employee_id)
@@ -244,7 +244,7 @@ def remgarbage(*paths:Path):
 		file.unlink()
 
 
-def jpk_files(path:Path):
+def jpk_files(path:Path) -> list:
 	'''find all .jpk files created in present month and year'''
 	files = []
 	year, month = now().year, now().month
@@ -290,7 +290,7 @@ def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 	return registerdata
 
 
-def cashregisterhtml2pdf(company_id:int, month:int, year:int):
+def cashregisterhtml2pdf(company_id:int, month:int, year:int) -> bool:
 	'''convert html cash register for last month to pdf'''
 	company = Company.objects.get(pk=company_id)
 	cashregister = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
@@ -309,7 +309,7 @@ def cashregisterhtml2pdf(company_id:int, month:int, year:int):
 		return False
 
 
-def make_attachment(html, filename):
+def make_attachment(html, filename) -> HttpResponse:
 	options = {'page-size'  : 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
 	           'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None, 'quiet': ''}
 
@@ -370,7 +370,7 @@ def cashaccept2pdf(record:int, number=1):
 
 
 # quiz
-def quizdata(file:Path=Path('latin.txt'), encoding='utf-8'):
+def quizdata(file:Path=Path('latin.txt'), encoding='utf-8') -> deque:
 	with file.open('r', encoding=encoding) as file:
 		quiz_data=deque(line.rstrip(' \n').split(' – ') for line in file if not line.startswith('=='))
 
@@ -378,7 +378,7 @@ def quizdata(file:Path=Path('latin.txt'), encoding='utf-8'):
 
 
 # upper first letter
-def upperfirst(string:str):
+def upperfirst(string:str) -> str:
 
 	return string[:1].upper() + string[1:]
 
@@ -396,7 +396,7 @@ def quizset(iterable):
 		return None
 
 
-def dirdata():
+def dirdata() -> dict:
 	drives = [chr(x)+':' for x in range(65,90) if os.path.exists(chr(x)+':')]
 	usage = {drive: shutil.disk_usage(drive)._asdict() for drive in drives}
 
@@ -407,7 +407,7 @@ def dirdata():
 	return usage
 
 
-def last_relased_accountancy_document(company_id:int=None):
+def last_relased_accountancy_document(company_id:int=None) -> int:
 	check = {'company_id': company_id, 'created__year': now().year, 'created__month': now().month}
 	documents = AccountancyDocument.objects.filter(**check)
 

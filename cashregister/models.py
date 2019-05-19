@@ -2,10 +2,13 @@
 from django.db import models
 from django.urls import reverse
 
+# my mixin
+from account.models import CreationModificationDateMixin
+
 # Create your models here.
 
 
-class Company(models.Model):
+class Company(CreationModificationDateMixin):
 	company = models.CharField(max_length=240,)
 	nip = models.CharField(max_length=13,)
 	street = models.CharField(blank=True, max_length=100,)
@@ -14,8 +17,6 @@ class Company(models.Model):
 	phone = models.CharField(blank=True, max_length=20,)
 	account = models.CharField(blank=True, max_length=34, verbose_name='Contrary account')
 	status = models.IntegerField(default=1,)
-	created = models.DateTimeField(auto_now_add=True,)
-	updated = models.DateTimeField(auto_now=True,)
 
 	class Meta:
 		ordering = ['company']
@@ -33,9 +34,8 @@ class Company(models.Model):
 		return reverse('accountancy:accountancy', args=[self.id])
 
 
-class CashRegister(models.Model):
+class CashRegister(CreationModificationDateMixin):
 	company = models.ForeignKey(Company, on_delete=models.DO_NOTHING)
-	created = models.DateTimeField(auto_now_add=True,)
 	symbol = models.CharField(max_length=200,)
 	contents = models.CharField(max_length=250,)
 	income = models.FloatField(default=0.0,)

@@ -13,7 +13,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # Create your payment functions here
 
 
-def holiday(year:int)->dict:
+def holiday(year:int) -> dict:
     '''return dictionary key=holiday name, value=date of holiday for current year'''
     year = int(year)
     a = year%19
@@ -49,7 +49,7 @@ def holiday(year:int)->dict:
     return holidays
 
 
-def worker_rate(employee_id:int, year:int, month:int)->float:
+def worker_rate(employee_id:int, year:int, month:int) -> float:
     day = calendar.monthrange(year, month)
     rate = EmployeeHourlyRate.objects.filter(worker_id=employee_id, update__lte=date(year, month, day[1])).last()
     if rate is None:
@@ -72,7 +72,7 @@ def workingdays(year:int, month:int):
         start += timedelta(1)
 
 
-def saturday_payment(employee_id:int, year:int, month:int)->float:
+def saturday_payment(employee_id:int, year:int, month:int) -> float:
     '''returns the employee's income for worked Saturdays without Holidays in a given year and month'''
     satpay = 0
     rate= worker_rate(employee_id, year, month)
@@ -89,7 +89,7 @@ def saturday_payment(employee_id:int, year:int, month:int)->float:
     return satpay
 
 
-def sunday_payment(employee_id:int, year:int, month:int)->float:
+def sunday_payment(employee_id:int, year:int, month:int) -> float:
     '''returns the employee's income for worked Sundays without Holidays in a given year and month'''
     sunpay = 0
     rate= worker_rate(employee_id, year, month)
@@ -106,7 +106,7 @@ def sunday_payment(employee_id:int, year:int, month:int)->float:
     return sunpay
 
 
-def holiday_payment(employee_id:int, year:int, month:int)->float:
+def holiday_payment(employee_id:int, year:int, month:int) -> float:
     '''returns the employee's income for worked Holidays in a given year and month'''
     holidaypay = 0
     rate= worker_rate(employee_id, year, month)
@@ -169,7 +169,7 @@ def overhours_payment(employee_id:int, year:int, month:int)->float:
         return overhourspay
 
 
-def basic_payment(employee_id:int, year:int, month:int)->float:
+def basic_payment(employee_id:int, year:int, month:int) -> float:
     '''returns the employee's basic income (without Saturdays, Sundays, holidays) in a given year and month'''
     rate= worker_rate(employee_id, year, month)
     holidays = holiday(year).values()
@@ -187,7 +187,7 @@ def basic_payment(employee_id:int, year:int, month:int)->float:
     return basicpay
 
 
-def leave_payment(employee_id:int, year:int, month:int)->float:
+def leave_payment(employee_id:int, year:int, month:int) -> float:
     '''returns the employee's income for paid vacation in a given year and month'''
     rate= worker_rate(employee_id, year, month)
     query = Q(worker_id=employee_id) & Q(leave_date__year=year) & Q(leave_date__month=month) & Q(leave_flag='paid_leave')
@@ -202,7 +202,7 @@ def leave_payment(employee_id:int, year:int, month:int)->float:
     return leavepay
 
 
-def account_payment(employee_id:int, year:int, month:int)->float:
+def account_payment(employee_id:int, year:int, month:int) -> float:
     '''returns the employee's income for paid vacation in a given year and month'''
     account_paid = AccountPayment.objects.filter(worker_id=employee_id, account_date__year=year, account_date__month=month)
 
@@ -215,7 +215,7 @@ def account_payment(employee_id:int, year:int, month:int)->float:
     return accountpay
 
 
-def total_payment(employee_id:int, year:int, month:int)->dict:
+def total_payment(employee_id:int, year:int, month:int) -> dict:
     '''returns the total payout for a given employee in a given month and year'''
     basicpay = basic_payment(employee_id, year, month)
     leavepay = leave_payment(employee_id, year, month)
@@ -235,7 +235,7 @@ def total_payment(employee_id:int, year:int, month:int)->dict:
     return context
 
 
-def employee_total_data(employee_id:int, year:int, month:int, context:dict)->dict:
+def employee_total_data(employee_id:int, year:int, month:int, context:dict) -> dict:
     '''returns complete data on the employee's wokrhours, rate, income in a given date'''
     rate= worker_rate(employee_id, year, month)
     query = Q(worker_id=employee_id) & Q(start_work__year=year) & Q(start_work__month=month)
@@ -255,7 +255,7 @@ def employee_total_data(employee_id:int, year:int, month:int, context:dict)->dic
     return context
 
 
-def data_modal_chart(employee_id:int)->dict:
+def data_modal_chart(employee_id:int) -> dict:
     '''creates a set of brutto income each subsequent year for a given employee'''
     months = range(1,13)
     years = set(WorkEvidence.objects.filter(worker_id=employee_id).values_list('start_work__year', flat=True))

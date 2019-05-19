@@ -68,7 +68,7 @@ class CustomerAddView(View):
 						messages.success(request, msg)
 
 				except Customer.DoesNotExist:
-					messages.warning(request, r'Somthing wrong...')
+					messages.warning(request, r'Somthing wrong... try again!')
 
 			else:
 				messages.info(request, r'Nothing to change!')

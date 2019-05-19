@@ -23,7 +23,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # Create your archive functions here.
 
 
-def check_internet_connection()->bool:
+def check_internet_connection() -> bool:
 	try:
 		host= 'www.unikolor.com'
 		http = urllib3.PoolManager()
@@ -93,7 +93,7 @@ def make_archives(archive_name, root_backup, archive_file):
 		print(f'Directory {root_backup} is empty...')
 
 
-def invoices_backup():
+def invoices_backup() -> bool:
 	'''create compressed in zip format archive file with invoices'''
 	root_backup = Path('~/Desktop/Invoice_backup').expanduser()
 	base_name = Path('~/Desktop/zip2ftp/invoices').expanduser()
@@ -147,7 +147,7 @@ def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, us
 		print(r'No internet connection...')
 
 
-def getArchiveFilefromFTP(request, server:str, username:str, password:str, archive_file, root_backup):
+def getArchiveFilefromFTP(request, server:str, username:str, password:str, archive_file, root_backup) -> bool:
 	'''loading compressed in zip format archive file with fixtures on ftp server'''
 	if check_internet_connection():
 		try:

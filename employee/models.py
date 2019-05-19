@@ -5,11 +5,14 @@ from django.urls import reverse
 # my validators
 from validators.my_validator import check_pesel
 
+# my mixin
+from account.models import CreationModificationDateMixin
+
 
 # Create your models here.
 
 
-class Employee(models.Model):
+class Employee(CreationModificationDateMixin):
     '''class representing a basic data table of employee'''
     UNPAID_LEAVE = 0
     PAID_LEAVE = 1
@@ -55,7 +58,7 @@ class Employee(models.Model):
         return reverse('evidence:employee_complex_data', args=[self.id])
 
 
-class EmployeeData(models.Model):
+class EmployeeData(CreationModificationDateMixin):
     '''class representing an extented data table of employee'''
     NO_OVERTIME = 0
     WEEKLY_OVERTIME = 1

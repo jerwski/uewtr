@@ -5,6 +5,8 @@ from django.utils.timezone import now
 
 # my models
 from cashregister.models import Company
+
+# my mixin
 from account.models import CreationModificationDateMixin
 
 # my validators

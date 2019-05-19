@@ -34,7 +34,7 @@ class CompanyAddView(View):
 		companies = Company.objects.order_by('company')
 		if company_id:
 			company = Company.objects.get(pk=company_id)
-			fields = list(company.__dict__.keys())[2:-2]
+			fields = list(company.__dict__.keys())[4:]
 			initial = Company.objects.filter(pk=company_id).values(*fields)[0]
 			form = CompanyAddForm(initial=initial)
 			context = {'form': form, 'company_id': company_id, 'companies': companies}
@@ -46,13 +46,14 @@ class CompanyAddView(View):
 		return render(request, 'cashregister/company_add.html', context)
 
 	def post(self, request, company_id:int = None) -> HttpResponseRedirect:
+		args = [company_id]
 		companies = Company.objects.all().order_by('company')
 		form = CompanyAddForm(data=request.POST)
 		context = {'form': form, 'companies': companies}
 
 		if company_id:
-			employee = Company.objects.get(pk=company_id)
-			fields = list(employee.__dict__.keys())[2:-2]
+			company = Company.objects.get(pk=company_id)
+			fields = list(company.__dict__.keys())[4:]
 			old_values = Company.objects.filter(pk=company_id).values(*fields)[0]
 			old_values['status'] = str(old_values['status'])
 		else:
@@ -64,6 +65,7 @@ class CompanyAddView(View):
 			if new_values!=old_values:
 				try:
 					obj, created = Company.objects.update_or_create(defaults=new_values, **old_values)
+					args = [obj.id]
 
 					if created:
 						msg = f'Successful created new company {obj}'
@@ -72,14 +74,14 @@ class CompanyAddView(View):
 						msg = f'Successful update data for company {obj}'
 						messages.success(request, msg)
 
-					return HttpResponseRedirect(reverse('cashregister:change_company', args=[obj.id]))
-
 				except Company.DoesNotExist:
 					messages.warning(request, r'Somthing wrong... try again!')
 
 			else:
 				messages.info(request, r'Nothing to change!')
-				return HttpResponseRedirect(reverse('cashregister:change_company', args=[company_id]))
+
+			return HttpResponseRedirect(reverse('cashregister:change_company', args=args))
+
 		else:
 			return render(request, 'cashregister/company_add.html', context)
 
@@ -87,7 +89,7 @@ class CompanyAddView(View):
 class CashRegisterView(View):
 	'''class implementing the method of adding records to the Cash Register'''
 
-	def get(self, request, company_id:int=None) -> HttpResponseRedirect:
+	def get(self, request, company_id:int=None) -> HttpResponse:
 		check = CashRegister.objects.filter(company_id=company_id)
 		tags = CashRegister.objects.order_by('contents').distinct('contents').exclude(contents='z przeniesienia').values_list('contents', flat=True)
 		symbols = CashRegister.objects.order_by('symbol').distinct('symbol').values_list('symbol', flat=True)

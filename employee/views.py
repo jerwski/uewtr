@@ -35,7 +35,7 @@ class EmployeeBasicDataView(View):
 
 		if employee_id:
 			worker = Employee.objects.get(pk=employee_id)
-			fields = list(worker.__dict__.keys())[2:]
+			fields = list(worker.__dict__.keys())[4:]
 			initial = Employee.objects.filter(pk=employee_id).values(*fields)[0]
 			active = EmployeeData.objects.filter(worker=worker)
 
@@ -62,6 +62,7 @@ class EmployeeBasicDataView(View):
 			return render(request, 'employee/employee_basicdata.html', context)
 
 	def post(self, request, employee_id:int=None)->HttpResponseRedirect:
+		args = [employee_id]
 		form = EmployeeBasicDataForm(data=request.POST)
 		context = {'form': form}
 		employees = Employee.objects.all()
@@ -74,7 +75,7 @@ class EmployeeBasicDataView(View):
 
 		if employee_id:
 			employee = Employee.objects.get(pk=employee_id)
-			fields = list(employee.__dict__.keys())[2:]
+			fields = list(employee.__dict__.keys())[4:]
 			old_values = Employee.objects.filter(pk=employee_id).values(*fields)[0]
 		else:
 			old_values = {'pesel': request.POST['pesel']}
@@ -88,15 +89,13 @@ class EmployeeBasicDataView(View):
 					context.__setitem__('employee_id', obj.id)
 
 					if created:
+						args = [obj.id]
 						EmployeeHourlyRate.objects.create(worker=obj, update=now().date(), hourly_rate=8.00)
 						msg = f'Successful created basic data for employee {obj} with minimum rate 8.00 PLN/h'
 						messages.success(request, msg)
-						return HttpResponseRedirect(reverse('employee:employee_extendeddata', args=[obj.id]))
 					else:
 						msg = f'Successful update data for employee {obj}'
 						messages.success(request, msg)
-
-						return HttpResponseRedirect(reverse('employee:employee_basicdata', args=[employee_id]))
 
 				except Employee.DoesNotExist:
 					messages.warning(request, r'Somthing wrong... try again!')
@@ -104,11 +103,11 @@ class EmployeeBasicDataView(View):
 			else:
 				messages.info(request, r'Nothing to change!')
 
-				return HttpResponseRedirect(reverse('employee:employee_basicdata', args=[employee_id]))
+			return HttpResponseRedirect(reverse('employee:employee_basicdata', args=args))
 		else:
 			context.__setitem__('new_employee', True)
 
-			return render(request, 'employee/employee_basicdata.html', context)
+		return render(request, 'employee/employee_basicdata.html', context)
 
 
 class EmployeeEraseAll(View):
@@ -135,9 +134,9 @@ class EmployeeExtendedDataView(View):
 
 		if EmployeeData.objects.filter(worker=worker).exists():
 			employee = EmployeeData.objects.get(worker=worker)
-			fields = list(employee.__dict__.keys())[2:]
+			fields = list(employee.__dict__.keys())[4:]
 			old_values = EmployeeData.objects.filter(worker=worker).values(*fields)[0]
-			old_values['worker'] = old_values.pop('worker_id')
+			old_values.pop('worker_id')
 			old_values['worker'] = worker
 			form = EmployeeExtendedDataForm(initial=old_values)
 		else:
@@ -160,25 +159,20 @@ class EmployeeExtendedDataView(View):
 
 			if EmployeeData.objects.filter(worker=worker).exists():
 				employee_extendeddata = EmployeeData.objects.get(worker=worker)
-				fields = list(employee_extendeddata.__dict__.keys())[2:]
+				fields = list(employee_extendeddata.__dict__.keys())[4:]
 				old_values.update(EmployeeData.objects.filter(worker=worker).values(*fields)[0])
 				old_values.pop('worker_id')
-				val = old_values['overtime']
-				old_values['overtime'] = str(val)
+				old_values['overtime'] = str(old_values['overtime'])
 
 			if new_values != old_values:
 				try:
 					obj, created = EmployeeData.objects.update_or_create(**old_values, defaults=new_values)
 
 					if created:
-						msg = f'Successful created extended data for employee {obj}'
-						messages.success(request, msg)
-						return HttpResponseRedirect(reverse('employee:employee_hourly_rate', args=[employee_id]))
-					else:
-						msg = f'Successful update data for employee {obj}'
-						messages.success(request, msg)
+						messages.success(request, f'Successful created extended data for employee {obj}')
 
-						return HttpResponseRedirect(reverse('employee:employee_basicdata', args=[employee_id]))
+					else:
+						messages.success(request, f'Successful update data for employee {obj}')
 
 				except Employee.DoesNotExist:
 					messages.warning(request, r'Somthing wrong... try again!')
@@ -186,7 +180,8 @@ class EmployeeExtendedDataView(View):
 			else:
 				messages.info(request, r'Nothing to change!')
 
-				return HttpResponseRedirect(reverse('employee:employee_extendeddata', args=[employee_id]))
+			return HttpResponseRedirect(reverse('employee:employee_extendeddata', args=[employee_id]))
+
 		else:
 			return render(request, 'employee/employee_extendeddata.html', context)
 
