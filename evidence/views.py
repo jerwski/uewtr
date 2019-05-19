@@ -222,7 +222,7 @@ class LeaveTimeRecorderEraseView(View):
 
 class LeavesDataPrintView(View):
 	'''class representing the view of annual leaves days print'''
-	def post(self, request, employee_id:int) -> HttpResponseRedirect:
+	def post(self, request, employee_id:int):
 		'''convert html annuall leave time for each employee in current year to pdf'''
 		year = int(request.POST['leave_year'])
 		html = leavehtml2pdf(employee_id, year)
