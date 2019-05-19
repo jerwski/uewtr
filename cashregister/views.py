@@ -195,7 +195,7 @@ class CashRegisterDelete(View):
 
 class CashRegisterPrintView(View):
 	'''class representing the view of monthly cash register print'''
-	def get(self, request, company_id:int) -> HttpResponseRedirect:
+	def get(self, request, company_id:int):
 		'''convert html cashregister_pdf for selected company to pdf'''
 		if now().month==1:
 			month, year = 12, now().year - 1
@@ -215,7 +215,7 @@ class CashRegisterPrintView(View):
 
 		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 
-	def post(self, request, company_id:int) -> HttpResponseRedirect:
+	def post(self, request, company_id:int):
 		'''convert html cashregister_pdf for selected cash register to pdf'''
 		data = request.POST['cr_number']
 		month, year = int(data.split('/')[0]), int(data.split('/')[1])
