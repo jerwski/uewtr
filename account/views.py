@@ -63,7 +63,7 @@ class AdminView(View):
 					employee_id =employee.first().id
 				context.update({'employee_id': employee_id, 'nodata': False})
 			else:
-				backup = Path(r'backup_json/db.json')
+				backup = settings.ARCHIVE_ROOT
 				created = datetime.fromtimestamp(backup.stat().st_mtime)
 				context.update({'nodata': True, 'backup': str(backup), 'created': created})
 				return render(request, '500.html', context)
