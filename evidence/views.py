@@ -265,7 +265,7 @@ class SendLeavesDataPdf(View):
 				mail = {'subject': f'list of leave for {worker} ({date.today().year})r.',
 						'message': f'List of leave in attachment {worker} za {date.today().year}r.',
 						'sender': settings.EMAIL_HOST_USER,
-						'recipient':  ['projekt@unikolor.com'],
+						'recipient':  [settings.CC_MAIL],
 						'attachments': [pdfile]}
 				sendemail(**mail)
 				messages.info(request, f'The file <<{pdfile}>> was sending....')
@@ -394,7 +394,7 @@ class SendMonthlyPayrollPdf(View):
 				mail = {'subject': f'payrol for {month}/{year} r.',
 						'message': f'Payroll in attachment {month}-{year}...',
 						'sender': settings.EMAIL_HOST_USER,
-						'recipient':  ['projekt@unikolor.com'],
+						'recipient':  [settings.CC_MAIL],
 						'attachments': [pdfile]}
 				sendemail(**mail)
 				messages.info(request, f'The file <<{pdfile}>> was sending....')

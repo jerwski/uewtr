@@ -95,8 +95,8 @@ def make_archives(archive_name, root_backup, archive_file):
 
 def invoices_backup() -> bool:
 	'''create compressed in zip format archive file with invoices'''
-	root_backup = Path('~/Desktop/Invoice_backup').expanduser()
-	base_name = Path('~/Desktop/zip2ftp/invoices').expanduser()
+	root_backup = settings.INVOICE_BACKUP.expanduser()
+	base_name = settings.INVOICE_ZIP.expanduser()
 	backup_file = base_name.with_suffix('.zip')
 	make_archives(base_name, root_backup, backup_file)
 	if check_internet_connection():
@@ -152,7 +152,7 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
 	if check_internet_connection():
 		try:
 			with FTP(server, username, password) as myFTP:
-				myFTP.cwd(r'/unikolor_db/')
+				myFTP.cwd(settings.FTP_BACKUP_DIR)
 				if Path.is_file(archive_file):
 					if myFTP.size(archive_file.name) > archive_file.stat().st_size:
 						archive_file.unlink()

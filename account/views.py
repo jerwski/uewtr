@@ -68,9 +68,9 @@ class AdminView(View):
 				context.update({'nodata': True, 'backup': str(backup), 'created': created})
 				return render(request, '500.html', context)
 
-			if list(Path(r'E:/Fakturowanie').rglob(r'JPK/0001/jpk_fa_*.xml')):
+			if list(settings.INVOICE_WORKPATH.rglob(r'JPK/0001/jpk_fa_*.xml')):
 				context.__setitem__('jpk', True)
-			if Path('~/Desktop/zip2ftp/invoices.zip').expanduser().is_file():
+			if settings.INVOICE_ZIP.expanduser().is_file():
 				context.__setitem__('upload', True)
 
 			return render(request, 'account/admin.html', context)
@@ -93,8 +93,8 @@ class RestoreDataBase(View):
 class Invoices2Ftp(View):
 	'''class that allows archiving the database of issued invoices'''
 	def get(self, request)->HttpResponseRedirect:
-		backup_file = Path('~/Desktop/zip2ftp/invoices.zip').expanduser()
-		ftp_invoice_dir = r'Invoice_backup'
+		backup_file = settings.INVOICE_ZIP.expanduser()
+		ftp_invoice_dir = settings.FTP_INVOICE_DIR
 		args = (backup_file, ftp_invoice_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
 		if socket.gethostname() == 'OFFICELAPTOP':
 			if invoices_backup():
@@ -112,7 +112,7 @@ class JPK2Accountancy(View):
 	'''class to send JPK files to accountancy'''
 	def get(self, request):
 		if check_internet_connection():
-			files = jpk_files(Path(r'E:/Fakturowanie/'))
+			files = jpk_files(settings.INVOICE_WORKPATH)
 
 			if files:
 				stamp = now().strftime("%A %d %B %Y %H%M%S.%f")
@@ -123,8 +123,8 @@ class JPK2Accountancy(View):
 					month, year = now().month - 1, now().year
 				mail = {'subject': f'pliki JPK za okres {month}/{year}',
 				        'message': f'W załączniku pliki JPK za okres {month}/{year}r.',
-				        'sender' : settings.EMAIL_HOST_USER, 'recipient': ['biuro.hossa@wp.pl'],
-				        'attachments': files, 'cc': ['projekt@unikolor.com']}
+				        'sender' : settings.EMAIL_HOST_USER, 'recipient': [settings.ACCOUNTANT_MAIL],
+				        'attachments': files, 'cc': [settings.CC_MAIL]}
 				sendemail(**mail)
 				messages.info(request, f'JPK files on {month}/{year} was sending to accountancy....')
 
