@@ -1,0 +1,14 @@
+<application>
+  <component name="FileTypeManager" version="17">
+    <ignoreFiles list="*$py.class;*.hprof;*.pyc;*.pyo;*.rbc;*~;.DS_Store;.git;.hg;.svn;CVS;RCS;SCCS;__pycache__;_svn;rcs;vssver.scc;vssver2.scc;" />
+    <extensionMap>
+      <mapping ext="dkm" type="HTML" />
+      <mapping ext="fak" type="HTML" />
+      <mapping ext="dmp" type="PLAIN_TEXT" />
+      <mapping ext="backup" type="PLAIN_TEXT" />
+      <mapping pattern="unisetings" type="Python" />
+      <mapping pattern="my_menu" type="Python" />
+      <mapping pattern="magazyn_3" type="Python" />
+    </extensionMap>
+  </component>
+</application>
