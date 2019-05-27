@@ -385,7 +385,7 @@ def upperfirst(string:str) -> str:
 
 def quizset(iterable):
 
-	while len(iterable) >= 4:
+	if len(iterable) >= 4:
 		shuffle(iterable)
 		query, answer = iterable.popleft()
 		answers = [upperfirst(item[1]) for item in choices(iterable, k=3)]
