@@ -208,7 +208,7 @@ def archiving_of_deleted_records(employee_id):
 				else:
 					all_records += list(model.objects.filter(worker_id=employee_id))
 		path = Path(f'backup_json/erase_worker/{employee_id}.json')
-		with path.open('w') as file:
+		with path.open('w', encoding='utf-8') as file:
 			serialize('json', all_records, indent=4, stream=file)
 	except BadSerializer as error:
 		print(f'Serialization error: {error}')
