@@ -70,7 +70,7 @@ class AdminView(View):
 
 			if list(settings.INVOICE_WORKPATH.rglob(r'JPK/0001/jpk_fa_*.xml')):
 				context.__setitem__('jpk', True)
-			if settings.INVOICE_ZIP_FILE.expanduser().is_file():
+			if settings.INVOICE_ZIP.expanduser().with_suffix('.zip').is_file():
 				context.__setitem__('upload', True)
 
 			return render(request, 'account/admin.html', context)
