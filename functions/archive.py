@@ -192,7 +192,6 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
 		messages.error(request, r'No internet connection...')
 
 
-
 # serialization json
 def export_as_json(modeladmin, request, queryset):
 	opts = modeladmin.model._meta
