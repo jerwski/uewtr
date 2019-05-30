@@ -101,14 +101,18 @@ def invoices_backup() -> bool:
 	make_archives(base_name, root_backup, backup_file)
 	if check_internet_connection():
 		with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-			myFTP.cwd(settings.FTP_INVOICE_DIR.name)
-			if settings.FTP_INVOICE_FILE.is_file():
-				if myFTP.size(backup_file.name) != backup_file.stat().st_size:
-					return True
-				else:
-					return False
-			else:
+			ftpdirs = list(name for name in myFTP.nlst())
+			if settings.FTP_INVOICE_DIR.name not in ftpdirs:
 				return True
+			else:
+				myFTP.cwd(settings.FTP_INVOICE_DIR.name)
+				if settings.FTP_INVOICE_FILE.name in myFTP.nlst():
+					if myFTP.size(backup_file.name) != backup_file.stat().st_size:
+						return True
+					else:
+						return False
+				else:
+					return True
 	else:
 		return False
 

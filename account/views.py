@@ -93,7 +93,7 @@ class RestoreDataBase(View):
 class Invoices2Ftp(View):
 	'''class that allows archiving the database of issued invoices'''
 	def get(self, request)->HttpResponseRedirect:
-		backup_file = settings.INVOICE_ZIP_FILE.expanduser()
+		backup_file = settings.INVOICE_ZIP.with_suffix('.zip').expanduser()
 		ftp_invoice_dir = settings.FTP_INVOICE_DIR.name
 		args = (backup_file, ftp_invoice_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
 		if socket.gethostname() == 'OFFICELAPTOP':
