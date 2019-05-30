@@ -99,13 +99,17 @@ def invoices_backup() -> bool:
 	base_name = settings.INVOICE_ZIP.expanduser()
 	backup_file = base_name.with_suffix('.zip')
 	make_archives(base_name, root_backup, backup_file)
+	size = backup_file.stat().st_size
 	if check_internet_connection():
 		with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-			myFTP.cwd(r'Invoice_backup')
-			if myFTP.size(backup_file.name) != backup_file.stat().st_size:
-				return True
+			myFTP.cwd(settings.FTP_INVOICE_DIR.name)
+			if settings.FTP_INVOICE_FILE.is_file():
+				if myFTP.size(backup_file.name) != size:
+					return True
+				else:
+					return False
 			else:
-				return False
+				return True
 	else:
 		return False
 

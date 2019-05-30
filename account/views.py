@@ -70,7 +70,7 @@ class AdminView(View):
 
 			if list(settings.INVOICE_WORKPATH.rglob(r'JPK/0001/jpk_fa_*.xml')):
 				context.__setitem__('jpk', True)
-			if settings.INVOICE_ZIP.expanduser().is_file():
+			if settings.INVOICE_ZIP_FILE.expanduser().is_file():
 				context.__setitem__('upload', True)
 
 			return render(request, 'account/admin.html', context)
@@ -93,8 +93,8 @@ class RestoreDataBase(View):
 class Invoices2Ftp(View):
 	'''class that allows archiving the database of issued invoices'''
 	def get(self, request)->HttpResponseRedirect:
-		backup_file = settings.INVOICE_ZIP.expanduser()
-		ftp_invoice_dir = settings.FTP_INVOICE_DIR
+		backup_file = settings.INVOICE_ZIP_FILE.expanduser()
+		ftp_invoice_dir = settings.FTP_INVOICE_DIR.name
 		args = (backup_file, ftp_invoice_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
 		if socket.gethostname() == 'OFFICELAPTOP':
 			if invoices_backup():
