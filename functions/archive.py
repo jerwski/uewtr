@@ -25,14 +25,13 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 def check_internet_connection() -> bool:
 	try:
-		host= 'www.unikolor.com'
 		http = urllib3.PoolManager()
-		req = http.request('GET', host)
+		req = http.request('GET', settings.FTP)
 		if req.status == 200:
 			return True
 		else:
 			return False
-	except ConnectionRefusedError:
+	except:
 		return False
 
 
@@ -46,7 +45,7 @@ def backup():
 			print(f'Something wrong... Error: {error}')
 
 
-def mkfixture(root_backup):
+def mkfixture(root_backup:Path):
 	'''create fixtures in json format'''
 	year = date.today().year
 	querys = {'employee': Employee.objects.all(),
@@ -61,13 +60,13 @@ def mkfixture(root_backup):
 		for app in ('employee', 'evidence', 'cashregister'):
 			models = apps.all_models[app]
 			for model in models.values():
-				with Path.cwd().joinpath(f'{root_backup}/{model._meta.model_name}.json').open('w') as fixture:
+				with Path.cwd().joinpath(f'{root_backup}/{model._meta.model_name}').with_suffix('.json').open('w') as fixture:
 					serialize('json', querys[f'{model._meta.verbose_name}'], indent=4, stream=fixture)
 	except FileNotFoundError as error:
 		print(f'Serialization error: {error}')
 
 
-def readfixture(request, root_backup):
+def readfixture(request, root_backup:Path):
 	files = [file for file in Path.iterdir(root_backup)]
 	keys = [f'f{i}' for i in range(1, len(files) + 1)]
 	fixtures = OrderedDict(zip(keys, files))
@@ -161,7 +160,7 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
 			with FTP(server, username, password) as myFTP:
 				myFTP.cwd(settings.FTP_BACKUP_DIR)
 				if Path.is_file(archive_file):
-					if myFTP.size(archive_file.name) > archive_file.stat().st_size:
+					if myFTP.size(archive_file.name) != archive_file.stat().st_size:
 						archive_file.unlink()
 						myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
 						messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
@@ -195,7 +194,7 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
 # serialization json
 def export_as_json(modeladmin, request, queryset):
 	opts = modeladmin.model._meta
-	path = Path(f'backup_json/{opts.verbose_name}.json')
+	path = Path(f'{settings.ADMIN_SERIALIZE}/{opts}').with_suffix('.json')
 	with path.open('w') as file:
 		serialize('json', queryset, indent=4, stream=file)
 	messages.success(request, f'Selected records have been serialized to <<{opts.verbose_name}>>')
@@ -213,7 +212,7 @@ def archiving_of_deleted_records(employee_id):
 					all_records.append(model.objects.get(pk=employee_id))
 				else:
 					all_records += list(model.objects.filter(worker_id=employee_id))
-		path = Path(f'backup_json/erase_worker/{employee_id}.json')
+		path = Path(f'{settings.BACKUP_ERASE_WORKER}/{employee_id}').with_suffix('.json')
 		with path.open('w', encoding='utf-8') as file:
 			serialize('json', all_records, indent=4, stream=file)
 

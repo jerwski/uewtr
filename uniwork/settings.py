@@ -189,6 +189,8 @@ FTP_BACKUP_DIR = get_setting('ftp_backup_dir')
 INVOICE_WORKPATH = Path(get_setting('invoice_workpath'))
 ACCOUNTANT_MAIL = get_setting('accountant_mail')
 CC_MAIL = get_setting('cc_mail')
+ADMIN_SERIALIZE = get_setting('admin_serialize')
+BACKUP_ERASE_WORKER = get_setting('backup_erase_worker')
 
 # FTP
 FTP = get_setting('FTP')
