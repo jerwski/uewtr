@@ -24,7 +24,7 @@ from io import BytesIO
 from pathlib import Path
 from collections import deque
 from collections import defaultdict
-from random import shuffle, choices, randrange
+from random import shuffle, sample, randrange
 from datetime import date, datetime, timedelta
 
 # django library
@@ -388,10 +388,11 @@ def quizset(iterable):
 	if len(iterable) >= 4:
 		shuffle(iterable)
 		query, answer = iterable.popleft()
-		answers = [upperfirst(item[1]) for item in choices(iterable, k=3)]
+		answers = [upperfirst(item[1]) for item in sample(iterable, k=3)]
 		answers.insert(randrange(0,4), upperfirst(answer))
 
 		return query, upperfirst(answer), answers
+
 	else:
 		return None
 

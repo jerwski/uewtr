@@ -165,7 +165,8 @@ class QuizView(View):
 				defaults = {'query': query, 'set_of_questions': set_of_questions,
 				            'answer': answer, 'answers': ';'.join(answers)}
 				Quiz.objects.filter(pk=quiz_id).update(**defaults)
-				data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'playtime': playtime, 'poll': len(_queryset),
+				poll = len(_queryset) - 3
+				data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'playtime': playtime, 'poll': poll,
 				        'answers': answers, 'set_of_questions': set_of_questions, 'percent': percent}
 				context.update(data)
 			except:
