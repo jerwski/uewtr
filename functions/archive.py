@@ -202,8 +202,7 @@ def export_as_json(modeladmin, request, queryset):
 			serialize('json', queryset, indent=4, stream=file)
 		messages.success(request, f'Selected records have been serialized to <<{opts.verbose_name}>>')
 	except:
-		messages.warning(request, f'The {path.parent} directory can not be created...')
-
+		messages.warning(request, f'The {path.parent} directory can\'t be created...')
 
 
 # archiving of delete records
