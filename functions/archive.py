@@ -195,9 +195,15 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
 def export_as_json(modeladmin, request, queryset):
 	opts = modeladmin.model._meta
 	path = Path(f'{settings.ADMIN_SERIALIZE}/{opts}').with_suffix('.json')
-	with path.open('w') as file:
-		serialize('json', queryset, indent=4, stream=file)
-	messages.success(request, f'Selected records have been serialized to <<{opts.verbose_name}>>')
+	try:
+		if not path.exists():
+			Path.mkdir(path.parent)
+		with path.open('w') as file:
+			serialize('json', queryset, indent=4, stream=file)
+		messages.success(request, f'Selected records have been serialized to <<{opts.verbose_name}>>')
+	except:
+		messages.warning(request, f'The {path.parent} directory can not be created...')
+
 
 
 # archiving of delete records
