@@ -3,7 +3,7 @@ import urllib3
 from ftplib import FTP
 from pathlib import Path
 from datetime import date
-from collections import OrderedDict
+from collections import deque
 from shutil import make_archive, unpack_archive
 
 # django core
@@ -67,13 +67,10 @@ def mkfixture(root_backup:Path):
 
 
 def readfixture(request, root_backup:Path):
-	files = [file for file in Path.iterdir(root_backup)]
-	keys = [f'f{i}' for i in range(1, len(files) + 1)]
-	fixtures = OrderedDict(zip(keys, files))
-	for key in ('f1','f3','f2'):
-		fixtures.move_to_end(key)
+	files = deque(file for file in root_backup.iterdir() if file.name.startswith('employee'))
+	files.extend(file for file in root_backup.iterdir() if not file.name.startswith('employee'))
 	try:
-		for file in fixtures.values():
+		for file in files:
 			call_command('loaddata', file)
 			messages.info(request, f'Fixture {file.name} have been loaded...\n')
 	except FileNotFoundError as error:

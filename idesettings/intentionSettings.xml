@@ -1,7 +1,0 @@
-<application>
-  <component name="IntentionManagerSettings">
-    <ignoreAction name="Language Injection/Edit Injected Fragment" />
-    <ignoreAction name="Python/Convert method to property" />
-    <ignoreAction name="Language Injection/Inject language or reference" />
-  </component>
-</application>
