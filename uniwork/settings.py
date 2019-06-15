@@ -191,6 +191,7 @@ ACCOUNTANT_MAIL = get_setting('accountant_mail')
 CC_MAIL = get_setting('cc_mail')
 ADMIN_SERIALIZE = get_setting('admin_serialize')
 BACKUP_ERASE_WORKER = get_setting('backup_erase_worker')
+FIXTURES_APPS = get_setting('fixtures_apps')
 
 # FTP
 FTP = get_setting('FTP')

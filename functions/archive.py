@@ -48,20 +48,20 @@ def backup():
 def mkfixture(root_backup:Path):
 	'''create fixtures in json format'''
 	year = date.today().year
-	querys = {'employee': Employee.objects.all(),
-			  'employee data': EmployeeData.objects.all(),
-			  'employee hourly rate': EmployeeHourlyRate.objects.all(),
-			  'work evidence': WorkEvidence.objects.filter(start_work__year=year),
-			  'employee leave': EmployeeLeave.objects.filter(leave_date__year=year),
-			  'account payment': AccountPayment.objects.filter(account_date__year=year),
-			  'company': Company.objects.filter(created__year=year),
-			  'cash register': CashRegister.objects.filter(created__year=year)}
+	query = {'employee': Employee.objects.all(),
+			 'employeedata': EmployeeData.objects.all(),
+			 'employeehourlyrate': EmployeeHourlyRate.objects.all(),
+			 'workevidence': WorkEvidence.objects.filter(start_work__year=year),
+			 'employeeleave': EmployeeLeave.objects.filter(leave_date__year=year),
+			 'accountpayment': AccountPayment.objects.filter(account_date__year=year),
+			 'company': Company.objects.filter(created__year=year),
+			 'cashregister': CashRegister.objects.filter(created__year=year)}
 	try:
-		for app in ('employee', 'evidence', 'cashregister'):
+		for app in settings.FIXTURES_APPS:
 			models = apps.all_models[app]
-			for model in models.values():
-				with Path.cwd().joinpath(f'{root_backup}/{model._meta.model_name}').with_suffix('.json').open('w') as fixture:
-					serialize('json', querys[f'{model._meta.verbose_name}'], indent=4, stream=fixture)
+			for key in models.keys():
+				with Path.cwd().joinpath(f'{root_backup}/{key}').with_suffix('.json').open('w') as fixture:
+					serialize('json', query[f'{key}'], indent=4, stream=fixture)
 	except FileNotFoundError as error:
 		print(f'Serialization error: {error}')
 
