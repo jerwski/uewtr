@@ -491,17 +491,16 @@ class EmployeeCurrentComplexDataView(View):
 		month, year = choice_date.month, choice_date.year
 		choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
 		form = PeriodCurrentComplexDataForm(initial={'choice_date': choice_date})
-		worker = Employee.objects.get(id=employee_id)
-		workerdata=EmployeeData.objects.get(worker=worker)
+		workerdata=EmployeeData.objects.get(worker_id=employee_id)
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
-		work_hours = WorkEvidence.objects.filter(worker=worker, start_work__year=year, start_work__month=month)
+		work_hours = WorkEvidence.objects.filter(worker_id=employee_id, start_work__year=year, start_work__month=month)
 		holidays = holiday(year)
 		leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
-		month_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year, leave_date__month=month)
-		year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
+		month_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
+		year_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year)
 		month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 		year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
-		context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'choice_date': choice_date,
+		context = {'form': form, 'employee_id': employee_id, 'choice_date': choice_date,
 		           'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
 		           'holidays' : holidays, 'work_hours': work_hours.order_by('start_work'), 'workerdata': workerdata}
 		employee_total_data(employee_id, year, month, context)
@@ -514,27 +513,26 @@ class EmployeeCurrentComplexDataView(View):
 		choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
 		month, year = choice_date.month, choice_date.year
 		form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
-		worker = Employee.objects.get(id=employee_id)
-		workerdata = EmployeeData.objects.get(worker=worker)
+		workerdata = EmployeeData.objects.get(worker_id=employee_id)
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
-		work_hours = WorkEvidence.objects.filter(worker=worker, start_work__year=year, start_work__month=month)
+		work_hours = WorkEvidence.objects.filter(worker_id=employee_id, start_work__year=year, start_work__month=month)
 		# data for modal chart
-		context = {'total_brutto_set': data_modal_chart(employee_id), 'workerdata': workerdata}
+		context = {'total_brutto_set': data_modal_chart(employee_id)}
 
 		if form.is_valid():
 			leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
 			holidays = holiday(year)
-			month_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year, leave_date__month=month)
-			year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
+			month_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
+			year_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year)
 			month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 			year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
-			context.update({'form': form, 'worker': worker, 'employee_id': employee_id, 'choice_date': choice_date,
+			context.update({'form': form, 'employee_id': employee_id, 'choice_date': choice_date,
 			                'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
-			                'holidays' : holidays, 'work_hours': work_hours.order_by('start_work')})
+			                'holidays' : holidays, 'work_hours': work_hours.order_by('start_work'), 'workerdata': workerdata})
 			employee_total_data(employee_id, year, month, context)
 
 		else:
-			context.update({'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees})
+			context.update({'form': form, 'employee_id': employee_id, 'employees': employees, 'workerdata': workerdata})
 
 		return render(request, r'evidence/current_complex_evidence_data.html', context)
 
