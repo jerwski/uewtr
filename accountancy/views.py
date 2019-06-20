@@ -92,9 +92,9 @@ class AccountancyDocumentView(View):
 
 		initial = {'number': number,
 		           'date_of_shipment': now().date(),
-		           'order': f'{number}/{now().year}',
-		           'invoice': f'FS-{number}/{now().year}',
-		           'waybill': f'LKW-{number}/{now().year}',}
+		           'order': f'{number}/{now().month}/{now().year}',
+		           'invoice': f'FS-{number}/{now().month}/{now().year}',
+		           'waybill': f'LKW-{number}/{now().month}/{now().year}',}
 
 		if company_id:
 			company = Company.objects.get(pk=company_id)

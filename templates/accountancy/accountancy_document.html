@@ -8,19 +8,7 @@
 {% block content %}
 
   <div class="container-fluid">
-    <div class="row ml-3 mr-3 mt-2 bgbisque">
-      <div class="col-sm-2 mt-2 text-center">
-        <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="50%"></a>
-        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
-      </div>
-      <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
-        <p class="h1 font-weight-normal">Company Accountancy</p>
-        <p class="text-info font-weight-bold font-italic">Application to handle company accountancy</p>
-      </div>
-      <div class="col-sm-2 mt-2">
-        {% include 'blocks/alert.html' %}
-      </div>
-    </div>
+    {% include 'blocks/accountancy_headline.html' %}
     <div class="row ml-3 mr-3 mb-2 bgbisque">
       <div class="col-sm-4">
         <p class="text-center text-danger lead font-weight-normal bg-warning">COMPANIES</p>
@@ -30,7 +18,7 @@
           {% for company in companies %}
             <tr>
               {% if company_id == company.id %}
-                <td><a class="text-danger" href="{{ company.create_doc }}">{{ company }}</a></td>
+                <td><a class="text-danger font-weight-bold" href="{{ company.create_doc }}">{{ company }}</a></td>
               {% else %}
                 <td><a href="{{ company.create_doc }}">{{ company }}</a></td>
               {% endif %}
@@ -85,8 +73,7 @@
             </div>
             <input class="form-control" id="myInput" type="text" placeholder="Wyszukaj odbiorcę wpisując nazwę, nip, kod, miasto, ulicę lub adres e-mail... albo dodaj odbiorcę" aria-label="Filtering table" aria-describedby="basic-addon">
             <div class="input-group-append">
-              <a href="{% url 'accountancy:add_customer' %}" class="btn btn-info">Add/change
-                customer</a>
+              <a href="{% url 'accountancy:add_customer' %}" class="btn btn-info">Add/change customer</a>
             </div>
           </div>
           <div class="scrollit">
@@ -95,7 +82,13 @@
                 {% for customer in customers %}
                   <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td><a href="{% url 'accountancy:accountancy' company_id customer.id %}">{{ customer }}</a></td>
+
+                    {% if customer_id == customer.id %}
+                      <td><a class="text-danger font-weight-bold" href="{% url 'accountancy:accountancy' company_id customer.id %}">{{ customer }}</a></td>
+                    {% else %}
+                      <td><a href="{% url 'accountancy:accountancy' company_id customer.id %}">{{ customer }}</a></td>
+                    {% endif %}
+
                     <td>{{ customer.nip }}</td>
                     <td>{{ customer.postal }}&nbsp;{{ customer.city }}</td>
                     <td>{{ customer.street }}</td>
