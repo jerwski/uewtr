@@ -2,7 +2,6 @@
 import urllib3
 from ftplib import FTP
 from pathlib import Path
-from datetime import date
 from collections import deque
 from shutil import make_archive, unpack_archive
 
@@ -10,14 +9,13 @@ from shutil import make_archive, unpack_archive
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
+from django.utils.timezone import now
 from django.core.management import call_command
 from django.core.serializers import serialize, BadSerializer
 
 
 # my models
-from cashregister.models import Company, CashRegister
-from employee.models import Employee, EmployeeData, EmployeeHourlyRate
-from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
+from employee.models import Employee
 
 
 # Create your archive functions here.
@@ -41,6 +39,7 @@ def backup():
 		try:
 			with settings.ARCHIVE_ROOT.open('w', encoding='utf-8') as jsonfile:
 				call_command('dumpdata', indent=4, stdout=jsonfile)
+			print(f'Backup is created at {now} in the {settings.ARCHIVE_ROOT.name}')
 		except FileNotFoundError as error:
 			print(f'Something wrong... Error: {error}')
 
