@@ -39,7 +39,7 @@ def backup():
 		try:
 			with settings.ARCHIVE_ROOT.open('w', encoding='utf-8') as jsonfile:
 				call_command('dumpdata', indent=4, stdout=jsonfile)
-			print(f'Backup is created at {now} in the {settings.ARCHIVE_ROOT.name}')
+			print(f'Backup is created at {now} in the {settings.ARCHIVE_ROOT}')
 		except FileNotFoundError as error:
 			print(f'Something wrong... Error: {error}')
 
