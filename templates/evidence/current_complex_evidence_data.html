@@ -47,37 +47,38 @@
 
       <div class="col-6">
         <p class="text-center text-danger lead font-weight-normal bg-warning">CURRENT DATA: {{ workerdata|upper }}</p>
-        {% if not workerdata.end_contract %}
-          <form action="." method="POST">{% csrf_token %}
-            <div class="row">
-              <div class="col-8 mt-1">
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <div class="input-group-text bg-info">Select date</div>
-                  </div>
-                  {% bootstrap_field form.choice_date  form_group_class='form-inline' show_label=False %}
-                  <div class="input-group-append">
-                    <button type="submit" class="btn btn-outline-success">Confirm</button>
-                  </div>
+
+        <form action="." method="POST">{% csrf_token %}
+          <div class="row">
+            <div class="col-8 mt-1">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <div class="input-group-text bg-info">Select date</div>
                 </div>
-              </div>
-              <div class="col-4">
-                <div class="btn-sm" role="group">
-                  <button id="btnGroupDropHolidays" type="button" class="btn btn-outline-danger btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Holidays in {{ choice_date|date:'Y' }} year </button>
-                  <div class="dropdown-menu" aria-labelledby="btnGroupDropHolidays">
-                    <table class="table table-sm table-hover">
-                      <tbody>
-                      {% for key, value in holidays.items %}
-                        <tr class="font-weight-light font-italic"><td class="text-right text-danger" width="55%">{{ key }}:</td><td class="text-left text-dark">{{ value|date:'d-m-Y (D)' }}</td></tr>
-                      {% endfor %}
-                      </tbody>
-                    </table>
-                  </div>
+                {% bootstrap_field form.choice_date  form_group_class='form-inline' show_label=False %}
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-outline-success">Confirm</button>
                 </div>
               </div>
             </div>
-          </form>
+            <div class="col-4">
+              <div class="btn-sm" role="group">
+                <button id="btnGroupDropHolidays" type="button" class="btn btn-outline-danger btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Holidays in {{ choice_date|date:'Y' }} year </button>
+                <div class="dropdown-menu" aria-labelledby="btnGroupDropHolidays">
+                  <table class="table table-sm table-hover">
+                    <tbody>
+                    {% for key, value in holidays.items %}
+                      <tr class="font-weight-light font-italic"><td class="text-right text-danger" width="55%">{{ key }}:</td><td class="text-left text-dark">{{ value|date:'d-m-Y (D)' }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
 
+        {% if not workerdata.end_contract or workerdata.end_contract.year >= year and workerdata.end_contract.month >= month %}
           {% if rate %}
             <p class="text-center lead font-weight-normal bg-info">Kind of leave in {{ choice_date|date:'F Y' }}</p>
             <table class="table table-sm">
@@ -134,7 +135,7 @@
             <p class="text-center lead font-weight-normal">No data is available!</p>
           {% endif %}
         {% else %}
-          <p class="text-center lead font-weight-normal">No data for {{ workerdata }} available because the employee is no longer employed.</p>
+          <p class="text-center text-primary lead font-weight-normal">No data for {{ workerdata }} available because the employee is no longer employed.</p>
         {% endif %}
         <div class="row">
           <div class="col-6 btn">

@@ -492,7 +492,8 @@ class EmployeeCurrentComplexDataView(View):
 		choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
 		form = PeriodCurrentComplexDataForm(initial={'choice_date': choice_date})
 		workerdata=EmployeeData.objects.get(worker_id=employee_id)
-		employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
+		end_contract = Q(employeedata__end_contract__year__gte=year, employeedata__end_contract__month__gte=month) | Q(employeedata__end_contract__isnull=True)
+		employees = Employee.objects.filter(end_contract).order_by('surname')
 		work_hours = WorkEvidence.objects.filter(worker_id=employee_id, start_work__year=year, start_work__month=month)
 		holidays = holiday(year)
 		leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
@@ -500,8 +501,8 @@ class EmployeeCurrentComplexDataView(View):
 		year_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year)
 		month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 		year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
-		context = {'form': form, 'employee_id': employee_id, 'choice_date': choice_date,
-		           'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
+		context = {'form': form, 'employee_id': employee_id, 'choice_date': choice_date, 'month': month,
+		           'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves, 'year': year,
 		           'holidays' : holidays, 'work_hours': work_hours.order_by('start_work'), 'workerdata': workerdata}
 		employee_total_data(employee_id, year, month, context)
 		# data for modal chart
@@ -514,7 +515,8 @@ class EmployeeCurrentComplexDataView(View):
 		month, year = choice_date.month, choice_date.year
 		form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
 		workerdata = EmployeeData.objects.get(worker_id=employee_id)
-		employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
+		end_contract = Q(employeedata__end_contract__year__gte=year, employeedata__end_contract__month__gte=month) | Q(employeedata__end_contract__isnull=True)
+		employees = Employee.objects.filter(end_contract).order_by('surname')
 		work_hours = WorkEvidence.objects.filter(worker_id=employee_id, start_work__year=year, start_work__month=month)
 		# data for modal chart
 		context = {'total_brutto_set': data_modal_chart(employee_id)}
@@ -527,8 +529,9 @@ class EmployeeCurrentComplexDataView(View):
 			month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 			year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 			context.update({'form': form, 'employee_id': employee_id, 'choice_date': choice_date,
-			                'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
-			                'holidays' : holidays, 'work_hours': work_hours.order_by('start_work'), 'workerdata': workerdata})
+							'month': month, 'employees': employees, 'month_leaves': month_leaves,
+							'year_leaves': year_leaves, 'year': year, 'holidays' : holidays,
+							'work_hours': work_hours.order_by('start_work'), 'workerdata': workerdata})
 			employee_total_data(employee_id, year, month, context)
 
 		else:
