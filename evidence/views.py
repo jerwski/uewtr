@@ -413,12 +413,28 @@ class AccountPaymentView(View):
 		initial=initial_account_form(employee_id)
 		form = AccountPaymentForm(initial=initial)
 		worker = initial['worker']
-		employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
 		salary = total_payment(employee_id, year, month)
 		salary = salary['brutto']
-		context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees, 'salary': salary}
-		query = Q(worker=worker) & Q(account_date__year=now().year) & Q(account_date__month=now().month)
+		month_, year_ = initial['account_date'].month, initial['account_date'].year
+		salary_ = total_payment(employee_id, year_, month_)
+		salary_ = salary_['brutto']
+
+		# set list of valid employees
+		queryset = Employee.objects.all()
+
+		q1 = queryset.filter(status=1)
+		q2 = queryset.filter(employeedata__end_contract__year__gte=year_, employeedata__end_contract__month__gte=month_)
+		employees = q1 | q2
+
+		# seting context
+		context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees,
+				   'salary': salary, 'salary_': salary_, 'earlier_date': initial['account_date']}
+
+		# check out total account
+		query = Q(worker=worker) & Q(account_date__year=year) & Q(account_date__month=month)
 		total_account = AccountPayment.objects.filter(query)
+		query_ = Q(worker=worker) & Q(account_date__year=year_) & Q(account_date__month=month_)
+		total_account_ = AccountPayment.objects.filter(query_)
 
 		if total_account.exists():
 			total_account = total_account.aggregate(ta=Sum('account_value'))
@@ -426,40 +442,62 @@ class AccountPaymentView(View):
 		else:
 			total_account = 0
 
-		context.__setitem__('total_account', total_account)
+		if total_account_.exists():
+			total_account_ = total_account_.aggregate(ta_=Sum('account_value'))
+			total_account_ = total_account_['ta_']
+		else:
+			total_account_ = 0
+
+		left, left_ = salary - total_account, salary_ - total_account_
+		context.update({'total_account': total_account, 'total_account_': total_account_, 'left': left, 'left_': left_})
 
 		return render(request, 'evidence/account_payment.html', context)
 
 	def post(self, request, employee_id:int) -> render:
 		form = AccountPaymentForm(data=request.POST)
-		employees = Employee.objects.filter(employeedata__end_contract__isnull=True).order_by('surname')
-
-		context = {'form': form, 'employee_id': employee_id, 'employees': employees}
+		worker = Employee.objects.get(pk=employee_id)
+		context = {'form': form, 'employee_id': employee_id, 'worker': worker}
 
 		if form.is_valid():
+			form.save(commit=False)
 			data = form.cleaned_data
-			worker, account_date, account_value = data['worker'], data['account_date'], data['account_value']
-			year, month = account_date.year, account_date.month
-			context.__setitem__('worker', worker)
-			context.__setitem__('account_date', account_date)
-			context.__setitem__('account_value', account_value)
+			account_date, account_value = data['account_date'], data['account_value']
+			month, year = account_date.month, account_date.year
+			context.update({'account_date': account_date, 'account_value': account_value})
 
 			# check if the total of advances is not greater than the income earned
-			salary = total_payment(employee_id, account_date.year, account_date.month)
+			salary = total_payment(employee_id, year, month)
 			salary = salary['brutto']
-			context.__setitem__('salary', salary)
+
+			# set list of valid employees
+			queryset = Employee.objects.all()
+			month_, year_ = now().month, now().year
+
+			if month_==1:
+				month_, year_ = 12, year_ - 1
+			else:
+				month_, year_ = month_ - 1, year_
+
+			q1 = queryset.filter(status=1)
+			q2 = queryset.filter(employeedata__end_contract__year__gte=year_, employeedata__end_contract__month__gte=month_)
+			employees = q1 | q2
+
+			# updating context
+			context.update({'salary': salary, 'employees': employees, 'earlier_date': 'account_date'})
+
+			# check out advances
 			query = Q(worker=worker) & Q(account_date__year=year) & Q(account_date__month=month)
 			advances = AccountPayment.objects.filter(query).aggregate(ap=Sum('account_value'))
 
 			if advances['ap'] is None:
 				advances = account_value
-				context.__setitem__('advances', advances)
 			else:
 				advances = advances['ap'] + account_value
-				context.__setitem__('advances', advances)
+
+			context.__setitem__('advances', advances)
 
 			if salary >= advances:
-				AccountPayment.objects.create(**data)
+				form.save(commit=True)
 				messages.success(request, f'Employee {worker} has become an account {account_value:,.2f} PLN on {account_date}')
 			else:
 				msg = f'The sum of advances ({advances:,.2f} PLN) is greater than the income earned so far ({salary:,.2f} PLN). The advance can not be paid...'

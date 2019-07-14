@@ -174,10 +174,9 @@ class QuizView(View):
 				return HttpResponseRedirect(reverse_lazy('login'))
 
 		else:
-			start_play = now()
 			Quiz.objects.all().delete()
-			quiz = Quiz.objects.create(player=user, start_play=start_play, set_of_questions=0, points=0)
-			context.update({'start_play': start_play, 'quiz_id': quiz.id})
+			quiz = Quiz.objects.create(player=user, start_play=now(), set_of_questions=0, points=0)
+			context.update({'start_play': now(), 'quiz_id': quiz.id})
 
 		return render(request, 'account/quiz.html', context)
 
