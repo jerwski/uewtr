@@ -26,7 +26,9 @@ if month == 1:
 else:
 	month, year = month -1, year
 
-query = queryset.filter(status=1) | queryset.filter(employeedata__end_contract__year__gte=year, employeedata__end_contract__month__gte=month)
+q1 = queryset.filter(status=1)
+q2 = queryset.filter(employeedata__end_contract__year__gte=year, employeedata__end_contract__month__gte=month)
+query = q1 | q2
 
 
 # my forms
