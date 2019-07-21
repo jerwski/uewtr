@@ -24,7 +24,7 @@ from io import BytesIO
 from pathlib import Path
 from collections import deque
 from collections import defaultdict
-from random import shuffle, choices, randrange
+from random import shuffle, sample, randrange
 from datetime import date, datetime, timedelta
 
 # django library
@@ -167,10 +167,10 @@ def plot_chart(employee_id:int, year:int):
 	ax.set(xlabel='Value [PLN]', ylabel='Months',
 		   title=f'Incomes in {year} year for {worker} (total {total_income:,.2f} PLN)')
 	for k, v in income.items():
-		if 0 < v < 300:
+		if 0 < v < 1000:
 			ax.set_xlim(0, max(list(income.values())) * 1.25)
 			plt.text(v + len(str(v)), k, money_format(v), ha='left', va='center', fontsize=10, fontweight='bold')
-		elif v!=0:
+		else:
 			plt.text(v - len(str(v)), k, money_format(v), ha='right', va='center', fontsize=10, fontweight='bold')
 	imgdata = BytesIO()
 	fig.savefig(imgdata, format='png')
@@ -385,13 +385,14 @@ def upperfirst(string:str) -> str:
 
 def quizset(iterable):
 
-	while len(iterable) >= 4:
+	if len(iterable) >= 4:
 		shuffle(iterable)
 		query, answer = iterable.popleft()
-		answers = [upperfirst(item[1]) for item in choices(iterable, k=3)]
+		answers = [upperfirst(item[1]) for item in sample(iterable, k=3)]
 		answers.insert(randrange(0,4), upperfirst(answer))
 
 		return query, upperfirst(answer), answers
+
 	else:
 		return None
 

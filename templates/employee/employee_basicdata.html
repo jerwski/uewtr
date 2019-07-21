@@ -11,16 +11,20 @@
       <div class="col-md-4">
         <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
         <table class="table table-hover table-sm">
+          <colgroup>
+            <col span="1" style="width:5%">
+            <col span="1" style="width:95%">
+          </colgroup>
           <tbody>
           {% for employee in employees_st %}
             <tr>
               {% if request.path == '/employee/add_change/basicdata/' %}
-                <td width="5%" class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                <td class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
               {% else %}
                 {% if employee_id == employee.id %}
-                  <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                  <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
                 {% else %}
-                  <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                  <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
                 {% endif %}
               {% endif %}
             </tr>
@@ -32,18 +36,25 @@
       <div class="col-md-4">
         <p class="text-center text-danger lead font-weight-normal bg-warning">DEACTIVE EMPLOYEES</p>
         <table class="table table-hover table-sm">
+          <colgroup>
+            <col span="1" style="width:5%">
+            <col span="1" style="width:95%">
+          </colgroup>
           <tbody>
           {% for employee in employees_sf %}
             <tr>
             {% if employee_id == employee.id %}
-              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+              <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
             {% else %}
-              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+              <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
             {% endif %}
             </tr>
           {% endfor %}
           </tbody>
         </table>
+
+        {% include 'blocks/pagination.html' with items=employees_sf %}
+
         <div class="btn btn-group float-sm-right mr-2" role="group">
           <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
           <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
