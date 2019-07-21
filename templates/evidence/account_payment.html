@@ -15,18 +15,18 @@
         <tbody>
         {% for employee in employees %}
           <tr>
-          {% if employee_id == employee.id %}
-            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
-          {% else %}
-            <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
-          {% endif %}
+            {% if employee_id == employee.id %}
+              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
+            {% else %}
+              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
+            {% endif %}
           </tr>
         {% endfor %}
         </tbody>
       </table>
     </div>
     <div class="col-sm-8">
-      {% if worker.status %}
+      {% if salary or salary_ %}
         <p class="text-center text-danger lead font-weight-normal bg-warning">ADVANCE FOR: {{ worker|upper }}</p>
 
         <form action="{% url 'evidence:account_payment' employee_id %}" method="POST">{% csrf_token %}
@@ -52,25 +52,52 @@
               <a href="{% url 'evidence:account_recorder_erase' employee_id account_date account_value %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the down payment ({{ account_value|money_format }})</em></a>
             </div>
           {% else %}
-            <p class="text-justify text-danger lead font-weight-normal">The sum of advances <em class="font-weight-bold">{{ advances|money_format }}</em> is greater than the income earned so far <em class="font-weight-bold">{{ salary|money_format }}</em>. The advance can not be paid!</p>
+            <p class="text-justify text-danger lead font-weight-normal">The sum of advances <em class="font-weight-bold">{{ advances|money_format }}</em> is greater than the income earned so far <em class="font-weight-bold">{% if salary %}{{ salary|money_format }}{% elif salary_ %}{{ salary|money_format }}{% endif %}</em>. The advance can not be paid!</p>
           {% endif %}
         {% else %}
           <table class="table table-hover table-sm">
             <thead class="bg-info">
-              <tr><th class="text-center text-white">TOTAL ADVANCE INFO</th></tr>
+            <tr><th class="text-center text-white">TOTAL ADVANCE INFO FOR {{ worker|upper }}</th></tr>
             </thead>
           </table>
           <table class="table table-hover table-sm">
+            <colgroup>
+              <col span="1" style="width:30%">
+              <col span="1" style="width:30%">
+              <col span="1" style="width:30%">
+              <col span="1" style="width:10%">
+            </colgroup>
             <tbody>
-              <tr><td width="50%">Worker:</td><td class="text-danger font-weight-bold">{{ worker }}</td></tr>
-              <tr><td width="50%">Total advance:</td><td class="text-danger font-weight-bold">{{ total_account|money_format }}</td></tr>
-              <tr><td>Netto income:</td><td class="text-danger font-weight-bold">{{ salary|money_format }}</td></tr>
+            <tr class="text-info text-right font-weight-bold">
+              <td>Preiod:</td>
+              <td>{{ earlier_date|date:'F Y' }}</td>
+              <td>{% now 'F Y' %}</td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr class="text-right">
+              <td class="text-right">Total advance:</td>
+              <td class="text-danger font-weight-bold">{{ total_account_|money_format }}</td>
+              <td class="text-danger font-weight-bold">{{ total_account|money_format }}</td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr class="text-right">
+              <td class="text-right">Brutto income:</td>
+              <td class="text-danger font-weight-bold">{{ salary_|money_format }}</td>
+              <td class="text-danger font-weight-bold">{{ salary|money_format }}</td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr class="text-primary text-right font-weight-bold">
+              <td>Left to be paid out:</td>
+              <td>{{ left_|money_format }}</td>
+              <td>{{ left|money_format }}</td>
+              <td>&nbsp;</td>
+            </tr>
             </tbody>
           </table>
         {% endif %}
       {% else %}
-        <p class="text-center text-danger lead font-weight-normal bg-warning">ADVANCE</p>
-        <p class="text-justify text-danger lead font-weight-normal">You can't add any advance for <em class="font-weight-bold">{{ worker }}</em> because the employee is no longer employed.</p>
+        <p class="text-center text-danger lead font-weight-normal bg-warning">NO DOWN PAYMENT WAS GRANTED</p>
+        <p class="text-justify text-danger lead font-weight-normal">You can't add any advance for <em class="font-weight-bold">{{ worker }}</em> because the employee haven't any income or sum of advance is grower them income.</p>
       {% endif %}
       <div class="btn-sm mb-2">
         <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>

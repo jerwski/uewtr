@@ -22,19 +22,7 @@
 {% block content %}
 
   <div class="container-fluid">
-    <div class="row ml-3 mr-3 mt-2 bgbisque">
-      <div class="col-sm-2 mt-2 text-center">
-        <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="50%"></a>
-        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
-      </div>
-      <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
-        <p class="h1 font-weight-normal">Company Accountancy</p>
-        <p class="text-info font-weight-bold font-italic">Application to handle company accountancy</p>
-      </div>
-      <div class="col-sm-2 mt-2 text-right">
-        {% include 'blocks/alert.html' %}
-      </div>
-    </div>
+    {% include 'blocks/accountancy_headline.html' %}
     <div class="row ml-3 mr-3 mb-2 bgbisque">
       <div class="col-sm-3">
         <p class="text-center text-danger lead font-weight-normal bg-warning">CURRENT CONTRACTOR</p>

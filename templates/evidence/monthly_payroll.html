@@ -56,17 +56,19 @@
             </thead>
             <tbody id="searchTable">
             {% for name, data in payroll.items %}
-              <tr>
-                <td class="text-primary font-weight-bold font-italic"><a href="{{ name.employee_complex_data }}">{{ name }}</a></td>
-                <td class="text-right text-dark">{{ data.brutto|money_format }}</td>
-                <td class="text-right text-dark">{{ data.basicpay|money_format }}</td>
-                <td class="text-right text-dark">{{ data.leavepay|money_format }}</td>
-                <td class="text-right text-dark">{{ data.overhourspay|money_format }}</td>
-                <td class="text-right text-dark">{{ data.satpay|money_format }}</td>
-                <td class="text-right text-dark">{{ data.sunpay|money_format }}</td>
-                <td class="text-right text-dark">{{ data.accountpay|money_format }}</td>
-                <td class="text-right text-dark">{{ data.salary|money_format }}</td>
-              </tr>
+              {% if data.brutto > 0 %}
+                <tr>
+                  <td class="text-primary font-weight-bold font-italic"><a href="{{ name.employee_complex_data }}">{{ name }}</a></td>
+                  <td class="text-right text-dark">{{ data.brutto|money_format }}</td>
+                  <td class="text-right text-dark">{{ data.basicpay|money_format }}</td>
+                  <td class="text-right text-dark">{{ data.leavepay|money_format }}</td>
+                  <td class="text-right text-dark">{{ data.overhourspay|money_format }}</td>
+                  <td class="text-right text-dark">{{ data.satpay|money_format }}</td>
+                  <td class="text-right text-dark">{{ data.sunpay|money_format }}</td>
+                  <td class="text-right text-dark">{{ data.accountpay|money_format }}</td>
+                  <td class="text-right text-dark">{{ data.salary|money_format }}</td>
+                </tr>
+              {% endif %}
             {% endfor %}
               <tr class="bg-info"><td class="text-right text-white font-weight-bold">TOTAL:</td>
               {% for value in amountpay.values %}
