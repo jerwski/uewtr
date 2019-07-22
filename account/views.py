@@ -48,7 +48,7 @@ class AdminView(View):
 			if request.session.get('check_update', True):
 				global _queryset
 				_queryset = quizdata()
-				if socket.gethostname() == 'MBP-Jerzy':
+				if socket.gethostname() in settings.HOME_HOSTS:
 					args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
 					getArchiveFilefromFTP(request, *args)
 				else:
@@ -96,7 +96,7 @@ class Invoices2Ftp(View):
 		backup_file = settings.INVOICE_ZIP.with_suffix('.zip').expanduser()
 		ftp_invoice_dir = settings.FTP_INVOICE_DIR.name
 		args = (backup_file, ftp_invoice_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
-		if socket.gethostname() == 'OFFICELAPTOP':
+		if socket.gethostname() in settings.OFFICE_HOSTS:
 			if invoices_backup():
 				uploadFileFTP(*args)
 				messages.info(request, f'\nInvoices archive is safe...')
@@ -215,7 +215,7 @@ def exit(request)->HttpResponseRedirect:
 	paths = (Path(r'templates/pdf'), Path('~/Downloads').expanduser())
 	args = (settings.ARCHIVE_FILE, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
 
-	if socket.gethostname() == 'OFFICELAPTOP':
+	if socket.gethostname() in settings.OFFICE_HOSTS:
 		backup()
 		mkfixture(settings.ROOT_BACKUP)
 		make_archives(settings.ARCHIVE_NAME, settings.ROOT_BACKUP, settings.ARCHIVE_FILE)
@@ -234,7 +234,7 @@ def exit(request)->HttpResponseRedirect:
 			if request.user.is_authenticated:
 				logout(request)
 
-	elif socket.gethostname() == 'MBP-Jerzy':
+	elif socket.gethostname() in settings.HOME_HOSTS:
 		if request.user.is_authenticated:
 			backup()
 			remgarbage(*paths)
