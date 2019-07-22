@@ -40,7 +40,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = get_setting('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if socket.gethostname() == 'HOMELAPTOP':
+if socket.gethostname() == 'MBP-Jerzy':
     DEBUG = True
 elif socket.gethostname() == 'OFFICELAPTOP':
     DEBUG = True
@@ -103,7 +103,7 @@ WSGI_APPLICATION = 'uniwork.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-if socket.gethostname() == 'HOMELAPTOP':
+if socket.gethostname() == 'MBP-Jerzy':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',

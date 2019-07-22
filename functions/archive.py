@@ -68,7 +68,8 @@ def mkfixture(root_backup:Path):
 
 def readfixture(request, root_backup:Path):
 	files = deque(file for file in root_backup.iterdir() if file.name.startswith('employee'))
-	files.extend(file for file in root_backup.iterdir() if not file.name.startswith('employee'))
+	files.extend(file for file in root_backup.iterdir() if file.name.startswith('company'))
+	files.extend(file for file in root_backup.iterdir() if not file.name.startswith('employee') and not file.name.startswith('company'))
 	try:
 		for file in files:
 			call_command('loaddata', file)

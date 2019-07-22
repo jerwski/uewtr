@@ -48,7 +48,7 @@ class AdminView(View):
 			if request.session.get('check_update', True):
 				global _queryset
 				_queryset = quizdata()
-				if socket.gethostname() == 'HOMELAPTOP':
+				if socket.gethostname() == 'MBP-Jerzy':
 					args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
 					getArchiveFilefromFTP(request, *args)
 				else:
@@ -234,7 +234,7 @@ def exit(request)->HttpResponseRedirect:
 			if request.user.is_authenticated:
 				logout(request)
 
-	elif socket.gethostname() == 'HOMELAPTOP':
+	elif socket.gethostname() == 'MBP-Jerzy':
 		if request.user.is_authenticated:
 			backup()
 			remgarbage(*paths)
