@@ -40,9 +40,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = get_setting('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if socket.gethostname() == 'MBP-Jerzy':
+if socket.gethostname() in get_setting('home_hosts'):
     DEBUG = True
-elif socket.gethostname() == 'OFFICELAPTOP':
+elif socket.gethostname() in get_setting('office_hosts'):
     DEBUG = True
 else:
     DEBUG = False
@@ -103,7 +103,7 @@ WSGI_APPLICATION = 'uniwork.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-if socket.gethostname() == 'MBP-Jerzy':
+if socket.gethostname() in get_setting('home_hosts'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -114,7 +114,7 @@ if socket.gethostname() == 'MBP-Jerzy':
             'PORT': '5432',
         }
     }
-elif socket.gethostname() == 'OFFICELAPTOP':
+elif socket.gethostname() in get_setting('office_hosts'):
         DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -192,6 +192,8 @@ CC_MAIL = get_setting('cc_mail')
 ADMIN_SERIALIZE = get_setting('admin_serialize')
 BACKUP_ERASE_WORKER = get_setting('backup_erase_worker')
 FIXTURES_APPS = get_setting('fixtures_apps')
+HOME_HOSTS = get_setting('home_hosts')
+OFFICE_HOSTS = get_setting('office_hosts')
 
 # FTP
 FTP = get_setting('FTP')
