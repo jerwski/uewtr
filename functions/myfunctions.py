@@ -1,3 +1,6 @@
+# standard library
+import sys
+
 # django library
 from django.http import HttpResponse
 
@@ -311,7 +314,7 @@ def cashregisterhtml2pdf(company_id:int, month:int, year:int) -> bool:
 
 def make_attachment(html, filename) -> HttpResponse:
 	options = {'page-size'  : 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
-	           'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None, 'quiet': ''}
+			   'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None, 'quiet': ''}
 
 	pdf = pdfkit.from_string(html, False, options=options)
 
@@ -398,8 +401,12 @@ def quizset(iterable):
 
 
 def dirdata() -> dict:
-	drives = [chr(x)+':' for x in range(65,90) if os.path.exists(chr(x)+':')]
-	usage = {drive: shutil.disk_usage(drive)._asdict() for drive in drives}
+	usage = dict()
+	if 'darwin' in sys.platform:
+		usage.__setitem__('Macintosh HD', shutil.disk_usage('/')._asdict())
+	elif 'win' in sys.platform:
+		drivers = [chr(x)+':' for x in range(65,90) if os.path.exists(chr(x)+':')]
+		usage = {drive: shutil.disk_usage(drive)._asdict() for drive in drivers}
 
 	for key, value in usage.items():
 		percent = value['used'] * 100 / value['total']
