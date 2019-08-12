@@ -1,8 +1,14 @@
 # standard library
+import os
 import sys
-
-# django library
-from django.http import HttpResponse
+import shutil
+import calendar
+from io import BytesIO
+from pathlib import Path
+from collections import deque
+from collections import defaultdict
+from random import shuffle, sample, randrange
+from datetime import date, datetime, timedelta
 
 # pdfkit library
 import pdfkit
@@ -19,18 +25,8 @@ from PIL import Image
 # num2words library
 import num2words
 
-# standard library
-import os
-import shutil
-import calendar
-from io import BytesIO
-from pathlib import Path
-from collections import deque
-from collections import defaultdict
-from random import shuffle, sample, randrange
-from datetime import date, datetime, timedelta
-
 # django library
+from django.http import HttpResponse
 from django.utils.timezone import now
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
