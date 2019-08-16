@@ -169,7 +169,7 @@ def plot_chart(employee_id:int, year:int):
 		if 0 < v < 1000:
 			ax.set_xlim(0, max(list(income.values())) * 1.25)
 			plt.text(v + len(str(v)), k, money_format(v), ha='left', va='center', fontsize=10, fontweight='bold')
-		else:
+		elif v >= 1000:
 			plt.text(v - len(str(v)), k, money_format(v), ha='right', va='center', fontsize=10, fontweight='bold')
 	imgdata = BytesIO()
 	fig.savefig(imgdata, format='png')
