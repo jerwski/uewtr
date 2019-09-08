@@ -6,7 +6,7 @@ from django.urls import reverse
 from validators.my_validator import check_pesel
 
 # my mixin
-from account.models import CreationModificationDateMixin
+from account.mixins import CreationModificationDateMixin
 
 
 # Create your models here.
