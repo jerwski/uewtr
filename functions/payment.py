@@ -228,7 +228,7 @@ def total_payment(employee_id:int, year:int, month:int) -> dict:
     accountpay = account_payment(employee_id, year, month)
     # returns the total wage for a given employee in selected year and month
     brutto = basicpay + leavepay + overhourspay + satpay + sunpay
-    salary = brutto - accountpay
+    salary = round(brutto, 2) - accountpay
     context = {'brutto': brutto, 'basicpay': basicpay, 'leavepay': leavepay, 'overhourspay': overhourspay,
                'satpay': satpay, 'sunpay': sunpay, 'accountpay': accountpay, 'salary': salary}
 
