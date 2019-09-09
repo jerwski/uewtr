@@ -467,7 +467,7 @@ class AccountPaymentView(View):
 
 			# check if the total of advances is not greater than the income earned
 			salary = total_payment(employee_id, year, month)
-			salary = salary['brutto']
+			salary = round(salary['brutto'], 2)
 
 			# set list of valid employees
 			queryset = Employee.objects.all()
