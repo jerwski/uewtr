@@ -7,7 +7,7 @@ from django.utils.timezone import now
 from cashregister.models import Company
 
 # my mixin
-from account.models import CreationModificationDateMixin
+from account.mixins import CreationModificationDateMixin
 
 # my validators
 from validators.my_validator import positive_value

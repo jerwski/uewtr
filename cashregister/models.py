@@ -3,7 +3,7 @@ from django.db import models
 from django.urls import reverse
 
 # my mixin
-from account.models import CreationModificationDateMixin
+from account.mixins import CreationModificationDateMixin
 
 # Create your models here.
 
