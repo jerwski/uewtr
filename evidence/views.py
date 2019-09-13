@@ -25,7 +25,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # my function
 from functions.archive import check_internet_connection
 from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
-from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form
+from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year
 
 
 # Create your views here.
@@ -410,7 +410,7 @@ class AccountPaymentView(View):
 	'''class representing the view of payment on account'''
 	def get(self, request, employee_id:int) -> render:
 		month, year = now().month, now().year
-		initial=initial_account_form(employee_id)
+		initial = initial_account_form(employee_id)
 		form = AccountPaymentForm(initial=initial)
 		worker = initial['worker']
 		salary = total_payment(employee_id, year, month)
@@ -471,12 +471,7 @@ class AccountPaymentView(View):
 
 			# set list of valid employees
 			queryset = Employee.objects.all()
-			month_, year_ = now().month, now().year
-
-			if month_==1:
-				month_, year_ = 12, year_ - 1
-			else:
-				month_, year_ = month_ - 1, year_
+			month_, year_ = previous_month_year(now().month, now().year)
 
 			q1 = queryset.filter(status=1)
 			q2 = queryset.filter(employeedata__end_contract__year__gte=year_, employeedata__end_contract__month__gte=month_)

@@ -107,6 +107,17 @@ def initial_worktime_form(work_hours:int) -> dict:
 	return initial
 
 
+def previous_month_year(month, year):
+	'''return previous month and year'''
+
+	if month==1:
+		month, year = 12, year - 1
+	else:
+		month = month - 1
+
+	return month, year
+
+
 def initial_account_form(employee_id:int) -> dict:
 	'''return initial date for AccountPaymentForm'''
 	worker = Employee.objects.get(pk=employee_id)

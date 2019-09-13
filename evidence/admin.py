@@ -9,6 +9,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # my functions
 from functions.archive import export_as_json
+from functions.myfunctions import previous_month_year
 
 
 # Register your models here.
@@ -28,11 +29,7 @@ class LastMonthWorkingDaysFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == LAST_MONTH:
-            year, month = now().year, now().month
-            if month == 1:
-                year, month = year-1, 12
-            else:
-                year, month = year, month-1
+            month, year = previous_month_year(now().month, now().year)
             return queryset.filter(start_work__year=year, start_work__month=month)
         else:
             return queryset

@@ -22,7 +22,7 @@ from employee.models import Employee
 from account.forms import UserCreateForm
 
 # my function
-from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset, dirdata
+from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset, dirdata, previous_month_year
 from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection, invoices_backup
 
 
@@ -117,10 +117,7 @@ class JPK2Accountancy(View):
 			if files:
 				stamp = now().strftime("%A %d %B %Y %H%M%S.%f")
 				# send e-mail with attached cash register as file in pdf format
-				if now().month == 1:
-					month, year = 12, now().year - 1
-				else:
-					month, year = now().month - 1, now().year
+				month, year = previous_month_year(now().month, now().year)
 				mail = {'subject': f'pliki JPK za okres {month}/{year}',
 				        'message': f'W załączniku pliki JPK za okres {month}/{year}r.',
 				        'sender' : settings.EMAIL_HOST_USER, 'recipient': [settings.ACCOUNTANT_MAIL],
