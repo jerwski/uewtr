@@ -12,19 +12,16 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # bootstrap4 widget
 from bootstrap4.widgets import RadioSelectButtonGroup
 
+# my functions
+from functions.myfunctions import previous_month_year
+
 
 # Create your forms here.
 
 
 # queryset to validate HiddenInput fields
 queryset = Employee.objects.all()
-month, year = now().month, now().year
-
-if month == 1:
-	month, year = 12, year - 1
-else:
-	month, year = month -1, year
-
+month, year = previous_month_year(now().month, now().year)
 q1 = queryset.filter(status=1)
 q2 = queryset.filter(employeedata__end_contract__year__gte=year, employeedata__end_contract__month__gte=month)
 query = q1 | q2
