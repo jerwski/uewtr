@@ -38,6 +38,7 @@ class RegisterView(CreateView):
 
 class AdminView(View):
 	'''class implementing the method of view application's dashboard'''
+
 	def get(self, request)->HttpResponseRedirect:
 		if request.user.is_superuser or request.user.is_staff:
 			user = request.user.username
