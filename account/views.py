@@ -137,7 +137,7 @@ class JPK2Accountancy(View):
 
 class QuizView(View):
 
-	def get(self, request, quiz_id:int=None)->render:
+	def get(self, request, quiz_id=None)->render:
 		user = request.user
 		context = {'user': user}
 
