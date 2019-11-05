@@ -15,7 +15,7 @@ numpy==1.17.3
 pdfkit==0.6.1
 Pillow==6.2.1
 psycopg2-binary==2.8.4
-pyparsing==2.4.2
+pyparsing==2.4.3
 python-dateutil==2.8.1
 pytz==2019.3
 six==1.12.0
