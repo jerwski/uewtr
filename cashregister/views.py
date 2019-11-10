@@ -1,4 +1,6 @@
 # django library
+from typing import List
+
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
@@ -104,7 +106,8 @@ class CashRegisterView(View):
 			records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
 			form = CashRegisterForm(initial={'company': company})
 			cr_data = CashRegister.objects.filter(company_id=company_id).exclude(contents='z przeniesienia')
-			cr_set = sorted(set(f'{item.created.month}/{item.created.year}' for item in cr_data))
+			cr_set = set(f'{item.created.month}/{item.created.year}' for item in cr_data)
+			cr_set = sorted(cr_set, key=lambda d: int(d.split('/')[0]), reverse=True)
 			context.update({'form': form, 'company': company, 'company_id': company_id,
 			                'cr_set': cr_set, 'records': records.order_by('-created')})
 
