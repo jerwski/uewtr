@@ -530,13 +530,15 @@ class EmployeeCurrentComplexDataView(View):
 		work_hours = WorkEvidence.objects.filter(worker_id=employee_id, start_work__year=year, start_work__month=month)
 		holidays = holiday(year)
 		leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
-		month_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
+        # selected month leaves = aml
+		sml = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
 		year_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year)
-		month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
+		month_leaves = {kind:sml.filter(leave_flag=kind).count() for kind in leave_kind}
 		year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 		context = {'form': form, 'employee_id': employee_id, 'choice_date': choice_date, 'month': month,
-		           'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves, 'year': year,
-		           'holidays' : holidays, 'work_hours': work_hours.order_by('start_work'), 'workerdata': workerdata}
+                   'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
+                   'year': year, 'holidays' : holidays, 'sml': sml.order_by('leave_date'),
+                   'work_hours': work_hours.order_by('start_work'), 'workerdata': workerdata}
 		employee_total_data(employee_id, year, month, context)
 		# data for modal chart
 		context.__setitem__('total_brutto_set', data_modal_chart(employee_id))
@@ -557,13 +559,14 @@ class EmployeeCurrentComplexDataView(View):
 		if form.is_valid():
 			leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
 			holidays = holiday(year)
-			month_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
+            # selected month leaves = aml
+			sml = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
 			year_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year)
-			month_leaves = {kind:month_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
+			month_leaves = {kind:sml.filter(leave_flag=kind).count() for kind in leave_kind}
 			year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
-			context.update({'form': form, 'employee_id': employee_id, 'choice_date': choice_date,
-							'month': month, 'employees': employees, 'month_leaves': month_leaves,
-							'year_leaves': year_leaves, 'year': year, 'holidays' : holidays,
+			context.update({'form': form, 'employee_id': employee_id, 'choice_date': choice_date, 'month': month,
+                            'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
+                            'year': year, 'holidays' : holidays, 'sml': sml.order_by('leave_date'),
 							'work_hours': work_hours.order_by('start_work'), 'workerdata': workerdata})
 			employee_total_data(employee_id, year, month, context)
 

@@ -46,15 +46,6 @@ def backup():
 
 def mkfixture(root_backup:Path):
 	'''create fixtures in json format'''
-	# year = date.today().year
-	# query = {'employee': Employee.objects.all(),
-	# 		 'employeedata': EmployeeData.objects.all(),
-	# 		 'employeehourlyrate': EmployeeHourlyRate.objects.all(),
-	# 		 'workevidence': WorkEvidence.objects.filter(start_work__year=year),
-	# 		 'employeeleave': EmployeeLeave.objects.filter(leave_date__year=year),
-	# 		 'accountpayment': AccountPayment.objects.filter(account_date__year=year),
-	# 		 'company': Company.objects.filter(created__year=year),
-	# 		 'cashregister': CashRegister.objects.filter(created__year=year)}
 	try:
 		for app in settings.FIXTURES_APPS:
 			models = apps.all_models[app]
