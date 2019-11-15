@@ -93,7 +93,7 @@
 
           <div class="row">
             <div class="col-md-3">
-              <p class="ml-3 mt-3">Leads:</p>
+              <p class="ml-3 mt-4">Leads:</p>
             </div>
             <div class="col-md-4">
               <div class="form-check-inline">
@@ -102,7 +102,7 @@
             </div>
             <div class="col-md-5">
               {% if not new_employee and active %}
-                <div class="form-check-inline mt-3">
+                <div class="form-check-inline mt-4">
                   {% bootstrap_field form.status size='small' %}
                 </div>
               {% elif not active %}
@@ -111,10 +111,11 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-md-12 text-center">
+          <div class="row mt-4">
+            <div class="col-1"></div>
+            <div class="col-md-10 text-center">
               {% if new_employee %}
-                <button type="submit" class="btn btn-outline-success btn-block m-2">Confirm</button>
+                <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
               {% else %}
                 {% if status %}
                   <div class="btn-group btn-group-sm mt-1" role="group">
@@ -136,6 +137,7 @@
                 {% endif %}
               {% endif %}
             </div>
+          <div class="col-1"></div>
           </div>
         </form>
       </div>

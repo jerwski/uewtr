@@ -199,7 +199,7 @@ def payrollhtml2pdf(month:int, year:int) -> bool:
 	day = calendar.monthrange(year, month)[1]
 	query = Q(employeedata__end_contract__lt=date(year, month, 1)) | Q(
 			employeedata__start_contract__gt=date(year, month, day))
-	employees = employees.exclude(query).order_by('surname')
+	employees = employees.exclude(query).order_by('surname', 'forename')
 	if employees.exists():
 		# create data for payroll as associative arrays for all employees
 		payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
