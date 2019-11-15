@@ -36,7 +36,8 @@ class WorkingTimeRecorderView(View):
 	def get(self, request, employee_id:int, work_hours:int=None) -> render:
 		worker = Employee.objects.get(pk=employee_id)
 		initial = {'worker': worker}
-		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
+		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
+		employees = employees.order_by('surname', 'forename')
 		query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
 		overhours = EmployeeData.objects.filter(query).exists()
 		context = {'worker': worker, 'employee_id': employee_id, 'employees': employees, 'overhours': overhours}
@@ -56,7 +57,8 @@ class WorkingTimeRecorderView(View):
 
 	def post(self, request, employee_id:int) -> render:
 		form = WorkEvidenceForm(data=request.POST)
-		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
+		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
+		employees = employees.order_by('surname', 'forename')
 
 		context = {'form': form, 'employee_id': employee_id, 'employees': employees}
 
@@ -120,7 +122,8 @@ class LeaveTimeRecorderView(View):
 	def get(self, request, employee_id:int) -> render:
 		initial=initial_leave_form(employee_id)
 		form = EmployeeLeaveForm(initial=initial)
-		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
+		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
+		employees = employees.order_by('surname', 'forename')
 		worker = initial['worker']
 		values = {'worker': worker, 'leave_date__year': now().year}
 		total_leaves = EmployeeLeave.objects.filter(**values).order_by('leave_date')
@@ -142,7 +145,8 @@ class LeaveTimeRecorderView(View):
 	def post(self, request, employee_id:int) -> render:
 		name_holiday, flag_weekend = False, False
 		form = EmployeeLeaveForm(data=request.POST)
-		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True).order_by('surname')
+		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
+		employees = employees.order_by('surname', 'forename')
 		context = {'form': form, 'employees': employees, 'employee_id': employee_id}
 
 		if form.is_valid():
@@ -294,7 +298,7 @@ class MonthlyPayrollView(View):
 			employee_id = employee_id.first().id
 			
 		total_work_hours = len(list(workingdays(year, month))) * 8
-		employees = employees.exclude(employeedata__end_contract__lt=date(year, month, 1)).order_by('surname')
+		employees = employees.exclude(employeedata__end_contract__lt=date(year, month, 1)).order_by('surname', 'forename')
 
 		# create data for payroll as associative arrays for every engaged employee
 		payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
@@ -330,7 +334,7 @@ class MonthlyPayrollView(View):
 		year, month = choice_date.year, choice_date.month
 		day = calendar.monthrange(year, month)[1]
 		query = Q(employeedata__end_contract__lt=date(year,month,1))|Q(employeedata__start_contract__gt=date(year,month,day))
-		employees = employees.exclude(query).order_by('surname')
+		employees = employees.exclude(query).order_by('surname', 'forename')
 		context = {'form': form, 'heads': heads, 'employee_id': employee_id,}
 
 		if form.is_valid():
@@ -420,7 +424,7 @@ class AccountPaymentView(View):
 		salary_ = salary_['brutto']
 
 		# set list of valid employees
-		queryset = Employee.objects.all()
+		queryset = Employee.objects.all().order_by('surname', 'forename')
 
 		q1 = queryset.filter(status=1)
 		q2 = queryset.filter(employeedata__end_contract__year__gte=year_, employeedata__end_contract__month__gte=month_)
@@ -526,7 +530,7 @@ class EmployeeCurrentComplexDataView(View):
 		form = PeriodCurrentComplexDataForm(initial={'choice_date': choice_date})
 		workerdata=EmployeeData.objects.get(worker_id=employee_id)
 		end_contract = Q(employeedata__end_contract__year__gte=year, employeedata__end_contract__month__gte=month) | Q(employeedata__end_contract__isnull=True)
-		employees = Employee.objects.filter(end_contract).order_by('surname')
+		employees = Employee.objects.filter(end_contract).order_by('surname', 'forename')
 		work_hours = WorkEvidence.objects.filter(worker_id=employee_id, start_work__year=year, start_work__month=month)
 		holidays = holiday(year)
 		leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
@@ -551,7 +555,7 @@ class EmployeeCurrentComplexDataView(View):
 		form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
 		workerdata = EmployeeData.objects.get(worker_id=employee_id)
 		end_contract = Q(employeedata__end_contract__year__gte=year, employeedata__end_contract__month__gte=month) | Q(employeedata__end_contract__isnull=True)
-		employees = Employee.objects.filter(end_contract).order_by('surname')
+		employees = Employee.objects.filter(end_contract).order_by('surname', 'forename')
 		work_hours = WorkEvidence.objects.filter(worker_id=employee_id, start_work__year=year, start_work__month=month)
 		# data for modal chart
 		context = {'total_brutto_set': data_modal_chart(employee_id)}
