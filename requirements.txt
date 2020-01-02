@@ -1,4 +1,4 @@
-Django==3.0.1
+Django==3.0.2
 beautifulsoup4==4.8.2
 certifi==2019.11.28
 chardet==3.0.4
@@ -13,7 +13,7 @@ matplotlib==3.2.0rc1
 num2words==0.5.10
 numpy==1.18.0
 pdfkit==0.6.1
-Pillow==6.2.1
+Pillow==7.0.0
 psycopg2-binary==2.8.4
 pyparsing==2.4.6
 python-dateutil==2.8.1
