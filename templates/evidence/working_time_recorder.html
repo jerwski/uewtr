@@ -82,7 +82,7 @@
             </div>
           {% else %}
             {% if jobhours %}
-              <p class="text-center text-primary font-weight-bold">For <em class="text-danger">{{ worker }}</em> adding <em class="text-danger">{{ jobhours|floatformat:2 }}</em> hour{{ total_hours|pluralize:'s' }}.</p>
+              <p class="text-center text-primary font-weight-bold">For <em class="text-danger">{{ worker }}</em> adding {% if jobhours <= 12 %}<em class="text-danger">{{ jobhours|floatformat:2 }}</em> hour{{ total_hours|pluralize:'s' }}.{% else %}<em class="display-4 text-danger">{{ jobhours|floatformat:2 }}</em> hour{{ total_hours|pluralize:'s' }}. <em class="text-danger">Are you sure???</em>{% endif %}</p>
               <p class="text-center text-primary font-weight-bold"><em>{{ start_work|date:'r' }} - {{ end_work|date:'r' }}</em></p>
               <div class="row">
                 <div class="col-md-6 btn-sm mb-2">
