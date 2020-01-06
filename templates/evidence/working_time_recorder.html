@@ -136,20 +136,6 @@
   </div>
 </div>
 
-{% if work_hours == False %}
-  <script type="text/javascript">
-    $(function () {
-      $('#id_start_work').datetimepicker();
-      $('#id_end_work').datetimepicker();
-      $("#id_start_work").on("change.datetimepicker", function (e) {
-      $('#id_end_work').datetimepicker('minDate', e.date);
-      });
-      $("#id_end_work").on("change.datetimepicker", function (e) {
-      $('#id_start_work').datetimepicker('maxDate', e.date);
-      });
-    });
-  </script>
-{% endif %}
 
   <!-- blinkin after hideTime: seconds-->
   <script>
