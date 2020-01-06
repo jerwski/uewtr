@@ -47,11 +47,9 @@ class WorkingTimeRecorderView(View):
 			initial.update(initial_worktime_form(work_hours))
 			form = WorkEvidenceForm(initial=initial)
 			context.__setitem__('form', form)
-			context.__setitem__('work_hours', True)
 		else:
 			form = WorkEvidenceForm(initial=initial)
 			context.__setitem__('form', form)
-			context.__setitem__('work_hours', False)
 
 		return render(request, 'evidence/working_time_recorder.html', context)
 
