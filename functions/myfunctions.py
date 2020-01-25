@@ -298,6 +298,7 @@ def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 			saldo = incomes['inc'] - expenditures['exp']
 			pm, py = last.created.date().month, last.created.date().year
 
+	# create new cashregister
 	if not check:
 		transfer = {'company_id': company_id,
 		            'symbol': f'RK {pm}/{py}',
@@ -337,7 +338,7 @@ def cashregisterhtml2pdf(company_id:int, month:int, year:int) -> bool:
 
 
 def make_attachment(html, filename) -> HttpResponse:
-	options = {'page-size'  : 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.2in',
+	options = {'page-size'  : 'A4', 'margin-top': '0.4in', 'margin-right': '0.2in', 'margin-bottom': '0.2in',
 			   'margin-left': '0.6in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None, 'quiet': ''}
 
 	pdf = pdfkit.from_string(html, False, options=options)

@@ -221,6 +221,7 @@
             <div class="btn btn-group mt-2 mb-2">
               <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
               {% if company_id and previous %}
+
                 {% include 'blocks/cash_register_print_modal.html' %}
                 <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print last
                   register</a>
@@ -232,6 +233,7 @@
                   last register</a>
                 <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info disabled">Send
                   last register</a>
+
               {% endif %}
               <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
               <a class="btn btn-outline-primary" href="/admin/">Admin Data Base</a>

@@ -242,7 +242,7 @@ class CashRegisterSendView(View):
 
 			if html:
 				# create pdf file and save on templates/pdf/cashregister_{company}_{month}_{year}.pdf
-				options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
+				options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.2in', 'margin-bottom': '0.4in',
 				           'margin-left': '0.6in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None,
 				           'quiet': ''}
 				pdfile = f'templates/pdf/cashregister_{company}_{month}_{year}.pdf'
