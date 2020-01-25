@@ -298,6 +298,7 @@ def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 			saldo = incomes['inc'] - expenditures['exp']
 			pm, py = last.created.date().month, last.created.date().year
 
+	if not check:
 		transfer = {'company_id': company_id,
 		            'symbol': f'RK {pm}/{py}',
 		            'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
