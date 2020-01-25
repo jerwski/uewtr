@@ -272,21 +272,37 @@ def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 	'''return data from cash register'''
 	registerdata, saldo = defaultdict(float), 0
 	register = CashRegister.objects.filter(company_id=company_id)
-	check = register.exclude(created__month__gte=month, created__year__gte=year)
+	check = register.filter(created__month=month, created__year=year)
 
-	if check:
-		lastdate = check.latest('created')
-		options = {'created__month': lastdate.created.date().month, 'created__year': lastdate.created.date().year}
-		lastdata = register.filter(**options)
-		incomes = lastdata.aggregate(inc=Sum('income'))
-		expenditures = lastdata.aggregate(exp=Sum('expenditure'))
-		saldo = incomes['inc'] - expenditures['exp']
+	pm, py = previous_month_year(month, year)
+	previous_data = register.filter(created__year=py, created__month=pm)
 
-		if not register.filter(created__month=month, created__year=year) and saldo > 0:
-			transfer = {'company_id': company_id,
-						'symbol': f'RK {lastdate.created.date().month}/{lastdate.created.date().year}',
-						'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
-			CashRegister.objects.create(**transfer)
+	if previous_data:
+		prev_incomes = previous_data.aggregate(inc=Sum('income'))
+		prev_expenditures = previous_data.aggregate(exp=Sum('expenditure'))
+		saldo = prev_incomes['inc'] - prev_expenditures['exp']
+
+	elif check:
+		incomes = check.aggregate(inc=Sum('income'))
+		expenditures = check.aggregate(exp=Sum('expenditure'))
+
+		if incomes['inc']!= None and expenditures['exp'] != None:
+			saldo = incomes['inc'] - expenditures['exp']
+	else:
+		last = register.filter(income__gt=0).last()
+
+		if last is not None:
+			data = register.filter(created__year=last.created.date().year, created__month=last.created.date().month)
+			incomes = data.aggregate(inc=Sum('income'))
+			expenditures = data.aggregate(exp=Sum('expenditure'))
+			saldo = incomes['inc'] - expenditures['exp']
+			pm, py = last.created.date().month, last.created.date().year
+
+		transfer = {'company_id': company_id,
+		            'symbol': f'RK {pm}/{py}',
+		            'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
+		CashRegister.objects.create(**transfer)
+
 
 	registerdata['saldo'] = saldo
 
@@ -320,8 +336,8 @@ def cashregisterhtml2pdf(company_id:int, month:int, year:int) -> bool:
 
 
 def make_attachment(html, filename) -> HttpResponse:
-	options = {'page-size'  : 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
-			   'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None, 'quiet': ''}
+	options = {'page-size'  : 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.2in',
+			   'margin-left': '0.6in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None, 'quiet': ''}
 
 	pdf = pdfkit.from_string(html, False, options=options)
 
