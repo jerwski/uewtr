@@ -1,6 +1,5 @@
 # django library
-from typing import List
-
+from django.db.models import Q
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
@@ -14,7 +13,7 @@ import pdfkit
 
 # my functions
 from functions.archive import check_internet_connection
-from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf, make_attachment
+from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf, make_attachment, previous_month_year
 
 # my models
 from cashregister.models import Company, CashRegister
@@ -105,18 +104,14 @@ class CashRegisterView(View):
 			context.update(dict(registerdata))
 			records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
 			form = CashRegisterForm(initial={'company': company})
-			cr_data = CashRegister.objects.filter(company_id=company_id).exclude(contents='z przeniesienia')
-			cr_set = set(f'{item.created.month}/{item.created.year}' for item in cr_data)
-			cr_set = sorted(cr_set, key=lambda d: int(d.split('/')[0]), reverse=True)
+			query = Q(company_id=company_id)&(Q(created__year=year)|Q(created__year=year-1))
+			cr_data = CashRegister.objects.filter(query).exclude(contents='z przeniesienia')
+			cr_set = cr_data.datetimes('created','month', order='DESC')
 			context.update({'form': form, 'company': company, 'company_id': company_id,
 			                'cr_set': cr_set, 'records': records.order_by('-created')})
 
-			if now().month==1:
-				month, year = 12, now().year - 1
-			else:
-				month, year = now().month - 1, now().year
-
-			previous = check.filter(created__month=month, created__year=year)
+			pm, py = previous_month_year(month, year)
+			previous = check.filter(created__month=pm, created__year=py)
 
 			if previous:
 				context.__setitem__('previous', True)
@@ -137,17 +132,14 @@ class CashRegisterView(View):
 			registerdata = cashregisterdata(company_id, month, year)
 			context.update(dict(registerdata))
 			records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
-			cr_data = CashRegister.objects.filter(company_id=company_id).exclude(contents='z przeniesienia')
-			cr_set = sorted(set(f'{item.created.month}/{item.created.year}' for item in cr_data))
+			query = Q(company_id=company_id)&(Q(created__year=year)|Q(created__year=year-1))
+			cr_data = CashRegister.objects.filter(query).exclude(contents='z przeniesienia')
+			cr_set = cr_data.datetimes('created','month', order='DESC')
 			context.update({'company': company, 'company_id': company_id,
 			                'cr_set': cr_set, 'records': records.order_by('-created')})
 
-			if now().month==1:
-				month, year = 12, now().year - 1
-			else:
-				month, year = now().month - 1, now().year
-
-			previous = check.filter(created__month=month, created__year=year)
+			pm, py = previous_month_year(month, year)
+			previous = check.filter(created__month=pm, created__year=py)
 
 			if previous:
 				context.__setitem__('previous', True)
@@ -200,10 +192,8 @@ class CashRegisterPrintView(View):
 	'''class representing the view of monthly cash register print'''
 	def get(self, request, company_id:int):
 		'''convert html cashregister_pdf for selected company to pdf'''
-		if now().month==1:
-			month, year = 12, now().year - 1
-		else:
-			month, year = now().month - 1, now().year
+		month, year = now().month, now().year
+		month, year = previous_month_year(month, year)
 
 		html = cashregisterhtml2pdf(company_id, month, year)
 
@@ -245,24 +235,22 @@ class CashRegisterSendView(View):
 		if check_internet_connection():
 			company = Company.objects.get(pk=company_id)
 
-			if now().month==1:
-				month, year = 12, now().year - 1
-			else:
-				month, year = now().month - 1, now().year
+			month, year = now().month, now().year
+			month, year = previous_month_year(month, year)
 
 			html = cashregisterhtml2pdf(company_id, month, year)
 
 			if html:
 				# create pdf file and save on templates/pdf/cashregister_{company}_{month}_{year}.pdf
-				options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.4in', 'margin-bottom': '0.4in',
-				           'margin-left': '0.8in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None,
+				options = {'page-size': 'A4', 'margin-top': '0.4in', 'margin-right': '0.2in', 'margin-bottom': '0.4in',
+				           'margin-left': '0.6in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None,
 				           'quiet': ''}
 				pdfile = f'templates/pdf/cashregister_{company}_{month}_{year}.pdf'
 				pdfkit.from_string(html, pdfile, options=options)
 				# send e-mail with attached cash register as file in pdf format
 				mail = {'subject': f'cash register for {month}/{year} r.',
 				        'message': f'Cash Register for {company} on {month}/{year} in attachment ...',
-				        'sender': settings.EMAIL_HOST_USER, 'recipient': ['biuro.hossa@wp.pl'], 'attachments': [pdfile]}
+				        'sender': settings.EMAIL_HOST_USER, 'recipient': ['projekt@unikolor.com'], 'attachments': [pdfile]}
 				sendemail(**mail)
 				messages.info(request, f'Cash register for {company} on {month}/{year} was sending....')
 			else:

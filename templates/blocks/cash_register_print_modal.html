@@ -26,12 +26,14 @@
               <table class="table table-sm table-hover">
                 <tbody class="small" id="CRTable">
                 {% for nr in cr_set %}
-                  <tr><td>
+                  <tr>
+                    <td>
                     <div class="form-check custom-control custom-radio ml-5 text-left">
-                      <input type="radio" id="{{ nr }}" name="cr_number" class="custom-control-input" value="{{ nr }}" required>
-                      <label class="custom-control-label text-primary" for="{{ nr }}">{{ nr }}</label>
+                      <input type="radio" id="{{ nr|date:'m/Y' }}" name="cr_number" class="custom-control-input" value="{{ nr|date:'m/Y' }}" required>
+                      <label class="custom-control-label text-primary" for="{{ nr|date:'m/Y' }}">{{ nr|date:'m/Y' }}</label>
                     </div>
-                  </td></tr>
+                    </td>
+                  </tr>
                 {% endfor %}
                 </tbody>
               </table>
