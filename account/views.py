@@ -91,6 +91,7 @@ class RestoreDataBase(View):
 		return HttpResponseRedirect(reverse_lazy('login'))
 
 
+# FUNCTION REMOVED!!!
 class Invoices2Ftp(View):
 	'''class that allows archiving the database of issued invoices'''
 	def get(self, request)->HttpResponseRedirect:
@@ -109,6 +110,7 @@ class Invoices2Ftp(View):
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
 
+# FUNCTION REMOVED!!!
 class JPK2Accountancy(View):
 	'''class to send JPK files to accountancy'''
 	def get(self, request):
