@@ -137,6 +137,15 @@ class JPK2Accountancy(View):
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
 
+class SerializingView(View):
+	'''class to serializng database'''
+	def get(self, request):
+		mkfixture(Path(settings.ADMIN_SERIALIZE))
+		messages.info(request, f'\nAll database have been serializing....')
+
+		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
+
+
 class QuizView(View):
 
 	def get(self, request, quiz_id=None)->render:
