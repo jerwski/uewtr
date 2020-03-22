@@ -139,7 +139,7 @@ class JPK2Accountancy(View):
 
 class SerializingView(View):
 	'''class to serializng database'''
-	def get(self, request):
+	def get(self, request)->HttpResponseRedirect:
 		mkfixture(Path(settings.ADMIN_SERIALIZE))
 		messages.info(request, f'\nAll database have been serializing....')
 
