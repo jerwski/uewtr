@@ -23,7 +23,11 @@
           <a class="btn btn-outline-secondary btn-lg" href="/admin/">Admin</a>
           <a class="btn btn-outline-info btn-lg" href="{% url 'cashregister:cash_register' %}">Cash register</a>
           <a class="btn btn-outline-primary btn-lg" href="{% url 'accountancy:accountancy' %}">Accountancy</a>
-          <a class="btn btn-outline-warning btn-lg" href="{% url 'account:serialize_database' %}">Serialize database</a>
+          {% if serialize %}
+            <a class="btn btn-outline-warning btn-lg" href="{% url 'account:serialize_database' %}">Serialize database</a>
+          {% else %}
+            <a class="btn btn-outline-warning btn-lg disabled" href="{% url 'account:deserialize_database' %}">Deserialize database</a>
+          {% endif %}
 {#        FUNCTIONS REMOVED!!!#}
 {#          {% if upload %}#}
 {#            <a class="btn btn-outline-secondary" href="{% url 'account:invoices_backup' %}">Archive Invoices</a>#}

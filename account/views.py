@@ -23,7 +23,7 @@ from account.forms import UserCreateForm
 
 # my function
 from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset, dirdata, previous_month_year
-from functions.archive import mkfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection, invoices_backup
+from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection, invoices_backup
 
 
 # Create your views here.
@@ -69,10 +69,16 @@ class AdminView(View):
 				context.update({'nodata': True, 'backup': str(backup), 'created': created})
 				return render(request, '500.html', context)
 
-			if list(settings.INVOICE_WORKPATH.rglob(r'JPK/0001/jpk_fa_*.xml')):
-				context.__setitem__('jpk', True)
-			if settings.INVOICE_ZIP.expanduser().with_suffix('.zip').is_file():
-				context.__setitem__('upload', True)
+			# functions removed
+			# if list(settings.INVOICE_WORKPATH.rglob(r'JPK/0001/jpk_fa_*.xml')):
+			# 	context.__setitem__('jpk', True)
+			# if settings.INVOICE_ZIP.expanduser().with_suffix('.zip').is_file():
+			# 	context.__setitem__('upload', True)
+
+			if socket.gethostname() in settings.OFFICE_HOSTS:
+				context.__setitem__('serialize', False)
+			else:
+				context.__setitem__('serialize', True)
 
 			return render(request, 'account/admin.html', context)
 
@@ -137,11 +143,20 @@ class JPK2Accountancy(View):
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
 
-class SerializingView(View):
+class SerializeView(View):
 	'''class to serializng database'''
 	def get(self, request)->HttpResponseRedirect:
 		mkfixture(Path(settings.ADMIN_SERIALIZE))
 		messages.info(request, f'\nAll database have been serializing....')
+
+		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
+
+
+class DeserializeView(View):
+	'''class to deserializng database'''
+	def get(self, request)->HttpResponseRedirect:
+		readfixture(Path(settings.ADMIN_SERIALIZE))
+		messages.info(request, f'\nAll database have been deserializing....')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
