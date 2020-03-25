@@ -1,5 +1,6 @@
 # standard library
 import socket
+from ftplib import FTP
 from pathlib import Path
 from datetime import datetime
 
@@ -146,8 +147,18 @@ class JPK2Accountancy(View):
 class SerializeView(View):
 	'''class to serializng database'''
 	def get(self, request)->HttpResponseRedirect:
-		mkfixture(Path(settings.ADMIN_SERIALIZE))
+		mkfixture(settings.ADMIN_SERIALIZE)
 		messages.info(request, f'\nAll database have been serializing....')
+
+		if check_internet_connection():
+			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+				myFTP.cwd(settings.FTP_SERIALIZE)
+				for file in list(Path.iterdir(settings.ADMIN_SERIALIZE)):
+					with file.open('rb') as fixture:
+						myFTP.storbinary(f'STOR {file.name}', fixture)
+						print(f'\nFile <<{file.name}>> was sent to the FTP directory <<{settings.FTP_SERIALIZE}>>')
+		else:
+			print(r'No internet connection...')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
@@ -155,7 +166,17 @@ class SerializeView(View):
 class DeserializeView(View):
 	'''class to deserializng database'''
 	def get(self, request)->HttpResponseRedirect:
-		readfixture(Path(settings.ADMIN_SERIALIZE))
+
+		if check_internet_connection():
+			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+				myFTP.cwd(settings.FTP_SERIALIZE)
+				for ff in myFTP.nlst():
+					myFTP.retrbinary(f'RETR {ff}', open(f'{settings.ADMIN_SERIALIZE}/{ff}', 'wb').write)
+					print(f'\nFile <<{ff}>> is safe in <<{settings.FTP_SERIALIZE}>>')
+		else:
+			print(r'No internet connection...')
+
+		readfixture(settings.ADMIN_SERIALIZE)
 		messages.info(request, f'\nAll database have been deserializing....')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
