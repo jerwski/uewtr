@@ -176,7 +176,7 @@ class DeserializeView(View):
 		else:
 			print(r'No internet connection...')
 
-		readfixture(settings.ADMIN_SERIALIZE)
+		readfixture(request, settings.ADMIN_SERIALIZE)
 		messages.info(request, f'\nAll database have been deserializing....')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
