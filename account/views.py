@@ -170,9 +170,9 @@ class DeserializeView(View):
 		if check_internet_connection():
 			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
 				myFTP.cwd(settings.FTP_SERIALIZE)
-				for ff in myFTP.nlst():
-					myFTP.retrbinary(f'RETR {ff}', open(f'{settings.ADMIN_SERIALIZE}/{ff}', 'wb').write)
-					print(f'\nFile <<{ff}>> is safe in <<{settings.FTP_SERIALIZE}>>')
+				for file in myFTP.nlst():
+					myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
+					print(f'\nFile <<{file}>> is safe in <<{settings.FTP_SERIALIZE}>>')
 		else:
 			print(r'No internet connection...')
 
