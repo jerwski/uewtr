@@ -26,7 +26,11 @@
           {% if serialize %}
             <a class="btn btn-outline-warning btn-lg" href="{% url 'account:serialize_database' %}">Serialize database</a>
           {% else %}
-            <a class="btn btn-outline-warning btn-lg disabled" href="{% url 'account:deserialize_database' %}">Deserialize database</a>
+            {% if ftp_files %}
+              <a class="btn btn-outline-warning btn-lg" href="{% url 'account:deserialize_database' %}">Deserialize database</a>
+            {% else %}
+              <a class="btn btn-outline-warning btn-lg disabled" href="{% url 'account:deserialize_database' %}">Deserialize database</a>
+            {% endif %}
           {% endif %}
 {#        FUNCTIONS REMOVED!!!#}
 {#          {% if upload %}#}
