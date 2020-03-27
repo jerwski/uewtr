@@ -76,10 +76,20 @@ class AdminView(View):
 			# if settings.INVOICE_ZIP.expanduser().with_suffix('.zip').is_file():
 			# 	context.__setitem__('upload', True)
 
-			if socket.gethostname() in settings.OFFICE_HOSTS:
-				context.__setitem__('serialize', False)
-			else:
+			if socket.gethostname() in settings.HOME_HOSTS:
 				context.__setitem__('serialize', True)
+
+			if check_internet_connection():
+				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+					myFTP.cwd(settings.FTP_SERIALIZE)
+					files = myFTP.nlst()
+
+					if files:
+						context.__setitem__('ftp_files', True)
+					else:
+						print(f'There are\'t new fixtures on FTP...')
+			else:
+				print(r'No internet connection...')
 
 			return render(request, 'account/admin.html', context)
 
@@ -172,6 +182,7 @@ class DeserializeView(View):
 				myFTP.cwd(settings.FTP_SERIALIZE)
 				for file in myFTP.nlst():
 					myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
+					myFTP.delete(file)
 					print(f'\nFile <<{file}>> is safe in <<{settings.FTP_SERIALIZE}>>')
 		else:
 			print(r'No internet connection...')
