@@ -1,5 +1,6 @@
 # standard library
 import urllib3
+import filecmp as fc
 from ftplib import FTP
 from pathlib import Path
 from collections import deque
@@ -31,6 +32,33 @@ def check_internet_connection() -> bool:
 			return False
 	except:
 		return False
+
+
+def cmpserializefile():
+	try:
+		if list(settings.ADMIN_SERIALIZE.iterdir()):
+			Path.mkdir(settings.TEMP_SERIALIZE)
+			mkfixture(settings.TEMP_SERIALIZE)
+			result = fc.dircmp(settings.ADMIN_SERIALIZE, settings.TEMP_SERIALIZE)
+
+			if result.diff_files:
+				return True
+			else:
+				return False
+		else:
+			return True
+
+	except FileNotFoundError as error:
+		print(f'No files in {settings.TEMP_SERIALIZE} directory...')
+
+	finally:
+		if Path.exists(settings.TEMP_SERIALIZE):
+			for file in settings.TEMP_SERIALIZE.iterdir():
+				file.unlink()
+			Path.rmdir(settings.TEMP_SERIALIZE)
+		else:
+			pass
+
 
 
 def backup():
@@ -81,6 +109,7 @@ def make_archives(archive_name, root_backup, archive_file):
 		print(f'Directory {root_backup} is empty...')
 
 
+#FUNCTION DEPRECIATED
 def invoices_backup() -> bool:
 	'''create compressed in zip format archive file with invoices'''
 	root_backup = settings.INVOICE_BACKUP.expanduser()
