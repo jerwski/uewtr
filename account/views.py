@@ -24,7 +24,7 @@ from account.forms import UserCreateForm
 
 # my function
 from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset, dirdata, previous_month_year
-from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection, invoices_backup
+from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection, invoices_backup, cmpserializefile
 
 
 # Create your views here.
@@ -79,6 +79,9 @@ class AdminView(View):
 			if socket.gethostname() in settings.HOME_HOSTS:
 				context.__setitem__('serialize', True)
 
+			if  cmpserializefile():
+				context.__setitem__('compare', True)
+
 			if check_internet_connection():
 				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
 					myFTP.cwd(settings.FTP_SERIALIZE)
@@ -106,6 +109,45 @@ class RestoreDataBase(View):
 			messages.error(request, f'Backup file <<{settings.ARCHIVE_ROOT}>> doesn\'t exist... => Error code: {error}')
 
 		return HttpResponseRedirect(reverse_lazy('login'))
+
+
+class SerializeView(View):
+	'''class to serializng database'''
+	def get(self, request)->HttpResponseRedirect:
+		mkfixture(settings.ADMIN_SERIALIZE)
+		messages.info(request, f'\nAll database have been serializing....')
+
+		if check_internet_connection():
+			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+				myFTP.cwd(settings.FTP_SERIALIZE)
+				for file in list(Path.iterdir(settings.ADMIN_SERIALIZE)):
+					with file.open('rb') as fixture:
+						myFTP.storbinary(f'STOR {file.name}', fixture)
+						print(f'\nFile <<{file.name}>> was sent to the FTP directory <<{settings.FTP_SERIALIZE}>>')
+		else:
+			print(r'No internet connection...')
+
+		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
+
+
+class DeserializeView(View):
+	'''class to deserializng database'''
+	def get(self, request)->HttpResponseRedirect:
+
+		if check_internet_connection():
+			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+				myFTP.cwd(settings.FTP_SERIALIZE)
+				for file in myFTP.nlst():
+					myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
+					myFTP.delete(file)
+					print(f'\nFile <<{file}>> is safe in <<{settings.FTP_SERIALIZE}>>')
+		else:
+			print(r'No internet connection...')
+
+		readfixture(request, settings.ADMIN_SERIALIZE)
+		messages.info(request, f'\nAll database have been deserializing....')
+
+		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
 
 # FUNCTION REMOVED!!!
@@ -150,45 +192,6 @@ class JPK2Accountancy(View):
 					file.rename(parent/f'sent{nr}{stamp}{suffix}')
 		else:
 			messages.error(request, 'No internet connection...')
-
-		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
-
-
-class SerializeView(View):
-	'''class to serializng database'''
-	def get(self, request)->HttpResponseRedirect:
-		mkfixture(settings.ADMIN_SERIALIZE)
-		messages.info(request, f'\nAll database have been serializing....')
-
-		if check_internet_connection():
-			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-				myFTP.cwd(settings.FTP_SERIALIZE)
-				for file in list(Path.iterdir(settings.ADMIN_SERIALIZE)):
-					with file.open('rb') as fixture:
-						myFTP.storbinary(f'STOR {file.name}', fixture)
-						print(f'\nFile <<{file.name}>> was sent to the FTP directory <<{settings.FTP_SERIALIZE}>>')
-		else:
-			print(r'No internet connection...')
-
-		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
-
-
-class DeserializeView(View):
-	'''class to deserializng database'''
-	def get(self, request)->HttpResponseRedirect:
-
-		if check_internet_connection():
-			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-				myFTP.cwd(settings.FTP_SERIALIZE)
-				for file in myFTP.nlst():
-					myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
-					myFTP.delete(file)
-					print(f'\nFile <<{file}>> is safe in <<{settings.FTP_SERIALIZE}>>')
-		else:
-			print(r'No internet connection...')
-
-		readfixture(request, settings.ADMIN_SERIALIZE)
-		messages.info(request, f'\nAll database have been deserializing....')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
