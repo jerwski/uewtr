@@ -90,7 +90,7 @@ class AdminView(View):
 					if files:
 						context.__setitem__('ftp_files', True)
 					else:
-						print(f'There are\'t new fixtures on FTP...')
+						print(f'There aren\'t new fixtures on FTP...')
 			else:
 				print(r'No internet connection...')
 
