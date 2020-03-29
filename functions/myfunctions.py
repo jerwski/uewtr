@@ -237,6 +237,34 @@ def leavehtml2pdf(employee_id:int, year:int) -> bool:
 		return False
 
 
+def workhourshtml2pdf(employee_id:int, month:int, year:int) -> bool:
+	'''convert html workhours for curent employee in month and year parameters to pdf'''
+	worker = Employee.objects.get(pk=employee_id)
+	employee_leave = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year, leave_date__month=month)
+	work_hours = WorkEvidence.objects.filter(worker=worker, start_work__year=year, start_work__month=month)
+	context = {'work_hours': work_hours.order_by('start_work'), 'worker': worker, 'month': month, 'year': year}
+
+	if worker:
+		if work_hours.exists():
+			total_hours = work_hours.aggregate(th=Sum('jobhours'))
+			total_hours = total_hours['th']
+		else:
+			total_hours = 0
+
+		if employee_leave.exists():
+			employee_leave = employee_leave.order_by('leave_date')
+			# create leaves data as associative arrays for selected employee
+			leave_data = [item.leave_date for item in employee_leave]
+			context.update({'leave_data': leave_data})
+
+		context.update({'total_hours': total_hours})
+		template = get_template(r'evidence/workhours_pdf.html')
+		html = template.render(context)
+		return html
+	else:
+		return False
+
+
 def tree(directory:Path):
 	'''listing whole tree for passed directory as instance of class WindowsPath'''
 	print(f'+ {directory}')

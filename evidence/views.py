@@ -25,7 +25,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # my function
 from functions.archive import check_internet_connection
 from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
-from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year
+from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year, workhourshtml2pdf
 
 
 # Create your views here.
@@ -576,6 +576,31 @@ class EmployeeCurrentComplexDataView(View):
 			context.update({'form': form, 'employee_id': employee_id, 'employees': employees, 'workerdata': workerdata})
 
 		return render(request, r'evidence/current_complex_evidence_data.html', context)
+
+
+class WorkhoursPrintView(View):
+	'''class representing the view of workhours print'''
+	def get(self, request, employee_id:int, month:int, year:int):
+		'''send statement of workhours as pdf attachmnet on browser'''
+		html = workhourshtml2pdf(employee_id, month, year)
+		print(html)
+
+		if html:
+			# create pdf file with following options
+			options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.2in',
+					   'margin-bottom': '0.1in', 'margin-left': '0.3in', 'encoding': "UTF-8",
+					   'orientation': 'portrait','no-outline': None, 'quiet': '', }
+			pdf = pdfkit.from_string(html, False, options=options)
+			filename = f'workhours.pdf'
+			# send statement of workhours as attachment
+			response = HttpResponse(pdf, content_type='application/pdf')
+			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+
+			return response
+		else:
+			messages.warning(request, r'Nothing to print...')
+
+		return HttpResponseRedirect(reverse('evidence:employee_complex_data', args=[employee_id]))
 
 
 class PlotChart(View):

@@ -172,7 +172,7 @@
         </div>
       </div>
       <div class="col-3 text-center">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">Working days for {{ choice_date|date:'m/Y' }}</p>
+        <p class="text-center text-danger lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'evidence:workhours_print' employee_id month year %}">Working days for {{ choice_date|date:'m/Y' }}</a></p>
         {% if work_hours %}
           <div class="row text-primary font-weight-bold font-italic">
             <div class="col-6">
@@ -217,8 +217,7 @@
                 <col span="1" style="width:10%">
                 <col span="1" style="width:10%">
                 <col span="1" style="width:27%">
-              </colgroup>
-              <tbody id="searchTable">
+              </colgroup><tbody id="searchTable">
               {% for hours in work_hours %}
                 <tr>
                   <td class="text-secondary">{{ forloop.counter }}</td>
@@ -235,6 +234,7 @@
                 </tr>
               {% endfor %}
               </tbody>
+
             </table>
           {% else %}
           <p class="text-justify text-danger font-weight-bold font-italic">For selected date <mark>{{ choice_date|date:'m/Y' }}</mark> there aren't register working days in database. Please select another date...</p>
