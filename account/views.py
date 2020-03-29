@@ -76,7 +76,7 @@ class AdminView(View):
 			# if settings.INVOICE_ZIP.expanduser().with_suffix('.zip').is_file():
 			# 	context.__setitem__('upload', True)
 
-			if socket.gethostname() in settings.HOME_HOSTS:
+			if socket.gethostname() == settings.SERIALIZE_HOST:
 				context.__setitem__('serialize', True)
 
 			if  cmpserializefile():

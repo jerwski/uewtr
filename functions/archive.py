@@ -60,7 +60,6 @@ def cmpserializefile():
 			pass
 
 
-
 def backup():
 	'''total backup of database'''
 	if Employee.objects.all().exists():

@@ -195,6 +195,7 @@ BACKUP_ERASE_WORKER = get_setting('backup_erase_worker')
 FIXTURES_APPS = get_setting('fixtures_apps')
 HOME_HOSTS = get_setting('home_hosts')
 OFFICE_HOSTS = get_setting('office_hosts')
+SERIALIZE_HOST = get_setting('serialize_host')
 
 # FTP
 FTP = get_setting('FTP')
