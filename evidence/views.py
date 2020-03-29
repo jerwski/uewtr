@@ -583,7 +583,6 @@ class WorkhoursPrintView(View):
 	def get(self, request, employee_id:int, month:int, year:int):
 		'''send statement of workhours as pdf attachmnet on browser'''
 		html = workhourshtml2pdf(employee_id, month, year)
-		print(html)
 
 		if html:
 			# create pdf file with following options
