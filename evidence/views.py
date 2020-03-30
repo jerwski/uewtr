@@ -583,7 +583,6 @@ class WorkhoursPrintView(View):
 	def get(self, request, employee_id:int, month:int, year:int):
 		'''send statement of workhours as pdf attachmnet on browser'''
 		html = workhourshtml2pdf(employee_id, month, year)
-		print(html)
 
 		if html:
 			# create pdf file with following options
@@ -591,7 +590,7 @@ class WorkhoursPrintView(View):
 					   'margin-bottom': '0.1in', 'margin-left': '0.3in', 'encoding': "UTF-8",
 					   'orientation': 'portrait','no-outline': None, 'quiet': '', }
 			pdf = pdfkit.from_string(html, False, options=options)
-			filename = f'workhours.pdf'
+			filename = f'workhours_{employee_id}.pdf'
 			# send statement of workhours as attachment
 			response = HttpResponse(pdf, content_type='application/pdf')
 			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'

@@ -276,12 +276,12 @@ def tree(directory:Path):
 
 def remgarbage(*paths:Path):
 	'''removes attachment pdf file'''
-	patterns = ('leaves_data_*.pdf', 'payroll_*.pdf', 'cashregister_*.pdf', 'cashaccept_*.pdf')
+	patterns = ('leaves_data_*.pdf', 'payroll_*.pdf', 'cashregister_*.pdf', 'cashaccept_*.pdf', 'workhours_*.pdf')
 	find = (file for path in paths for file in Path.iterdir(path) for pattern in patterns if file.match(pattern))
 	for file in find:
 		file.unlink()
 
-
+# FUNCTION DEPRECATED
 def jpk_files(path:Path) -> list:
 	'''find all .jpk files created in present month and year'''
 	files = []
