@@ -26,6 +26,7 @@ from PIL import Image
 import num2words
 
 # django library
+from django.conf import settings
 from django.http import HttpResponse
 from django.utils.timezone import now
 from django.core.mail import EmailMessage
@@ -276,7 +277,7 @@ def tree(directory:Path):
 
 def remgarbage(*paths:Path):
 	'''removes attachment pdf file'''
-	patterns = ('leaves_data_*.pdf', 'payroll_*.pdf', 'cashregister_*.pdf', 'cashaccept_*.pdf', 'workhours_*.pdf')
+	patterns = settings.GARBAGE_PATTERNS
 	find = (file for path in paths for file in Path.iterdir(path) for pattern in patterns if file.match(pattern))
 	for file in find:
 		file.unlink()
