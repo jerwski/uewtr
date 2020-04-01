@@ -231,7 +231,7 @@ def leavehtml2pdf(employee_id:int, year:int) -> bool:
 		# create leaves data as associative arrays for selected employee
 		leave_data = [item.leave_date for item in employee]
 		context = {'leave_data': leave_data, 'month_name': month_name, 'worker': worker, 'year': year}
-		template = get_template(r'evidence/leaves_data.html')
+		template = get_template(r'evidence/leaves_data_pdf.html')
 		html = template.render(context)
 		return html
 	else:
