@@ -282,6 +282,7 @@ def remgarbage(*paths:Path):
 	for file in find:
 		file.unlink()
 
+
 # FUNCTION DEPRECATED
 def jpk_files(path:Path) -> list:
 	'''find all .jpk files created in present month and year'''

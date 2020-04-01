@@ -11,7 +11,7 @@
         <p class="text-info lead text-center font-weight-bold">{{ worker|capfirst }} PESEL: {{ worker.pesel }}</p>
         <p class="text-primary lead text-center font-weight-bold bg-warning">Zestawienie godzin pracy za miesiąc:&nbsp;{% if month == 1 %}Styczeń{% elif month == 2 %}Luty{% elif month == 3 %}Marzec{% elif month == 4 %}Kwiecień{% elif month == 5 %}Maj{% elif month == 6 %}Czerwiec{% elif month == 7 %}Lipiec{% elif month == 8 %}Sierpień{% elif month == 9 %}Wrzesień{% elif month == 10 %}Październik{% elif month == 11 %}Listopad{% elif month == 12 %}Grudzień{% endif %}&nbsp;{{ year }}&nbsp;rok.<br>Ilość przepracowanych dni roboczych:&nbsp;{{ work_hours|length }}&nbsp;&nbsp;&nbsp;&nbsp;Ilość przepracowanych godzin:&nbsp;{{ total_hours|floatformat:2 }}</p>
 
-        <table class="table table-bordered table-striped table-hover table-sm font-weight-light" style="width:100%">
+        <table class="table table-sm table-bordered table-striped font-weight-light" style="width:100%">
           <colgroup>
             <col span="1" style="width:6%">
             <col span="1" style="width:30%">
