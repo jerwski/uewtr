@@ -11,7 +11,7 @@
   {% include 'blocks/header.html' %}
   <div class="row m-3">
     <div class="col-sm-3">
-      <p class="text-center text-danger lead font-weight-normal bg-warning">PRESENT EMPLOYEES</p>
+      <p class="text-center text-danger lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
       <table class="table table-hover table-sm">
         <tbody>
         {% for employee in employees %}
