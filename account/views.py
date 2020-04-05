@@ -1,5 +1,6 @@
 # standard library
 import socket
+import platform
 from ftplib import FTP
 from pathlib import Path
 from datetime import datetime
@@ -62,7 +63,7 @@ class AdminView(View):
 				if employee.filter(status=True):
 					employee_id = employee.filter(status=True).first().id
 				else:
-					employee_id =employee.first().id
+					empxqloyee_id =employee.first().id
 				context.update({'employee_id': employee_id, 'nodata': False})
 			else:
 				backup = settings.ARCHIVE_ROOT
@@ -271,7 +272,10 @@ class QuizView(View):
 
 def exit(request)->HttpResponseRedirect:
 	'''backups features and exit from the application'''
-	paths = (Path(r'templates/pdf'), Path('~/Downloads').expanduser())
+	if platform.system() == 'Darwin':
+		paths = (Path('/Users/jurgen/Downloads'), Path('/private/var/tmp'))
+	else:
+		paths = (Path(r'templates/pdf'), Path('~/Downloads').expanduser())
 	args = (settings.ARCHIVE_FILE, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
 
 	if socket.gethostname() in settings.OFFICE_HOSTS:
