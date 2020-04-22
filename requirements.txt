@@ -12,7 +12,7 @@ idna==2.9
 kiwisolver==1.2.0
 matplotlib==3.2.1
 num2words==0.5.10
-numpy==1.18.2
+numpy==1.18.3
 pdfkit==0.6.1
 Pillow==7.1.1
 psycopg2-binary==2.8.5
