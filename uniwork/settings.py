@@ -47,7 +47,7 @@ elif socket.gethostname() in get_setting('office_hosts'):
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1',]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -161,7 +161,6 @@ USE_TZ = get_setting('USE_TZ')
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = get_setting('STATIC_URL')
-STATICFILES_DIRS = [Path('static')]
 LOGIN_URL = get_setting('LOGIN_URL')
 LOGIN_REDIRECT_URL = 'account:admin_site'
 LOGOUT_REDIRECT_URL = 'login'
