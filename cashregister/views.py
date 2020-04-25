@@ -246,7 +246,7 @@ class CashRegisterSendView(View):
 				           'margin-left': '0.6in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None,
 				           'quiet': ''}
 				pdfile = f'templates/pdf/cashregister_{company}_{month}_{year}.pdf'
-				pdfkit.from_string(html, pdfile, options=options)
+				pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
 				# send e-mail with attached cash register as file in pdf format
 				mail = {'subject': f'cash register for {month}/{year} r.',
 				        'message': f'Cash Register for {company} on {month}/{year} in attachment ...',

@@ -151,7 +151,7 @@ AUTH_PASSWORD_VALIDATORS = [
 DJANGO_WATCHMAN_TIMEOUT = 1
 
 # Internationalization
-# https://docs.djangoproject.com/en/2.1/topics/i18n/
+# https://docs.djangoproject.com/en/3.0/topics/i18n/
 LANGUAGE_CODE = get_setting('LANGUAGE_CODE')
 TIME_ZONE = country_timezones['PL'][0]
 USE_I18N = get_setting('USE_I18N')
@@ -159,8 +159,10 @@ USE_L10N = get_setting('USE_L10N')
 USE_TZ = get_setting('USE_TZ')
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
+# https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATIC_URL = get_setting('STATIC_URL')
+STATICFILES_DIRS = [Path.joinpath(BASE_DIR, 'static'),]
+CSS_FILE = [Path.joinpath(BASE_DIR, 'static/style/style.css'),]
 LOGIN_URL = get_setting('LOGIN_URL')
 LOGIN_REDIRECT_URL = 'account:admin_site'
 LOGOUT_REDIRECT_URL = 'login'
