@@ -242,7 +242,7 @@ class AccountancyDocumentPrintView(View):
 		# 	           'margin-left': '0.1in', 'encoding': "UTF-8", 'orientation': 'landscape', 'no-outline': None,
 		# 	           'quiet'      : '', }
 		#
-		# 	pdf = pdfkit.from_string(html, False, options=options)
+		# 	pdf = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
 		# 	filename = f'leaves_data_{employee_id}.pdf'
 		#
 		# 	response = HttpResponse(pdf, content_type='application/pdf')

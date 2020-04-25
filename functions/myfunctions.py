@@ -371,7 +371,7 @@ def make_attachment(html, filename) -> HttpResponse:
 	options = {'page-size'  : 'A4', 'margin-top': '0.4in', 'margin-right': '0.2in', 'margin-bottom': '0.2in',
 			   'margin-left': '0.6in', 'encoding': "UTF-8", 'orientation': 'portrait', 'no-outline': None, 'quiet': ''}
 
-	pdf = pdfkit.from_string(html, False, options=options)
+	pdf = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
 
 	response = HttpResponse(pdf, content_type='application/pdf')
 	response['Content-Disposition'] = 'attachment; filename="' + filename + '"'

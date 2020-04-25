@@ -235,7 +235,7 @@ class LeavesDataPrintView(View):
 					   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
 					   'orientation': 'landscape','no-outline': None, 'quiet': '', }
 
-			pdf = pdfkit.from_string(html, False, options=options)
+			pdf = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
 			filename = f'leaves_data_{employee_id}.pdf'
 
 			response = HttpResponse(pdf, content_type='application/pdf')
@@ -259,7 +259,7 @@ class SendLeavesDataPdf(View):
 		pdfile = f'templates/pdf/leaves_data_{employee_id}.pdf'
 
 		if check_internet_connection():
-			pdf = pdfkit.from_string(html, pdfile, options=options)
+			pdf = pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
 
 			if pdf:
 				# send e-mail with attached leaves_data in pdf format
@@ -365,7 +365,7 @@ class MonthlyPayrollPrintView(View):
 			options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
 					   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
 					   'orientation': 'landscape','no-outline': None, 'quiet': '', }
-			pdf = pdfkit.from_string(html, False, options=options)
+			pdf = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
 			filename = f'payroll_{month}_{year}.pdf'
 			# send montly pyroll as attachment
 			response = HttpResponse(pdf, content_type='application/pdf')
@@ -391,7 +391,7 @@ class SendMonthlyPayrollPdf(View):
 						   'orientation': 'landscape','no-outline': None, 'quiet': '', }
 				# create pdf file
 				pdfile = f'templates/pdf/payroll_{month}_{year}.pdf'
-				pdfkit.from_string(html, pdfile, options=options)
+				pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
 				# send e-mail with attached payroll as file in pdf format
 				mail = {'subject': f'payrol for {month}/{year} r.',
 						'message': f'Payroll in attachment {month}-{year}...',
