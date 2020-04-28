@@ -20,7 +20,7 @@
           <a class="btn btn-outline-primary btn-lg" href="{% url 'account:register' %}">Create user</a>
           <a class="btn btn-outline-success btn-lg" href="{% url 'employee:employee_basicdata' %}">Add/Change employee data</a>
           <a class="btn btn-outline-danger btn-lg" href="{% url 'evidence:working_time_recorder_add' employee_id %}">Work evidence</a>
-          <a class="btn btn-outline-secondary btn-lg" href="/admin/">Admin</a>
+          <a class="btn btn-outline-lihgt btn-lg" href="/admin/">Admin</a>
           <a class="btn btn-outline-info btn-lg" href="{% url 'cashregister:cash_register' %}">Cash register</a>
           <a class="btn btn-outline-primary btn-lg" href="{% url 'accountancy:accountancy' %}">Accountancy</a>
           {% if serialize %}
@@ -38,9 +38,9 @@
           {% endif %}
 {#        FUNCTIONS REMOVED!!!#}
 {#          {% if upload %}#}
-{#            <a class="btn btn-outline-secondary" href="{% url 'account:invoices_backup' %}">Archive Invoices</a>#}
+{#            <a class="btn btn-outline-lihgt" href="{% url 'account:invoices_backup' %}">Archive Invoices</a>#}
 {#          {% else %}#}
-{#            <a class="btn btn-outline-secondary disabled" href="{% url 'account:invoices_backup' %}">Archive Invoices</a>#}
+{#            <a class="btn btn-outline-lihgt disabled" href="{% url 'account:invoices_backup' %}">Archive Invoices</a>#}
 {#          {% endif %}#}
 {#          {% if jpk %}#}
 {#            <a class="btn btn-outline-primary" href="{% url 'account:send_jpk_files' %}">Send JPK Files</a>#}
