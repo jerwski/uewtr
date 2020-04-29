@@ -13,7 +13,7 @@
     <div class="jumbotron text-center">
       <h2 class="text-primary font-weight-normal">Latin sentences</h2>
       <p class="font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
-      <div class="btn btn-group btn-group-sm mb-2">
+      <div class="btn btn-group mb-2">
         <a class="btn btn-outline-danger" href="{% url 'account:exit' %}">Exit</a>
         {% include 'blocks/latina_auxilium_modal.html' %}
         <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
