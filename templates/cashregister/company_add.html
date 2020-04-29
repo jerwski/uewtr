@@ -21,7 +21,7 @@
     </div>
     <div class="row">
       <div class="col-sm-6">
-        <p class="lead text-center bgburlywood"><strong class="text-danger">REGISTERED COMPANIES</strong></p>
+        <p class="lead text-center uk-bg-burlywood"><strong class="text-danger">REGISTERED COMPANIES</strong></p>
         <div class="input-group">
           <input class="form-control" id="myInput" type="text" placeholder="Search company..." aria-label="Filtering table" aria-describedby="basic-addon">
           <div class="input-group-append">
@@ -49,7 +49,7 @@
       </div>
 
       <div class="col-sm-6">
-        <p class="lead text-center bgburlywood"><strong class="text-danger">{% if company_id %}CHANGE{% else %}ADD{% endif %} COMPANY DATA</strong></p>
+        <p class="lead text-center uk-bg-burlywood"><strong class="text-danger">{% if company_id %}CHANGE{% else %}ADD{% endif %} COMPANY DATA</strong></p>
 
         <form action="." method="POST">{% csrf_token %}
           <div class="row">

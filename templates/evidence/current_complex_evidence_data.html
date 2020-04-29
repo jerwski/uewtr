@@ -8,10 +8,10 @@
 {% block content %}
 
   <div class="container-fluid">
-    <div class="row ml-3 mr-3 mt-2 bgbisque">
+    <div class="row ml-3 mr-3 mt-2 uk-bg-bisque">
       <div class="col-sm-2 text-center">
         <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="58%"></a>
-        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
+        <p class="uk-text-small text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
       </div>
       <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
         <p class="h1 font-weight-normal">Working Time Recorder</p>
@@ -22,7 +22,7 @@
         {% include 'blocks/alert.html' %}
       </div>
     </div>
-    <div class="row ml-3 mr-3 mb-2 bgbisque">
+    <div class="row ml-3 mr-3 mb-2 uk-bg-bisque">
       <div class="col-3">
         <p class="text-center text-danger lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">EMPLOYED WORKERS</a></p>
 
@@ -209,7 +209,7 @@
               </tr>
             </thead>
           </table>
-          <div class="table-scroll">
+          <div class="uk-table-scroll-md">
             <table class="table table-hover table-sm" style="width:100%">
                 <colgroup>
                 <col span="1" style="width:4%">
