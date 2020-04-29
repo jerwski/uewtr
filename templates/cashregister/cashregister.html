@@ -26,10 +26,10 @@
 {% block content %}
 
   <div class="container-fluid">
-    <div class="row ml-3 mr-3 mt-2 bgbisque">
+    <div class="row ml-3 mr-3 mt-2 uk-bg-bisque">
       <div class="col-sm-2 mt-2 text-center">
         <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="50%"></a>
-        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
+        <p class="uk-text-small text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
       </div>
       <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
         <p class="h1 font-weight-normal">Company Cash Register</p>
@@ -39,7 +39,7 @@
         {% include 'blocks/alert.html' %}
       </div>
     </div>
-    <div class="row ml-3 mr-3 mb-2 bgbisque">
+    <div class="row ml-3 mr-3 mb-2 uk-bg-bisque">
       <div class="col-sm-3">
         <p class="text-center text-danger lead font-weight-normal bg-warning">COMPANIES</p>
         <table class="table table-hover table-sm">
@@ -74,7 +74,7 @@
               <div class="col-4">
                 <div class="input-group mb-2">
                   <div class="input-group-prepend">
-                    <span class="input-group-text bg-info text-white font-weight-normal">Podmiot&nbsp;</span>
+                    <span class="input-group-text bg-info text-white font-weight-normal">Podmiot&nbsp;&nbsp;</span>
                   </div>
                   {% bootstrap_field form.symbol form_group_class='form-inline' show_label=False placeholder='Firma, osoba...' %}
                 </div>
@@ -156,7 +156,7 @@
             </tr>
             </thead>
           </table>
-          <div class="scrollit">
+          <div class="uk-table-scroll-sm">
             <table class="table table-sm table-hover">
               <colgroup>
                 <col span="1" style="width:3%">
@@ -223,17 +223,14 @@
               {% if company_id and previous %}
 
                 {% include 'blocks/cash_register_print_modal.html' %}
-                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print last
-                  register</a>
+                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print last register</a>
                 <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info">Send last
                   register</a>
               {% elif company_id and not previous %}
                 {% include 'blocks/cash_register_print_modal.html' %}
-                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success disabled">Print
-                  last register</a>
+                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success disabled">Print last register</a>
                 <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info disabled">Send
                   last register</a>
-
               {% endif %}
               <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
               <a class="btn btn-outline-light" href="/admin/">Admin Data Base</a>

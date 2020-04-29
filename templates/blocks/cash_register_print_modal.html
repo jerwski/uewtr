@@ -1,7 +1,7 @@
 {% load static %}
 <!-- Modal for data to will be erase if you want -->
   {% if cr_set %}
-    <button id="crButton" type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#crModal">Print selected cahs register</button>
+    <button id="crButton" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#crModal">Print selected cahs register</button>
   {% endif %}
 
   <!-- Modal -->
@@ -22,7 +22,7 @@
                 <span class="input-group-text" id="basic-addon"><img src="{% static 'images/mainboard/search.ico' %}" width="24px" alt="Lupa"></span>
               </div>
             </div>
-            <div class="scrollit">
+            <div class="uk-table-scroll-sm">
               <table class="table table-sm table-hover">
                 <tbody class="small" id="CRTable">
                 {% for nr in cr_set %}

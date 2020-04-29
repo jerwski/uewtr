@@ -9,7 +9,7 @@
 
   <div class="container">
     <div class="row p-2">
-      <div class="col-8 offset-2 p-2 bgbisque">
+      <div class="col-8 offset-2 p-2 uk-bg-bisque">
         <pre class="text-center text-danger display-4">L O G I N   F O R M</pre>
         {% if request.user.is_authenticated %}
           <p class="text-center font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
@@ -39,7 +39,7 @@
             <div class="text-center">
               <br><h1>Unikolor Working Time Recorder</h1>
               <img src="{% static 'images/mainboard/logoUNI.png' %}">
-              <p class="footer text-secondary text-center"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
+              <p class="uk-text-small text-secondary text-center"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
             </div>
             <div class="btn-group p-3 float-left" >
               {% if request.user.is_authenticated %}
@@ -58,7 +58,7 @@
                 <a href="{% url 'logout' %}" class="btn btn-md btn-outline-dark">Logout</a>
               {% else %}
                 <a href="{% url 'account:admin_site' %}" class="btn btn-md btn-outline-dark disabled">Dashboard</a>
-                <button type="submit" class="btn btn-sm btn-outline-success">Login</button>
+                <button type="submit" class="btn btn-md btn-outline-success">Login</button>
               {% endif %}
             </div>
           </form>

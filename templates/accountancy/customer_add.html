@@ -11,7 +11,7 @@
     <div class="row m-3">
       <div class="col-2 text-left">
         <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" width="92%"></a>
-        <p class="footer text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
+        <p class="uk-text-small text-secondary">Copyright UNIKOLOR Jerzy Wygonowski</p>
       </div>
       <div class="col-8 mb-3 mt-2 text-center text-dark">
           <p class="h1 font-weight-normal">Working Time Recorder</p>
@@ -21,7 +21,7 @@
     </div>
     <div class="row">
       <div class="col-sm-6">
-        <p class="lead text-center bgburlywood"><strong class="text-danger">REGISTERED CUSTOMERS</strong></p>
+        <p class="lead text-center uk-bg-burlywood"><strong class="text-danger">REGISTERED CUSTOMERS</strong></p>
         <div class="input-group">
           <input class="form-control" id="myInput" type="text" placeholder="Search customer..." aria-label="Filtering table" aria-describedby="basic-addon">
           <div class="input-group-append">
@@ -31,7 +31,7 @@
         <table class="table table-hover table-sm ">
           <thead class="text-info font-weight-bold"><tr><th>CUSTOMER</th><th>NIP</th></tr></thead>
         </table>
-        <div class="table-scroll">
+        <div class="uk-table-scroll-md">
           <table class="table table-hover table-sm">
             <tbody id="searchTable">
             {% for customer in customers %}
@@ -53,7 +53,7 @@
       </div>
 
       <div class="col-sm-6">
-        <p class="lead text-center bgburlywood"><strong class="text-danger">{% if customer_id %}CHANGE{% else %}ADD{% endif %} CUSTOMER DATA</strong></p>
+        <p class="lead text-center uk-bg-burlywood"><strong class="text-danger">{% if customer_id %}CHANGE{% else %}ADD{% endif %} CUSTOMER DATA</strong></p>
 
         <form action="." method="POST">{% csrf_token %}
           <div class="row">
