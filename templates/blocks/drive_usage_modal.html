@@ -1,6 +1,6 @@
 
   <!-- Small modal -->
-  <a class="text-primary display-4" href="drive_usage_modal.html" data-toggle="modal" data-target=".usage-modal">Administration Dashboard</a>
+  <a class="uk-text-large" href="drive_usage_modal.html" data-toggle="modal" data-target=".usage-modal">Administration Dashboard</a>
     <!-- Modal -->
     <div class="modal fade usage-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -15,7 +15,7 @@
             {% for key, value in usage.items %}
               <div class="row">
                 <div class="col mb-3 text-center">
-                  <p class="small">Drive {{ key }} total={{ value.total }} used={{ value.used }} free={{ value.free }}</p>
+                  <p class="uk-text-middle">Drive {{ key }} total={{ value.total }} used={{ value.used }} free={{ value.free }}</p>
                   <div class="progress">
                     <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ value.percent|floatformat:2 }}%" aria-valuenow="{{ value.used }}" aria-valuemin="0" aria-valuemax="{{ value.total }}">{{ value.percent|floatformat:2 }}%</div>
                   </div>

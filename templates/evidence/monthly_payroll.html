@@ -41,7 +41,8 @@
       </div>
       <div class="col-10">
         {% if amountpay.brutto %}
-          <p class="text-center text-primary lead font-weight-bold bg-warning mt-lg-4">Monthly rollpay for {{ month }}/{{ year }}. Total work hours: {{ total_work_hours }} hours. Total payment: {{ amountpay.brutto|money_format }}</p>
+          <p class="uk-text-middle text-center">Monthly payroll for {{ month }}/{{ year }}</p>
+          <p class="text-center text-primary lead font-weight-bold bg-warning mt-lg-4">Total work hours: {{ total_work_hours }} hours.&nbsp;&nbsp;&nbsp;Total payment: {{ amountpay.brutto|money_format }}</p>
 
           <div class="input-group">
             <input class="form-control" id="myInput" type="text" placeholder="Search employee..." aria-label="Filtering table" aria-describedby="basic-addon">

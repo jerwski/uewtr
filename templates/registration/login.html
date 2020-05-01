@@ -10,11 +10,11 @@
   <div class="container">
     <div class="row p-2">
       <div class="col-8 offset-2 p-2 uk-bg-bisque">
-        <pre class="text-center text-danger display-4">L O G I N   F O R M</pre>
+        <pre class="text-center uk-text-large">LOGIN FORM</pre>
         {% if request.user.is_authenticated %}
-          <p class="text-center font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
+          <p class="text-center uk-text-middle">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
         {% else %}
-          <p class="small text-center text-secondary">To login please fill both fields with correct data...<br>If you are for the first time, notify the admin or create a superuser...</p>
+          <p class="uk-text-small text-center">To login please fill both fields with correct data...<br>If you are for the first time, notify the admin or create a superuser...</p>
         {% endif %}
         <div class="form-control-lg">
           <form method="POST">{% csrf_token %}
@@ -36,8 +36,7 @@
                 </div>
               </div>
             </div>
-            <div class="text-center">
-              <br><h1>Unikolor Working Time Recorder</h1>
+            <div class="text-center mt-3">
               <img src="{% static 'images/mainboard/logoUNI.png' %}">
               <p class="uk-text-small text-center"><small>Copyright UNIKOLOR Jerzy Wygonowski</small></p>
             </div>
