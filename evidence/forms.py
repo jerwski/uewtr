@@ -1,3 +1,6 @@
+# standard library
+from datetime import timedelta
+
 # django core
 from django import forms
 from django.utils.timezone import now
@@ -26,13 +29,20 @@ q1 = queryset.filter(status=1)
 q2 = queryset.filter(employeedata__end_contract__year__gte=year, employeedata__end_contract__month__gte=month)
 query = q1 | q2
 
+icons = {
+	        'today': 'fa fa-calendar-alt',
+            'clear': 'fa fa-trash-alt',
+            'close': 'fa fa-times'
+		}
+
 
 # my forms
 class WorkEvidenceForm(forms.ModelForm):
-	options = {'icons': {'time': 'fa fa-clock-o'}, 'format': 'YYYY-MM-DD HH:mm',
-			   'useCurrent': False, 'stepping': 5, 'sideBySide': True,
-			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-	attrs={'prepend': 'fa fa-clock-o', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+	options = {'icons': icons, 'format': 'YYYY-MM-DD HH:mm',
+	           'useCurrent': False, 'stepping': 5, 'sideBySide': True,
+			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True},
+			   'maxDate': str(now().date() + timedelta(days=1))}
+	attrs={'prepend': 'fa fa-user-clock', 'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=query)
 	start_work = forms.DateTimeField(label='Start of work (date and time):',
@@ -47,9 +57,9 @@ class WorkEvidenceForm(forms.ModelForm):
 
 class EmployeeLeaveForm(forms.ModelForm):
 	LEAVEKIND = [('unpaid_leave', 'Unpaid leave'), ('paid_leave', 'Paid leave'), ('maternity_leave', 'Maternity leave')]
-	options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True, 'daysOfWeekDisabled': [0,6],
+	options = {'icons': icons, 'useCurrent': True, 'daysOfWeekDisabled': [0,6],
 			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-	attrs = {'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+	attrs = {'prepend': 'fa fa-calendar-check', 'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=query)
 	leave_date = forms.DateField(label='Select a date of leave...', widget=DatePicker(options=options, attrs=attrs))
@@ -62,25 +72,25 @@ class EmployeeLeaveForm(forms.ModelForm):
 
 
 class PeriodCurrentComplexDataForm(forms.Form):
-	options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True, 'format': 'MM/YYYY',
+	options = {'icons': icons, 'useCurrent': True, 'format': 'MM/YYYY',
 			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-	attrs = {'prepend': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+	attrs = {'prepend': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	choice_date = forms.DateField(widget=DatePicker(options=options, attrs=attrs))
 
 
 class PeriodMonthlyPayrollForm(forms.Form):
-	options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True, 'format': 'MM/YYYY',
+	options = {'icons': icons, 'useCurrent': True, 'format': 'MM/YYYY',
 			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-	attrs = {'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+	attrs = {'prepend': 'fa fa-calendar-check', 'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	choice_date = forms.DateField(label='Select a month on year...', widget=DatePicker(options=options, attrs=attrs))
 
 
 class AccountPaymentForm(forms.ModelForm):
-	options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True,
+	options = {'icons': icons, 'useCurrent': True,
 			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-	attrs = {'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+	attrs = {'prepend': 'fa fa-calendar-check', 'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=query)
 

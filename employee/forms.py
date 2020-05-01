@@ -14,8 +14,15 @@ from bootstrap4.widgets import RadioSelectButtonGroup
 # Create your forms here.
 
 
+
 # queryset to validate HiddenInput fields
 queryset = Employee.objects.all()
+
+icons = {
+	        'today': 'fa fa-calendar-alt',
+            'clear': 'fa fa-trash-alt',
+            'close': 'fa fa-times'
+		}
 
 class EmployeeBasicDataForm(forms.ModelForm):
     '''class representing a form to create/change and save the basic data of employee'''
@@ -35,9 +42,9 @@ class EmployeeExtendedDataForm(forms.ModelForm):
     WEEKLY_OVERTIME = 1
     SATURDAT_OVERTIME = 2
     RATINGS = [(NO_OVERTIME, 'Clear contract'), (WEEKLY_OVERTIME, 'Weekly overtime'), (SATURDAT_OVERTIME, 'Saturday overtime')]
-    options = {'icons': {'clear': 'fa fa-trash'}, 'useCurrent': True,
+    options = {'icons': icons, 'useCurrent': True,
                'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-    attrs={'prepend': 'fa fa-calendar', 'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+    attrs={'prepend': 'fa fa-calendar-check', 'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
     worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset)
     birthday = forms.DateField(label='Date of birthday', widget=DatePicker(options=options, attrs=attrs))

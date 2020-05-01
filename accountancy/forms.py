@@ -18,6 +18,13 @@ from tempus_dominus.widgets import DatePicker
 # Create your forms here
 
 
+icons = {
+	        'today': 'fa fa-calendar-alt',
+            'clear': 'fa fa-trash-alt',
+            'close': 'fa fa-times'
+		}
+
+
 class NewProductAddForm(forms.ModelForm):
 	ZW = Decimal('0')
 	VAT5 = Decimal('5')
@@ -61,9 +68,9 @@ class AccountancyDocumentForm(forms.ModelForm):
 	KURIER = 2
 	CONVEYANCE = ((ODBIORCA, 'Odbiorca'), (CB774GU, 'CB 774GU'), (KURIER, 'Kurier'))
 
-	options = {'icons'  : {'clear': 'fa fa-trash'}, 'useCurrent': True,
+	options = {'icons': icons, 'useCurrent': True,
 	           'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-	attrs = {'append': 'fa fa-calendar', 'input_toggle': False, 'icon_toggle': True}
+	attrs = {'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	qs_company = Company.objects.filter(status__range=[1, 3])
 	qs_customer = Customer.objects.filter(status__range=[1, 3])
