@@ -30,9 +30,9 @@ q2 = queryset.filter(employeedata__end_contract__year__gte=year, employeedata__e
 query = q1 | q2
 
 icons = {
-	        'today': 'fas fa-calendar-alt',
+	        'today': 'fas fa-calendar-day',
             'clear': 'fas fa-trash-alt',
-            'close': 'fas fa-times'
+            'close': 'fas fa-times-circle'
 		}
 
 
@@ -42,7 +42,7 @@ class WorkEvidenceForm(forms.ModelForm):
 	           'useCurrent': False, 'stepping': 5, 'sideBySide': True,
 			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True},
 			   'maxDate': str(now().date() + timedelta(days=1))}
-	attrs={'prepend': 'fa fa-user-clock', 'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
+	attrs={'prepend': 'fas fa-user-clock', 'append': 'fas fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=query)
 	start_work = forms.DateTimeField(label='Start of work (date and time):',
@@ -59,7 +59,7 @@ class EmployeeLeaveForm(forms.ModelForm):
 	LEAVEKIND = [('unpaid_leave', 'Unpaid leave'), ('paid_leave', 'Paid leave'), ('maternity_leave', 'Maternity leave')]
 	options = {'icons': icons, 'useCurrent': True, 'daysOfWeekDisabled': [0,6],
 			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-	attrs = {'prepend': 'fa fa-calendar-check', 'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
+	attrs = {'prepend': 'fas fa-calendar-check', 'append': 'fas fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=query)
 	leave_date = forms.DateField(label='Select a date of leave...', widget=DatePicker(options=options, attrs=attrs))
@@ -74,7 +74,7 @@ class EmployeeLeaveForm(forms.ModelForm):
 class PeriodCurrentComplexDataForm(forms.Form):
 	options = {'icons': icons, 'useCurrent': True, 'format': 'MM/YYYY',
 			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-	attrs = {'prepend': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
+	attrs = {'prepend': 'fas fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	choice_date = forms.DateField(widget=DatePicker(options=options, attrs=attrs))
 
@@ -82,7 +82,7 @@ class PeriodCurrentComplexDataForm(forms.Form):
 class PeriodMonthlyPayrollForm(forms.Form):
 	options = {'icons': icons, 'useCurrent': True, 'format': 'MM/YYYY',
 			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-	attrs = {'prepend': 'fa fa-calendar-check', 'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
+	attrs = {'prepend': 'fas fa-calendar-check', 'append': 'fas fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	choice_date = forms.DateField(label='Select a month on year...', widget=DatePicker(options=options, attrs=attrs))
 
@@ -90,7 +90,7 @@ class PeriodMonthlyPayrollForm(forms.Form):
 class AccountPaymentForm(forms.ModelForm):
 	options = {'icons': icons, 'useCurrent': True,
 			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
-	attrs = {'prepend': 'fa fa-calendar-check', 'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
+	attrs = {'prepend': 'fas fa-calendar-check', 'append': 'fas fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
 	worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=query)
 
