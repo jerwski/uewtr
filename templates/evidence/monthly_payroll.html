@@ -41,7 +41,7 @@
       </div>
       <div class="col-10">
         {% if amountpay.brutto %}
-          <p class="uk-text-middle text-center">Monthly payroll for {{ month }}/{{ year }}</p>
+          {% include 'blocks/payrolldata_modal.html' %}
           <p class="text-center text-primary lead font-weight-bold bg-warning mt-lg-4">Total work hours: {{ total_work_hours }} hours.&nbsp;&nbsp;&nbsp;Total payment: {{ amountpay.brutto|money_format }}</p>
 
           <div class="input-group">
@@ -79,12 +79,12 @@
             </tbody>
           </table>
         {% elif not amountpay %}
-          <div class="jumbotron bg-warning mt-lg-5">
-            <p class="text-center text-danger lead font-weight-bold font-italic">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>
+          <div class="jumbotron bg-warning mt-lg-5 text-center">
+            <p class="uk-text-middle">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>
           </div>
         {% else %}
-          <div class="jumbotron bg-warning mt-lg-5">
-            <p class="text-center text-danger lead font-weight-bold font-italic">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>
+          <div class="jumbotron bg-warning mt-lg-5 text-center">
+            <p class="uk-text-middle">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>
           </div>
         {% endif %}
       </div>

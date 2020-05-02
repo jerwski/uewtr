@@ -1,0 +1,45 @@
+{% load utility_tags %}
+
+  <!-- Small modal -->
+<p class="text-center"><a class="uk-text-middle" href="payrolldata_modal.html" data-toggle="modal" data-target=".usage-modal">Monthly payroll for {{ month }}/{{ year }}</a></p>
+    <!-- Modal -->
+    <div class="modal fade usage-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header uk-bg-burlywood">
+            <h5 class="modal-title" id="alertModal">Summary of payroll data for the {{ month }}/{{ year }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span class="fas fa-times-circle" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="modal-body uk-bg-bisque">
+            <div class="row text-right">
+              <div class="col-6">
+                <table class="table table-sm">
+                  <tbody>
+                    {% for head in heads %}
+                      {% if head != 'Employee' %}
+                        <tr class="font-weight-bold">{{ head }}:&nbsp;</tr><br>
+                      {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-4">
+                <table class="table table-sm">
+                  <tbody>
+                    {% for value in amountpay.values %}
+                      <tr class="text-white font-weight-bold">{{ value|money_format }}</tr><br>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-2"></div>
+            </div>
+          </div>
+          <div class="modal-footer uk-bg-bisque">
+            <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>

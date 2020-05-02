@@ -30,9 +30,9 @@ q2 = queryset.filter(employeedata__end_contract__year__gte=year, employeedata__e
 query = q1 | q2
 
 icons = {
-	        'today': 'fa fa-calendar-alt',
-            'clear': 'fa fa-trash-alt',
-            'close': 'fa fa-times'
+	        'today': 'fas fa-calendar-alt',
+            'clear': 'fas fa-trash-alt',
+            'close': 'fas fa-times'
 		}
 
 
