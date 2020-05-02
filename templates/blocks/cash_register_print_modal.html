@@ -11,7 +11,7 @@
         <div class="modal-header bg-danger text-white">
           <h6 class="modal-title">Cash registers for {{ company }}</h6>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+            <span class="fas fa-times-circle" aria-hidden="true"></span>
           </button>
         </div>
         <div class="modal-body">
@@ -23,7 +23,7 @@
               </div>
             </div>
             <div class="uk-table-scroll-sm">
-              <table class="table table-sm table-hover">
+              <table class="table table-borderless table-sm table-hover">
                 <tbody class="small" id="CRTable">
                 {% for nr in cr_set %}
                   <tr>

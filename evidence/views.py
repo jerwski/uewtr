@@ -345,11 +345,8 @@ class MonthlyPayrollView(View):
 				for k,v in item.items():
 					amountpay[k] += v
 
-			context.__setitem__('payroll', payroll)
-			context.__setitem__('month', month)
-			context.__setitem__('year', year)
-			context.__setitem__('total_work_hours', total_work_hours)
-			context.__setitem__('amountpay', dict(amountpay))
+			context.update({'payroll': payroll, 'month': month, 'year': year,
+			                'total_work_hours': total_work_hours,'amountpay': dict(amountpay)})
 
 		return render(request, 'evidence/monthly_payroll.html', context)
 

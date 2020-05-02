@@ -11,8 +11,8 @@
 
   <div class="container-fluid">
     <div class="jumbotron text-center">
-      <h2 class="text-primary font-weight-normal">Latin sentences</h2>
-      <p class="font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
+      <h2 class="uk-text-large">Latin sentences</h2>
+      <p class="uk-text-middle">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
       <div class="btn btn-group mb-2">
         <a class="btn btn-outline-danger" href="{% url 'account:exit' %}">Exit</a>
         {% include 'blocks/latina_auxilium_modal.html' %}
