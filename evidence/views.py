@@ -191,7 +191,7 @@ class LeaveTimeRecorderView(View):
 				form.save()
 				msg = f'Succesful register new leave day ({leave_date}) for {worker}'
 				messages.success(request, msg)
-				leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [item.year for item in EmployeeLeave.objects.filter(worker=worker).distinct().dates('leave_date', 'year', order='DESC')]}
+				leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [item.year for item in EmployeeLeave.objects.filter(worker=worker).dates('leave_date', 'year', order='DESC')]}
 				context.__setitem__('leave_flag', leave_flag)
 				context.__setitem__('leave_set', leave_set)
 
