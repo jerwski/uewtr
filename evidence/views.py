@@ -128,7 +128,7 @@ class LeaveTimeRecorderView(View):
 		remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
 
 		if EmployeeLeave.objects.filter(worker=worker).exists():
-			leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [item.year for item in EmployeeLeave.objects.filter(worker=worker).distinct().dates('leave_date', 'year', order='DESC')]}
+			leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [item.year for item in EmployeeLeave.objects.filter(worker=worker).dates('leave_date', 'year', order='DESC')]}
 		else:
 			leave_set = None
 		context = {'form': form, 'worker': worker, 'employee_id': employee_id,
