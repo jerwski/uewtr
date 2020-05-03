@@ -1,5 +1,3 @@
-{% load static %}
-
 <!-- Modal for data to will be erase if you want -->
   {% if cr_set %}
     <button id="crButton" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#crModal">Print selected cahs register</button>
@@ -18,9 +16,12 @@
         <div class="modal-body">
           <form action="{% url 'cashregister:print_register' company_id %}" method="POST">{% csrf_token %}
             <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text fas fa-search" id="basic-addon"></span>
+              </div>
               <input class="form-control" id="myCR" type="text" placeholder="Search cash register..." aria-label="Filtering table" aria-describedby="basic-addon">
               <div class="input-group-append">
-                <span class="input-group-text fas fa-search" id="basic-addon"></span>
+                <span class="input-group-text fas fa-eraser" id="clear"></span>
               </div>
             </div>
             <div class="uk-table-scroll-sm">
@@ -40,14 +41,10 @@
               </table>
             </div>
             <div class="modal-footer">
-              <div class="col-1"></div>
-              <div class="col-3 btn">
-                <button type="button" class="btn btn-outline-info btn-block" data-dismiss="modal">Close</button>
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Close window</button>
+                <button id="crsub" type="submit" class="btn btn-outline-success">Print selected leave data</button>
               </div>
-              <div class="col-7 btn">
-                <button id="crsub" type="submit" class="btn btn-outline-success btn-block">Print selected cash register</button>
-              </div>
-              <div class="col-1"></div>
             </div>
           </form>
         </div>
@@ -57,11 +54,18 @@
 
 
 <!-- hide modal-->
-<script>
-  $('#crsub').click(function() {
-   $('#crModal').modal('hide');
-});
-</script>
+  <script>
+
+    $('#crsub').click(function() {
+      $('#crModal').modal('hide');
+    });
+
+    $('#clear').click(function() {
+      $('#myCR').val('');
+      document.getElementById("myCR").focus();
+    });
+
+  </script>
 
 
 <!-- search table-->
