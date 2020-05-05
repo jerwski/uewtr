@@ -3,6 +3,7 @@ from datetime import datetime
 
 # django core
 from django import template
+from django.urls import reverse
 
 
 # Create your tags and filters here.
@@ -50,3 +51,8 @@ import unicodedata
 @register.filter()
 def npds(txt):
     return ''.join(c for c in unicodedata.normalize('NFD', txt) if not unicodedata.combining(c))
+
+
+@register.simple_tag()
+def employee_complex_data_pass(employee_id:int, month:int, year:int):
+    return reverse('evidence:employee_complex_data_args', args=[employee_id, month, year])

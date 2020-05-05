@@ -35,9 +35,9 @@
           {% for employee in employees %}
             <tr>
               {% if employee_id == employee.id %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.employee_complex_data }}">{{ employee }}</a></td>
+                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.complex_data }}">{{ employee }}</a></td>
               {% else %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_complex_data }}">{{ employee }}</a></td>
+                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.complex_data }}">{{ employee }}</a></td>
               {% endif %}
             </tr>
           {% endfor %}
@@ -48,7 +48,7 @@
       <div class="col-6">
         <p class="text-center text-danger lead font-weight-normal bg-warning">CURRENT DATA: {{ workerdata|upper }}</p>
 
-        <form action="." method="POST">{% csrf_token %}
+        <form action="{% url 'evidence:employee_complex_data' employee_id %}" method="POST">{% csrf_token %}
           <div class="row">
             <div class="col-8 mt-1">
               <div class="input-group mb-3">

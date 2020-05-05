@@ -54,8 +54,11 @@ class Employee(CreationModificationDateMixin):
     def hurly_rate_employee_id(self):
         return reverse('employee:employee_hourly_rate', args=[self.id])
 
-    def employee_complex_data(self):
+    def complex_data(self):
         return reverse('evidence:employee_complex_data', args=[self.id])
+
+    def employee_complex_data(self):
+        return self.id
 
 
 class EmployeeData(CreationModificationDateMixin):
