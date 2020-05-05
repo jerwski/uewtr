@@ -1,5 +1,3 @@
-{% load static %}
-
 <!-- Modal for data to will be erase if you want -->
   {% if leave_set %}
     <button id="leaveButton" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#leaveModal">Print leave data</button>
@@ -20,9 +18,12 @@
         <div class="modal-body">
           <form action="{% url 'evidence:leaves_data_print' employee_id %}" method="POST">{% csrf_token %}
             <div class="input-group">
-              <input class="form-control" id="myLY" type="text" placeholder="Search leave year..." aria-label="Filtering table" aria-describedby="basic-addon">
-              <div class="input-group-append">
+              <div class="input-group-prepend">
                 <span class="input-group-text fas fa-search" id="basic-addon"></span>
+              </div>
+              <input class="form-control" id="myLY" type="text" placeholder="Search leave year... backspace show all" aria-label="Filtering table" aria-describedby="basic-addon">
+              <div class="input-group-append">
+                <span class="input-group-text fas fa-eraser" id="clear"></span>
               </div>
             </div>
             <div class="uk-table-scroll-sm">
@@ -33,7 +34,7 @@
                     <td>
                       <div class="form-check custom-control custom-radio ml-5 text-left">
                         <input type="radio" id="{{ leave_year }}" name="leave_year" class="custom-control-input" value="{{ leave_year }}" required {% if leave_value == 0 %}disabled{% endif %}>
-                        <label {% if leave_value == 0 %}class="custom-control-label text-secondary" {% else %}class="custom-control-label text-primary"{% endif %} for="{{ leave_year }}">{{ leave_year }} year (total leave: {{ leave_value }} day{{ leave_value|pluralize:'s' }})</label>
+                        <label {% if leave_value == 0 %}class="custom-control-label text-secondary"{% else %}class="custom-control-label text-primary"{% endif %} for="{{ leave_year }}">{{ leave_year }} year (total leave: {{ leave_value }} day{{ leave_value|pluralize:'s' }})</label>
                       </div>
                     </td>
                   </tr>
@@ -55,9 +56,16 @@
 
 <!-- hide modal-->
   <script>
+
     $('#leavesub').click(function() {
      $('#leaveModal').modal('hide');
   });
+
+    $('#clear').click(function() {
+      $('#myLY').val('');
+      document.getElementById("myLY").focus();
+   });
+
   </script>
 
 <!-- search table-->
