@@ -19,7 +19,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <form action="{% url 'evidence:plot_chart' employee_id %}" method="POST">{% csrf_token %}
+        <form action="{% url 'evidence:plot_chart' employee_id month year %}" method="POST">{% csrf_token %}
           {% for year, value in total_brutto_set.items %}
             <div class="form-check custom-control custom-radio ml-5 text-left">
               <input type="radio" id="{{ year }}" name="plot_year" class="custom-control-input" value="{{ year }}" required>

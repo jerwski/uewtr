@@ -24,7 +24,8 @@ urlpatterns = [
     path('leaves_data/pdf/send/employee=<int:employee_id>/', login_required(views.SendLeavesDataPdf.as_view()), name='leaves_data_pdf'),
     path('complex/data/employee=<int:employee_id>/month=<int:month>/year=<int:year>/', login_required(views.EmployeeCurrentComplexDataView.as_view()), name='employee_complex_data_args'),
 	path('complex/data/employee=<int:employee_id>/', login_required(views.EmployeeCurrentComplexDataView.as_view()), name='employee_complex_data'),
-    path('chart/employee=<int:employee_id>/', login_required(views.PlotChart.as_view()), name='plot_chart'),
+    path('chart/employee=<int:employee_id>/month=<int:month>/year=<int:year>/', login_required(views.PlotChart.as_view()), name='plot_chart'),
+	path('chart/employee=<int:employee_id>/', login_required(views.PlotChart.as_view()), name='plot_chart'),
 	path('workhours/print/employee=<int:employee_id>/month=<int:month>/year=<int:year>/', login_required(views.WorkhoursPrintView.as_view()),name='workhours_print'),
 	path('workhours/print/employee=<int:employee_id>/', login_required(views.WorkhoursPrintView.as_view()),name='workhours_print'),
 ]
