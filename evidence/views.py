@@ -518,9 +518,10 @@ class AccountPaymentEraseView(View):
 
 class EmployeeCurrentComplexDataView(View):
 	'''class representing employee complex data view'''
-	def get(self, request, employee_id:int) -> render:
-		choice_date = now()
-		month, year = choice_date.month, choice_date.year
+	def get(self, request, employee_id:int, month=None, year=None) -> render:
+		if month == None or year == None:
+			month, year = now().month, now().year
+
 		choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
 		form = PeriodCurrentComplexDataForm(initial={'choice_date': choice_date})
 		workerdata=EmployeeData.objects.get(worker_id=employee_id)
@@ -593,13 +594,13 @@ class WorkhoursPrintView(View):
 		else:
 			messages.warning(request, r'Nothing to print...')
 
-		return HttpResponseRedirect(reverse('evidence:employee_complex_data', args=[employee_id]))
+		return HttpResponseRedirect(reverse('evidence:employee_complex_data_args', args=[employee_id, month, year]))
 
 
 class PlotChart(View):
 
-	def post(self, request, employee_id:int) -> HttpResponseRedirect:
-		year = int(request.POST['plot_year'])
-		plot_chart(employee_id, year)
+	def post(self, request, employee_id:int, month:int, year:int) -> HttpResponseRedirect:
+		year_data = int(request.POST['plot_year'])
+		plot_chart(employee_id, year_data)
 
-		return HttpResponseRedirect(reverse('evidence:employee_complex_data', args=[employee_id]))
+		return HttpResponseRedirect(reverse('evidence:employee_complex_data_args', args=[employee_id, month, year]))
