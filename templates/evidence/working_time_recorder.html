@@ -28,7 +28,7 @@
     </div>
     <div class="col-sm-9">
       {% if worker.status %}
-        <p class="text-center text-danger lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'evidence:workhours_print' employee_id %}">WORK EVIDENCE FOR: {{ worker|upper }}</a></p>
+        <p class="text-center text-danger lead font-weight-normal bg-warning">WORK EVIDENCE FOR: {{ worker|upper }}</p>
         <div class="row">
           <div class="col-3 text-center">
             <div class="btn btn-group-sm btn-group-vertical" role="group">
