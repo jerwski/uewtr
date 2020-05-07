@@ -35,9 +35,9 @@
           {% for employee in employees %}
             <tr>
               {% if employee_id == employee.id %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.complex_data }}">{{ employee }}</a></td>
+                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{% employee_complex_data_pass employee.employee_complex_data month year %}">{{ employee }}</a></td>
               {% else %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.complex_data }}">{{ employee }}</a></td>
+                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{% employee_complex_data_pass employee.employee_complex_data month year %}">{{ employee }}</a></td>
               {% endif %}
             </tr>
           {% endfor %}
