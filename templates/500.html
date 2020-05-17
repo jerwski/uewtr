@@ -6,12 +6,12 @@
 {% block content %}
 
   <div class="jumbotron text-center">
-    <p class="text-primary display-4">Administration Dashboard</p>
+    <p class="uk-text-large">Administration Dashboard</p>
     {% if user.is_authenticated %}
-      <p class="text-center font-italic lead">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p><br>
+      <p class="text-center uk-text-middle">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p><br>
     {% endif %}
     {% if error %}
-      <p class="text-center text-danger font-weight-bold font-italic lead">Internet isn't available...</p><br>
+      <p class="text-center uk-text-middle">Check internet connection...</p><br>
       <p class="text-info text-danger font-italic lead">Causation: {{ error }}</p>
     {% endif %}
     {% if nodata %}
@@ -24,10 +24,10 @@
       </div>
     {% else %}
       <div class="btn-group btn-group-lg">
-        <a class="btn btn-outline-lihgt" href="/admin/">Admin Data Base</a>
+        <a class="btn btn-outline-light" href="/admin/">Admin Data Base</a>
         <a class="btn btn-outline-info" href="{% url 'login' %}">Back to login</a>
         <a href="{% url 'logout' %}" class="btn btn-md btn-outline-dark">Logout</a>
-        <a class="btn btn-outline-danger" href="{% url 'account:exit' %}">Exit</a>
+        <a class="btn btn-outline-danger" href="https://www.google.com/">Exit</a>
       </div>
     {% endif %}
   </div>

@@ -25,7 +25,7 @@ from account.forms import UserCreateForm
 
 # my function
 from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset, dirdata, previous_month_year
-from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_internet_connection, invoices_backup, cmpserializefile
+from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_FTPconn, invoices_backup, cmpserializefile
 
 
 # Create your views here.
@@ -83,7 +83,7 @@ class AdminView(View):
 			if  cmpserializefile():
 				context.__setitem__('compare', True)
 
-			if check_internet_connection():
+			if check_FTPconn():
 				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
 					myFTP.cwd(settings.FTP_SERIALIZE)
 					files = myFTP.nlst()
@@ -93,7 +93,7 @@ class AdminView(View):
 					else:
 						print(f'There aren\'t new fixtures on FTP...')
 			else:
-				print(r'No internet connection...')
+				print(r'Occurred problem with FTP connection...')
 
 			return render(request, 'account/admin.html', context)
 
@@ -118,7 +118,7 @@ class SerializeView(View):
 		mkfixture(settings.ADMIN_SERIALIZE)
 		messages.info(request, f'\nAll database have been serializing....')
 
-		if check_internet_connection():
+		if check_FTPconn():
 			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
 				myFTP.cwd(settings.FTP_SERIALIZE)
 				for file in list(Path.iterdir(settings.ADMIN_SERIALIZE)):
@@ -126,7 +126,7 @@ class SerializeView(View):
 						myFTP.storbinary(f'STOR {file.name}', fixture)
 						print(f'\nFile <<{file.name}>> was sent to the FTP directory <<{settings.FTP_SERIALIZE}>>')
 		else:
-			print(r'No internet connection...')
+			print(r'Occurred problem with FTP connection...')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
@@ -135,7 +135,7 @@ class DeserializeView(View):
 	'''class to deserializng database'''
 	def get(self, request)->HttpResponseRedirect:
 
-		if check_internet_connection():
+		if check_FTPconn():
 			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
 				myFTP.cwd(settings.FTP_SERIALIZE)
 				for file in myFTP.nlst():
@@ -143,7 +143,7 @@ class DeserializeView(View):
 					myFTP.delete(file)
 					print(f'\nFile <<{file}>> is safe in <<{settings.FTP_SERIALIZE}>>')
 		else:
-			print(r'No internet connection...')
+			print(r'Occurred problem with FTP connection...')
 
 		readfixture(request, settings.ADMIN_SERIALIZE)
 		messages.info(request, f'\nAll database have been deserializing....')
@@ -174,7 +174,7 @@ class Invoices2Ftp(View):
 class JPK2Accountancy(View):
 	'''class to send JPK files to accountancy'''
 	def get(self, request):
-		if check_internet_connection():
+		if check_FTPconn():
 			files = jpk_files(settings.INVOICE_WORKPATH)
 
 			if files:
@@ -192,7 +192,7 @@ class JPK2Accountancy(View):
 					file, parent, suffix = Path(file), Path(file).parent, Path(file).suffix
 					file.rename(parent/f'sent{nr}{stamp}{suffix}')
 		else:
-			messages.error(request, 'No internet connection...')
+			messages.error(request, 'Occurred problem with FTP connection...')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
@@ -285,11 +285,11 @@ def exit(request)->HttpResponseRedirect:
 		remgarbage(*paths)
 
 		try:
-			if check_internet_connection():
+			if check_FTPconn():
 				uploadFileFTP(*args)
 				return HttpResponseRedirect(r'https://www.google.pl/')
 			else:
-				return render(request, '500.html', {'error': ConnectionError.__doc__})
+				return render(request, '500.html', {'error': 'Occurred problem with FTP connection...'})
 		except:
 			pass
 
@@ -302,7 +302,7 @@ def exit(request)->HttpResponseRedirect:
 			backup()
 			remgarbage(*paths)
 			logout(request)
-		if check_internet_connection():
+		if check_FTPconn():
 			return HttpResponseRedirect(r'https://www.google.pl/')
 		else:
-			return render(request, '500.html', {'error': ConnectionError.__doc__})
+			return render(request, '500.html', {'error': 'Occurred problem with FTP connection'})
