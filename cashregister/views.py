@@ -12,7 +12,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 import pdfkit
 
 # my functions
-from functions.archive import check_internet_connection
+from functions.archive import check_FTPconn
 from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf, make_attachment, previous_month_year
 
 # my models
@@ -232,7 +232,7 @@ class CashRegisterSendView(View):
 
 	def get(self, request, company_id:int) -> HttpResponseRedirect:
 
-		if check_internet_connection():
+		if check_FTPconn():
 			company = Company.objects.get(pk=company_id)
 
 			month, year = now().month, now().year
@@ -256,7 +256,7 @@ class CashRegisterSendView(View):
 			else:
 				messages.warning(request, r'Nothing to send...')
 		else:
-			messages.error(request, 'No internet connection...')
+			messages.error(request, 'Occurred problem with FTP connection...')
 
 		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 

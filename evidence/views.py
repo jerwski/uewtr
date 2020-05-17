@@ -23,7 +23,7 @@ from employee.models import Employee, EmployeeData
 from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 
 # my function
-from functions.archive import check_internet_connection
+from functions.archive import check_FTPconn
 from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
 from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year, workhourshtml2pdf, make_attachment
 
@@ -258,7 +258,7 @@ class SendLeavesDataPdf(View):
 				   'orientation': 'landscape','no-outline': None, 'quiet': '', }
 		pdfile = f'templates/pdf/leaves_data_{employee_id}.pdf'
 
-		if check_internet_connection():
+		if check_FTPconn():
 			pdf = pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
 
 			if pdf:
@@ -379,7 +379,7 @@ class SendMonthlyPayrollPdf(View):
 	'''class representing the view for sending monthly payroll as pdf file'''
 	def get(self, request, month:int, year:int) -> HttpResponseRedirect:
 		# convert html file (evidence/monthly_payroll_pdf.html) to pdf file
-		if check_internet_connection():
+		if check_FTPconn():
 			html = payrollhtml2pdf(month, year)
 			if html:
 				# create pdf file and save on templates/pdf/payroll_{}_{}.pdf.format(choice_date.month, choice_date.year)

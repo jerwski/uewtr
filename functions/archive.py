@@ -1,5 +1,4 @@
 # standard library
-import urllib3
 import filecmp as fc
 from ftplib import FTP
 from pathlib import Path
@@ -22,14 +21,11 @@ from employee.models import Employee
 # Create your archive functions here.
 
 
-def check_internet_connection() -> bool:
+def check_FTPconn() -> bool:
 	try:
-		http = urllib3.PoolManager()
-		req = http.request('GET', settings.FTP)
-		if req.status == 200:
-			return True
-		else:
-			return False
+		conn = FTP(settings.FTP)
+		conn.login(user=settings.FTP_USER, passwd=settings.FTP_LOGIN)
+		return True
 	except:
 		return False
 
@@ -115,7 +111,7 @@ def invoices_backup() -> bool:
 	base_name = settings.INVOICE_ZIP.expanduser()
 	backup_file = base_name.with_suffix('.zip')
 	make_archives(base_name, root_backup, backup_file)
-	if check_internet_connection():
+	if check_FTPconn():
 		with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
 			ftpdirs = list(name for name in myFTP.nlst())
 			if settings.FTP_INVOICE_DIR.name not in ftpdirs:
@@ -135,7 +131,7 @@ def invoices_backup() -> bool:
 
 def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, username:str, password:str):
 	'''sending compressed in zip format archive file with fixtures on ftp server'''
-	if check_internet_connection():
+	if check_FTPconn():
 		try:
 			with FTP(server, username, password) as myFTP:
 				print(f'\nConnected to FTP...<<{myFTP.host}>>')
@@ -172,7 +168,7 @@ def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, us
 
 def getArchiveFilefromFTP(request, server:str, username:str, password:str, archive_file, root_backup) -> bool:
 	'''loading compressed in zip format archive file with fixtures on ftp server'''
-	if check_internet_connection():
+	if check_FTPconn():
 		try:
 			with FTP(server, username, password) as myFTP:
 				myFTP.cwd(settings.FTP_BACKUP_DIR)
