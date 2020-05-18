@@ -274,7 +274,7 @@ class SendLeavesDataPdf(View):
 			else:
 				messages.warning(request, r'Nothing to send...')
 		else:
-			messages.error(request, 'No internet connection...')
+			messages.error(request, 'FTP connection failure...')
 
 		return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[employee_id]))
 
@@ -400,7 +400,7 @@ class SendMonthlyPayrollPdf(View):
 			else:
 				messages.warning(request, r'Nothing to send...')
 		else:
-			messages.error(request, 'No internet connection...')
+			messages.error(request, 'FTP connection failure...')
 
 		return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
 

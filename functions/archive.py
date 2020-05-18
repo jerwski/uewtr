@@ -163,7 +163,7 @@ def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, us
 		except ConnectionRefusedError as error:
 			print(f'\nError code: {error}')
 	else:
-		print(r'No internet connection...')
+		print(r'FTP connection failure...')
 
 
 def getArchiveFilefromFTP(request, server:str, username:str, password:str, archive_file, root_backup) -> bool:
@@ -201,7 +201,7 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
 
 			return False
 	else:
-		messages.error(request, r'No internet connection...')
+		messages.error(request, r'FTP connection failure...')
 
 
 # serialization json
