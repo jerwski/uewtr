@@ -329,12 +329,13 @@ def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 			pm, py = last.created.date().month, last.created.date().year
 
 	# create new cashregister
-	if not check:
+	if not register:
 		transfer = {'company_id': company_id,
 		            'symbol': f'RK {pm}/{py}',
 		            'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
 		CashRegister.objects.create(**transfer)
-
+		prev_date = now() - timedelta(days=now().day)
+		CashRegister.objects.filter(company_id=company_id).update(created=prev_date, updated=prev_date)
 
 	registerdata['saldo'] = saldo
 

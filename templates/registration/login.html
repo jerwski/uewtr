@@ -9,12 +9,12 @@
 
   <div class="container">
     <div class="row p-2">
-      <div class="col-8 offset-2 p-2 uk-bg-bisque">
-        <p class="text-center uk-text-large">LOGIN FORM</p>
+      <div class="col-8 offset-2 p-2 uk-bg-bisque text-center">
+        <p class="uk-text-large">LOGIN FORM</p>
         {% if request.user.is_authenticated %}
-          <p class="text-center uk-text-middle">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
+          <p class="uk-text-middle">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
         {% else %}
-          <p class="small text-center">To login please fill both fields with correct data...<br>If you are for the first time, notify the admin or create a superuser...</p>
+          <p class="uk-text-small text-primary">To login please fill both fields with correct data...<br>If you are for the first time, notify the admin or create a superuser...</p>
         {% endif %}
         <div class="form-control-lg">
           <form method="POST">{% csrf_token %}
