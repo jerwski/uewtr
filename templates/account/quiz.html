@@ -34,7 +34,7 @@
       <div class="col text-center">
         {% if quiz_id %}
           <h3 class="text-success font-weight-normal">{{ query }}</h3>
-          {% if query %}<p class="text-secondary small">Questions pool: {{ poll }}</p>{% endif %}
+          {% if query %}<p class="uk-text-small">Questions pool: {{ poll }}</p>{% endif %}
           <form action="{% url 'account:quiz' quiz_id %}" method="POST">{% csrf_token %}
             {% for answer in answers %}
               <div class="form-check custom-control custom-radio offset-4 text-left font-weight-bold">
@@ -57,7 +57,7 @@
     <div class="row">
       <div class="col text-center mt-4">
         <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/quiz/gotowork.png' %}" width="13%" alt="Exit"></a>
-        <p class="uk-text-small">Copyright UNIKOLOR Jerzy Wygonowski</p>
+        <p class="uk-text-logo">Copyright UNIKOLOR Jerzy Wygonowski</p>
       </div>
     </div>
   </div>

@@ -10,8 +10,8 @@
   {% include 'blocks/header.html' %}
   <div class="row m-3">
     <div class="col-sm-4">
-      <p class="text-center text-danger lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
-      <table class="table table-hover table-sm">
+      <p class="text-center lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
+      <table class="table table-hover table-borderless table-sm">
         <tbody>
         {% for employee in employees %}
           <tr>
@@ -55,12 +55,12 @@
             <p class="text-justify text-danger lead font-weight-normal">The sum of advances <em class="font-weight-bold">{{ advances|money_format }}</em> is greater than the income earned so far <em class="font-weight-bold">{% if salary %}{{ salary|money_format }}{% elif salary_ %}{{ salary|money_format }}{% endif %}</em>. The advance can not be paid!</p>
           {% endif %}
         {% else %}
-          <table class="table table-hover table-sm">
+          <table class="table table-borderless table-sm">
             <thead class="bg-info">
             <tr><th class="text-center text-white">TOTAL ADVANCE INFO FOR {{ worker|upper }}</th></tr>
             </thead>
           </table>
-          <table class="table table-hover table-sm">
+          <table class="table table-hover table-borderless table-sm">
             <colgroup>
               <col span="1" style="width:30%">
               <col span="1" style="width:30%">

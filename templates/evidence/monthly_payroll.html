@@ -36,7 +36,7 @@
         <hr class="small">
         <div class="col text-center">
           <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="92%"></a>
-          <p class="uk-text-small">Copyright UNIKOLOR Jerzy Wygonowski</p>
+          <p class="uk-text-logo">Copyright UNIKOLOR Jerzy Wygonowski</p>
         </div>
       </div>
       <div class="col-10">
@@ -51,7 +51,7 @@
             </div>
           </div>
 
-          <table class="table table-sm table-bordered table-striped table-hover">
+          <table class="table table-sm table-borderless table-striped table-hover">
             <thead class="text-center bg-info">
               <tr>{% for head in heads %}<th>{{ head }}</th>{% endfor %}</tr>
             </thead>
