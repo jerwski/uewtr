@@ -11,7 +11,7 @@
     <div class="row ml-3 mr-3 mt-2 uk-bg-bisque">
       <div class="col-sm-2 text-center">
         <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="58%"></a>
-        <p class="uk-text-small">Copyright UNIKOLOR Jerzy Wygonowski</p>
+        <p class="uk-text-logo">Copyright UNIKOLOR Jerzy Wygonowski</p>
       </div>
       <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
         <p class="uk-text-large">Working Time Recorder</p>
@@ -24,9 +24,9 @@
     </div>
     <div class="row ml-3 mr-3 mb-2 uk-bg-bisque">
       <div class="col-3">
-        <p class="text-center text-danger lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">EMPLOYED WORKERS</a></p>
+        <p class="text-center lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">EMPLOYED WORKERS</a></p>
 
-        <table class="table table-sm table-hover">
+        <table class="table table-sm table-hover table-borderless">
           <colgroup>
             <col span="1" style="width:5%">
             <col span="1" style="width:95%">
@@ -65,7 +65,7 @@
               <div class="btn-sm" role="group">
                 <button id="btnGroupDropHolidays" type="button" class="btn btn-outline-danger btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Holidays in {{ choice_date|date:'Y' }} year </button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDropHolidays">
-                  <table class="table table-sm table-hover">
+                  <table class="table table-sm table-hover table-borderless">
                     <tbody>
                     {% for key, value in holidays.items %}
                       <tr class="font-weight-light font-italic"><td class="text-right text-danger" width="55%">{{ key }}:</td><td class="text-left text-dark">{{ value|date:'d-m-Y (D)' }}</td></tr>
@@ -81,7 +81,7 @@
         {% if not workerdata.end_contract or workerdata.end_contract.year >= year and workerdata.end_contract.month >= month %}
           {% if rate %}
             <p class="text-center lead font-weight-normal bg-info">Kind of leave in {{ choice_date|date:'F Y' }}</p>
-            <table class="table table-sm">
+            <table class="table table-sm table-borderless">
               <tbody class="text-center font-weight-normal">
                 <tr>
                 {% for key,value in month_leaves.items %}
@@ -114,7 +114,7 @@
               </tbody>
             </table>
             <p class="text-center lead font-weight-normal bg-info">All of leave in {{ choice_date|date:'Y' }} year</p>
-            <table class="table table-sm">
+            <table class="table table-sm table-borderless">
               <tbody>
                 <tr>
                 {% for key,value in year_leaves.items %}
@@ -126,7 +126,7 @@
 
             <p class="text-center lead font-weight-normal bg-info">Total payment data for {{ choice_date|date:'F Y' }}&nbsp;&nbsp;&nbsp;RATE: <em class="text-white font-weight-bold">{{ rate|floatformat:2 }} PLN/h</em></p>
 
-            <table class="table table-hover table-sm">
+            <table class="table table-hover table-borderless table-sm">
               <tbody>
                 <tr>
                   <td class="text-right">Total hours:</td><td class="text-danger font-weight-bold"><a data-toggle="tooltip" data-html="true" title='<p class="text-justify">The total number of working hours is the sum of all hours worked in a given month, including Saturdays, Sundays and holidays but without days marked as paid vacation.</p>'>{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</a></td>
@@ -172,7 +172,7 @@
         </div>
       </div>
       <div class="col-3 text-center">
-        <p class="text-center text-danger lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'evidence:workhours_print' employee_id month year %}">Working days for {{ choice_date|date:'m/Y' }}</a></p>
+        <p class="lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'evidence:workhours_print' employee_id month year %}">Working days for {{ choice_date|date:'m/Y' }}</a></p>
         {% if work_hours %}
           <div class="row text-primary font-weight-bold font-italic">
             <div class="col-6">
@@ -191,7 +191,7 @@
               <a class="btn btn-outline-light" href="/admin/">Admin</a>
             </div>
           </div>
-          <table class="table table-hover table-sm" style="width:100%">
+          <table class="table table-hover table-borderless table-sm" style="width:100%">
             <colgroup>
               <col span="1" style="width:4%">
               <col span="1" style="width:49%">
@@ -210,7 +210,7 @@
             </thead>
           </table>
           <div class="uk-table-scroll-md">
-            <table class="table table-hover table-sm" style="width:100%">
+            <table class="table table-hover table-borderless table-sm" style="width:100%">
                 <colgroup>
                 <col span="1" style="width:4%">
                 <col span="1" style="width:49%">

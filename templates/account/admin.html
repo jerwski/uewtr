@@ -7,7 +7,7 @@
   <div class="jumbotron text-center">
     {% include 'blocks/drive_usage_modal.html' %}
     <p class="uk-text-middle">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
-    <p class="text-secondary font-italic lead">Feci, quod potui, faciant meliora potentes...</p>
+    <p class="uk-text-small">Feci, quod potui, faciant meliora potentes...</p>
   </div>
 {% endblock %}
 
@@ -58,7 +58,7 @@
     <div class="row mt-1">
       <div class="col text-center">
         <a href="{% url 'account:quiz' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor"></a>
-        <p class="uk-text-small">Copyright UNIKOLOR Jerzy Wygonowski</p>
+        <p class="uk-text-logo">Copyright UNIKOLOR Jerzy Wygonowski</p>
         <p>{% include 'blocks/start_message.html' %}</p>
       </div>
     </div>

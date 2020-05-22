@@ -12,7 +12,7 @@
   <div class="row m-3">
     <div class="col-sm-3">
       <p class="text-center text-danger lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
-      <table class="table table-hover table-sm">
+      <table class="table table-hover table-borderless table-sm">
         <tbody>
         {% for employee in employees %}
           <tr>
@@ -101,12 +101,12 @@
         {% endif %}
         <div class="row p-sm-1">
           <div class="col-md-12">
-            <table class="table table-hover table-sm p-2">
+            <table class="table table-borderless table-hover table-sm p-2">
               <thead class="bg-info">
               <tr><th>TOTAL PAYMENT FOR:</th><th class="text-white">{{ worker }}</th><th class="text-right" width="8%">RATE:</th><th class="text-white" width="18%">{{ rate|floatformat:2 }} PLN/h</th><th width="10%">HOURS:</th><th class="text-white" width="10%">{{ total_hours|floatformat:2 }}</th></tr>
               </thead>
             </table>
-            <table class="table table-hover table-sm">
+            <table class="table table-hover table-borderless table-sm">
               <tbody>
               <tr><td class="text-right">Total hours:</td><td class="text-danger font-weight-bold">{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</td><td class="text-right">Brutto income:</td><td class="text-danger font-weight-bold">{{ brutto|money_format }}</td></tr>
               <tr><td class="text-right">Basic payment (100%):</td><td class="text-danger font-weight-bold">{{ basicpay|money_format }}</td><td class="text-right">Leave payment (100%):</td><td class="text-danger font-weight-bold">{{ leavepay|money_format }}</td></tr>
