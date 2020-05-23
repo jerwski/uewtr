@@ -25,7 +25,7 @@ from account.forms import UserCreateForm
 
 # my function
 from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset, dirdata, previous_month_year
-from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_FTPconn, invoices_backup, cmpserializefile
+from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_FTPconn, invoices_backup, cmp_fixtures
 
 
 # Create your views here.
@@ -63,7 +63,7 @@ class AdminView(View):
 				if employee.filter(status=True):
 					employee_id = employee.filter(status=True).first().id
 				else:
-					empxqloyee_id =employee.first().id
+					empxqloyee_id = employee.first().id
 				context.update({'employee_id': employee_id, 'nodata': False})
 			else:
 				backup = settings.ARCHIVE_ROOT
@@ -80,18 +80,21 @@ class AdminView(View):
 			if socket.gethostname() == settings.SERIALIZE_HOST:
 				context.__setitem__('serialize', True)
 
-			if  cmpserializefile():
+			if cmp_fixtures():
 				context.__setitem__('compare', True)
 
 			if check_FTPconn():
 				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-					myFTP.cwd(settings.FTP_SERIALIZE)
-					files = myFTP.nlst()
+					try:
+						myFTP.cwd(settings.FTP_SERIALIZE)
+						files = myFTP.nlst()
 
-					if files:
-						context.__setitem__('ftp_files', True)
-					else:
-						print(f'There aren\'t new fixtures on FTP...')
+						if files:
+							context.__setitem__('ftp_files', True)
+						else:
+							print(f'There aren\'t new fixtures on FTP...')
+					except:
+						context.__setitem__('ftp_files', False)
 			else:
 				print(r'Occurred problem with FTP connection...')
 
@@ -115,16 +118,21 @@ class RestoreDataBase(View):
 class SerializeView(View):
 	'''class to serializng database'''
 	def get(self, request)->HttpResponseRedirect:
-		mkfixture(settings.ADMIN_SERIALIZE)
-		messages.info(request, f'\nAll database have been serializing....')
-
 		if check_FTPconn():
 			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-				myFTP.cwd(settings.FTP_SERIALIZE)
-				for file in list(Path.iterdir(settings.ADMIN_SERIALIZE)):
+				try:
+					myFTP.cwd(settings.FTP_SERIALIZE)
+				except:
+					myFTP.mkd(settings.FTP_SERIALIZE)
+					myFTP.cwd(settings.FTP_SERIALIZE)
+
+				for file in list(Path.iterdir(settings.TEMP_SERIALIZE)):
 					with file.open('rb') as fixture:
 						myFTP.storbinary(f'STOR {file.name}', fixture)
 						print(f'\nFile <<{file.name}>> was sent to the FTP directory <<{settings.FTP_SERIALIZE}>>')
+					file.unlink()
+			Path.rmdir(settings.TEMP_SERIALIZE)
+
 		else:
 			print(r'Occurred problem with FTP connection...')
 
@@ -135,13 +143,16 @@ class DeserializeView(View):
 	'''class to deserializng database'''
 	def get(self, request)->HttpResponseRedirect:
 
+		if not Path.exists(settings.ADMIN_SERIALIZE):
+			Path.mkdir(settings.ADMIN_SERIALIZE)
+
 		if check_FTPconn():
 			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
 				myFTP.cwd(settings.FTP_SERIALIZE)
 				for file in myFTP.nlst():
 					myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
 					myFTP.delete(file)
-					print(f'\nFile <<{file}>> is safe in <<{settings.FTP_SERIALIZE}>>')
+					print(f'\nFile <<{file}>> is safe in <<{settings.ADMIN_SERIALIZE}>>')
 		else:
 			print(r'Occurred problem with FTP connection...')
 
@@ -280,8 +291,8 @@ def exit(request)->HttpResponseRedirect:
 
 	if socket.gethostname() in settings.OFFICE_HOSTS:
 		backup()
-		mkfixture(settings.ROOT_BACKUP)
-		make_archives(settings.ARCHIVE_NAME, settings.ROOT_BACKUP, settings.ARCHIVE_FILE)
+		mkfixture(settings.ADMIN_SERIALIZE)
+		make_archives(settings.ARCHIVE_NAME, settings.ADMIN_SERIALIZE, settings.ARCHIVE_FILE)
 		remgarbage(*paths)
 
 		try:

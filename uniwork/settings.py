@@ -178,10 +178,10 @@ ADMIN_EMAIL = get_setting('ADMIN_EMAIL')
 
 # archives and invoices paths
 ARCH_DIR = Path(get_setting('arch_dir'))
-ROOT_BACKUP = Path(get_setting('root_backup'))
 ARCHIVE_ROOT = Path(get_setting('archive_root'))
 ARCHIVE_FILE = Path(get_setting('archive_file'))
 ARCHIVE_NAME = Path(get_setting('archive_name'))
+ROOT_BACKUP = Path(get_setting('root_backup'))
 INVOICE_ZIP = Path(get_setting('invoice_zip'))
 INVOICE_BACKUP = Path(get_setting('invoice_backup'))
 FTP_INVOICE_DIR = Path(get_setting('ftp_invoice_dir'))

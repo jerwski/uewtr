@@ -13,9 +13,10 @@
           </div>
           <div class="modal-body">
             {% for key, value in usage.items %}
-              <div class="row">
-                <div class="col mb-3 text-center">
-                  <p class="uk-text-middle">Drive {{ key }} total={{ value.total }} used={{ value.used }} free={{ value.free }}</p>
+              <div class="container text-center">
+                <div class="d-block">
+                  <p class="uk-text-middle">Drive {{ key }}</p>
+                  <p class="uk-text-small">total={{ value.total }}<br>used={{ value.used }}<br>free={{ value.free }}</p>
                   <div class="progress">
                     <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ value.percent|floatformat:2 }}%" aria-valuenow="{{ value.used }}" aria-valuemin="0" aria-valuemax="{{ value.total }}">{{ value.percent|floatformat:2 }}%</div>
                   </div>
