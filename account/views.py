@@ -109,6 +109,7 @@ class RestoreDataBase(View):
 		try:
 			call_command('loaddata', settings.ARCHIVE_ROOT)
 			messages.info(request, f'Database have been restored...\n')
+
 		except FileNotFoundError as error:
 			messages.error(request, f'Backup file <<{settings.ARCHIVE_ROOT}>> doesn\'t exist... => Error code: {error}')
 
