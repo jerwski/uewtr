@@ -1,7 +1,6 @@
 # standard library
 import shutil
 import hashlib
-import filecmp as fc
 from ftplib import FTP
 from pathlib import Path
 from collections import deque
@@ -25,7 +24,9 @@ from employee.models import Employee
 def fcsum(path:Path):
 	h = hashlib.sha256()
 
+
 	with open(path, 'rb') as file:
+
 		while True:
 			chunk = file.read(h.block_size)
 			if not chunk:
