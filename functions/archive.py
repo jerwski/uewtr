@@ -1,17 +1,18 @@
 # standard library
+import shutil
+import hashlib
 import filecmp as fc
 from ftplib import FTP
 from pathlib import Path
 from collections import deque
-from shutil import make_archive, unpack_archive
 
 # django core
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.utils.timezone import now
+from django.core.serializers import serialize
 from django.core.management import call_command
-from django.core.serializers import serialize, BadSerializer
 
 
 # my models
@@ -19,6 +20,18 @@ from employee.models import Employee
 
 
 # Create your archive functions here.
+
+
+def fcsum(path:Path):
+	h = hashlib.sha256()
+
+	with open(path, 'rb') as file:
+		while True:
+			chunk = file.read(h.block_size)
+			if not chunk:
+				break
+			h.update(chunk)
+		return h.hexdigest()
 
 
 def check_FTPconn() -> bool:
@@ -30,30 +43,39 @@ def check_FTPconn() -> bool:
 		return False
 
 
-def cmpserializefile():
-	try:
-		if list(settings.ADMIN_SERIALIZE.iterdir()):
-			Path.mkdir(settings.TEMP_SERIALIZE)
-			mkfixture(settings.TEMP_SERIALIZE)
-			result = fc.dircmp(settings.ADMIN_SERIALIZE, settings.TEMP_SERIALIZE)
+def cmp_fixtures():
+	paths = [settings.ADMIN_SERIALIZE, settings.TEMP_SERIALIZE]
+	for path in paths:
+		if not Path.exists(path):
+			Path.mkdir(path)
 
-			if result.diff_files:
+	try:
+		mkfixture(settings.TEMP_SERIALIZE)
+		old_files = list(settings.ADMIN_SERIALIZE.iterdir())
+		new_files = list(settings.TEMP_SERIALIZE.iterdir())
+
+		if old_files:
+			all_files = list(zip(old_files, new_files))
+
+			for file in all_files:
+				if fcsum(file[0]) == fcsum(file[1]):
+					file[1].unlink()
+				else:
+					shutil.copy(file[1], settings.ADMIN_SERIALIZE)
+
+			if list(settings.TEMP_SERIALIZE.iterdir()):
 				return True
 			else:
+				Path.rmdir(settings.TEMP_SERIALIZE)
 				return False
 		else:
-			return True
+			for file in new_files:
+				shutil.copy(file, settings.ADMIN_SERIALIZE)
+			return  True
 
-	except FileNotFoundError as error:
-		print(f'No files in {settings.TEMP_SERIALIZE} directory...')
-
-	finally:
-		if Path.exists(settings.TEMP_SERIALIZE):
-			for file in settings.TEMP_SERIALIZE.iterdir():
-				file.unlink()
-			Path.rmdir(settings.TEMP_SERIALIZE)
-		else:
-			pass
+	except:
+		print(f'The {settings.ADMIN_SERIALIZE} directory is empty...')
+		return False
 
 
 def backup():
@@ -67,13 +89,16 @@ def backup():
 			print(f'Something wrong... Error: {error}')
 
 
-def mkfixture(root_backup:Path):
+def mkfixture(path:Path):
 	'''create fixtures in json format'''
 	try:
+		if not Path.exists(path):
+			Path.mkdir(path)
+
 		for app in settings.FIXTURES_APPS:
 			models = apps.all_models[app]
 			for name, model in models.items():
-				with Path.cwd().joinpath(f'{root_backup}/{name}').with_suffix('.json').open('w') as fixture:
+				with Path.cwd().joinpath(f'{path}/{name}').with_suffix('.json').open('w') as fixture:
 					serialize('json', model.objects.all(), indent=4, stream=fixture)
 	except:
 		print(f'Serialization error...')
@@ -81,6 +106,7 @@ def mkfixture(root_backup:Path):
 
 
 def readfixture(request, root_backup:Path):
+	'''load data from fixtures'''
 	files = deque(file for file in root_backup.iterdir() if file.name.startswith('employee'))
 	files.extend(file for file in root_backup.iterdir() if file.name.startswith('company'))
 	files.extend(file for file in root_backup.iterdir() if not file.name.startswith('employee') and not file.name.startswith('company'))
@@ -96,7 +122,7 @@ def make_archives(archive_name, root_backup, archive_file):
 	'''create compressed in zip format archive file with fixtures'''
 	if list(Path.iterdir(root_backup)):
 		try:
-			make_archive(archive_name, 'zip', root_backup)
+			shutil.make_archive(archive_name, 'zip', root_backup)
 			print(f'The archive <<{archive_file.name}>> has been packaged...')
 		except FileNotFoundError as error:
 			print(f'Archiving has failed => Error code: {error}')
@@ -170,6 +196,8 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
 	'''loading compressed in zip format archive file with fixtures on ftp server'''
 	if check_FTPconn():
 		try:
+			if not Path.exists(root_backup):
+				Path.mkdir(root_backup)
 			with FTP(server, username, password) as myFTP:
 				myFTP.cwd(settings.FTP_BACKUP_DIR)
 				if Path.is_file(archive_file):
@@ -177,10 +205,10 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
 						archive_file.unlink()
 						myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
 						messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
-						unpack_archive(archive_file, settings.ROOT_BACKUP, 'zip')
+						shutil.unpack_archive(archive_file, root_backup, 'zip')
 						messages.info(request, 'The archive has been unpacked...')
 						print(f'\n{"*"*22}\nStart read fixtures...\n{"*"*42}')
-						readfixture(request, settings.ROOT_BACKUP)
+						readfixture(request, root_backup)
 						print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
 						messages.info(request, f'\nDatabase is up to date...')
 					else:
@@ -188,10 +216,10 @@ def getArchiveFilefromFTP(request, server:str, username:str, password:str, archi
 				else:
 					myFTP.retrbinary(f'RETR {archive_file.name}', open(archive_file, 'wb').write)
 					messages.info(request, f'\nArchive <<{archive_file.name}>> successfully imported...')
-					unpack_archive(archive_file, root_backup, 'zip')
+					shutil.unpack_archive(archive_file, root_backup, 'zip')
 					messages.info(request, 'The archive has been added and unpacked...')
 					print(f'\n{"*"*22}\nStart read fixtures...\n{"*"*42}')
-					readfixture(request, settings.ROOT_BACKUP)
+					readfixture(request, root_backup)
 					print(f'{"*"*42}\nFinish read fixtures...\n{"*"*22}\n')
 
 				return True
@@ -234,5 +262,6 @@ def archiving_of_deleted_records(employee_id):
 		with path.open('w', encoding='utf-8') as file:
 			serialize('json', all_records, indent=4, stream=file)
 
-	except BadSerializer as error:
-		print(f'Serialization error: {error}')
+	except:
+		print(f'Serialization error...')
+		pass
