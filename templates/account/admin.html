@@ -4,10 +4,12 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block header %}
-  <div class="jumbotron text-center">
-    {% include 'blocks/drive_usage_modal.html' %}
-    <p class="uk-text-middle">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
-    <p class="uk-text-small">Feci, quod potui, faciant meliora potentes...</p>
+  <div class="container mt-5 mb-5">
+    <div class="d-block text-center">
+      {% include 'blocks/drive_usage_modal.html' %}
+      <p class="uk-text-middle">Welcome {{ user }}</p>
+      <p class="uk-text-small">Feci, quod potui, faciant meliora potentes...</p>
+    </div>
   </div>
 {% endblock %}
 
@@ -55,10 +57,10 @@
         </div>
       </div>
     </div>
-    <div class="row mt-1">
-      <div class="col text-center">
+    <div class="container">
+      <div class="d-block text-center mt-5">
         <a href="{% url 'account:quiz' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor"></a>
-        <p class="uk-text-logo">Copyright UNIKOLOR Jerzy Wygonowski</p>
+        <p class="uk-text-logo">&copy; Copyright UNIKOLOR Jerzy Wygonowski</p>
         <p>{% include 'blocks/start_message.html' %}</p>
       </div>
     </div>
