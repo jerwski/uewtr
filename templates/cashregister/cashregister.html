@@ -107,7 +107,7 @@
                 <col span="1" style="width:25%">
               </colgroup>
               <thead class="text-center">
-              <tr class="font-weight-bold small">
+              <tr class="uk-text-small">
                 <th class="text-primary">Z przeniesienia</th>
                 <th class="text-success">Przychód</th>
                 <th class="text-danger">Rozchód</th>
@@ -172,7 +172,7 @@
               {% for record in records %}
                 <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"
                     {% else %}class="text-secondary font-weight-bold font-italic"{% endif %}>
-                  <td>{{ forloop.counter }}</td>
+                  <td>{{ forloop.revcounter }}</td>
                   <td>{{ record.created|date:'d-m-Y' }}</td>
                   <td>{{ record.symbol }}</td>
                   <td>{{ record.contents }}</td>

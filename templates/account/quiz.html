@@ -9,56 +9,75 @@
 
 {% block content %}
 
-  <div class="container-fluid">
-    <div class="jumbotron text-center">
-      <h2 class="uk-text-large">Latin sentences</h2>
-      <p class="uk-text-middle">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
-      <div class="btn btn-group mb-2">
-        <a class="btn btn-outline-danger" href="{% url 'account:exit' %}">Exit</a>
-        {% include 'blocks/latina_auxilium_modal.html' %}
-        <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
-        <a class="btn btn-outline-info" href="{% url 'login' %}">Reset</a>
-        {% if request.user.is_authenticated %}
-          <a href="{% url 'logout' %}" class="btn btn-md btn-outline-primary">Logout</a>
-        {% endif %}
-      </div>
-      {% if set_of_questions %}
-        <h3 class="text-dark">Query number: <em class="text-danger font-weight-bold">{{ set_of_questions }}</em>&nbsp;&nbsp;&nbsp;Your points: <em class="text-success font-weight-bold">{{ points }}</em>&nbsp;&nbsp;&nbsp;Percent of good answers: <em class="text-primary font-weight-bold">{{ percent|floatformat:0 }}%</em>&nbsp;&nbsp;&nbsp;Your time: <em class="text-info font-weight-bold">{{ playtime }}</em></h3>
-      {% else %}
-        <div class="text-center mt-5">
-          <p class="uk-text-middle">Please select **Start the quiz** button...</p>
+  <div class="container">
+
+    <div class="row">
+      <div class="col-lg text-center">
+        <p class="uk-text-large">&reg;UNIKOLOR QUIZ</p>
+        <p class="uk-text-middle">Latin sentences</p>
+        <div class="btn btn-group mb-5">
+          <a class="btn btn-outline-danger" href="{% url 'account:exit' %}">Exit</a>
+          {% include 'blocks/latina_auxilium_modal.html' %}
+          <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+          <a class="btn btn-outline-info" href="{% url 'login' %}">Reset</a>
+          {% if request.user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="btn btn-md btn-outline-primary">Logout</a>
+          {% endif %}
         </div>
-      {% endif %}
-    </div>
-    <div class="row">
-      <div class="col text-center">
-        {% if quiz_id %}
-          <h3 class="text-success font-weight-normal">{{ query }}</h3>
-          {% if query %}<p class="uk-text-small">Questions pool: {{ poll }}</p>{% endif %}
-          <form action="{% url 'account:quiz' quiz_id %}" method="POST">{% csrf_token %}
-            {% for answer in answers %}
-              <div class="form-check custom-control custom-radio offset-4 text-left font-weight-bold">
-                <input type="radio" id="answer_{{ forloop.counter }}" name="your_answer" class="custom-control-input" value="{{ answer }}" required>
-                <label class="custom-control-label text-primary" for="answer_{{ forloop.counter }}">{{ answer }}</label>
-              </div>
-            {% endfor %}
-            <div class="col-6 btn mt-2">
-              {% if query %}
-                <button type="submit" class="btn btn-success mr-5">Confirm the selection</button>
-                <a class="btn btn-primary ml-5" href="{% url 'account:quiz' quiz_id %}">Next query...</a>
-              {% else %}
-                <a class="btn btn-lg btn-primary" href="{% url 'account:quiz' quiz_id %}">Start the quiz</a>
-              {% endif %}
-            </div>
-          </form>
+        {% if set_of_questions %}
+          <h3 class="text-dark">Query number: <em class="text-danger font-weight-bold">{{ set_of_questions }}</em>&nbsp;&nbsp;&nbsp;Your points: <em class="text-success font-weight-bold">{{ points }}</em>&nbsp;&nbsp;&nbsp;Percent of good answers: <em class="text-primary font-weight-bold">{{ percent|floatformat:0 }}%</em>&nbsp;&nbsp;&nbsp;Your time: <em class="text-info font-weight-bold">{{ playtime }}</em></h3>
+        {% else %}
+          <div class="text-center mt-5">
+            <p class="uk-text-middle">Please select **Start the quiz** button...</p>
+          </div>
         {% endif %}
       </div>
     </div>
+
     <div class="row">
-      <div class="col text-center mt-4">
-        <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/quiz/gotowork.png' %}" width="13%" alt="Exit"></a>
-        <p class="uk-text-logo">&copy; Copyright UNIKOLOR Jerzy Wygonowski</p>
+      <div class="col-lg text-center">
+        {% if quiz_id %}
+          <div class="container-fluid uk-bg-bisque">
+            {% if query %}
+              <span class="uk-text-small text-danger pt-5">Questions pool: {{ poll }}</span>
+            {% endif %}
+            <p class="uk-quiz-question">{{ query }}</p>
+          </div>
+          <div class="container">
+            <div class="col-lg text-center">
+              <form action="{% url 'account:quiz' quiz_id %}" method="POST">{% csrf_token %}
+                {% for answer in answers %}
+                  <div class="form-check custom-control custom-radio text-primary font-weight-bold">
+                    <div class="text-left offset-4">
+                      <input type="radio" id="answer_{{ forloop.counter }}" name="your_answer" class="custom-control-input" value="{{ answer }}" required>
+                        <label class="custom-control-label" for="answer_{{ forloop.counter }}">{{ answer }}</label>
+                    </div>
+                  </div>
+                {% endfor %}
+                <div class="container">
+                  <div class="pt-3">
+                    {% if query %}
+                      <button type="submit" class="btn btn-success mr-5">Confirm the selection</button>
+                      <a class="btn btn-light ml-5" href="{% url 'account:quiz' quiz_id %}">Next query...</a>
+                    {% else %}
+                      <a class="btn btn-lg btn-primary" href="{% url 'account:quiz' quiz_id %}">Start the quiz</a>
+                    {% endif %}
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        {% endif %}
       </div>
+    </div>
+
+    <div class="container">
+        <div class="text-center mt-5">
+          <a href="{% url 'account:admin_site' %}">
+            <img class="d-block mx-auto" src="{% static 'images/quiz/gotowork.png' %}" width="25%" alt="Logo Unikolor">
+            <span class="d-block uk-text-logo">&copy; Copyright UNIKOLOR Jerzy Wygonowski</span>
+          </a>
+        </div>
     </div>
   </div>
 
