@@ -256,7 +256,7 @@ class CashRegisterSendView(View):
 			else:
 				messages.warning(request, r'Nothing to send...')
 		else:
-			messages.error(request, 'Occurred problem with FTP connection...')
+			messages.error(request, 'Occurred problem with internet connection...')
 
 		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 

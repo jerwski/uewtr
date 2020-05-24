@@ -86,9 +86,7 @@ class AdminView(View):
 			if check_FTPconn():
 				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
 					try:
-						myFTP.cwd(settings.FTP_SERIALIZE)
-						files = myFTP.nlst()
-
+						files = [name for name, facts in myFTP.mlsd(settings.FTP_SERIALIZE) if facts['type']=='file']
 						if files:
 							context.__setitem__('ftp_files', True)
 						else:
@@ -120,13 +118,13 @@ class SerializeView(View):
 	'''class to serializng database'''
 	def get(self, request)->HttpResponseRedirect:
 		if check_FTPconn():
+			root = Path(settings.FTP_SERIALIZE)
 			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-				try:
-					myFTP.cwd(settings.FTP_SERIALIZE)
-				except:
+				dirs = (item[0] for item in myFTP.mlsd(path=root.parent))
+				if root.name not in dirs:
 					myFTP.mkd(settings.FTP_SERIALIZE)
-					myFTP.cwd(settings.FTP_SERIALIZE)
 
+				myFTP.cwd(settings.FTP_SERIALIZE)
 				for file in list(Path.iterdir(settings.TEMP_SERIALIZE)):
 					with file.open('rb') as fixture:
 						myFTP.storbinary(f'STOR {file.name}', fixture)
@@ -149,8 +147,8 @@ class DeserializeView(View):
 
 		if check_FTPconn():
 			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-				myFTP.cwd(settings.FTP_SERIALIZE)
-				for file in myFTP.nlst():
+				files = (name for name, facts in myFTP.mlsd(settings.FTP_SERIALIZE) if facts['type']=='file')
+				for file in files:
 					myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
 					myFTP.delete(file)
 					print(f'\nFile <<{file}>> is safe in <<{settings.ADMIN_SERIALIZE}>>')
