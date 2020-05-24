@@ -22,15 +22,17 @@ from employee.models import Employee
 
 
 def fcsum(path):
-	h = hashlib.sha256()
+	fh = hashlib.sha256()
 
 	with open(path, 'rb') as file:
 		while True:
-			chunk = file.read(h.block_size)
+			chunk = file.read(fh.block_size)
 			if not chunk:
 				break
-			h.update(chunk)
-		return h.hexdigest()
+			fh.update(chunk)
+		result = fh.hexdigest()
+
+		return result
 
 
 def check_FTPconn() -> bool:
@@ -138,13 +140,13 @@ def invoices_backup() -> bool:
 	make_archives(base_name, root_backup, backup_file)
 	if check_FTPconn():
 		with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-			ftpdirs = list(name for name in myFTP.nlst())
+			ftpdirs = (name for name, facts in myFTP.mlsd())
+			files = (name for name, facts in myFTP.mlsd(settings.FTP_INVOICE_DIR) if facts['type']=='file')
 			if settings.FTP_INVOICE_DIR.name not in ftpdirs:
 				return True
 			else:
-				myFTP.cwd(settings.FTP_INVOICE_DIR.name)
-				if settings.FTP_INVOICE_FILE.name in myFTP.nlst():
-					if myFTP.size(backup_file.name) != backup_file.stat().st_size:
+				if settings.FTP_INVOICE_FILE.name in ftpdirs and backup_file.name in files:
+					if myFTP.size(f'{settings.FTP_INVOICE_DIR}/{backup_file.name}') != backup_file.stat().st_size:
 						return True
 					else:
 						return False
@@ -157,46 +159,33 @@ def invoices_backup() -> bool:
 def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, username:str, password:str):
 	'''sending compressed in zip format archive file with fixtures on ftp server'''
 	if check_FTPconn():
-		try:
-			with FTP(server, username, password) as myFTP:
-				print(f'\nConnected to FTP...<<{myFTP.host}>>')
-				ftpdirs = list(name for name in myFTP.nlst())
+		with FTP(server, username, password) as myFTP:
+			print(f'\nConnected to FTP...<<{myFTP.host}>>')
+			ftpdirs = (item for item, facts in myFTP.mlsd() if facts['type']=='dir')
 
-				if destinationDirectory not in ftpdirs:
-					print(f'\nDestination directory <<{destinationDirectory}>> does not exist...\nCreating a target catalog...')
-					try:
-						myFTP.mkd(destinationDirectory)
-						print(f'Destination directory <<{destinationDirectory}>> has been created...')
-						myFTP.cwd(destinationDirectory)
-						if Path.is_file(sourceFilePath):
-							with sourceFilePath.open('rb') as file:
-								myFTP.storbinary(f'STOR {sourceFilePath.name}', file)
-								print(f'\nThe <<{sourceFilePath.name}>> file has been sent to the directory <<{destinationDirectory}>>\n')
-						else:
-							print('\nNo source file...')
-					except ConnectionRefusedError as error:
-						print(f'\nError code: {error}')
-				else:
-					try:
-						myFTP.cwd(destinationDirectory)
-						if Path.is_file(sourceFilePath):
-							with sourceFilePath.open('rb') as file:
-								myFTP.storbinary(f'STOR {sourceFilePath.name}', file)
-								print(f'\nFile <<{sourceFilePath.name}>> was sent to the FTP directory <<{destinationDirectory}>>\n')
-					except ConnectionRefusedError as error:
-						print(f'\nError code: {error}')
-		except ConnectionRefusedError as error:
-			print(f'\nError code: {error}')
+			if destinationDirectory not in ftpdirs:
+				print(f'\nDestination directory <<{destinationDirectory}>> does not exist...\nCreating a target catalog...')
+				myFTP.mkd(destinationDirectory)
+				print(f'Destination directory <<{destinationDirectory}>> has been created...')
+
+			myFTP.cwd(destinationDirectory)
+			if Path.is_file(sourceFilePath):
+				with sourceFilePath.open('rb') as file:
+					myFTP.storbinary(f'STOR {sourceFilePath.name}', file)
+					print(f'\nThe <<{sourceFilePath.name}>> file has been sending to the directory <<{destinationDirectory}>>\n')
+			else:
+				print('\nNo source file...')
+
 	else:
-		print(r'FTP connection failure...')
+		print(r'Occurred problem with FTP connection...')
 
 
 def getArchiveFilefromFTP(request, server:str, username:str, password:str, archive_file, root_backup) -> bool:
 	'''loading compressed in zip format archive file with fixtures on ftp server'''
 	if check_FTPconn():
+		if not Path.exists(root_backup):
+			Path.mkdir(root_backup)
 		try:
-			if not Path.exists(root_backup):
-				Path.mkdir(root_backup)
 			with FTP(server, username, password) as myFTP:
 				myFTP.cwd(settings.FTP_BACKUP_DIR)
 				if Path.is_file(archive_file):
