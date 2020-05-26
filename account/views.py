@@ -63,7 +63,7 @@ class AdminView(View):
 				if employee.filter(status=True):
 					employee_id = employee.filter(status=True).first().id
 				else:
-					empxqloyee_id = employee.first().id
+					employee_id = employee.first().id
 				context.update({'employee_id': employee_id, 'nodata': False})
 			else:
 				backup = settings.ARCHIVE_ROOT
@@ -80,8 +80,8 @@ class AdminView(View):
 			if socket.gethostname() == settings.SERIALIZE_HOST:
 				context.__setitem__('serialize', True)
 
-			if cmp_fixtures():
-				context.__setitem__('compare', True)
+				if cmp_fixtures():
+					context.__setitem__('compare', True)
 
 			if check_FTPconn():
 				try:
