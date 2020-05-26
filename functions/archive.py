@@ -139,19 +139,22 @@ def invoices_backup() -> bool:
 	backup_file = base_name.with_suffix('.zip')
 	make_archives(base_name, root_backup, backup_file)
 	if check_FTPconn():
-		with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-			ftpdirs = (name for name, facts in myFTP.mlsd())
-			files = (name for name, facts in myFTP.mlsd(settings.FTP_INVOICE_DIR) if facts['type']=='file')
-			if settings.FTP_INVOICE_DIR.name not in ftpdirs:
-				return True
-			else:
-				if settings.FTP_INVOICE_FILE.name in ftpdirs and backup_file.name in files:
-					if myFTP.size(f'{settings.FTP_INVOICE_DIR}/{backup_file.name}') != backup_file.stat().st_size:
-						return True
-					else:
-						return False
-				else:
+		try:
+			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+				ftpdirs = (name for name, facts in myFTP.mlsd())
+				files = (name for name, facts in myFTP.mlsd(settings.FTP_INVOICE_DIR) if facts['type']=='file')
+				if settings.FTP_INVOICE_DIR.name not in ftpdirs:
 					return True
+				else:
+					if settings.FTP_INVOICE_FILE.name in ftpdirs and backup_file.name in files:
+						if myFTP.size(f'{settings.FTP_INVOICE_DIR}/{backup_file.name}') != backup_file.stat().st_size:
+							return True
+						else:
+							return False
+					else:
+						return True
+		except:
+			print(f'Occurred problem with FTP connection...')
 	else:
 		return False
 
@@ -159,22 +162,25 @@ def invoices_backup() -> bool:
 def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, username:str, password:str):
 	'''sending compressed in zip format archive file with fixtures on ftp server'''
 	if check_FTPconn():
-		with FTP(server, username, password) as myFTP:
-			print(f'\nConnected to FTP...<<{myFTP.host}>>')
-			ftpdirs = (item for item, facts in myFTP.mlsd() if facts['type']=='dir')
+		try:
+			with FTP(server, username, password) as myFTP:
+				print(f'\nConnected to FTP...<<{myFTP.host}>>')
+				ftpdirs = (item for item, facts in myFTP.mlsd() if facts['type']=='dir')
 
-			if destinationDirectory not in ftpdirs:
-				print(f'\nDestination directory <<{destinationDirectory}>> does not exist...\nCreating a target catalog...')
-				myFTP.mkd(destinationDirectory)
-				print(f'Destination directory <<{destinationDirectory}>> has been created...')
+				if destinationDirectory not in ftpdirs:
+					print(f'\nDestination directory <<{destinationDirectory}>> does not exist...\nCreating a target catalog...')
+					myFTP.mkd(destinationDirectory)
+					print(f'Destination directory <<{destinationDirectory}>> has been created...')
 
-			myFTP.cwd(destinationDirectory)
-			if Path.is_file(sourceFilePath):
-				with sourceFilePath.open('rb') as file:
-					myFTP.storbinary(f'STOR {sourceFilePath.name}', file)
-					print(f'\nThe <<{sourceFilePath.name}>> file has been sending to the directory <<{destinationDirectory}>>\n')
-			else:
-				print('\nNo source file...')
+				myFTP.cwd(destinationDirectory)
+				if Path.is_file(sourceFilePath):
+					with sourceFilePath.open('rb') as file:
+						myFTP.storbinary(f'STOR {sourceFilePath.name}', file)
+						print(f'\nThe <<{sourceFilePath.name}>> file has been sending to the directory <<{destinationDirectory}>>\n')
+				else:
+					print('\nNo source file...')
+		except:
+			print(f'Occurred problem with FTP connection... Directory: {destinationDirectory}')
 
 	else:
 		print(r'Occurred problem with FTP connection...')

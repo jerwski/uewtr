@@ -84,15 +84,18 @@ class AdminView(View):
 				context.__setitem__('compare', True)
 
 			if check_FTPconn():
-				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-					try:
-						files = [name for name, facts in myFTP.mlsd(settings.FTP_SERIALIZE) if facts['type']=='file']
-						if files:
-							context.__setitem__('ftp_files', True)
-						else:
-							print(f'There aren\'t new fixtures on FTP...')
-					except:
-						context.__setitem__('ftp_files', False)
+				try:
+					with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+						try:
+							files = [name for name, facts in myFTP.mlsd(settings.FTP_SERIALIZE) if facts['type']=='file']
+							if files:
+								context.__setitem__('ftp_files', True)
+							else:
+								print(f'There aren\'t new fixtures on FTP...')
+						except:
+							context.__setitem__('ftp_files', False)
+				except:
+					print(f'Occurred problem with FTP connection... Directory: {settings.FTP_SERIALIZE}')
 			else:
 				print(r'Occurred problem with FTP connection...')
 
@@ -119,18 +122,21 @@ class SerializeView(View):
 	def get(self, request)->HttpResponseRedirect:
 		if check_FTPconn():
 			root = Path(settings.FTP_SERIALIZE)
-			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-				dirs = (item[0] for item in myFTP.mlsd(path=root.parent))
-				if root.name not in dirs:
-					myFTP.mkd(settings.FTP_SERIALIZE)
+			try:
+				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+					dirs = (item[0] for item in myFTP.mlsd(path=root.parent))
+					if root.name not in dirs:
+						myFTP.mkd(settings.FTP_SERIALIZE)
 
-				myFTP.cwd(settings.FTP_SERIALIZE)
-				for file in list(Path.iterdir(settings.TEMP_SERIALIZE)):
-					with file.open('rb') as fixture:
-						myFTP.storbinary(f'STOR {file.name}', fixture)
-						print(f'\nFile <<{file.name}>> was sent to the FTP directory <<{settings.FTP_SERIALIZE}>>')
-					file.unlink()
-			Path.rmdir(settings.TEMP_SERIALIZE)
+					myFTP.cwd(settings.FTP_SERIALIZE)
+					for file in list(Path.iterdir(settings.TEMP_SERIALIZE)):
+						with file.open('rb') as fixture:
+							myFTP.storbinary(f'STOR {file.name}', fixture)
+							print(f'\nFile <<{file.name}>> was sent to the FTP directory <<{settings.FTP_SERIALIZE}>>')
+						file.unlink()
+				Path.rmdir(settings.TEMP_SERIALIZE)
+			except:
+				print(f'Occurred problem with FTP connection. Directory: {settings.FTP_SERIALIZE}')
 
 		else:
 			print(r'Occurred problem with FTP connection...')
@@ -146,12 +152,16 @@ class DeserializeView(View):
 			Path.mkdir(settings.ADMIN_SERIALIZE)
 
 		if check_FTPconn():
-			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-				files = (name for name, facts in myFTP.mlsd(settings.FTP_SERIALIZE) if facts['type']=='file')
-				for file in files:
-					myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
-					myFTP.delete(file)
-					print(f'\nFile <<{file}>> is safe in <<{settings.ADMIN_SERIALIZE}>>')
+			try:
+				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
+					files = (name for name, facts in myFTP.mlsd(settings.FTP_SERIALIZE) if facts['type']=='file')
+					FTP.cwd(settings.FTP_SERIALIZE)
+					for file in files:
+						myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
+						myFTP.delete(file)
+						print(f'\nFile <<{file}>> is safe in <<{settings.ADMIN_SERIALIZE}>>')
+			except:
+				print(f'There aren\'t files in {settings.FTP_SERIALIZE}')
 		else:
 			print(r'Occurred problem with FTP connection...')
 
