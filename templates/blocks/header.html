@@ -2,9 +2,11 @@
 
 
 <div class="row mt-2">
-  <div class="col-2 mt-1 text-center">
-    <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="92%"></a>
-    <p class="uk-text-logo text-center">&copy; Copyright:<br>UNIKOLOR Jerzy Wygonowski</p>
+  <div class="col-2 text-center">
+    <a href="{% url 'account:admin_site' %}">
+      <img class="d-block mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor" width="95%">
+      <span class="d-block uk-text-logo">&copy; Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
+    </a>
   </div>
   <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
     <p class="uk-text-large">Working Time Recorder</p>
