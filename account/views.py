@@ -154,8 +154,8 @@ class DeserializeView(View):
 		if check_FTPconn():
 			try:
 				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-					files = (name for name, facts in myFTP.mlsd(settings.FTP_SERIALIZE) if facts['type']=='file')
 					myFTP.cwd(settings.FTP_SERIALIZE)
+					files = (name for name, facts in myFTP.mlsd() if facts['type']=='file')
 					for file in files:
 						myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
 						myFTP.delete(file)
