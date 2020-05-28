@@ -25,7 +25,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # my function
 from functions.archive import check_FTPconn
 from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
-from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year, workhourshtml2pdf, make_attachment
+from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year, workhourshtml2pdf, make_attachment, accountpaymenthtml2pdf
 
 
 # Create your views here.
@@ -426,8 +426,8 @@ class AccountPaymentView(View):
 		employees = q1 | q2
 
 		# seting context
-		context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees,
-				   'salary': salary, 'salary_': salary_, 'earlier_date': initial['account_date']}
+		context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees, 'year': year,
+		           'salary': salary, 'salary_': salary_, 'earlier_date': initial['account_date'], 'month': month}
 
 		# check out total account
 		query = Q(worker=worker) & Q(account_date__year=year) & Q(account_date__month=month)
@@ -454,23 +454,23 @@ class AccountPaymentView(View):
 
 	def post(self, request, employee_id:int) -> render:
 		form = AccountPaymentForm(data=request.POST)
+		month, year = now().month, now().year
 		worker = Employee.objects.get(pk=employee_id)
-		context = {'form': form, 'employee_id': employee_id, 'worker': worker}
+		context = {'form': form, 'employee_id': employee_id, 'worker': worker, 'month': month, 'year': year}
 
 		if form.is_valid():
 			form.save(commit=False)
 			data = form.cleaned_data
 			account_date, account_value = data['account_date'], data['account_value']
-			month, year = account_date.month, account_date.year
 			context.update({'account_date': account_date, 'account_value': account_value})
 
 			# check if the total of advances is not greater than the income earned
-			salary = total_payment(employee_id, year, month)
+			salary = total_payment(employee_id, account_date.year, account_date.month)
 			salary = round(salary['brutto'], 2)
 
 			# set list of valid employees
 			queryset = Employee.objects.all()
-			month_, year_ = previous_month_year(now().month, now().year)
+			month_, year_ = previous_month_year(month, year)
 
 			q1 = queryset.filter(status=1)
 			q2 = queryset.filter(employeedata__end_contract__year__gte=year_, employeedata__end_contract__month__gte=month_)
@@ -480,7 +480,7 @@ class AccountPaymentView(View):
 			context.update({'salary': salary, 'employees': employees, 'earlier_date': 'account_date'})
 
 			# check out advances
-			query = Q(worker=worker) & Q(account_date__year=year) & Q(account_date__month=month)
+			query = Q(worker=worker) & Q(account_date__year=account_date.year) & Q(account_date__month=account_date.month)
 			advances = AccountPayment.objects.filter(query).aggregate(ap=Sum('account_value'))
 
 			if advances['ap'] is None:
@@ -516,6 +516,25 @@ class AccountPaymentEraseView(View):
 		return HttpResponseRedirect(reverse('evidence:account_payment', args=[employee_id]))
 
 
+class AccountPaymentPrintView(View):
+	'''class representing the view of account payment print'''
+	def get(self, request, employee_id:int, month:int, year:int):
+		'''send a statement of advances as a pdf attachment to the browser'''
+
+		html = accountpaymenthtml2pdf(employee_id, month, year)
+
+		if html:
+			# create pdf file
+			filename = f'accountpayment_{employee_id}_{month}_{year}.pdf'
+			response = make_attachment(html, filename)
+
+			return response
+		else:
+			messages.warning(request, r'Nothing to print...')
+
+		return HttpResponseRedirect(reverse('evidence:account_payment', args=[employee_id]))
+
+
 class EmployeeCurrentComplexDataView(View):
 	'''class representing employee complex data view'''
 	def get(self, request, employee_id:int, month=None, year=None) -> render:
@@ -530,7 +549,7 @@ class EmployeeCurrentComplexDataView(View):
 		work_hours = WorkEvidence.objects.filter(worker_id=employee_id, start_work__year=year, start_work__month=month)
 		holidays = holiday(year)
 		leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
-        # selected month leaves = aml
+		# selected month leaves = sml
 		sml = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
 		year_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year)
 		month_leaves = {kind:sml.filter(leave_flag=kind).count() for kind in leave_kind}
@@ -559,7 +578,7 @@ class EmployeeCurrentComplexDataView(View):
 		if form.is_valid():
 			leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
 			holidays = holiday(year)
-            # selected month leaves = aml
+			# selected month leaves = sml
 			sml = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
 			year_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year)
 			month_leaves = {kind:sml.filter(leave_flag=kind).count() for kind in leave_kind}

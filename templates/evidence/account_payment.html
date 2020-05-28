@@ -70,8 +70,8 @@
             <tbody>
             <tr class="text-info text-right font-weight-bold">
               <td>Preiod:</td>
-              <td>{{ earlier_date|date:'F Y' }}</td>
-              <td>{% now 'F Y' %}</td>
+              <td><a href="{% url 'evidence:advances_print' employee_id earlier_date.month earlier_date.year %}">{{ earlier_date|date:'F Y' }}</a></td>
+              <td><a href="{% url 'evidence:advances_print' employee_id month year %}">{% now 'F Y' %}</a></td>
               <td>&nbsp;</td>
             </tr>
             <tr class="text-right">

@@ -266,6 +266,31 @@ def workhourshtml2pdf(employee_id:int, month:int, year:int) -> bool:
 		return False
 
 
+def accountpaymenthtml2pdf(employee_id:int, month:int, year:int) -> bool:
+	'''convert html statement of advances to pdf'''
+	worker = Employee.objects.get(pk=employee_id)
+	context = {'worker': worker, 'month': month, 'year': year}
+
+	if worker:
+		query = Q(worker=worker) & Q(account_date__year=year) & Q(account_date__month=month)
+		advances = AccountPayment.objects.filter(query)
+		context.update({'advances': advances})
+
+		if advances:
+			total_account = advances.aggregate(ta=Sum('account_value'))
+			total_account = total_account['ta']
+			context.update({'total_account': total_account})
+
+		template = get_template(r'evidence/advances_pdf.html')
+		html = template.render(context)
+
+		return html
+
+	else:
+		return False
+
+
+
 def tree(directory:Path):
 	'''listing whole tree for passed directory as instance of class WindowsPath'''
 	print(f'+ {directory}')
