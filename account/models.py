@@ -16,3 +16,6 @@ class Quiz(models.Model):
     start_play = models.DateTimeField(null=True,)
     end_play = models.DateTimeField(null=True,)
     points = models.SmallIntegerField(null=True,)
+
+    def __str__(self):
+        return f'Welcome {self.player}'

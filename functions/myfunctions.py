@@ -276,11 +276,13 @@ def accountpaymenthtml2pdf(employee_id:int, month:int, year:int) -> bool:
 		advances = AccountPayment.objects.filter(query)
 		context.update({'advances': advances})
 
-		if advances:
+		if advances is None:
+			total_account = 0
+		else:
 			total_account = advances.aggregate(ta=Sum('account_value'))
 			total_account = total_account['ta']
-			context.update({'total_account': total_account})
 
+		context.update({'total_account': total_account})
 		template = get_template(r'evidence/advances_pdf.html')
 		html = template.render(context)
 
@@ -288,7 +290,6 @@ def accountpaymenthtml2pdf(employee_id:int, month:int, year:int) -> bool:
 
 	else:
 		return False
-
 
 
 def tree(directory:Path):
