@@ -26,7 +26,7 @@
       </div>
 
       <div class="col-7">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">{{ employee|upper }} - CHANGE EXTENDED DATA</p>
+        <p class="text-center text-danger lead font-weight-normal bg-warning">{{ worker|upper }} - CHANGE EXTENDED DATA</p>
 
         <form action="{% url 'employee:employee_extendeddata' employee_id %}" method="POST">{% csrf_token %}
           <div class="row">

@@ -146,7 +146,7 @@ class EmployeeExtendedDataView(View):
 		else:
 			form = EmployeeExtendedDataForm(initial={'worker': worker})
 
-		context = {'form': form, 'employee_id': employee_id, 'employees': employees, 'employee': worker}
+		context = {'form': form, 'employee_id': employee_id, 'employees': employees, 'worker': worker}
 
 		return render(request, 'employee/employee_extendeddata.html', context)
 
