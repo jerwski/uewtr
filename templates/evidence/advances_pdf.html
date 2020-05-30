@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load utility_tags %}
+
+{% block title %}Advances for {{ worker }} on {{ month }}/{{ year }}{% endblock %}
+
+{% block content %}
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <p class="text-info lead text-center font-weight-bold">{{ worker|capfirst }} PESEL: {{ worker.pesel }}</p>
+        <p class="text-primary lead text-center font-weight-bold bg-warning">Zestawienie wypłaconych zaliczek za miesiąc:&nbsp;{% if month == 1 %}Styczeń{% elif month == 2 %}Luty{% elif month == 3 %}Marzec{% elif month == 4 %}Kwiecień{% elif month == 5 %}Maj{% elif month == 6 %}Czerwiec{% elif month == 7 %}Lipiec{% elif month == 8 %}Sierpień{% elif month == 9 %}Wrzesień{% elif month == 10 %}Październik{% elif month == 11 %}Listopad{% elif month == 12 %}Grudzień{% endif %}&nbsp;{{ year }}&nbsp;rok.</p>
+
+        <table class="table table-sm table-bordered table-striped font-weight-light" style="width:100%">
+          <colgroup>
+            <col span="1" style="width:6%">
+            <col span="1" style="width:26%">
+            <col span="1" style="width:18%">
+            <col span="1" style="width:50%">
+          </colgroup>
+          <thead>
+            <tr class="text-dark text-center">
+              <th>Nr</th>
+              <th>Data zaliczki</th>
+              <th class="text-right">Kwota zaliczki</th>
+              <th>Powód wypłacenia zaliczki</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for advance in advances %}
+              <tr>
+                <td class="text-right text-secondary">{{ forloop.counter }}</td>
+                <td class="text-right">{{ advance.account_date|date:'l, jS F Y' }}</td>
+                <td class="text-right text-info font-weight-bold">{{ advance.account_value|money_format }}</td>
+                <td class="text-center text-success">{{ advance.notice }}</td>
+              </tr>
+            {% endfor %}
+              <tr class="text-primary font-weight-bold text-right">
+                <td colspan="2">Suma zaliczek:</td>
+                <td>{{ total_account|money_format }}</td>
+              </tr>
+          </tbody>
+        </table>
+        <p class="uk-text-small text-sm-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

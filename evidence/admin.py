@@ -76,4 +76,14 @@ class AccountPaymentAdmin(admin.ModelAdmin):
     list_display = ('worker','account_date', 'account_value', 'notice')
     list_filter = ('worker', 'account_date')
     ordering = ('worker', '-account_date')
-    actions = [export_as_json]
+    actions = [export_as_json, 'aggregate']
+
+    def aggregate(self, request, queryset):
+        agg = 0
+        for obj in queryset:
+            agg += obj.account_value
+
+        msg = f'The sum of account payment for the selected records is: {agg:,.2f} PLN'
+        messages.success(request, msg)
+
+    aggregate.short_description = 'Sum of account payment for the selected records'

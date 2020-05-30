@@ -1,5 +1,11 @@
+# standard library
+import datetime
+
 # django core
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
 
 # my models
 from employee.models import Employee
@@ -10,15 +16,20 @@ from employee.models import Employee
 
 class WorkEvidence(models.Model):
     worker = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    start_work = models.DateTimeField(blank=True,)
-    end_work = models.DateTimeField(blank=True,)
-    jobhours = models.FloatField(blank=True,)
+    start_work = models.DateTimeField()
+    end_work = models.DateTimeField()
+    jobhours = models.FloatField()
 
     class Meta:
         ordering = ['worker', '-start_work']
 
     def __str__(self):
         return f'{self.worker}'
+
+    def clean(self):
+        # Check the start-work and end-work date is less or equal from today.
+        if self.start_work.date() > datetime.date.today() or self.end_work.date() > datetime.date.today():
+            raise ValidationError(_('The start-work and end-work date have to be less or equal from today'))
 
 
 class EmployeeLeave(models.Model):
@@ -36,7 +47,7 @@ class EmployeeLeave(models.Model):
 class AccountPayment(models.Model):
     worker = models.ForeignKey(Employee, on_delete=models.CASCADE)
     account_date = models.DateField()
-    account_value = models.FloatField(default=50.00,)
+    account_value = models.FloatField()
     notice = models.TextField()
 
     class Meta:
@@ -44,3 +55,8 @@ class AccountPayment(models.Model):
 
     def __str__(self):
         return f'{self.worker}'
+
+    def clean(self):
+        # Don't allow value is less than 10.00 PLN.
+        if self.account_value < 10.0:
+            raise ValidationError(_('The value provided is less than 10.00 PLN'))

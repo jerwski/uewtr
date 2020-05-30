@@ -49,7 +49,6 @@ def cmp_fixtures():
 	for path in paths:
 		if not Path.exists(path):
 			Path.mkdir(path)
-
 	try:
 		mkfixture(settings.TEMP_SERIALIZE)
 		old_files = list(settings.ADMIN_SERIALIZE.iterdir())
