@@ -12,13 +12,17 @@
     <div class="col-sm-4">
       <p class="text-center lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
       <table class="table table-hover table-borderless table-sm">
+        <colgroup>
+          <col span="1" style="width:5%">
+          <col span="1" style="width:95%">
+        </colgroup>
         <tbody>
         {% for employee in employees %}
           <tr>
             {% if employee_id == employee.id %}
-              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
+              <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
             {% else %}
-              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
+              <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
             {% endif %}
           </tr>
         {% endfor %}
@@ -26,82 +30,91 @@
       </table>
     </div>
     <div class="col-sm-8">
-      {% if salary or salary_ %}
-        <p class="text-center text-danger lead font-weight-normal bg-warning">ADVANCE FOR: {{ worker|upper }}</p>
+      {% if worker.status %}
+        {% if salary or prevsalary %}
+          <p class="text-center text-danger lead font-weight-normal bg-warning">ADVANCE FOR: {{ worker|upper }}</p>
 
-        <form action="{% url 'evidence:account_payment' employee_id %}" method="POST">{% csrf_token %}
-          <div class="row">
-            <div class="col-6">
-              {% bootstrap_field form.worker size='medium' %}
-              {% bootstrap_field form.account_date size='medium' label_class='text-primary font-weight-bold' %}
+          <form action="{% url 'evidence:account_payment' employee_id %}" method="POST">{% csrf_token %}
+            <div class="row">
+              <div class="col-6">
+                {% bootstrap_field form.worker size='medium' %}
+                {% bootstrap_field form.account_date size='medium' label_class='text-primary font-weight-bold' %}
+              </div>
+              <div class="col-6">
+                {% bootstrap_field form.account_value size='medium' label_class='text-primary font-weight-bold' placeholder='The account should be min. 10 PLN' %}
+              </div>
             </div>
-            <div class="col-6">
-              {% bootstrap_field form.account_value size='medium' label_class='text-primary font-weight-bold' placeholder='The account should be min. 10 PLN' %}
+            {% bootstrap_field form.notice size='medium' label_class='text-primary font-weight-bold' placeholder='Please indicate the circumstances of the down payment...' %}
+            <div class="btn-sm mb-2">
+              <button type="submit" class="btn btn-outline-success btn-block">Confirm the down payment</button>
             </div>
-          </div>
-          {% bootstrap_field form.notice size='medium' label_class='text-primary font-weight-bold' placeholder='Please indicate the circumstances of the down payment...' %}
-          <div class="btn-sm mb-2">
-            <button type="submit" class="btn btn-outline-success btn-block">Confirm the down payment</button>
-          </div>
-        </form>
+          </form>
 
-        {% if request.POST %}
-          {% if salary >= advances %}
-            <p class="text-justify text-danger lead font-weight-normal">Granted an advance payment of: <em class="font-weight-bold">{{ account_value|money_format }}</em></p>
-            <div class="btn-sm mb-lg-4">
-              <a href="{% url 'evidence:account_recorder_erase' employee_id account_date account_value %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase the down payment ({{ account_value|money_format }})</em></a>
-            </div>
+          {% if request.POST %}
+            {% if salary >= advances %}
+              <p class="text-center uk-text-middle">Granted an advance payment of: <span class="text-danger">{{ account_value|money_format }}</span></p>
+              <div class="btn-sm mb-lg-4">
+                <a href="{% url 'evidence:account_recorder_erase' employee_id account_date account_value %}" class="btn btn-sm btn-danger btn-block"><span class="font-weight-bold blink">Erase the down payment ({{ account_value|money_format }})</span></a>
+              </div>
+            {% else %}
+              <p class="text-center uk-text-middle">The sum of advances <span class="text-danger">{{ advances|money_format }}</span> is greater than the income earned so far <span class="text-danger">{{ salary|money_format }}</span>. The advance can't be paid!</p>
+            {% endif %}
           {% else %}
-            <p class="text-justify text-danger lead font-weight-normal">The sum of advances <em class="font-weight-bold">{{ advances|money_format }}</em> is greater than the income earned so far <em class="font-weight-bold">{% if salary %}{{ salary|money_format }}{% elif salary_ %}{{ salary|money_format }}{% endif %}</em>. The advance can not be paid!</p>
+            <table class="table table-borderless table-sm">
+              <thead class="bg-info">
+              <tr><th class="text-center text-white">TOTAL ADVANCE INFO FOR {{ worker|upper }}</th></tr>
+              </thead>
+            </table>
+            <table class="table table-hover table-borderless table-sm">
+              <colgroup>
+                <col span="1" style="width:30%">
+                <col span="1" style="width:30%">
+                <col span="1" style="width:30%">
+                <col span="1" style="width:10%">
+              </colgroup>
+              <tbody>
+              <tr class="text-info text-right font-weight-bold">
+                <td>Preiod:</td>
+                <td><a class="text-info" {% if prevloan %}href="{% url 'evidence:advances_print' employee_id earlier_date.month earlier_date.year %}"{% endif %}>{{ earlier_date|date:'F Y' }}</a></td>
+                <td><a class="text-info" {% if currloan %}href="{% url 'evidence:advances_print' employee_id month year %}"{% endif %}>{% now 'F Y' %}</a></td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr class="text-right">
+                <td class="text-right">Total advance:</td>
+                <td class="text-danger font-weight-bold">{{ prevloan|money_format }}</td>
+                <td class="text-danger font-weight-bold">{{ currloan|money_format }}</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr class="text-right">
+                <td class="text-right">Brutto income:</td>
+                <td class="text-danger font-weight-bold">{{ prevsalary|money_format }}</td>
+                <td class="text-danger font-weight-bold">{{ salary|money_format }}</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr class="text-white text-right font-weight-bold bg-info">
+                <td>Left to be paid out:</td>
+                <td>{{ prevsaldo|money_format }}</td>
+                <td>{{ saldo|money_format }}</td>
+                <td>&nbsp;</td>
+              </tr>
+              </tbody>
+            </table>
           {% endif %}
-        {% else %}
-          <table class="table table-borderless table-sm">
-            <thead class="bg-info">
-            <tr><th class="text-center text-white">TOTAL ADVANCE INFO FOR {{ worker|upper }}</th></tr>
-            </thead>
-          </table>
-          <table class="table table-hover table-borderless table-sm">
-            <colgroup>
-              <col span="1" style="width:30%">
-              <col span="1" style="width:30%">
-              <col span="1" style="width:30%">
-              <col span="1" style="width:10%">
-            </colgroup>
-            <tbody>
-            <tr class="text-info text-right font-weight-bold">
-              <td>Preiod:</td>
-              <td><a href="{% url 'evidence:advances_print' employee_id earlier_date.month earlier_date.year %}">{{ earlier_date|date:'F Y' }}</a></td>
-              <td><a href="{% url 'evidence:advances_print' employee_id month year %}">{% now 'F Y' %}</a></td>
-              <td>&nbsp;</td>
-            </tr>
-            <tr class="text-right">
-              <td class="text-right">Total advance:</td>
-              <td class="text-danger font-weight-bold">{{ total_account_|money_format }}</td>
-              <td class="text-danger font-weight-bold">{{ total_account|money_format }}</td>
-              <td>&nbsp;</td>
-            </tr>
-            <tr class="text-right">
-              <td class="text-right">Brutto income:</td>
-              <td class="text-danger font-weight-bold">{{ salary_|money_format }}</td>
-              <td class="text-danger font-weight-bold">{{ salary|money_format }}</td>
-              <td>&nbsp;</td>
-            </tr>
-            <tr class="text-primary text-right font-weight-bold">
-              <td>Left to be paid out:</td>
-              <td>{{ left_|money_format }}</td>
-              <td>{{ left|money_format }}</td>
-              <td>&nbsp;</td>
-            </tr>
-            </tbody>
-          </table>
+          <div class="btn-sm mb-2">
+            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
+          </div>
         {% endif %}
       {% else %}
-        <p class="text-center text-danger lead font-weight-normal bg-warning">NO DOWN PAYMENT WAS GRANTED</p>
-        <p class="text-justify text-danger lead font-weight-normal">You can't add any advance for <em class="font-weight-bold">{{ worker }}</em> because the employee haven't any income or sum of advance is grower them income.</p>
+        <p class="text-center text-danger lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' employee_id %}">EMPLOYEE IS DEACTIVATED</a></p>
+          <div class="row text-center">
+            <div class="col-1"></div>
+            <div class="col-9 btn-sm mb-2">
+              <p class="uk-text-middle">You can't add any advances for <span class="text-danger">{{ worker }}</span> because the employee is no longer employed or deactivated.</p>
+              <a href="{% url 'employee:employee_basicdata' employee_id %}" class="btn btn-outline-info btn-block blink">Activate Employee</a>
+            </div>
+            <div class="col-1"></div>
+          </div>
       {% endif %}
-      <div class="btn-sm mb-2">
-        <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
-      </div>
     </div>
   </div>
 </div>

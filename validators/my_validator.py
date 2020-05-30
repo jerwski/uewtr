@@ -5,7 +5,9 @@ from django.core.exceptions import ValidationError
 # Create your validators here
 
 
-contents_variants = ('z przeniesienia', 'Z przeniesienia', 'Z Przeniesienia', 'Z PRZENIESIENIA', 'z Przeniesienia')
+contents_variants = ('z przeniesienia', 'Z przeniesienia',
+                     'Z Przeniesienia', 'Z PRZENIESIENIA',
+                     'z Przeniesienia', 'z PRZENIESIENIA')
 
 def check_pesel(digit:str):
     if len(digit) != 11:

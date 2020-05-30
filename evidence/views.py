@@ -414,41 +414,41 @@ class AccountPaymentView(View):
 		worker = initial['worker']
 		salary = total_payment(employee_id, year, month)
 		salary = salary['brutto']
-		month_, year_ = initial['account_date'].month, initial['account_date'].year
-		salary_ = total_payment(employee_id, year_, month_)
-		salary_ = salary_['brutto']
+		prevmonth, prevyear = initial['account_date'].month, initial['account_date'].year
+		prevsalary = total_payment(employee_id, prevyear, prevmonth)
+		prevsalary = prevsalary['brutto']
 
 		# set list of valid employees
 		queryset = Employee.objects.all().order_by('surname', 'forename')
 
 		q1 = queryset.filter(status=1)
-		q2 = queryset.filter(employeedata__end_contract__year__gte=year_, employeedata__end_contract__month__gte=month_)
+		q2 = queryset.filter(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
 		employees = q1 | q2
 
 		# seting context
 		context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees, 'year': year,
-		           'salary': salary, 'salary_': salary_, 'earlier_date': initial['account_date'], 'month': month}
+		           'salary': salary, 'prevsalary': prevsalary, 'earlier_date': initial['account_date'], 'month': month}
 
-		# check out total account
-		query = Q(worker=worker) & Q(account_date__year=year) & Q(account_date__month=month)
-		total_account = AccountPayment.objects.filter(query)
-		query_ = Q(worker=worker) & Q(account_date__year=year_) & Q(account_date__month=month_)
-		total_account_ = AccountPayment.objects.filter(query_)
+		# check out loans, currloan = current loan, prevloan = previous loan
+		current_query = Q(worker=worker) & Q(account_date__year=year) & Q(account_date__month=month)
+		currloan = AccountPayment.objects.filter(current_query)
+		previous_query = Q(worker=worker) & Q(account_date__year=prevyear) & Q(account_date__month=prevmonth)
+		prevloan = AccountPayment.objects.filter(previous_query)
 
-		if total_account.exists():
-			total_account = total_account.aggregate(ta=Sum('account_value'))
-			total_account = total_account['ta']
+		if currloan.exists():
+			currloan = currloan.aggregate(ta=Sum('account_value'))
+			currloan = currloan['ta']
 		else:
-			total_account = 0
+			currloan = 0
 
-		if total_account_.exists():
-			total_account_ = total_account_.aggregate(ta_=Sum('account_value'))
-			total_account_ = total_account_['ta_']
+		if prevloan.exists():
+			prevloan = prevloan.aggregate(ta_=Sum('account_value'))
+			prevloan = prevloan['ta_']
 		else:
-			total_account_ = 0
+			prevloan = 0
 
-		left, left_ = salary - total_account, salary_ - total_account_
-		context.update({'total_account': total_account, 'total_account_': total_account_, 'left': left, 'left_': left_})
+		saldo, prevsaldo = salary - currloan, prevsalary - prevloan
+		context.update({'currloan': currloan, 'prevloan': prevloan, 'saldo': saldo, 'prevsaldo': prevsaldo})
 
 		return render(request, 'evidence/account_payment.html', context)
 
@@ -470,10 +470,10 @@ class AccountPaymentView(View):
 
 			# set list of valid employees
 			queryset = Employee.objects.all()
-			month_, year_ = previous_month_year(month, year)
+			prevmonth, prevyear = previous_month_year(month, year)
 
 			q1 = queryset.filter(status=1)
-			q2 = queryset.filter(employeedata__end_contract__year__gte=year_, employeedata__end_contract__month__gte=month_)
+			q2 = queryset.filter(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
 			employees = q1 | q2
 
 			# updating context
@@ -537,60 +537,69 @@ class AccountPaymentPrintView(View):
 
 class EmployeeCurrentComplexDataView(View):
 	'''class representing employee complex data view'''
-	def get(self, request, employee_id:int, month=None, year=None) -> render:
-		if month == None or year == None:
-			month, year = now().month, now().year
 
-		choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
-		form = PeriodCurrentComplexDataForm(initial={'choice_date': choice_date})
-		workerdata=EmployeeData.objects.get(worker_id=employee_id)
-		end_contract = Q(employeedata__end_contract__year__gte=year, employeedata__end_contract__month__gte=month) | Q(employeedata__end_contract__isnull=True)
-		employees = Employee.objects.filter(end_contract).order_by('surname', 'forename')
-		work_hours = WorkEvidence.objects.filter(worker_id=employee_id, start_work__year=year, start_work__month=month)
-		holidays = holiday(year)
+	def setup(self, request, **kwargs):
+		super().setup(request, **kwargs)
+		self.request, self.kwargs = request, kwargs
+		self.employee_id = self.kwargs['employee_id']
+		self.worker = Employee.objects.get(pk=self.employee_id)
+
+		if self.request.method == 'GET':
+			self.month, self.year = self.kwargs['month'], self.kwargs['year']
+			self.choice_date = datetime.strptime(f'{self.month}/{self.year}','%m/%Y')
+
+		elif self.request.method == 'POST':
+			self.choice_date = datetime.strptime(self.request.POST['choice_date'],'%m/%Y')
+			self.month, self.year = self.choice_date.month, self.choice_date.year
+
+		if self.month == 12:
+			self.cut_off_month, self.cut_off_year = 1, self.year + 1
+		else:
+			self.cut_off_month, self.cut_off_year = self.month + 1, self.year
+
+		self.cut_off_date = datetime.strptime(f'{self.cut_off_month}/{self.cut_off_year}','%m/%Y')
+		q1 = Q(employeedata__start_contract__lt=self.cut_off_date)
+		q2 = Q(employeedata__end_contract__gte=self.choice_date) | Q(employeedata__end_contract__isnull=True)
+		self.employees = Employee.objects.filter(q1 & q2).order_by('surname', 'forename')
+		query = Q(worker=self.worker, start_work__year=self.year, start_work__month=self.month)
+		self.work_hours = WorkEvidence.objects.filter(query)
+		self.holidays = holiday(self.year)
+		self.year_leaves = EmployeeLeave.objects.filter(worker=self.worker, leave_date__year=self.year)
+		self.sml = EmployeeLeave.objects.filter(worker=self.worker, leave_date__year=self.year, leave_date__month=self.month)
+
+
+	def get(self, request, **kwargs) -> render:
+		form = PeriodCurrentComplexDataForm(initial={'choice_date': self.choice_date})
 		leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
-		# selected month leaves = sml
-		sml = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
-		year_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year)
-		month_leaves = {kind:sml.filter(leave_flag=kind).count() for kind in leave_kind}
-		year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
-		context = {'form': form, 'employee_id': employee_id, 'choice_date': choice_date, 'month': month,
-                   'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
-                   'year': year, 'holidays' : holidays, 'sml': sml.order_by('leave_date'),
-                   'work_hours': work_hours.order_by('start_work'), 'workerdata': workerdata}
-		employee_total_data(employee_id, year, month, context)
+		month_leaves = {kind:self.sml.filter(leave_flag=kind).count() for kind in leave_kind}
+		year_leaves = {kind:self.year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
+		context = {'form': form, 'employee_id': self.employee_id, 'choice_date': self.choice_date,
+		           'employees': self.employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
+		           'month': self.month, 'year': self.year, 'holidays' : self.holidays, 'worker': self.worker,
+		           'sml': self.sml.order_by('leave_date'), 'work_hours': self.work_hours.order_by('start_work')}
+		employee_total_data(self.employee_id, self.year, self.month, context)
 		# data for modal chart
-		context.__setitem__('total_brutto_set', data_modal_chart(employee_id))
+		context.__setitem__('total_brutto_set', data_modal_chart(self.employee_id))
 
 		return render(request, r'evidence/current_complex_evidence_data.html', context)
 
-	def post(self, request, employee_id:int) -> render:
-		choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
-		month, year = choice_date.month, choice_date.year
-		form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
-		workerdata = EmployeeData.objects.get(worker_id=employee_id)
-		end_contract = Q(employeedata__end_contract__year__gte=year, employeedata__end_contract__month__gte=month) | Q(employeedata__end_contract__isnull=True)
-		employees = Employee.objects.filter(end_contract).order_by('surname', 'forename')
-		work_hours = WorkEvidence.objects.filter(worker_id=employee_id, start_work__year=year, start_work__month=month)
+	def post(self, request, **kwargs) -> render:
+		form = PeriodCurrentComplexDataForm(data={'choice_date':self.choice_date})
 		# data for modal chart
-		context = {'total_brutto_set': data_modal_chart(employee_id)}
+		context = {'total_brutto_set': data_modal_chart(self.employee_id)}
 
 		if form.is_valid():
 			leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
-			holidays = holiday(year)
-			# selected month leaves = sml
-			sml = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year, leave_date__month=month)
-			year_leaves = EmployeeLeave.objects.filter(worker_id=employee_id, leave_date__year=year)
-			month_leaves = {kind:sml.filter(leave_flag=kind).count() for kind in leave_kind}
-			year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
-			context.update({'form': form, 'employee_id': employee_id, 'choice_date': choice_date, 'month': month,
-                            'employees': employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
-                            'year': year, 'holidays' : holidays, 'sml': sml.order_by('leave_date'),
-							'work_hours': work_hours.order_by('start_work'), 'workerdata': workerdata})
-			employee_total_data(employee_id, year, month, context)
+			month_leaves = {kind:self.sml.filter(leave_flag=kind).count() for kind in leave_kind}
+			year_leaves = {kind:self.year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
+			context.update({'form': form, 'employee_id': self.employee_id, 'choice_date': self.choice_date,
+			                'employees': self.employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
+			                'month': self.month, 'year': self.year, 'holidays' : self.holidays, 'worker': self.worker,
+			                'sml': self.sml.order_by('leave_date'), 'work_hours': self.work_hours.order_by('start_work')})
+			employee_total_data(self.employee_id, self.year, self.month, context)
 
 		else:
-			context.update({'form': form, 'employee_id': employee_id, 'employees': employees, 'workerdata': workerdata})
+			context.update({'form': form, 'employee_id': self.employee_id, 'employees': self.employees, 'worker': self.worker})
 
 		return render(request, r'evidence/current_complex_evidence_data.html', context)
 
