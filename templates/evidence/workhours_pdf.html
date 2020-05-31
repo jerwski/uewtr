@@ -49,7 +49,9 @@
         {% if leave_data %}
           <p class="text-danger lead">Nieobecność w pracy: <a class="text-monospace, text-dark">{% for item in leave_data %}{{ item|date:'d-m-Y' }}, {% endfor %}</a> </p>
         {% endif %}
-        <p class="uk-text-small text-sm-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+        <div class="col-4">
+          <p class="uk-text-logo text-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+        </div>
       </div>
     </div>
   </div>
