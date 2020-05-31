@@ -14,7 +14,7 @@
     {% include 'blocks/header.html' %}
     <div class="row m-3">
       <div class="col-sm-3">
-        <p class="text-center lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
+        <p class="uk-hedline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
         <table class="table table-sm table-hover table-borderless">
           <tbody>
           {% for employee in employees %}
@@ -31,7 +31,7 @@
       </div>
       <div class="col-sm-9">
         {% if worker.status %}
-          <p class="text-center text-danger lead font-weight-normal bg-warning">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
+          <p class="uk-hedline">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
 
           <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
             <div class="row text-center">
