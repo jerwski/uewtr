@@ -41,7 +41,7 @@
     </div>
     <div class="row ml-3 mr-3 mb-2 uk-bg-bisque">
       <div class="col-sm-3">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">COMPANIES</p>
+        <p class="uk-headline">COMPANIES</p>
         <table class="table table-hover table-borderless table-sm">
           <tbody>
           {% for company in companies %}
@@ -58,7 +58,7 @@
         <div class="row mt-4">
           <div class="col">
             <div class="btn-sm mb-2">
-              <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary btn-block">Add/change
+              <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-light btn-block">Add/change
                 company</a>
             </div>
           </div>
@@ -67,7 +67,7 @@
 
       <div class="col-sm-9">
         {% if company_id %}
-          <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD TO CASH REGISTER FOR {{ company }}</p>
+          <p class="uk-headline">ADD RECORD TO CASH REGISTER FOR {{ company }}</p>
           <form action="." method="POST">{% csrf_token %}
             {% bootstrap_field form.company %}
             <div class="row ml-5">
@@ -208,10 +208,10 @@
             </table>
           </div>
         {% else %}
-          <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD FOR {{ company }}</p>
+          <p class="uk-headline">ADD RECORD FOR {{ company }}</p>
           <div class="row">
             <div class="col text-center">
-              <p class="text-danger lead font-weight-bold font-italic">Please select company to add records into Cash
+              <p class="uk-quiz-question">Please select company to add records into Cash
                 register...</p>
             </div>
           </div>
