@@ -195,7 +195,7 @@ class EmployeeHourlyRateView(View):
 	def get(self, request, employee_id:int)->render:
 		worker = Employee.objects.get(pk=employee_id)
 		employees = Employee.objects.filter(status=True)
-		all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=worker)
+		all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=worker).order_by('update')
 		last_hourly_rate = all_hourly_rate.last()
 		initial={'worker': worker, 'hourly_rate': f'{last_hourly_rate.hourly_rate:.2f}'}
 		form = EmployeeHourlyRateForm(initial=initial)
@@ -219,7 +219,7 @@ class EmployeeHourlyRateView(View):
 				messages.error(request, msg)
 				context.__setitem__('check_rate', True)
 			else:
-				all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=worker)
+				all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=worker).order_by('update')
 				last_exist_hourly_rate = all_hourly_rate.last()
 
 				if data['hourly_rate'] != last_exist_hourly_rate.hourly_rate:

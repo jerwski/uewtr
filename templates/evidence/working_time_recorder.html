@@ -11,16 +11,19 @@
   {% include 'blocks/header.html' %}
   <div class="row m-3">
     <div class="col-sm-3">
-{#    TODO: poprawić klasę uk-size#}
       <p class="uk-hedline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
       <table class="table table-hover table-borderless table-sm">
+        <colgroup>
+          <col span="1" style="width: auto">
+          <col span="1" style="width: auto">
+        </colgroup>
         <tbody>
         {% for employee in employees %}
           <tr>
             {% if employee_id == employee.id %}
-              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
+              <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
             {% else %}
-              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
+              <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
             {% endif %}
           </tr>
         {% endfor %}
