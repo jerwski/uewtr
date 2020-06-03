@@ -34,10 +34,10 @@
         </form>
 
         <hr class="small">
-        <div class="col text-center">
+        <div class="col">
           <a href="{% url 'account:admin_site' %}">
-            <img class="d-block mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor" width="90%">
-            <span class="d-block uk-text-logo">&copy; Copyright UNIKOLOR Jerzy Wygonowski</span>
+            <img class="uk-logo" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
+            <span class="d-block uk-text-logo">&copy; Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
           </a>
         </div>
       </div>
@@ -54,6 +54,17 @@
           </div>
 
           <table class="table table-sm table-borderless table-striped table-hover">
+            <colgroup>
+              <col span="1" style="width: auto">
+              <col span="1" style="width: auto">
+              <col span="1" style="width: auto">
+              <col span="1" style="width: auto">
+              <col span="1" style="width: auto">
+              <col span="1" style="width: auto">
+              <col span="1" style="width: auto">
+              <col span="1" style="width: auto">
+              <col span="1" style="width: auto">
+            </colgroup>
             <thead class="text-center bg-info">
               <tr>{% for head in heads %}<th>{{ head }}</th>{% endfor %}</tr>
             </thead>

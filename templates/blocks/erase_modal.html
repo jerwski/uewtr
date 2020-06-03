@@ -1,29 +1,33 @@
   <!-- Modal for data to will be erase if you want -->
-  <div class="text-center mt-sm-1">
+  <div class="text-center mt-1">
     <p class="text-info font-italic font-weight-bold">You can delete all records in datatabase for {{ worker }}...</p>
-    <p class="text-danger font-italic font-weight-bold">Think twice before you do it...!!!</p>
+    <p class="text-danger font-italic font-weight-bold blink">Think twice before you decide...</p>
   </div>
 
-    <div class="btn btn-group">
-    <button id="eraseButton" type="button" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#eraseModal">Erase all records for {{ worker }}...</button>
+    <div class="btn btn-group mb-3">
+      <button id="eraseButton" type="button" class="btn btn-outline-light" data-toggle="modal" data-target="#eraseModal">Erase all records for {{ worker }}</button>
     </div>
     <!-- Modal -->
     <div class="modal fade" id="eraseModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header bg-danger text-white">
-            <h5 class="modal-title" id="eraseModal">You try do erase all records bellow for {{ worker }}</h5>
+            <p class="modal-title lead" id="eraseModal">You try do erase all records bellow for<br><span class="font-weight-bold">{{ worker }}</span><br><span class="small">Think twice before you decide...</span></p>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span class="fas fa-times-circle" aria-hidden="true"></span>
             </button>
           </div>
           <div class="modal-body bg-info">
             <table class="table table-sm table-borderless">
+              <colgroup>
+                <col span="1" style="width: 50%">
+                <col span="1" style="width: 50%">
+              </colgroup>
               <tbody>
-                <tr><th width="50%" class="text-right">Model</th><th>Amount of records</th></tr>
+                <tr><th class="text-right">Model</th><th>Amount of records</th></tr>
                 {% for key, value in records.items %}
                   <tr>
-                    <td width="50%" class="text-right">{{ key|capfirst }} :</td><td>{{ value }}</td>
+                    <td class="text-right">{{ key|capfirst }} :</td><td>{{ value }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -36,3 +40,24 @@
         </div>
       </div>
     </div>
+
+
+  <!-- blinkin after hideTime: seconds-->
+  <script>
+    $('.blink').each(function() {
+      var elem = $(this);
+      // count the blinks
+      var count = 1;
+      var intervalId = setInterval(function() {
+         if (elem.css('visibility') == 'hidden') {
+            elem.css('visibility', 'visible');
+            // increment counter when showing to count # of blinks and stop when visible
+            if (count++ === 3) {
+              clearInterval(intervalId);
+              }
+          } else {
+              elem.css('visibility', 'hidden');
+          }
+       }, 200);
+    });
+  </script>

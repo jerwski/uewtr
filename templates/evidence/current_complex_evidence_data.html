@@ -11,7 +11,7 @@
     <div class="row ml-3 mr-3 mt-2 uk-bg-bisque">
       <div class="col-2 text-center">
         <a href="{% url 'account:admin_site' %}">
-          <img class="d-block mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor" width="80%">
+          <img class="mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor" width="80%">
           <span class="d-block uk-text-logo">&copy; Copyright UNIKOLOR Jerzy Wygonowski</span>
         </a>
       </div>
@@ -26,7 +26,7 @@
     </div>
     <div class="row ml-3 mr-3 mb-2 uk-bg-bisque">
       <div class="col-3">
-        <p class="text-center lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">EMPLOYED WORKERS</a></p>
+        <p class="uk-hedline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">EMPLOYED WORKERS</a></p>
 
         <table class="table table-sm table-hover table-borderless">
           <colgroup>
@@ -48,7 +48,7 @@
       </div>
 
       <div class="col-6">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">CURRENT DATA: {{ worker|upper }}</p>
+        <p class="uk-hedline text-danger">CURRENT DATA: {{ worker|upper }}</p>
 
         <form action="{% url 'evidence:employee_complex_data' employee_id %}" method="POST">{% csrf_token %}
           <div class="row">
@@ -173,8 +173,8 @@
           </div>
         </div>
       </div>
-      <div class="col-3 text-center">
-        <p class="lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'evidence:workhours_print' employee_id month year %}">Working days for {{ choice_date|date:'m/Y' }}</a></p>
+      <div class="col-3">
+        <p class="uk-hedline"><a class="text-danger" href="{% url 'evidence:workhours_print' employee_id month year %}">WORKING DAYS FOR: {{ choice_date|date:'m/Y' }}</a></p>
         {% if work_hours %}
           <div class="row text-primary font-weight-bold font-italic">
             <div class="col-6">

@@ -11,13 +11,17 @@
       <div class="col-5">
         <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
         <table class="table table-hover table-borderless table-sm">
+          <colgroup>
+            <col span="1" style="width: auto">
+            <col span="1" style="width: auto">
+          </colgroup>
           <tbody>
           {% for employee in employees %}
             <tr>
             {% if employee_id == employee.id %}
-              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
+              <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
             {% else %}
-              <td width="5%" class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
+              <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
             {% endif %}
             </tr>
           {% endfor %}
@@ -26,7 +30,7 @@
       </div>
 
       <div class="col-7">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">{{ employee|upper }} - CHANGE EXTENDED DATA</p>
+        <p class="text-center text-danger lead font-weight-normal bg-warning">{{ worker|upper }} - CHANGE EXTENDED DATA</p>
 
         <form action="{% url 'employee:employee_extendeddata' employee_id %}" method="POST">{% csrf_token %}
           <div class="row">

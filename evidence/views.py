@@ -565,7 +565,8 @@ class EmployeeCurrentComplexDataView(View):
 		self.work_hours = WorkEvidence.objects.filter(query)
 		self.holidays = holiday(self.year)
 		self.year_leaves = EmployeeLeave.objects.filter(worker=self.worker, leave_date__year=self.year)
-		self.sml = EmployeeLeave.objects.filter(worker=self.worker, leave_date__year=self.year, leave_date__month=self.month)
+		query = Q(worker=self.worker, leave_date__year=self.year, leave_date__month=self.month)
+		self.sml = EmployeeLeave.objects.filter(query)
 
 
 	def get(self, request, **kwargs) -> render:

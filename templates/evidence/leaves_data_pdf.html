@@ -7,8 +7,11 @@
 
   <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-12">
-          <p class="text-center text-primary lead font-weight-bold bg-warning mt-4">List of annual ({{ year }} year) employee holidays for {{ worker }}{% if leave_data %}<em class="text-danger font-weight-bold"> (used: {{ leave_data|length }} day{{ leave_data|pluralize:'s' }})</em>{% endif %}</p>
+      <div class="col">
+        <div class="text-center bg-warning mt-4">
+           <p class="text-primary lead font-weight-bold">List of annual ({{ year }} year) employee holidays for {{ worker }}{% if leave_data %}<em class="text-danger font-weight-bold"> (used: {{ leave_data|length }} day{{ leave_data|pluralize:'s' }})</em>{% endif %}</p>
+        </div>
+
       </div>
       <table class="table table-sm table-bordered">
         <thead class="text-center bg-info">
@@ -33,7 +36,9 @@
           </tbody>
         {% endif %}
       </table>
-      <p class="uk-text-small text-sm-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+      <div class="col-4">
+          <p class="uk-text-logo text-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+        </div>
     </div>
   </div>
 
