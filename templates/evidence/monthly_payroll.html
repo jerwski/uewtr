@@ -44,7 +44,7 @@
       <div class="col-10">
         {% if amountpay.brutto %}
           {% include 'blocks/payrolldata_modal.html' %}
-          <p class="text-center text-primary lead font-weight-bold bg-warning mt-lg-4">Total work hours: {{ total_work_hours }} hours.&nbsp;&nbsp;&nbsp;Total payment: {{ amountpay.brutto|money_format }}</p>
+          <p class="uk-headline">Total work hours: {{ total_work_hours }} hours.&nbsp;&nbsp;&nbsp;Total payment: {{ amountpay.brutto|money_format }}</p>
 
           <div class="input-group">
             <input class="form-control" id="myInput" type="text" placeholder="Search employee..." aria-label="Filtering table" aria-describedby="basic-addon">
@@ -71,16 +71,16 @@
             <tbody id="searchTable">
             {% for name, data in payroll.items %}
               {% if data.brutto > 0 %}
-                <tr>
-                  <td class="text-primary font-weight-bold font-italic"><a href="{% employee_complex_data_pass name.employee_complex_data month year %}">{{ name }}</a></td>
-                  <td class="text-right text-dark">{{ data.brutto|money_format }}</td>
-                  <td class="text-right text-dark">{{ data.basicpay|money_format }}</td>
-                  <td class="text-right text-dark">{{ data.leavepay|money_format }}</td>
-                  <td class="text-right text-dark">{{ data.overhourspay|money_format }}</td>
-                  <td class="text-right text-dark">{{ data.satpay|money_format }}</td>
-                  <td class="text-right text-dark">{{ data.sunpay|money_format }}</td>
-                  <td class="text-right text-dark">{{ data.accountpay|money_format }}</td>
-                  <td class="text-right text-dark">{{ data.salary|money_format }}</td>
+                <tr class="text-dark text-right">
+                  <td class="text-left font-weight-bold font-italic"><a class="text-primary" href="{% employee_complex_data_pass name.employee_complex_data month year %}">{{ forloop.counter }}.&nbsp;{{ name }}</a></td>
+                  <td>{{ data.brutto|money_format }}</td>
+                  <td>{{ data.basicpay|money_format }}</td>
+                  <td>{{ data.leavepay|money_format }}</td>
+                  <td>{{ data.overhourspay|money_format }}</td>
+                  <td>{{ data.satpay|money_format }}</td>
+                  <td>{{ data.sunpay|money_format }}</td>
+                  <td>{{ data.accountpay|money_format }}</td>
+                  <td>{{ data.salary|money_format }}</td>
                 </tr>
               {% endif %}
             {% endfor %}
