@@ -8,7 +8,9 @@
 {% block content %}
 
 <div class="container uk-bg-bisque">
-  {% include 'blocks/header.html' %}
+  <div class="container mt-3">
+      {% include 'blocks/header.html' %}
+  </div>
   <div class="row m-3">
     <div class="col-sm-3">
       <p class="uk-headline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>

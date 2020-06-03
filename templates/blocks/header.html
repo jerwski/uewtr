@@ -1,22 +1,22 @@
 {% load static %}
 
-
-<div class="row mt-2">
-  <div class="col-2">
-    <a href="{% url 'account:admin_site' %}">
-      <img class="uk-logo" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
-      <span class="d-block uk-text-logo">&copy; Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
-    </a>
-  </div>
-  <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
-    <p class="uk-text-large">Working Time Recorder</p>
-    <p class="uk-text-middle">Application to handle working time in small business</p>
-    {% if not new_employee %}
-      {% include 'blocks/small_upper_buttons.html' %}
-    {% endif %}
-  </div>
-  <div class="col-sm-2 mt-2 text-right">
-    {% include 'blocks/alert.html' %}
+<div class="container mt-3">
+  <div class="row">
+    <div class="col-2 uk-bg-bisque text-center">
+      <a href="{% url 'account:admin_site' %}">
+        <img class="uk-logo" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
+        <span class="d-block uk-text-logo">&copy; Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
+      </a>
+    </div>
+    <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
+      <p class="uk-text-large">Working Time Recorder</p>
+      <p class="uk-text-middle">Application to handle working time in small business</p>
+      {% if not new_employee %}
+        {% include 'blocks/small_upper_buttons.html' %}
+      {% endif %}
+    </div>
+    <div class="col-sm-2 mt-2 text-right">
+      {% include 'blocks/alert.html' %}
+    </div>
   </div>
 </div>
-
