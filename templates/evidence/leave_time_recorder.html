@@ -14,7 +14,7 @@
     {% include 'blocks/header.html' %}
     <div class="row m-3">
       <div class="col-sm-3">
-        <p class="uk-hedline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
+        <p class="uk-headline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
         <table class="table table-sm table-hover table-borderless">
           <colgroup>
             <col span="1" style="width: auto">
@@ -35,7 +35,7 @@
       </div>
       <div class="col-sm-9">
         {% if worker.status %}
-          <p class="uk-hedline">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
+          <p class="uk-headline">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
 
           <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
             <div class="row text-center">
