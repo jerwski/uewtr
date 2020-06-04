@@ -56,7 +56,7 @@ Amicus optima vitae possesio – Przyjaciel to największy skarb w życiu.
 Amicus Plato, sed magis amica veritas – Przyjacielem Plato, lecz większą przyjaciółką prawda.
 Amicus stultorum similis efficietur – Przyjaciel głupich stanie się do nich podobny - kto z kim przestaje, takim się staje.
 Amittit merito proprium, qui alienum appetit – Słusznie traci swoje, kto sięga po cudze.
-Amor caecus – Ślepa miłość.
+Amor caecus – ślepa miłość.
 Amor magister optimus – Miłość najlepszym nauczycielem.
 Amor non quaerit, amor reperit – Miłość nie szuka, miłość znajduje.
 Amor omnibus idem – Miłość dla wszystkich jednaka.
@@ -94,7 +94,7 @@ Asinus asinorum [in saecula saeculorum] – Osioł nad osłami [na wieki wieków
 Asinus in tegulis – Osioł na dachu.
 Assidue addiscens ad senium venio – Douczając się nieustannie dochodzę do starości.
 Attendite a falsis prophetis – Strzeżcie się fałszywych proroków.
-Audaces fortuna iuvat timidosque repellit – Śmiałym los sprzyja i bojaźliwych odtrąca.
+Audaces fortuna iuvat timidosque repellit – śmiałym los sprzyja i bojaźliwych odtrąca.
 Audentes fortuna iuvat [decoratque corona] – Odważnych los wspiera [i koroną wieńczy].
 Audi multa, loquere pauca – Słuchaj dużo, mów mało.
 Audi, vide, sile – Słuchaj, patrz i zachowaj milczenie.
@@ -288,7 +288,7 @@ Ex navicula navis – Z łódeczki łódź.
 Ex nihilo nihil – Z niczego nic [nie powstaje].
 Ex opere operantis – Z dzieła działającego.
 Ex oriente lux – Ze wschodu przychodzi światło.
-Ex oriente lux, ex occidente lex – Światło [kultury] ze wschodu, prawa z zachodu.
+Ex oriente lux, ex occidente lex – światło [kultury] ze wschodu, prawa z zachodu.
 Exegi monumentum aere perennius – Postawiłem pomnik trwalszy od spiżu.
 Exoriare aliquis nostris ex ossibus ultor – Niech z naszych kości narodzi się mściciel.
 Experto credite – Ufajcie doświadczonemu.
@@ -321,7 +321,7 @@ Finita est comoedia – Komedia skończona.
 Flagrante bello – Gdy szaleje wojna.
 Flagrante delicto – Na gorącym uczynku.
 Fluctuat nec mergitur – Rzuca nim fala, lecz nie tonie.
-Fortes fortuna adiuvat – Śmiałym los sprzyja.
+Fortes fortuna adiuvat – śmiałym los sprzyja.
 Fortuna favet fortibus – Los sprzyja dzielnym.
 Fraus latet in generalibus – Oszustwo kryje się w ogólnikach.
 Fumum vendere – Sprzedawać dym.

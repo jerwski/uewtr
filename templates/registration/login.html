@@ -14,7 +14,7 @@
         {% if request.user.is_authenticated %}
           <p class="uk-text-middle">Welcome <em class="text-danger font-weight-bold">{{ user }}</em></p>
         {% else %}
-          <p class="uk-text-small text-primary">To login please fill both fields with correct data...<br>If you are for the first time, notify the admin or create a superuser...</p>
+          <p class="text-muted">To login please fill both fields with correct data...<br>If you are for the first time, notify the admin or create a superuser...</p>
         {% endif %}
         <div class="form-control-lg">
           <form method="POST">{% csrf_token %}
