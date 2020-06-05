@@ -1,7 +1,9 @@
   <!-- Small buttons -->
-  <div class="btn-group btn-group-sm" role="group">
+
+    <div class="btn-group btn-group-sm" role="group">
     <a href="{% url 'evidence:working_time_recorder_add' employee_id %}" {% if worker.status %}class="btn btn-outline-primary"{% else %}class="btn btn-outline-primary disabled"{% endif %}>Working Time Recorder</a>
     <a href="{% url 'evidence:leave_time_recorder_add' employee_id %}" {% if worker.status %}class="btn btn-outline-danger"{% else %}class="btn btn-outline-danger disabled"{% endif %}>Leave Time Recorder</a>
     <a href="{% url 'evidence:account_payment' employee_id %}" {% if worker.status %}class="btn btn-outline-dark"{% else %}class="btn btn-outline-dark disabled"{% endif %}>Payment on Account</a>
     <a href="{% url 'evidence:monthly_payroll_view' %}" class="btn btn-outline-success">Monthly Payroll</a>
+    <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
   </div>

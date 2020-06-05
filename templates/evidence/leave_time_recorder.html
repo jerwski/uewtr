@@ -12,8 +12,8 @@
 
   <div class="container uk-bg-bisque">
     {% include 'blocks/header.html' %}
-    <div class="row m-3">
-      <div class="col-sm-3">
+    <div class="row">
+      <div class="col-3">
         <p class="uk-headline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
         <table class="table table-sm table-hover table-borderless">
           <colgroup>
@@ -33,7 +33,7 @@
           </tbody>
         </table>
       </div>
-      <div class="col-sm-9">
+      <div class="col-9">
         {% if worker.status %}
           <p class="uk-headline">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
 

@@ -26,14 +26,24 @@ icons = {
 
 class EmployeeBasicDataForm(forms.ModelForm):
     '''class representing a form to create/change and save the basic data of employee'''
+    UNPAID_LEAVE = 0
+    PAID_LEAVE = 1
+    LEAVE_CHOICE = ((UNPAID_LEAVE, 'Unpaid'), (PAID_LEAVE,'Paid'))
+    DEACTIVE = 0
+    ACTIVE = 1
+    STATUS_CHOICE = ((DEACTIVE, 'Deactive'), (ACTIVE,'Active'))
+    # fields
     forename = forms.CharField(max_length=100)
     surname = forms.CharField(max_length=100)
     pesel = forms.CharField(min_length=11, max_length=11)
+    leave = forms.ChoiceField(label="Leave choice:", widget=RadioSelectButtonGroup,
+                              required=True, choices=LEAVE_CHOICE)
+    status = forms.ChoiceField(label="Status choice:", widget=RadioSelectButtonGroup,
+                               required=True, choices=STATUS_CHOICE)
 
     class Meta:
         model = Employee
         fields = ('forename', 'surname', 'pesel', 'status', 'leave')
-        widgets = {'leave': forms.RadioSelect()}
 
 
 class EmployeeExtendedDataForm(forms.ModelForm):
@@ -45,7 +55,7 @@ class EmployeeExtendedDataForm(forms.ModelForm):
     options = {'icons': icons, 'useCurrent': True,
                'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
     attrs={'prepend': 'fa fa-calendar-check', 'append': 'fa fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
-
+    # fields
     worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset)
     birthday = forms.DateField(label='Date of birthday', widget=DatePicker(options=options, attrs=attrs))
     start_contract = forms.DateField(label='Date of start contract', widget=DatePicker(options=options, attrs=attrs))
@@ -61,6 +71,7 @@ class EmployeeExtendedDataForm(forms.ModelForm):
 
 class EmployeeHourlyRateForm(forms.ModelForm):
     '''class representing a form to create/change and save the hourly rate data of employee'''
+    # fields
     worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=queryset)
     hourly_rate = forms.FloatField(min_value=7)
 

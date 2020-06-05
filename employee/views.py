@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.contrib import messages
 from django.views.generic import View
 from django.utils.timezone import now
-from django.core.paginator import Paginator
 from django.shortcuts import render, HttpResponseRedirect
 
 # my models
@@ -29,13 +28,12 @@ class EmployeeBasicDataView(View):
 		if employees.exists():
 			employees_st = employees.filter(status=True)
 			first_id = employees_st.first().id
-			paginator = Paginator(employees.filter(status=False), 8)
-			page = request.GET.get('page')
-			employees_sf = paginator.get_page(page)
+			employees_sf = employees.filter(status=False)
 			context.update({'employees_st': employees_st, 'employees_sf': employees_sf, 'employee_id': first_id})
 
 		else:
 			messages.warning(request, r'No employee in database...')
+			context.update({'employee_id': employee_id})
 
 		if employee_id:
 			worker = Employee.objects.get(pk=employee_id)
@@ -86,6 +84,7 @@ class EmployeeBasicDataView(View):
 
 		if form.is_valid():
 			new_values = form.cleaned_data
+			print(new_values)
 
 			if new_values != old_values:
 				try:

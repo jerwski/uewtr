@@ -8,15 +8,22 @@
         <span class="d-block uk-text-logo">&copy; Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
       </a>
     </div>
-    <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
-      <p class="uk-text-large">Working Time Recorder</p>
+    <div class="col-10 text-center">
+      <div class="uk-header-title">
+        <p class="uk-text-large">Working Time Recorder</p>
+      </div>
+      <div class="uk-header-alert">
+        {% include "blocks/alert.html" %}
+      </div>
       <p class="uk-text-middle">Application to handle working time in small business</p>
-      {% if not new_employee %}
+      <div class="mb-3">
         {% include 'blocks/small_upper_buttons.html' %}
-      {% endif %}
-    </div>
-    <div class="col-sm-2 mt-2 text-right">
-      {% include 'blocks/alert.html' %}
+      </div>
     </div>
   </div>
 </div>
+
+
+
+
+
