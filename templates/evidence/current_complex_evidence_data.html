@@ -193,36 +193,20 @@
               <a class="btn btn-outline-light" href="/admin/">Admin</a>
             </div>
           </div>
-          <table class="table table-hover table-borderless table-sm" style="width:100%">
-            <colgroup>
-              <col span="1" style="width:4%">
-              <col span="1" style="width:49%">
-              <col span="1" style="width:10%">
-              <col span="1" style="width:10%">
-              <col span="1" style="width:27%">
-            </colgroup>
-            <thead>
-              <tr class="text-dark">
-                <th>Nr</th>
-                <th>Data</th>
-                <th class="text-center">Start</th>
-                <th class="text-right">End</th>
-                <th class="text-right">Hours</th>
-              </tr>
-            </thead>
-          </table>
           <div class="uk-table-scroll-md">
-            <table class="table table-hover table-borderless table-sm" style="width:100%">
-                <colgroup>
-                <col span="1" style="width:4%">
-                <col span="1" style="width:49%">
-                <col span="1" style="width:10%">
-                <col span="1" style="width:10%">
-                <col span="1" style="width:27%">
-              </colgroup><tbody id="searchTable">
+            <table class="table table-hover table-borderless table-sm">
+              <thead>
+                <tr class="text-dark text-center">
+                  <th>Nr</th>
+                  <th>Data</th>
+                  <th class="text-right">Start</th>
+                  <th>End</th>
+                  <th>Hours</th>
+                </tr>
+              </thead>
               {% for hours in work_hours %}
                 <tr>
-                  <td class="text-secondary">{{ forloop.counter }}</td>
+                  <td class="text-right text-secondary">{{ forloop.counter }}.</td>
                   {% if hours.start_work|date:'w' == '0' %}
                     <td class="text-right text-danger">{{ hours.start_work|date:'d l' }}</td>
                   {% elif hours.start_work|date:'w' == '6' %}

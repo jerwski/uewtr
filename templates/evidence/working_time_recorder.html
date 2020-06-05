@@ -89,14 +89,14 @@
               <p class="text-center text-primary font-weight-bold">For <span class="text-danger">{{ worker }}</span> adding <span class="text-danger uk-text-middle blink">{{ jobhours|floatformat:2 }}</span> hour{{ total_hours|pluralize:'s' }}.<span class="text-danger"> Are you sure???</span></p>
               <p class="text-center uk-text-middle"><span>{{ start_work|date:'d M Y H:i' }} - {{ end_work|date:'d M Y H:i' }}</span></p>
               <div class="row mb-3">
-                <div class="col-md-6 btn-sm">
+                <div class="col-6 btn-sm">
                   <a href="{% url 'account:admin_site' %}" class="btn btn-sm btn-outline-dark btn-block">Back to the dashboard</a>
                 </div>
-                <div class="col-md-6 btn-sm">
+                <div class="col-6 btn-sm">
                   {% if jobhours != 8 %}
-                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase expanded jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
+                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><span class="font-weight-bold blink">Erase expanded jobhours ({{ jobhours|floatformat:2 }} hours)</span></a>
                   {% else %}
-                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><em class="font-weight-bold blink">Erase standard jobhours ({{ jobhours|floatformat:2 }} hours)</em></a>
+                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><span class="font-weight-bold blink">Erase standard jobhours ({{ jobhours|floatformat:2 }} hours)</span></a>
                   {% endif %}
                 </div>
               </div>

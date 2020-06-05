@@ -28,7 +28,7 @@
   <div class="container-fluid">
     <div class="row ml-3 mr-3 mt-2 uk-bg-bisque">
       <div class="col-sm-2 mt-2 text-center">
-        <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="50%"></a>
+        <a class="uk-logo" href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo" width="50%"></a>
         <p class="uk-text-logo">&copy; Copyright UNIKOLOR Jerzy Wygonowski</p>
       </div>
       <div class="col-sm-8 mb-3 mt-2 text-center">
@@ -100,12 +100,6 @@
 
           <div class="row">
             <table class="table table-borderless table-sm table-hover">
-              <colgroup>
-                <col span="1" style="width:25%">
-                <col span="1" style="width:25%">
-                <col span="1" style="width:25%">
-                <col span="1" style="width:25%">
-              </colgroup>
               <thead class="text-center">
               <tr class="uk-text-small">
                 <th class="text-primary">Z przeniesienia</th>
@@ -115,7 +109,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr class="col-sm-3 text-center font-weight-bold font-italic">
+              <tr class="col-3 text-center font-weight-bold font-italic">
                 <td>{{ saldo|money_format }}</td>
                 <td>{{ incomes|money_format }}</td>
                 <td>{{ expenditures|money_format }}</td>
@@ -132,42 +126,20 @@
               <span class="input-group-text fas fa-search" id="basic-addon"></span>
             </div>
           </div>
-          <table class="table table-borderless table-info table-sm">
-            <colgroup>
-              <col span="1" style="width:3%">
-              <col span="1" style="width:10%">
-              <col span="1" style="width:25%">
-              <col span="1" style="width:24%">
-              <col span="1" style="width:11%">
-              <col span="1" style="width:11%">
-              <col span="1" style="width:11%">
-              <col span="1" style="width:6%">
-            </colgroup>
-            <thead class="text-left">
-            <tr class="font-weight-light small">
-              <th>Nr</th>
-              <th>Data</th>
-              <th>Firma, osoba</th>
-              <th>Nr faktury, dokumentu, treść operacji</th>
-              <th class="text-center">Wpłata</th>
-              <th class="text-center">Wypłata</th>
-              <th class="text-center">KP/KW</th>
-              <th class="text-center"></th>
-            </tr>
-            </thead>
-          </table>
           <div class="uk-table-scroll-sm">
             <table class="table table-borderless table-sm table-hover">
-              <colgroup>
-                <col span="1" style="width:3%">
-                <col span="1" style="width:10%">
-                <col span="1" style="width:25%">
-                <col span="1" style="width:24%">
-                <col span="1" style="width:11%">
-                <col span="1" style="width:11%">
-                <col span="1" style="width:11%">
-                <col span="1" style="width:6%">
-              </colgroup>
+              <thead>
+                <tr class="font-weight-light small">
+                  <th>Nr</th>
+                  <th>Data</th>
+                  <th>Firma, osoba</th>
+                  <th>Nr faktury, dokumentu, treść operacji</th>
+                  <th class="text-right">Wpłata</th>
+                  <th class="text-right">Wypłata</th>
+                  <th class="text-right">KP/KW</th>
+                  <th></th>
+                </tr>
+              </thead>
               <tbody class="small" id="searchTable">
               {% for record in records %}
                 <tr {% if forloop.first %}class="text-danger font-weight-bold font-italic"
