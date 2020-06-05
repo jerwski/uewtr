@@ -46,11 +46,11 @@
         </div>
       </div>
     </div>
-    <div class="container">
-        <div class="text-center mt-5">
+    <div class="row mt-4">
+        <div class="col-4 offset-4">
           <a href="{% url 'account:quiz' %}">
-            <img class="mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
-            <span class="d-block uk-text-logo">&copy; Copyright UNIKOLOR Jerzy Wygonowski</span>
+            <img class="d-block uk-logo mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
+            <span class="d-block uk-text-logo">&copy;Copyright UNIKOLOR Jerzy Wygonowski</span>
           </a>
           <div class="mt-3">
             {% include 'blocks/start_message.html' %}
