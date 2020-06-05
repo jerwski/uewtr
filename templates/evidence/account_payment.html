@@ -8,7 +8,7 @@
 
 <div class="container uk-bg-bisque">
   {% include 'blocks/header.html' %}
-  <div class="row m-3">
+  <div class="row">
     <div class="col-sm-4">
       <p class="uk-headline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
       <table class="table table-hover table-borderless table-sm">
@@ -45,8 +45,10 @@
               </div>
             </div>
             {% bootstrap_field form.notice size='medium' label_class='text-primary font-weight-bold' placeholder='Please indicate the circumstances of the down payment...' %}
-            <div class="btn-sm mb-2">
-              <button type="submit" class="btn btn-outline-success btn-block">Confirm the down payment</button>
+            <div class="col">
+              <div class="btn-sm mb-2">
+                <button type="submit" class="btn btn-outline-success btn-block">Confirm the down payment</button>
+              </div>
             </div>
           </form>
 
@@ -60,48 +62,54 @@
               <p class="text-center uk-text-middle">The sum of advances <span class="text-danger">{{ advances|money_format }}</span> is greater than the income earned so far <span class="text-danger">{{ salary|money_format }}</span>. The advance can't be paid!</p>
             {% endif %}
           {% else %}
-            <table class="table table-borderless table-sm">
-              <thead class="bg-info">
-              <tr><th class="text-center text-white">TOTAL ADVANCE INFO FOR {{ worker|upper }}</th></tr>
-              </thead>
-            </table>
-            <table class="table table-hover table-borderless table-sm">
-              <colgroup>
-                <col span="1" style="width:30%">
-                <col span="1" style="width:30%">
-                <col span="1" style="width:30%">
-                <col span="1" style="width:10%">
-              </colgroup>
-              <tbody>
-              <tr class="text-info text-right font-weight-bold">
-                <td>Preiod:</td>
-                <td><a class="text-info" {% if prevloan %}href="{% url 'evidence:advances_print' employee_id earlier_date.month earlier_date.year %}"{% endif %}>{{ earlier_date|date:'F Y' }}</a></td>
-                <td><a class="text-info" {% if currloan %}href="{% url 'evidence:advances_print' employee_id month year %}"{% endif %}>{% now 'F Y' %}</a></td>
-                <td>&nbsp;</td>
-              </tr>
-              <tr class="text-right">
-                <td class="text-right">Total advance:</td>
-                <td class="text-danger font-weight-bold">{{ prevloan|money_format }}</td>
-                <td class="text-danger font-weight-bold">{{ currloan|money_format }}</td>
-                <td>&nbsp;</td>
-              </tr>
-              <tr class="text-right">
-                <td class="text-right">Brutto income:</td>
-                <td class="text-danger font-weight-bold">{{ prevsalary|money_format }}</td>
-                <td class="text-danger font-weight-bold">{{ salary|money_format }}</td>
-                <td>&nbsp;</td>
-              </tr>
-              <tr class="text-white text-right font-weight-bold bg-info">
-                <td>Left to be paid out:</td>
-                <td>{{ prevsaldo|money_format }}</td>
-                <td>{{ saldo|money_format }}</td>
-                <td>&nbsp;</td>
-              </tr>
-              </tbody>
-            </table>
+            <div class="col">
+              <table class="table table-borderless table-sm">
+                <thead class="bg-info">
+                <tr><th class="text-center text-white">TOTAL ADVANCE INFO FOR {{ worker|upper }}</th></tr>
+                </thead>
+              </table>
+            </div>
+            <div class="col">
+              <table class="table table-hover table-borderless table-sm">
+                <colgroup>
+                  <col span="1" style="width:35%">
+                  <col span="1" style="width:25%">
+                  <col span="1" style="width:25%">
+                  <col span="1" style="width:15%">
+                </colgroup>
+                <tbody>
+                <tr class="text-info text-right font-weight-bold">
+                  <td>Preiod:</td>
+                  <td><a class="text-info" {% if prevloan %}href="{% url 'evidence:advances_print' employee_id earlier_date.month earlier_date.year %}"{% endif %}>{{ earlier_date|date:'F Y' }}</a></td>
+                  <td><a class="text-info" {% if currloan %}href="{% url 'evidence:advances_print' employee_id month year %}"{% endif %}>{% now 'F Y' %}</a></td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr class="text-right">
+                  <td class="text-right">Total advance:</td>
+                  <td class="text-danger font-weight-bold">{{ prevloan|money_format }}</td>
+                  <td class="text-danger font-weight-bold">{{ currloan|money_format }}</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr class="text-right">
+                  <td class="text-right">Brutto income:</td>
+                  <td class="text-danger font-weight-bold">{{ prevsalary|money_format }}</td>
+                  <td class="text-danger font-weight-bold">{{ salary|money_format }}</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr class="text-white text-right font-weight-bold bg-info">
+                  <td>Left to be paid out:</td>
+                  <td>{{ prevsaldo|money_format }}</td>
+                  <td>{{ saldo|money_format }}</td>
+                  <td>&nbsp;</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
           {% endif %}
-          <div class="btn-sm mb-2">
-            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
+          <div class="col">
+            <div class="btn-sm mb-2">
+              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
+            </div>
           </div>
         {% endif %}
       {% else %}

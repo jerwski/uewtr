@@ -17,11 +17,14 @@ class Employee(CreationModificationDateMixin):
     UNPAID_LEAVE = 0
     PAID_LEAVE = 1
     LEAVE_CHOICE = ((UNPAID_LEAVE, 'Unpaid'), (PAID_LEAVE,'Paid'))
+    DEACTIVE = 0
+    ACTIVE = 1
+    STATUS_CHOICE = ((DEACTIVE, 'Deactive'), (ACTIVE,'ACTIVE'))
     # fields
     forename = models.CharField(max_length=100,)
     surname = models.CharField(max_length=100,)
     pesel = models.CharField(max_length=11, validators=[check_pesel])
-    status = models.BooleanField(default=False, verbose_name='Active')
+    status = models.IntegerField(choices=STATUS_CHOICE, default=DEACTIVE)
     leave = models.IntegerField(choices=LEAVE_CHOICE, default=UNPAID_LEAVE)
 
     class Meta:
