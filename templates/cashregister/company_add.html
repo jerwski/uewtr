@@ -8,17 +8,25 @@
 {% block content %}
 
   <div class="container">
-    <div class="row m-3">
-      <div class="col-sm-2 mt-2 text-center">
-        <a href="{% url 'account:admin_site' %}"><img class="uk-logo" src="{% static 'images/mainboard/logoUNI.png' %}" alt="UniLogo"></a>
-        <p class="uk-text-logo">&copy; Copyright UNIKOLOR Jerzy Wygonowski</p>
+
+    <div class="row">
+      <div class="col-2 mt-2">
+        <a href="{% url 'account:admin_site' %}">
+          <img class="d-block uk-logo mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
+          <span class="d-block uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
+        </a>
       </div>
-      <div class="col-sm-8 mb-3 mt-2 text-center text-dark">
-        <p class="uk-text-large">Working Time Recorder</p>
+      <div class="col-10 text-center">
+        <div class="uk-header-title">
+          <p class="uk-text-large">Working Time Recorder</p>
+        </div>
+      <div class="uk-header-alert">
+        {% include "blocks/alert.html" %}
+      </div>
         <p class="uk-text-middle">Application to handle employee working time in small business</p>
       </div>
-      <div class="col-sm-2 mt-2 text-right">{% include 'blocks/alert.html' %}</div>
     </div>
+
     <div class="row">
       <div class="col-sm-6">
         <p class="uk-headline">REGISTERED COMPANIES</p>
@@ -47,16 +55,17 @@
             </tbody>
         </table>
       </div>
-
-      <div class="col-sm-6">
+      <div class="col-6">
         <p class="uk-headline">{% if company_id %}CHANGE{% else %}ADD{% endif %} COMPANY DATA</p>
 
         <form action="." method="POST">{% csrf_token %}
+
           <div class="row">
-            <div class="col-sm-12">
+            <div class="col-12">
               {% bootstrap_field form.company size='small' label_class='text-info font-italic font-weight-bold' %}
             </div>
           </div>
+
           <div class="row">
             <div class="col-6">
               {% bootstrap_field form.nip size='small' label_class='text-info font-italic font-weight-bold' %}
@@ -70,22 +79,23 @@
             </div>
           </div>
           <div class="row text-center">
-            <div class="col-sm-12 mb-1">
+            <div class="col-12 mb-1">
               {% bootstrap_field form.status label_class='text-info font-italic font-weight-bold' %}
             </div>
           </div>
           <hr>
-          <div class="row text-center">
-            <div class="col-sm-12">
+
+          <div class="row">
+            <div class="col-12 text-center">
               <div class="btn btn-group mb-2" role="group">
-                <a href="{% url 'account:exit' %}" class="btn btn-sm btn-outline-danger">Exit</a>
-                <a href="{% url 'account:admin_site' %}" class="btn btn-sm btn-outline-dark">Dashboard</a>
+                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
                 {% if company_id %}
-                  <a href="{% url 'cashregister:add_company' %}" class="btn btn-sm btn-outline-primary">Add company</a>
+                  <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Add company</a>
                 {% endif %}
-                <a href="{% url 'cashregister:cash_register' %}" class="btn btn-sm btn-outline-info">Cash register</a>
-                <a href="{% url 'accountancy:accountancy' %}" class="btn btn-sm btn-outline-danger">Accountancy</a>
-                <button type="submit" class="btn btn-sm btn-outline-success">Confirm</button>
+                <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
+                <a href="{% url 'accountancy:accountancy' %}" class="btn btn-outline-danger">Accountancy</a>
+                <button type="submit" class="btn btn-outline-success">Confirm</button>
               </div>
             </div>
           </div>
