@@ -46,8 +46,8 @@
             </div>
             {% bootstrap_field form.notice size='medium' label_class='text-primary font-weight-bold' placeholder='Please indicate the circumstances of the down payment...' %}
             <div class="col">
-              <div class="btn-sm mb-2">
-                <button type="submit" class="btn btn-outline-success btn-block">Confirm the down payment</button>
+              <div class="btn btn-block mb-2">
+                <button type="submit" class="btn btn-lg btn-outline-success btn-block">Confirm the down payment</button>
               </div>
             </div>
           </form>
@@ -107,8 +107,8 @@
             </div>
           {% endif %}
           <div class="col">
-            <div class="btn-sm mb-2">
-              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
+            <div class="btn btn-block mb-2">
+              <a href="{% url 'account:admin_site' %}" class="btn btn-lg btn-outline-dark btn-block">Back to the dashboard</a>
             </div>
           </div>
         {% endif %}
