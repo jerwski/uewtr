@@ -224,8 +224,30 @@ class LeaveTimeRecorderEraseView(View):
 
 class LeavesDataPrintView(View):
 	'''class representing the view of annual leaves days print'''
-	def post(self, request, employee_id:int):
+	def get(self, request, employee_id:int):
 		'''convert html annuall leave time for each employee in current year to pdf'''
+		year = now().year
+		html = leavehtml2pdf(employee_id, year)
+
+		if html:
+			# create pdf file
+			options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
+					   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
+					   'orientation': 'landscape','no-outline': None, 'quiet': '', }
+
+			pdf = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
+			filename = f'leaves_data_{employee_id}.pdf'
+
+			response = HttpResponse(pdf, content_type='application/pdf')
+			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+			return response
+		else:
+			messages.warning(request, r'Nothing to print...')
+
+		return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[employee_id]))
+
+	def post(self, request, employee_id:int):
+		'''convert html annuall leave time for each employee in selected year to pdf'''
 		year = int(request.POST['leave_year'])
 		html = leavehtml2pdf(employee_id, year)
 

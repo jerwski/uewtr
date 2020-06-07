@@ -28,8 +28,8 @@
 
         <form action="{% url 'evidence:monthly_payroll_view' %}" method="POST">{% csrf_token %}
           {% bootstrap_field form.choice_date label_class='text-primary font-weight-bold' %}
-          <div class="btn-sm">
-            <button type="submit" class="btn btn-outline-success btn-block">Confirm selected date</button>
+          <div class="btn btn-block">
+            <button type="submit" class="btn btn-lg btn-outline-success btn-block">Confirm date</button>
           </div>
         </form>
 

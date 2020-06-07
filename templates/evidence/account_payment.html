@@ -46,8 +46,8 @@
             </div>
             {% bootstrap_field form.notice size='medium' label_class='text-primary font-weight-bold' placeholder='Please indicate the circumstances of the down payment...' %}
             <div class="col">
-              <div class="btn-sm mb-2">
-                <button type="submit" class="btn btn-outline-success btn-block">Confirm the down payment</button>
+              <div class="btn btn-block mb-2">
+                <button type="submit" class="btn btn-lg btn-outline-success btn-block">Confirm the down payment</button>
               </div>
             </div>
           </form>
@@ -62,53 +62,66 @@
               <p class="text-center uk-text-middle">The sum of advances <span class="text-danger">{{ advances|money_format }}</span> is greater than the income earned so far <span class="text-danger">{{ salary|money_format }}</span>. The advance can't be paid!</p>
             {% endif %}
           {% else %}
-            <div class="col">
-              <table class="table table-borderless table-sm">
-                <thead class="bg-info">
-                <tr><th class="text-center text-white">TOTAL ADVANCE INFO FOR {{ worker|upper }}</th></tr>
-                </thead>
-              </table>
-            </div>
-            <div class="col">
-              <table class="table table-hover table-borderless table-sm">
-                <colgroup>
-                  <col span="1" style="width:35%">
-                  <col span="1" style="width:25%">
-                  <col span="1" style="width:25%">
-                  <col span="1" style="width:15%">
-                </colgroup>
-                <tbody>
-                <tr class="text-info text-right font-weight-bold">
-                  <td>Preiod:</td>
-                  <td><a class="text-info" {% if prevloan %}href="{% url 'evidence:advances_print' employee_id earlier_date.month earlier_date.year %}"{% endif %}>{{ earlier_date|date:'F Y' }}</a></td>
-                  <td><a class="text-info" {% if currloan %}href="{% url 'evidence:advances_print' employee_id month year %}"{% endif %}>{% now 'F Y' %}</a></td>
-                  <td>&nbsp;</td>
-                </tr>
-                <tr class="text-right">
-                  <td class="text-right">Total advance:</td>
-                  <td class="text-danger font-weight-bold">{{ prevloan|money_format }}</td>
-                  <td class="text-danger font-weight-bold">{{ currloan|money_format }}</td>
-                  <td>&nbsp;</td>
-                </tr>
-                <tr class="text-right">
-                  <td class="text-right">Brutto income:</td>
-                  <td class="text-danger font-weight-bold">{{ prevsalary|money_format }}</td>
-                  <td class="text-danger font-weight-bold">{{ salary|money_format }}</td>
-                  <td>&nbsp;</td>
-                </tr>
-                <tr class="text-white text-right font-weight-bold bg-info">
-                  <td>Left to be paid out:</td>
-                  <td>{{ prevsaldo|money_format }}</td>
-                  <td>{{ saldo|money_format }}</td>
-                  <td>&nbsp;</td>
-                </tr>
-                </tbody>
-              </table>
+            <div class="container">
+              <div class="uk-evidence-box">
+                <div class="row">
+                  <div class="col uk-evidence-headline d-flex justify-content-center">
+                    <div>TOTAL ADVANCE INFO FOR:</div>
+                    <div>&nbsp;&nbsp;</div>
+                    <div class="text-dark">{{ worker }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="uk-evidence-data-box">
+                <div class="row text-info font-weight-bold">
+                  <div class="col-3">
+                    <div>Preiod:</div>
+                  </div>
+                  <div class="col-4">
+                    <a class="text-info" {% if prevloan %}href="{% url 'evidence:advances_print' employee_id earlier_date.month earlier_date.year %}"{% endif %}>{{ earlier_date|date:'F Y' }}</a>
+                  </div>
+                  <div class="col-4">
+                    <a class="text-info" {% if currloan %}href="{% url 'evidence:advances_print' employee_id month year %}"{% endif %}>{% now 'F Y' %}</a>
+                  </div>
+                  <div class="col-1"></div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <div>Total advance:</div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-danger">{{ prevloan|money_format }}</div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-danger">{{ currloan|money_format }}</div>
+                  </div>
+                  <div class="col-1"></div>
+                </div>
+                <div class="row">
+                  <div class="col-3">
+                    <div>Brutto income:</div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-danger">{{ prevsalary|money_format }}</div>
+                  </div>
+                  <div class="col-4">
+                    <div class="text-danger">{{ salary|money_format }}</div>
+                  </div>
+                  <div class="col-1"></div>
+                </div>
+              </div>
+              <div class="uk-evidence-box">
+                <div class="row uk-evidence-headline">
+                  <div class="col-4 text-dark">Left to paid out:</div>
+                  <div class="col-4">{{ prevsaldo|money_format }}</div>
+                  <div class="col-4">{{ saldo|money_format }}</div>
+                </div>
+              </div>
             </div>
           {% endif %}
           <div class="col">
-            <div class="btn-sm mb-2">
-              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
+            <div class="btn btn-block mb-2">
+              <a href="{% url 'account:admin_site' %}" class="btn btn-lg btn-outline-dark btn-block">Back to the dashboard</a>
             </div>
           </div>
         {% endif %}

@@ -32,11 +32,11 @@
         <div class="row">
           <div class="col-3 text-center">
             <div class="btn btn-group-sm btn-group-vertical" role="group">
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id %}" class="btn btn-sm btn-outline-light font-weight-bold">Insert hours</a>
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id 12 %}" class="btn btn-sm btn-outline-info font-weight-bold">6:00-12:00</a>
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id 14 %}" class="btn btn-sm btn-outline-success font-weight-bold">6:00-14:00</a>
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id 16 %}" class="btn btn-sm btn-outline-primary font-weight-bold">6:00-16:00</a>
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id 18 %}" class="btn btn-sm btn-outline-danger font-weight-bold">6:00-18:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id %}" class="btn btn-sm btn-outline-light">Insert hours</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 12 %}" class="btn btn-sm btn-outline-info">6:00-12:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 14 %}" class="btn btn-sm btn-outline-success">6:00-14:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 16 %}" class="btn btn-sm btn-outline-primary">6:00-16:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 18 %}" class="btn btn-sm btn-outline-danger">6:00-18:00</a>
               <a href="{% url 'evidence:working_time_recorder_add' employee_id 6 %}" class="btn btn-sm btn-outline-dark font-weight-bold">22:00-6:00</a>
             </div>
           </div>
@@ -56,9 +56,9 @@
                 </div>
               </div>
               <div class="row mt-3">
-                <div class="col">
-                  <div class="btn-sm mb-2">
-                    <button type="submit" class="btn btn-outline-success btn-block font-weight-bold">Confirm</button>
+                <div class="col text-center">
+                  <div class="btn btn-block mb-2">
+                    <button type="submit" class="btn btn-lg btn-outline-success btn-block">Confirm</button>
                   </div>
                 </div>
               </div>
@@ -99,33 +99,91 @@
             {% endif %}
           {% endif %}
         {% endif %}
-        <div class="row">
-          <div class="col-12">
-            <table class="table table-borderless table-hover table-sm">
-              <thead class="bg-info">
-              <tr><th>TOTAL PAYMENT FOR:</th><th class="text-white">{{ worker }}</th><th class="text-right" width="8%">RATE:</th><th class="text-white" width="18%">{{ rate|floatformat:2 }} PLN/h</th><th width="10%">HOURS:</th><th class="text-white" width="10%">{{ total_hours|floatformat:2 }}</th></tr>
-              </thead>
-            </table>
-            <table class="table table-hover table-borderless table-sm">
-              <tbody>
-              <tr><td class="text-right">Total hours:</td><td class="text-danger font-weight-bold">{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</td><td class="text-right">Brutto income:</td><td class="text-danger font-weight-bold">{{ brutto|money_format }}</td></tr>
-              <tr><td class="text-right">Basic payment (100%):</td><td class="text-danger font-weight-bold">{{ basicpay|money_format }}</td><td class="text-right">Leave payment (100%):</td><td class="text-danger font-weight-bold">{{ leavepay|money_format }}</td></tr>
-              <tr><td class="text-right">Saturday payment (100%):</td><td class="text-danger font-weight-bold">{{ satpay|money_format }}</td><td class="text-right">Sunday payment (200%):</td><td class="text-danger font-weight-bold">{{ sunpay|money_format }}</td></tr>
-              {% if overhours %}
-                <tr><td class="text-right">Overhours (50%):</td><td class="text-danger font-weight-bold">{{ overhourspay|money_format }}</td><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td></tr>
-              {% else %}
-                <tr><td class="text-right">Account payment:</td><td class="text-danger font-weight-bold">{{ accountpay|money_format }}</td></tr>
-              {% endif %}
-              <tr class="text-white font-weight-bold bg-info"><td>&nbsp;</td><td class="text-right">NETTO INCOME:</td><td>{{ salary|money_format }}</td><td>&nbsp;</td></tr>
-              </tbody>
-            </table>
+
+        <div class="container">
+          <div class="uk-evidence-box">
+            <div class="row">
+              <div class="col uk-evidence-headline d-flex justify-content-between">
+                <div class="text-dark">Employee:</div>
+                <div>{{ worker }}</div>
+                <div class="text-dark">Rate:</div>
+                <div>{{ rate|floatformat:2 }} PLN/h</div>
+                <div class="text-dark">Hours:</div>
+                <div>{{ total_hours|floatformat:2 }}</div>
+              </div>
+            </div>
+            <div class="uk-evidence-data-box">
+              <div class="row text-right">
+                <div class="col-4 text-dark">
+                  <div>Total hours:</div>
+                </div>
+                <div class="col-2 text-danger">
+                  <div>{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</div>
+                </div>
+                <div class="col-4 text-dark">
+                  <div>Brutto income:</div>
+                </div>
+                <div class="col-2 text-danger">
+                  <div>{{ brutto|money_format }}</div>
+                </div>
+              </div>
+              <div class="row text-right">
+                <div class="col-4 text-dark">
+                  <div>Basic payment (100%):</div>
+                </div>
+                <div class="col-2 text-danger">
+                  <div>{{ basicpay|money_format }}</div>
+                </div>
+                <div class="col-4 text-dark">
+                  <div>Leave payment (100%):</div>
+                </div>
+                <div class="col-2 text-danger">
+                  <div>{{ leavepay|money_format }}</div>
+                </div>
+              </div>
+              <div class="row text-right">
+                <div class="col-4 text-dark">
+                  <div>Saturday payment (100%):</div>
+                </div>
+                <div class="col-2 text-danger">
+                  <div>{{ satpay|money_format }}</div>
+                </div>
+                <div class="col-4 text-dark">
+                  <div>Sunday payment (200%):</div>
+                </div>
+                <div class="col-2 text-danger">
+                  <div>{{ sunpay|money_format }}</div>
+                </div>
+              </div>
+              <div class="row text-right">
+                <div class="col-4 text-dark">
+                  <div>Overhours (50%):</div>
+                </div>
+                <div class="col-2 text-danger">
+                  <div>{{ overhourspay|money_format }}</div>
+                </div>
+                <div class="col-4 text-dark">
+                  <div>Account payment:</div>
+                </div>
+                <div class="col-2 text-danger">
+                  <div>{{ accountpay|money_format }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col uk-evidence-headline d-flex justify-content-around">
+                <div class="text-dark">NETTO INCOME:</div>
+                <div>{{ salary|money_format }}</div>
+              </div>
+            </div>
           </div>
         </div>
+
         {% if request.method == "GET" %}
           <div class="row text-center">
             <div class="col-2"></div>
-            <div class="col-8 btn-sm mb-2">
-              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
+            <div class="col-8 btn btn-block mb-2">
+              <a href="{% url 'account:admin_site' %}" class="btn btn-lg btn-outline-dark btn-block">Back to the dashboard</a>
             </div>
             <div class="col-2"></div>
           </div>
