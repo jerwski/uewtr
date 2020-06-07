@@ -83,35 +83,67 @@
             {% endif %}
           {% endif %}
 
-          <table class="table table-hover table-borderless table-sm">
-            <thead class="bg-info">
-              <tr><th class="text-center text-white">TOTAL LEAVES INFO FOR {{ worker|upper }} IN {% now 'Y' %} YEAR</th></tr>
-            </thead>
-          </table>
-          <table class="table table-hover table-borderless table-sm">
-            <tbody>
-              <tr><td width="30%">Total leave in {% now 'Y' %} year:</td><td class="text-danger font-weight-bold">{{ total_leaves|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
-              {% if remaining_leave < 0 %}
-                <td width="20%">Days of leave exceeded by:</td><td class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td>
-              {% elif remaining_leave < 26 %}
-                <td>Remaining leave:</td><td class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</td></tr>
-              {% endif %}
+          <div class="container">
+            <div class="uk-evidence-box">
+              <div class="row">
+                <div class="col uk-evidence-headline">
+                  <div>TOTAL LEAVES INFO FOR <span class="text-white">{{ worker }}</span> IN {% now 'Y' %} YEAR</div>
+                </div>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-4">
+                <p class="text-right text-uppercase">Total leave in {% now 'Y' %} year:</p>
+              </div>
+              <div class="col-2">
+                <p class="text-danger font-weight-bold">{{ total_leaves|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</p>
+              </div>
+              <div class="col-4">
+                <p class="text-right text-uppercase">
+                  {% if remaining_leave < 0 %}
+                    Days of leave exceeded by:
+                  {% elif remaining_leave <= 26 and worker.leave %}
+                    Remaining leave:
+                  {% endif %}
+                </p>
+              </div>
+              <div class="col-2">
+                {% if worker.leave %}
+                  <p class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</p>
+                {% endif %}
+              </div>
+            </div>
+            <div class="row">
               {% if leaves_pl %}
-                <tr><td>Date of paid leave:</td><td class="text-danger font-italic"  colspan="3">
-                  {% for date in leaves_pl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
+                <div class="col-4">
+                  <p class="text-right text-uppercase">Date of paid leave:</p>
+                </div>
+                <div class="col-8">
+                  <p class="text-danger font-italic text-justify">{% for date in leaves_pl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</p>
+                </div>
               {% endif %}
               {% if leaves_ml %}
-                <tr><td>Date of maternity leave:</td><td class="text-danger font-italic"  colspan="3">
-                  {% for date in leaves_ml %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
+                <div class="col-4">
+                  <p class="text-right text-uppercase">Date of maternity leave:</p>
+                </div>
+                <div class="col-8">
+                  <p class="text-danger font-italic text-justify">{% for date in leaves_ml %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</p>
+                </div>
               {% endif %}
               {% if leaves_upl %}
-                <tr><td>Date of unpaid leave:</td><td class="text-danger font-italic"  colspan="3">
-                  {% for date in leaves_upl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</td></tr>
+                <div class="col-4">
+                  <p class="text-right text-uppercase">Date of unpaid leave:</p>
+                </div>
+                <div class="col-8">
+                  <p class="text-danger font-italic text-justify">{% for date in leaves_upl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</p>
+                </div>
               {% endif %}
-            </tbody>
-          </table>
-          <div class="row text-center">
-            <div class="col-12">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12 text-center">
+              <hr>
               <div class="btn btn-group">
                 {% if total_leaves > 0 %}
                   <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
@@ -131,12 +163,10 @@
         {% else %}
           <p class="text-center text-danger lead font-weight-normal bg-warning"><a class="text-danger" href="{% url 'employee:employee_basicdata' employee_id %}">EMPLOYEE IS DEACTIVATED</a></p>
           <div class="row text-center">
-            <div class="col-1"></div>
-            <div class="col-9 btn-sm mb-2">
+            <div class="col-9 offset-1 btn-sm mb-2">
               <p class="uk-text-middle">You can't add any leave day for <span class="text-danger">{{ worker }}</span> because the employee is no longer employed or deactivated.</p>
               <a href="{% url 'employee:employee_basicdata' employee_id %}" class="btn btn-outline-info btn-block blink">Activate Employee</a>
             </div>
-            <div class="col-1"></div>
           </div>
         {% endif %}
       </div>
