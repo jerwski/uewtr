@@ -87,7 +87,7 @@
             <div class="uk-evidence-box">
               <div class="row">
                 <div class="col uk-evidence-headline">
-                  <div>TOTAL LEAVES INFO FOR <span class="text-white">{{ worker }}</span> IN {% now 'Y' %} YEAR</div>
+                  <div><a class="text-white" href="{% url 'evidence:leaves_data_print' employee_id %}">TOTAL LEAVES INFO FOR <span class="text-white">{{ worker }}</span> IN {% now 'Y' %} YEAR</a></div>
                 </div>
               </div>
             </div>
