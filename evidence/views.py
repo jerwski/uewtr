@@ -224,50 +224,37 @@ class LeaveTimeRecorderEraseView(View):
 
 class LeavesDataPrintView(View):
 	'''class representing the view of annual leaves days print'''
-	# TODO: przygotować metodę setup()
-	def get(self, request, employee_id:int):
-		'''convert html annuall leave time for each employee in current year to pdf'''
-		year = now().year
-		html = leavehtml2pdf(employee_id, year)
 
-		if html:
-			# create pdf file
-			options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
-					   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
-					   'orientation': 'landscape','no-outline': None, 'quiet': '', }
+	def setup(self, request, **kwargs):
+		super().setup(request, **kwargs)
+		self.request, self.kwargs = request, kwargs
+		self.employee_id = self.kwargs['employee_id']
 
-			pdf = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
-			filename = f'leaves_data_{employee_id}.pdf'
+		if self.request.method == 'GET':
+			self.year = now().year
 
-			response = HttpResponse(pdf, content_type='application/pdf')
-			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
-			return response
-		else:
-			messages.warning(request, r'Nothing to print...')
+		elif self.request.method == 'POST':
+			self.year = int(self.request.POST['leave_year'])
 
-		return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[employee_id]))
+		self.html = leavehtml2pdf(self.employee_id, self.year)
 
-	def post(self, request, employee_id:int):
-		'''convert html annuall leave time for each employee in selected year to pdf'''
-		year = int(request.POST['leave_year'])
-		html = leavehtml2pdf(employee_id, year)
+		# create pdf file
+		options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
+		           'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
+		           'orientation': 'landscape','no-outline': None, 'quiet': '', }
 
-		if html:
-			# create pdf file
-			options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
-					   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
-					   'orientation': 'landscape','no-outline': None, 'quiet': '', }
+		self.pdf = pdfkit.from_string(self.html, False, options=options, css=settings.CSS_FILE)
+		self.filename = f'leaves_data_{self.employee_id}.pdf'
+		self.response = HttpResponse(self.pdf, content_type='application/pdf')
+		self.response['Content-Disposition'] = 'attachment; filename="' + self.filename + '"'
 
-			pdf = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
-			filename = f'leaves_data_{employee_id}.pdf'
+	def get(self, request, **kwargs):
+		'''return pdf attachment annuall leave time for selected employee in current year'''
+		return self.response
 
-			response = HttpResponse(pdf, content_type='application/pdf')
-			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
-			return response
-		else:
-			messages.warning(request, r'Nothing to print...')
-
-		return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[employee_id]))
+	def post(self, request, **kwargs):
+		'''return pdf attachment annuall leave time for selected employee in selected year'''
+		return self.response
 
 
 class SendLeavesDataPdf(View):
