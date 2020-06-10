@@ -53,7 +53,8 @@
 
           <div class="row text-center">
             <div class="col-sm-12">
-              {% bootstrap_field form.overtime label_class='text-info font-italic font-weight-bold' %}
+              <span class="uk-text-small font-italic font-weight-bold">Select the contract type:</span>
+              {% bootstrap_field form.overtime form_group_class='form-group' show_label=False %}
             </div>
           </div>
 
