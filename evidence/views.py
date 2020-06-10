@@ -238,23 +238,39 @@ class LeavesDataPrintView(View):
 
 		self.html = leavehtml2pdf(self.employee_id, self.year)
 
-		# create pdf file
-		options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
-		           'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
-		           'orientation': 'landscape','no-outline': None, 'quiet': '', }
-
-		self.pdf = pdfkit.from_string(self.html, False, options=options, css=settings.CSS_FILE)
-		self.filename = f'leaves_data_{self.employee_id}.pdf'
-		self.response = HttpResponse(self.pdf, content_type='application/pdf')
-		self.response['Content-Disposition'] = 'attachment; filename="' + self.filename + '"'
+		self.options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
+		                'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
+		                'orientation': 'landscape','no-outline': None, 'quiet': '',}
 
 	def get(self, request, **kwargs):
-		'''return pdf attachment annuall leave time for selected employee in current year'''
-		return self.response
+		'''convert html annuall leave time for each employee in current year to pdf'''
+		if self.html:
+			# create pdf file
+			pdf = pdfkit.from_string(self.html, False, options=self.options, css=settings.CSS_FILE)
+			filename = f'leaves_data_{self.employee_id}.pdf'
+
+			response = HttpResponse(pdf, content_type='application/pdf')
+			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+			return response
+		else:
+			messages.warning(self.request, r'Nothing to print...')
+
+		return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[self.employee_id]))
 
 	def post(self, request, **kwargs):
-		'''return pdf attachment annuall leave time for selected employee in selected year'''
-		return self.response
+		'''convert html annuall leave time for each employee in selected year to pdf'''
+		if self.html:
+			# create pdf file
+			pdf = pdfkit.from_string(self.html, False, options=self.options, css=settings.CSS_FILE)
+			filename = f'leaves_data_{self.employee_id}.pdf'
+
+			response = HttpResponse(pdf, content_type='application/pdf')
+			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+			return response
+		else:
+			messages.warning(self.request, r'Nothing to print...')
+
+		return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[self.employee_id]))
 
 
 class SendLeavesDataPdf(View):

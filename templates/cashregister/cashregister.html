@@ -71,7 +71,7 @@
 
       <div class="col-9">
         {% if company_id %}
-          <p class="uk-headline">ADD RECORD TO CASH REGISTER FOR {{ company }}</p>
+          <p class="uk-headline">ADD RECORD TO CASH REGISTER FOR <a class="text-danger" href="{% url 'cashregister:change_company' company_id %}">{{ company }}</a></p>
           <form action="." method="POST">{% csrf_token %}
             {% bootstrap_field form.company %}
             <div class="row ml-5">
@@ -199,12 +199,12 @@
               {% if company_id and previous %}
 
                 {% include 'blocks/cash_register_print_modal.html' %}
-                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print last register</a>
+                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success">Print current register</a>
                 <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info">Send last
                   register</a>
               {% elif company_id and not previous %}
                 {% include 'blocks/cash_register_print_modal.html' %}
-                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success disabled">Print last register</a>
+                <a href="{% url 'cashregister:print_register' company_id %}" class="btn btn-outline-success disabled">Print current register</a>
                 <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info disabled">Send
                   last register</a>
               {% endif %}
