@@ -15,7 +15,7 @@
           <a class="btn btn-outline-primary d-print-none" href="{% url 'evidence:working_time_recorder_add' employee_id %}">Work time recorder</a>
           <a class="btn btn-outline-success d-print-none" href="{% url 'evidence:leave_time_recorder_add' employee_id %}">Leave time recorder</a>
           <a class="btn btn-outline-secondary d-print-none" href="{% url 'evidence:account_payment' employee_id %}">Payment on account</a>
-          {% if amountpay and amountpay.brutto > 0 %}
+          {% if amountpay.brutto > 0 %}
             <a class="btn btn-outline-info d-print-none" href="{% url 'evidence:monthly_payroll_print' month year %}">Print</a>
             <a class="btn btn-outline-warning d-print-none" href="{% url 'evidence:monthly_payroll_pdf' month year %}">Send PDF</a>
           {% else %}
@@ -53,18 +53,7 @@
             </div>
           </div>
 
-          <table class="table table-sm table-borderless table-striped table-hover">
-            <colgroup>
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-            </colgroup>
+          <table class="uk-table table-striped">
             <thead class="text-center bg-info">
               <tr>{% for head in heads %}<th>{{ head }}</th>{% endfor %}</tr>
             </thead>

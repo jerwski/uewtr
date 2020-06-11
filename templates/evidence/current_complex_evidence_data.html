@@ -25,24 +25,21 @@
     <div class="row ml-3 mr-3 mb-2 uk-bg-bisque">
       <div class="col-3">
         <p class="uk-headline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">EMPLOYED WORKERS</a></p>
-
-        <table class="table table-sm table-hover table-borderless">
-          <colgroup>
-            <col span="1" style="width:auto">
-            <col span="1" style="width:auto">
-          </colgroup>
-          <tbody>
-          {% for employee in employees %}
-            <tr>
-              {% if employee_id == employee.id %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{% employee_complex_data_pass employee.employee_complex_data month year %}">{{ employee }}</a></td>
-              {% else %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{% employee_complex_data_pass employee.employee_complex_data month year %}">{{ employee }}</a></td>
-              {% endif %}
-            </tr>
-          {% endfor %}
-          </tbody>
-        </table>
+        <div class="uk-table-scroll-lg">
+          <table class="uk-table">
+            <tbody>
+            {% for employee in employees %}
+              <tr>
+                {% if employee_id == employee.id %}
+                  <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{% employee_complex_data_pass employee.employee_complex_data month year %}">{{ employee }}</a></td>
+                {% else %}
+                  <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{% employee_complex_data_pass employee.employee_complex_data month year %}">{{ employee }}</a></td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="col-6">
@@ -161,13 +158,11 @@
           <p class="text-center text-primary lead font-weight-normal">No data for {{ worker }} available because the employee is no longer employed.</p>
         {% endif %}
         <div class="row">
-          <div class="col-6 btn">
-            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark btn-block">Back to the dashboard</a>
-          </div>
-          <div class="col-6 btn btn-group float-right" role="group">
+          <div class="col btn btn-group" role="group">
+            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the dashboard</a>
             <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
             {% include 'blocks/plot_chart_modal.html' %}
-            <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
+            <a href="{% url 'evidence:monthly_payroll_view' month year %}" class="btn btn-outline-success">Monthly Payroll</a>
           </div>
         </div>
       </div>
@@ -192,7 +187,7 @@
             </div>
           </div>
           <div class="uk-table-scroll-md">
-            <table class="table table-hover table-borderless table-sm">
+            <table class="uk-table">
               <thead>
                 <tr class="text-dark text-center">
                   <th>Nr</th>
@@ -202,6 +197,7 @@
                   <th>Hours</th>
                 </tr>
               </thead>
+              <tbody>
               {% for hours in work_hours %}
                 <tr>
                   <td class="text-right text-secondary">{{ forloop.counter }}.</td>
@@ -220,13 +216,11 @@
               </tbody>
 
             </table>
-          {% else %}
+          </div>
+        {% else %}
           <p class="text-justify text-danger font-weight-bold font-italic">For selected date <mark>{{ choice_date|date:'m/Y' }}</mark> there aren't register working days in database. Please select another date...</p>
-          {% endif %}
-        </div>
+        {% endif %}
       </div>
-
     </div>
   </div>
-
 {% endblock %}

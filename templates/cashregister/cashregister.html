@@ -46,19 +46,19 @@
     <div class="row ml-3 mr-3 mb-2 uk-bg-bisque">
       <div class="col-3">
         <p class="uk-headline">COMPANIES</p>
-        <table class="table table-hover table-borderless table-sm">
-          <tbody>
-          {% for company in companies %}
-            <tr>
-              {% if company_id == company.id %}
-                <td><a class="text-danger" href="{{ company.add_records }}">{{ company }}</a></td>
-              {% else %}
-                <td><a href="{{ company.add_records }}">{{ company }}</a></td>
-              {% endif %}
-            </tr>
-          {% endfor %}
-          </tbody>
-        </table>
+          <table class="uk-table">
+            <tbody>
+            {% for company in companies %}
+              <tr>
+                {% if company_id == company.id %}
+                  <td><a class="text-danger" href="{{ company.add_records }}">{{ company }}</a></td>
+                {% else %}
+                  <td><a href="{{ company.add_records }}">{{ company }}</a></td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
         <div class="row mt-4">
           <div class="col">
             <div class="btn-sm mb-2">
@@ -103,22 +103,22 @@
           </form>
 
           <div class="row">
-            <table class="table table-borderless table-sm table-hover">
+            <table class="uk-table">
               <thead class="text-center">
-              <tr class="uk-text-small">
-                <th class="text-primary">Z przeniesienia</th>
-                <th class="text-success">Przychód</th>
-                <th class="text-danger">Rozchód</th>
-                <th class="text-info">Stan kasy</th>
-              </tr>
+                <tr class="uk-text-small">
+                  <th class="text-primary">Z przeniesienia</th>
+                  <th class="text-success">Przychód</th>
+                  <th class="text-danger">Rozchód</th>
+                  <th class="text-info">Stan kasy</th>
+                </tr>
               </thead>
               <tbody>
-              <tr class="col-3 text-center font-weight-bold font-italic">
-                <td>{{ saldo|money_format }}</td>
-                <td>{{ incomes|money_format }}</td>
-                <td>{{ expenditures|money_format }}</td>
-                <td>{{ status|money_format }}</td>
-              </tr>
+                <tr class="col-3 text-center font-weight-bold font-italic">
+                  <td>{{ saldo|money_format }}</td>
+                  <td>{{ incomes|money_format }}</td>
+                  <td>{{ expenditures|money_format }}</td>
+                  <td>{{ status|money_format }}</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -131,7 +131,7 @@
             </div>
           </div>
           <div class="uk-table-scroll-sm">
-            <table class="table table-borderless table-sm table-hover">
+            <table class="uk-table">
               <thead>
                 <tr class="font-weight-light small">
                   <th>Nr</th>

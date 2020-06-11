@@ -36,24 +36,26 @@
             <span class="input-group-text fas fa-search" id="basic-addon"></span>
           </div>
         </div>
-        <table class="table table-hover table-borderless table-sm">
-          <thead class="text-info font-weight-bold"><tr><th>Company</th><th>NIP</th></tr></thead>
-            <tbody id="searchTable">
-            {% for company in companies %}
-              <tr>
-                {% if request.path == '/cashregister/add_company/' %}
-                  <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
-                {% else %}
-                  {% if company_id == company.id %}
-                    <td><a class="font-weight-normal text-danger" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
-                  {% else %}
+        <div class="uk-table-scroll-md">
+          <table class="uk-table">
+            <thead class="text-dark font-weight-bold"><tr><th>Company</th><th>NIP</th></tr></thead>
+              <tbody id="searchTable">
+              {% for company in companies %}
+                <tr>
+                  {% if request.path == '/cashregister/add_company/' %}
                     <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
+                  {% else %}
+                    {% if company_id == company.id %}
+                      <td><a class="font-weight-normal text-danger" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
+                    {% else %}
+                      <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
+                    {% endif %}
                   {% endif %}
-                {% endif %}
-              </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </tr>
+              {% endfor %}
+              </tbody>
+          </table>
+        </div>
       </div>
       <div class="col-6">
         <p class="uk-headline">{% if company_id %}CHANGE{% else %}ADD{% endif %} COMPANY DATA</p>
