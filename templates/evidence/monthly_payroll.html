@@ -54,7 +54,7 @@
           </div>
 
           <table class="uk-table table-striped">
-            <thead class="text-center bg-info">
+            <thead class="text-center uk-bg-burlywood">
               <tr>{% for head in heads %}<th>{{ head }}</th>{% endfor %}</tr>
             </thead>
             <tbody id="searchTable">
@@ -73,17 +73,16 @@
                 </tr>
               {% endif %}
             {% endfor %}
-              <tr class="bg-info"><td class="text-right text-white font-weight-bold">TOTAL:</td>
-              {% for value in amountpay.values %}
-                <td class="text-right text-white font-weight-bold">{{ value|money_format }}</td>
-              {% endfor %}
-              </tr>
             </tbody>
+            <thead class="text-right uk-bg-burlywood">
+              <tr>
+                <th>TOTAL PAYMENT:</th>
+                {% for value in amountpay.values %}
+                  <th>{{ value|money_format }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
           </table>
-        {% elif not amountpay %}
-          <div class="jumbotron bg-warning mt-lg-5 text-center">
-            <p class="uk-text-middle">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>
-          </div>
         {% else %}
           <div class="jumbotron bg-warning mt-lg-5 text-center">
             <p class="uk-text-middle">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>

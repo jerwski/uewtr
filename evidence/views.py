@@ -308,6 +308,7 @@ class SendLeavesDataPdf(View):
 class MonthlyPayrollView(View):
 	'''class representing the view of monthly payroll'''
 	def setup(self, request, **kwargs):
+		super().setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
 
 		if self.request.method == 'GET':
@@ -360,7 +361,7 @@ class MonthlyPayrollView(View):
 
 		return render(request, 'evidence/monthly_payroll.html', self.context)
 
-	def post(self,request, **kwargs) -> render:
+	def post(self, request, **kwargs) -> render:
 
 		return render(request, 'evidence/monthly_payroll.html', self.context)
 
@@ -435,9 +436,9 @@ class AccountPaymentView(View):
 		# set list of valid employees
 		queryset = Employee.objects.all().order_by('surname', 'forename')
 
-		q1 = queryset.filter(status=1)
-		q2 = queryset.filter(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
-		employees = q1 | q2
+		q1 = Q(status=1)
+		q2 = Q(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
+		employees = queryset.filter(q1|q2)
 
 		# seting context
 		context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees, 'year': year,
@@ -486,9 +487,9 @@ class AccountPaymentView(View):
 			queryset = Employee.objects.all()
 			prevmonth, prevyear = previous_month_year(month, year)
 
-			q1 = queryset.filter(status=1)
-			q2 = queryset.filter(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
-			employees = q1 | q2
+			q1 = Q(status=1)
+			q2 = Q(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
+			employees = queryset.filter(q1|q2)
 
 			# updating context
 			context.update({'salary': salary, 'employees': employees, 'earlier_date': 'account_date'})
