@@ -12,7 +12,7 @@
       <div class="col-4">
         <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
         <div class="uk-table-scroll-md">
-          <table class="table table-hover table-borderless table-sm">
+          <table class="uk-table">
             <tbody>
             {% for employee in employees_st %}
               <tr>
@@ -34,7 +34,7 @@
       <div class="col-4">
         <p class="text-center text-danger lead font-weight-normal bg-warning">DEACTIVE EMPLOYEES</p>
         <div class="uk-table-scroll-md">
-          <table class="table table-hover table-borderless table-sm">
+          <table class="uk-table">
             <tbody>
             {% for employee in employees_sf %}
               <tr>
@@ -53,7 +53,7 @@
         <p class="text-center text-danger lead font-weight-normal bg-warning">{% if new_employee %}ADD EMPLOYEE BASIC DATA{% else %}CHANGE EMPLOYEE BASIC DATA{% endif %}</p>
 
         <form action="." method="POST">{% csrf_token %}
-{#          <div class="row">#}
+          <div class="row">
             <div class="col text-center">
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -74,14 +74,14 @@
                 {% bootstrap_field form.pesel form_group_class='form-inline' show_label=False placeholder='Type pesel...' %}
               </div>
             </div>
-{#          </div>#}
+          </div>
 
           <div class="row">
-            <div class="col-6 text-center">
-              {% bootstrap_field form.leave size='small' label_class='text-info font-italic font-weight-bold' %}
+            <div class="col-6">
+              {% bootstrap_field form.leave size='small' label_class='uk-text-small font-italic font-weight-bold' %}
             </div>
-            <div class="col-6 text-center">
-              {% bootstrap_field form.status size='small' label_class='text-info font-italic font-weight-bold' %}
+            <div class="col-6">
+              {% bootstrap_field form.status size='small' label_class='uk-text-small font-italic font-weight-bold' %}
             </div>
           </div>
 
@@ -122,8 +122,8 @@
           <div class="btn btn-group btn-block" role="group">
             <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
             <a href="{% url 'account:admin_site' %}" class="btn btn-outline-success">Dashboard</a>
-            {% if new_employee %}
-              <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Add basic data</a>
+            {% if not new_employee %}
+              <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-info">Add new employee</a>
             {% endif %}
           </div>
         </div>

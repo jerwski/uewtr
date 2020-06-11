@@ -190,41 +190,46 @@ class CashRegisterDelete(View):
 
 class CashRegisterPrintView(View):
 	'''class representing the view of monthly cash register print'''
-	def get(self, request, company_id:int):
+	def setup(self, request, **kwargs):
+		super().setup(request, **kwargs)
+		self.request, self.kwargs = request, kwargs
+		self.company_id = self.kwargs['company_id']
+
+		if self.request.method == 'GET':
+			self.month, self.year = now().month, now().year
+
+		elif self.request.method == 'POST':
+			self.month = int(self.request.POST['cr_number'].split('/')[0])
+			self.year = int(self.request.POST['cr_number'].split('/')[1])
+
+		self.html = cashregisterhtml2pdf(self.company_id, self.month, self.year)
+
+
+	def get(self, request, **kwargs):
 		'''convert html cashregister_pdf for selected company to pdf'''
-		month, year = now().month, now().year
-		month, year = previous_month_year(month, year)
-
-		html = cashregisterhtml2pdf(company_id, month, year)
-
-		if html:
+		if self.html:
 			# create cash register as pdf file attachment
-			filename = f'cashregister_{company_id}_{year}_{month}.pdf'
-			response = make_attachment(html, filename)
+			filename = f'cashregister_{self.company_id}_{self.year}_{self.month}.pdf'
+			response = make_attachment(self.html, filename)
 
 			return response
 		else:
-			messages.warning(request, r'Nothing to print...')
+			messages.warning(self.request, r'Nothing to print...')
 
-		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
+		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[self.company_id]))
 
-	def post(self, request, company_id:int):
+	def post(self, request, **kwargs):
 		'''convert html cashregister_pdf for selected cash register to pdf'''
-		data = request.POST['cr_number']
-		month, year = int(data.split('/')[0]), int(data.split('/')[1])
-
-		html = cashregisterhtml2pdf(company_id, month, year)
-
-		if html:
+		if self.html:
 			# create cash register as pdf file attachment
-			filename = f'cashregister_{company_id}_{year}_{month}.pdf'
-			response = make_attachment(html, filename)
+			filename = f'cashregister_{self.company_id}_{self.year}_{self.month}.pdf'
+			response = make_attachment(self.html, filename)
 
 			return response
 		else:
-			messages.warning(request, r'Nothing to print...')
+			messages.warning(self.request, r'Nothing to print...')
 
-		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
+		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[self.company_id]))
 
 
 class CashRegisterSendView(View):

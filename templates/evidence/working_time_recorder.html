@@ -12,19 +12,21 @@
   <div class="row">
     <div class="col-3">
       <p class="uk-headline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
-      <table class="table table-hover table-borderless table-sm">
-        <tbody>
-        {% for employee in employees %}
-          <tr>
-            {% if employee_id == employee.id %}
-              <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
-            {% else %}
-              <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
-            {% endif %}
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
+      <div class="uk-table-scroll-lg">
+        <table class="uk-table">
+          <tbody>
+          {% for employee in employees %}
+            <tr>
+              {% if employee_id == employee.id %}
+                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
+              {% else %}
+                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="col-9">
       {% if worker.status %}
@@ -112,64 +114,34 @@
                 <div>{{ total_hours|floatformat:2 }}</div>
               </div>
             </div>
-            <div class="uk-evidence-data-box">
-              <div class="row text-right">
-                <div class="col-4 text-dark">
-                  <div>Total hours:</div>
-                </div>
-                <div class="col-2 text-danger">
-                  <div>{{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}</div>
-                </div>
-                <div class="col-4 text-dark">
-                  <div>Brutto income:</div>
-                </div>
-                <div class="col-2 text-danger">
-                  <div>{{ brutto|money_format }}</div>
-                </div>
+
+            <div class="uk-evidence-data-box d-flex justify-content-between">
+              <div class="text-dark">
+                  Total work hours:<br>
+                  Basic payment (100%):<br>
+                  Saturday payment (100%):<br>
+                  Overhours (50%):
               </div>
-              <div class="row text-right">
-                <div class="col-4 text-dark">
-                  <div>Basic payment (100%):</div>
-                </div>
-                <div class="col-2 text-danger">
-                  <div>{{ basicpay|money_format }}</div>
-                </div>
-                <div class="col-4 text-dark">
-                  <div>Leave payment (100%):</div>
-                </div>
-                <div class="col-2 text-danger">
-                  <div>{{ leavepay|money_format }}</div>
-                </div>
+              <div class="text-danger">
+                  {{ total_hours|floatformat:2 }} hour{{ total_hours|pluralize:'s' }}<br>
+                  {{ basicpay|money_format }}<br>
+                  {{ satpay|money_format }}<br>
+                  {{ overhourspay|money_format }}
               </div>
-              <div class="row text-right">
-                <div class="col-4 text-dark">
-                  <div>Saturday payment (100%):</div>
-                </div>
-                <div class="col-2 text-danger">
-                  <div>{{ satpay|money_format }}</div>
-                </div>
-                <div class="col-4 text-dark">
-                  <div>Sunday payment (200%):</div>
-                </div>
-                <div class="col-2 text-danger">
-                  <div>{{ sunpay|money_format }}</div>
-                </div>
+              <div class="text-dark">
+                  Brutto income:<br>
+                  Leave payment (100%):<br>
+                  Sunday payment (200%):<br>
+                  Account payment:
               </div>
-              <div class="row text-right">
-                <div class="col-4 text-dark">
-                  <div>Overhours (50%):</div>
-                </div>
-                <div class="col-2 text-danger">
-                  <div>{{ overhourspay|money_format }}</div>
-                </div>
-                <div class="col-4 text-dark">
-                  <div>Account payment:</div>
-                </div>
-                <div class="col-2 text-danger">
-                  <div>{{ accountpay|money_format }}</div>
-                </div>
+              <div class="text-danger">
+                  {{ brutto|money_format }}<br>
+                  {{ leavepay|money_format }}<br>
+                  {{ sunpay|money_format }}<br>
+                  {{ accountpay|money_format }}
               </div>
             </div>
+
             <div class="row">
               <div class="col uk-evidence-headline d-flex justify-content-around">
                 <div class="text-dark">NETTO INCOME:</div>

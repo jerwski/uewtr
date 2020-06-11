@@ -15,7 +15,7 @@
           <a class="btn btn-outline-primary d-print-none" href="{% url 'evidence:working_time_recorder_add' employee_id %}">Work time recorder</a>
           <a class="btn btn-outline-success d-print-none" href="{% url 'evidence:leave_time_recorder_add' employee_id %}">Leave time recorder</a>
           <a class="btn btn-outline-secondary d-print-none" href="{% url 'evidence:account_payment' employee_id %}">Payment on account</a>
-          {% if amountpay and amountpay.brutto > 0 %}
+          {% if amountpay.brutto > 0 %}
             <a class="btn btn-outline-info d-print-none" href="{% url 'evidence:monthly_payroll_print' month year %}">Print</a>
             <a class="btn btn-outline-warning d-print-none" href="{% url 'evidence:monthly_payroll_pdf' month year %}">Send PDF</a>
           {% else %}
@@ -53,19 +53,8 @@
             </div>
           </div>
 
-          <table class="table table-sm table-borderless table-striped table-hover">
-            <colgroup>
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-              <col span="1" style="width: auto">
-            </colgroup>
-            <thead class="text-center bg-info">
+          <table class="uk-table table-striped">
+            <thead class="text-center uk-bg-burlywood">
               <tr>{% for head in heads %}<th>{{ head }}</th>{% endfor %}</tr>
             </thead>
             <tbody id="searchTable">
@@ -84,17 +73,16 @@
                 </tr>
               {% endif %}
             {% endfor %}
-              <tr class="bg-info"><td class="text-right text-white font-weight-bold">TOTAL:</td>
-              {% for value in amountpay.values %}
-                <td class="text-right text-white font-weight-bold">{{ value|money_format }}</td>
-              {% endfor %}
-              </tr>
             </tbody>
+            <thead class="text-right uk-bg-burlywood">
+              <tr>
+                <th>TOTAL PAYMENT:</th>
+                {% for value in amountpay.values %}
+                  <th>{{ value|money_format }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
           </table>
-        {% elif not amountpay %}
-          <div class="jumbotron bg-warning mt-lg-5 text-center">
-            <p class="uk-text-middle">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>
-          </div>
         {% else %}
           <div class="jumbotron bg-warning mt-lg-5 text-center">
             <p class="uk-text-middle">Your choice: {{ month }}/{{ year }}r. Total work hours: {{ total_work_hours }} hours.<br>For {{ month }}/{{ year }} no data available in database!</p>

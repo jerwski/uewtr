@@ -36,24 +36,26 @@
             <span class="input-group-text fas fa-search" id="basic-addon"></span>
           </div>
         </div>
-        <table class="table table-hover table-borderless table-sm">
-          <thead class="text-info font-weight-bold"><tr><th>Company</th><th>NIP</th></tr></thead>
-            <tbody id="searchTable">
-            {% for company in companies %}
-              <tr>
-                {% if request.path == '/cashregister/add_company/' %}
-                  <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
-                {% else %}
-                  {% if company_id == company.id %}
-                    <td><a class="font-weight-normal text-danger" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
-                  {% else %}
+        <div class="uk-table-scroll-md">
+          <table class="uk-table">
+            <thead class="text-dark font-weight-bold"><tr><th>Company</th><th>NIP</th></tr></thead>
+              <tbody id="searchTable">
+              {% for company in companies %}
+                <tr>
+                  {% if request.path == '/cashregister/add_company/' %}
                     <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
+                  {% else %}
+                    {% if company_id == company.id %}
+                      <td><a class="font-weight-normal text-danger" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
+                    {% else %}
+                      <td><a class="font-weight-normal" href="{{ company.get_absolute_url }}">{{ company }}</a></td><td>{{ company.nip }}</td>
+                    {% endif %}
                   {% endif %}
-                {% endif %}
-              </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </tr>
+              {% endfor %}
+              </tbody>
+          </table>
+        </div>
       </div>
       <div class="col-6">
         <p class="uk-headline">{% if company_id %}CHANGE{% else %}ADD{% endif %} COMPANY DATA</p>
@@ -78,29 +80,36 @@
               {% bootstrap_field form.account size='small' label_class='text-info font-italic font-weight-bold' %}
             </div>
           </div>
-          <div class="row text-center">
-            <div class="col-12 mb-1">
+
+          <div class="row">
+            <div class="col-12 mb-1 text-center">
               {% bootstrap_field form.status label_class='text-info font-italic font-weight-bold' %}
             </div>
           </div>
-          <hr>
 
           <div class="row">
-            <div class="col-12 text-center">
-              <div class="btn btn-group mb-2" role="group">
-                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
-                {% if company_id %}
-                  <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Add company</a>
-                {% endif %}
-                <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
-                <a href="{% url 'accountancy:accountancy' %}" class="btn btn-outline-danger">Accountancy</a>
-                <button type="submit" class="btn btn-outline-success">Confirm</button>
+            <div class="col text-center">
+              <div class="btn btn-block mb-2">
+                <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
               </div>
             </div>
           </div>
         </form>
 
+        <hr>
+        <div class="row">
+          <div class="col-12 text-center">
+            <div class="btn-group mb-2" role="group">
+              <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+              {% if company_id %}
+                <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Add company</a>
+              {% endif %}
+              <a href="{% url 'accountancy:accountancy' %}" class="btn btn-outline-danger">Accountancy</a>
+              <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

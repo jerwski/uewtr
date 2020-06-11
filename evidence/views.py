@@ -238,23 +238,39 @@ class LeavesDataPrintView(View):
 
 		self.html = leavehtml2pdf(self.employee_id, self.year)
 
-		# create pdf file
-		options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
-		           'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
-		           'orientation': 'landscape','no-outline': None, 'quiet': '', }
-
-		self.pdf = pdfkit.from_string(self.html, False, options=options, css=settings.CSS_FILE)
-		self.filename = f'leaves_data_{self.employee_id}.pdf'
-		self.response = HttpResponse(self.pdf, content_type='application/pdf')
-		self.response['Content-Disposition'] = 'attachment; filename="' + self.filename + '"'
+		self.options = {'page-size': 'A4', 'margin-top': '1.0in', 'margin-right': '0.1in',
+		                'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
+		                'orientation': 'landscape','no-outline': None, 'quiet': '',}
 
 	def get(self, request, **kwargs):
-		'''return pdf attachment annuall leave time for selected employee in current year'''
-		return self.response
+		'''convert html annuall leave time for each employee in current year to pdf'''
+		if self.html:
+			# create pdf file
+			pdf = pdfkit.from_string(self.html, False, options=self.options, css=settings.CSS_FILE)
+			filename = f'leaves_data_{self.employee_id}.pdf'
+
+			response = HttpResponse(pdf, content_type='application/pdf')
+			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+			return response
+		else:
+			messages.warning(self.request, r'Nothing to print...')
+
+		return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[self.employee_id]))
 
 	def post(self, request, **kwargs):
-		'''return pdf attachment annuall leave time for selected employee in selected year'''
-		return self.response
+		'''convert html annuall leave time for each employee in selected year to pdf'''
+		if self.html:
+			# create pdf file
+			pdf = pdfkit.from_string(self.html, False, options=self.options, css=settings.CSS_FILE)
+			filename = f'leaves_data_{self.employee_id}.pdf'
+
+			response = HttpResponse(pdf, content_type='application/pdf')
+			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+			return response
+		else:
+			messages.warning(self.request, r'Nothing to print...')
+
+		return HttpResponseRedirect(reverse('evidence:leave_time_recorder_add', args=[self.employee_id]))
 
 
 class SendLeavesDataPdf(View):
@@ -291,74 +307,63 @@ class SendLeavesDataPdf(View):
 
 class MonthlyPayrollView(View):
 	'''class representing the view of monthly payroll'''
-	def get(self, request) -> render:
-		month, year = now().month, now().year
-		choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
+	def setup(self, request, **kwargs):
+		super().setup(request, **kwargs)
+		self.request, self.kwargs = request, kwargs
+
+		if self.request.method == 'GET':
+
+			if self.kwargs:
+				month, year = self.kwargs['month'], self.kwargs['year']
+
+			else:
+				month, year = now().month, now().year
+
+			choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
+			form = PeriodMonthlyPayrollForm(initial={'choice_date': choice_date})
+
+		elif self.request.method == 'POST':
+			choice_date = datetime.strptime(self.request.POST['choice_date'],'%m/%Y')
+			month, year = choice_date.month, choice_date.year
+			form = PeriodMonthlyPayrollForm(data={'choice_date':choice_date})
+
 		heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
-				 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
-		form = PeriodMonthlyPayrollForm(initial={'choice_date': choice_date})
+		         'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
 		employees = Employee.objects.all()
 		employee_id = employees.filter(employeedata__end_contract__isnull=True)
-		
+
 		if employee_id.filter(status=True).exists():
 			employee_id = employee_id.filter(status=True).first().id
 		else:
 			employee_id = employee_id.first().id
-			
-		total_work_hours = len(list(workingdays(year, month))) * 8
-		employees = employees.exclude(employeedata__end_contract__lt=date(year, month, 1)).order_by('surname', 'forename')
 
+		# create list of employee
+		day = calendar.monthrange(year, month)[1]
+		q1 = Q(employeedata__end_contract__lt=date(year, month, 1))
+		q2 = Q(employeedata__start_contract__gt=date(year, month, day))
+		employees = employees.exclude(q1|q2).order_by('surname', 'forename')
+		total_work_hours = len(list(workingdays(year, month))) * 8
 		# create data for payroll as associative arrays for every engaged employee
 		payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
-
 		# create defaultdict with summary payment
 		amountpay = defaultdict(float)
 
 		for item in payroll.values():
-			if item['accountpay'] != item['brutto']:
-				for k,v in item.items():
-					amountpay[k] += v
+			for k,v in item.items():
+				amountpay[k] += v
 
-		context = {'form': form, 'heads': heads, 'payroll': payroll, 'month': month, 'year': year,
-				   'total_work_hours': total_work_hours, 'amountpay': dict(amountpay), 'employee_id': employee_id}
+		self.context = {'form': form, 'heads': heads, 'month': month, 'year': year,
+		                'payroll': payroll, 'total_work_hours': total_work_hours,
+		                'amountpay': dict(amountpay), 'employee_id': employee_id}
 
-		return render(request, 'evidence/monthly_payroll.html', context)
 
-	def post(self,request) -> render:
-		heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
-				 'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
-		employees = Employee.objects.all()
-		employee_id = employees.filter(employeedata__end_contract__isnull=True)
-		
-		if employee_id.filter(status=True).exists():
-			employee_id = employee_id.filter(status=True).first().id
-		else:
-			employee_id = employee_id.first().id
-			
-		choice_date = datetime.strptime(request.POST['choice_date'],'%m/%Y')
-		form = PeriodMonthlyPayrollForm(data={'choice_date':choice_date})
+	def get(self, request, **kwargs) -> render:
 
-		# building query for actual list of employee
-		year, month = choice_date.year, choice_date.month
-		day = calendar.monthrange(year, month)[1]
-		query = Q(employeedata__end_contract__lt=date(year,month,1))|Q(employeedata__start_contract__gt=date(year,month,day))
-		employees = employees.exclude(query).order_by('surname', 'forename')
-		context = {'form': form, 'heads': heads, 'employee_id': employee_id,}
+		return render(request, 'evidence/monthly_payroll.html', self.context)
 
-		if form.is_valid():
-			total_work_hours = len(list(workingdays(year, month))) * 8
-			# create data for payroll as associative arrays for every engaged employee
-			payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
-			# create defaultdict with summary payment
-			amountpay = defaultdict(float)
-			for item in payroll.values():
-				for k,v in item.items():
-					amountpay[k] += v
+	def post(self, request, **kwargs) -> render:
 
-			context.update({'payroll': payroll, 'month': month, 'year': year,
-			                'total_work_hours': total_work_hours,'amountpay': dict(amountpay)})
-
-		return render(request, 'evidence/monthly_payroll.html', context)
+		return render(request, 'evidence/monthly_payroll.html', self.context)
 
 
 class MonthlyPayrollPrintView(View):
@@ -431,9 +436,9 @@ class AccountPaymentView(View):
 		# set list of valid employees
 		queryset = Employee.objects.all().order_by('surname', 'forename')
 
-		q1 = queryset.filter(status=1)
-		q2 = queryset.filter(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
-		employees = q1 | q2
+		q1 = Q(status=1)
+		q2 = Q(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
+		employees = queryset.filter(q1|q2)
 
 		# seting context
 		context = {'form': form, 'worker': worker, 'employee_id': employee_id, 'employees': employees, 'year': year,
@@ -482,9 +487,9 @@ class AccountPaymentView(View):
 			queryset = Employee.objects.all()
 			prevmonth, prevyear = previous_month_year(month, year)
 
-			q1 = queryset.filter(status=1)
-			q2 = queryset.filter(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
-			employees = q1 | q2
+			q1 = Q(status=1)
+			q2 = Q(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
+			employees = queryset.filter(q1|q2)
 
 			# updating context
 			context.update({'salary': salary, 'employees': employees, 'earlier_date': 'account_date'})

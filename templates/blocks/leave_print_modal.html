@@ -1,9 +1,9 @@
 <!-- Modal for data to will be erase if you want -->
   {% if leave_set %}
     {% if total_leaves > 0 %}
-      <button id="leaveButton" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#leaveModal">Print leave data</button>
+      <button id="leaveButton" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#leaveModal">Print selected leave data</button>
     {% else %}
-      <button id="leaveButton" type="button" class="btn btn-lg btn-outline-primary" data-toggle="modal" data-target="#leaveModal">Print leave data</button>
+      <button id="leaveButton" type="button" class="btn btn-lg btn-outline-primary" data-toggle="modal" data-target="#leaveModal">Print selected leave data</button>
      {% endif %}
   {% else %}
     {% if total_leaves > 0 %}
@@ -35,7 +35,7 @@
               </div>
             </div>
             <div class="uk-table-scroll-sm">
-              <table class="table table-borderless table-sm table-hover">
+              <table class="table table-borderless table-sm">
                 <tbody id="LYTable">
                 {% for leave_year, leave_value in leave_set.items %}
                   <tr>
