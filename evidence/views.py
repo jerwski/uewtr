@@ -564,68 +564,53 @@ class EmployeeCurrentComplexDataView(View):
 	def setup(self, request, **kwargs):
 		super(EmployeeCurrentComplexDataView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
-		self.employee_id = self.kwargs['employee_id']
-		self.worker = Employee.objects.get(pk=self.employee_id)
+		employee_id = self.kwargs['employee_id']
+		worker = Employee.objects.get(pk=employee_id)
+		leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
 
 		if self.request.method == 'GET':
-			self.month, self.year = self.kwargs['month'], self.kwargs['year']
-			self.choice_date = datetime.strptime(f'{self.month}/{self.year}','%m/%Y')
+			month, year = self.kwargs['month'], self.kwargs['year']
+			choice_date = datetime.strptime(f'{month}/{year}','%m/%Y')
+			form = PeriodCurrentComplexDataForm(initial={'choice_date': choice_date})
 
 		elif self.request.method == 'POST':
-			self.choice_date = datetime.strptime(self.request.POST['choice_date'],'%m/%Y')
-			self.month, self.year = self.choice_date.month, self.choice_date.year
+			choice_date = datetime.strptime(self.request.POST['choice_date'],'%m/%Y')
+			month, year = choice_date.month, choice_date.year
+			form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
 
-		if self.month == 12:
-			self.cut_off_month, self.cut_off_year = 1, self.year + 1
+		if month == 12:
+			cut_off_month, cut_off_year = 1, year + 1
 		else:
-			self.cut_off_month, self.cut_off_year = self.month + 1, self.year
+			cut_off_month, cut_off_year = month + 1, year
 
-		self.cut_off_date = datetime.strptime(f'{self.cut_off_month}/{self.cut_off_year}','%m/%Y')
-		q1 = Q(employeedata__start_contract__lt=self.cut_off_date)
-		q2 = Q(employeedata__end_contract__gte=self.choice_date) | Q(employeedata__end_contract__isnull=True)
-		self.employees = Employee.objects.filter(q1 & q2).order_by('surname', 'forename')
-		query = Q(worker=self.worker, start_work__year=self.year, start_work__month=self.month)
-		self.work_hours = WorkEvidence.objects.filter(query)
-		self.holidays = holiday(self.year)
-		self.year_leaves = EmployeeLeave.objects.filter(worker=self.worker, leave_date__year=self.year)
-		query = Q(worker=self.worker, leave_date__year=self.year, leave_date__month=self.month)
-		self.sml = EmployeeLeave.objects.filter(query)
+		cut_off_date = datetime.strptime(f'{cut_off_month}/{cut_off_year}','%m/%Y')
+		q1 = Q(employeedata__start_contract__lt=cut_off_date)
+		q2 = Q(employeedata__end_contract__gte=choice_date) | Q(employeedata__end_contract__isnull=True)
+		employees = Employee.objects.filter(q1 & q2).order_by('surname', 'forename')
+		query = Q(worker=worker, start_work__year=year, start_work__month=month)
+		work_hours = WorkEvidence.objects.filter(query)
+		holidays = holiday(year)
+		year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
+		query = Q(worker=worker, leave_date__year=year, leave_date__month=month)
+		sml = EmployeeLeave.objects.filter(query)
+		month_leaves = {kind:sml.filter(leave_flag=kind).count() for kind in leave_kind}
+		year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
+		# data for modal chart
+		total_brutto_set = data_modal_chart(employee_id)
+		self.context = {'form': form, 'employee_id': employee_id, 'choice_date': choice_date, 'month_leaves': month_leaves,
+		                'year_leaves': year_leaves, 'month': month, 'employees': employees, 'holidays' : holidays,
+		                'worker': worker, 'total_brutto_set': total_brutto_set, 'year': year,
+		                'sml': sml.order_by('leave_date'), 'work_hours': work_hours.order_by('start_work')}
+		employee_total_data(employee_id, year, month, self.context)
 
 
 	def get(self, request, **kwargs) -> render:
-		form = PeriodCurrentComplexDataForm(initial={'choice_date': self.choice_date})
-		leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
-		month_leaves = {kind:self.sml.filter(leave_flag=kind).count() for kind in leave_kind}
-		year_leaves = {kind:self.year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
-		context = {'form': form, 'employee_id': self.employee_id, 'choice_date': self.choice_date,
-		           'employees': self.employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
-		           'month': self.month, 'year': self.year, 'holidays' : self.holidays, 'worker': self.worker,
-		           'sml': self.sml.order_by('leave_date'), 'work_hours': self.work_hours.order_by('start_work')}
-		employee_total_data(self.employee_id, self.year, self.month, context)
-		# data for modal chart
-		context.__setitem__('total_brutto_set', data_modal_chart(self.employee_id))
 
-		return render(request, r'evidence/current_complex_evidence_data.html', context)
+		return render(request, r'evidence/current_complex_evidence_data.html', self.context)
 
 	def post(self, request, **kwargs) -> render:
-		form = PeriodCurrentComplexDataForm(data={'choice_date':self.choice_date})
-		# data for modal chart
-		context = {'total_brutto_set': data_modal_chart(self.employee_id)}
 
-		if form.is_valid():
-			leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
-			month_leaves = {kind:self.sml.filter(leave_flag=kind).count() for kind in leave_kind}
-			year_leaves = {kind:self.year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
-			context.update({'form': form, 'employee_id': self.employee_id, 'choice_date': self.choice_date,
-			                'employees': self.employees, 'month_leaves': month_leaves, 'year_leaves': year_leaves,
-			                'month': self.month, 'year': self.year, 'holidays' : self.holidays, 'worker': self.worker,
-			                'sml': self.sml.order_by('leave_date'), 'work_hours': self.work_hours.order_by('start_work')})
-			employee_total_data(self.employee_id, self.year, self.month, context)
-
-		else:
-			context.update({'form': form, 'employee_id': self.employee_id, 'employees': self.employees, 'worker': self.worker})
-
-		return render(request, r'evidence/current_complex_evidence_data.html', context)
+		return render(request, r'evidence/current_complex_evidence_data.html', self.context)
 
 
 class WorkhoursPrintView(View):
