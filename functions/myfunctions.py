@@ -122,7 +122,20 @@ def previous_month_year(month, year):
 def initial_account_form(employee_id:int) -> dict:
 	'''return initial date for AccountPaymentForm'''
 	worker = Employee.objects.get(pk=employee_id)
-	account_date = now().date() - timedelta(days=int(now().date().day))
+	jobdays = workingdays(now().year, now().month)
+	payday = date(now().year, now().month, 10)
+	nowadays = now().date()
+
+	for item in jobdays:
+		if item >= payday:
+			payday = item
+			break
+
+	if nowadays == payday or nowadays == payday - timedelta(days=1):
+		account_date = nowadays - timedelta(days=int(nowadays.day))
+	else:
+		account_date = nowadays
+
 	initial = {'worker': worker, 'account_date': account_date}
 
 	return initial
