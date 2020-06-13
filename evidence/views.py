@@ -33,74 +33,75 @@ from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, se
 
 class WorkingTimeRecorderView(View):
 	'''class implementing the method of adding working time for specific employee'''
-	def get(self, request, employee_id:int, work_hours:int=None) -> render:
-		worker = Employee.objects.get(pk=employee_id)
-		initial = {'worker': worker}
+	def setup(self, request, **kwargs):
+		super(WorkingTimeRecorderView, self).setup(request, **kwargs)
+		self.request, self.kwargs = request, kwargs
+		self.worker = Employee.objects.get(pk=self.kwargs['employee_id'])
+		initial = {'worker': self.worker}
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
 		employees = employees.order_by('surname', 'forename')
-		query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
+		query = Q(worker=self.worker) & (Q(overtime=1)|Q(overtime=2))
 		overhours = EmployeeData.objects.filter(query).exists()
-		context = {'worker': worker, 'employee_id': employee_id,
-		           'employees': employees, 'overhours': overhours, 'wtr_flag': True}
-		employee_total_data(employee_id, now().year, now().month, context)
+		self.context = {'worker': self.worker, 'employee_id': self.kwargs['employee_id'],
+		                'employees': employees, 'overhours': overhours, 'wtr_flag': True}
 
-		if work_hours:
-			initial.update(initial_worktime_form(work_hours))
-			form = WorkEvidenceForm(initial=initial)
-			context.__setitem__('form', form)
-		else:
-			form = WorkEvidenceForm(initial=initial)
-			context.__setitem__('form', form)
+		if self.request.method == 'GET':
+			if 'work_hours' in self.kwargs.keys():
+				initial.update(initial_worktime_form(self.kwargs['work_hours']))
+				self.form = WorkEvidenceForm(initial=initial)
+			else:
+				self.form = WorkEvidenceForm(initial=initial)
 
-		return render(request, 'evidence/working_time_recorder.html', context)
+			employee_total_data(self.kwargs['employee_id'], now().year, now().month, self.context)
 
-	def post(self, request, employee_id:int) -> render:
-		form = WorkEvidenceForm(data=request.POST)
-		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
-		employees = employees.order_by('surname', 'forename')
+		elif self.request.method == 'POST':
+			self.form = WorkEvidenceForm(data=self.request.POST)
 
-		context = {'form': form, 'employee_id': employee_id, 'employees': employees, 'wtr_flag': True}
+		self.context.__setitem__('form', self.form)
 
-		if form.is_valid():
-			data = form.cleaned_data
-			worker, start_work, end_work = data['worker'], data['start_work'], data['end_work']
-			query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
-			overhours = EmployeeData.objects.filter(query).exists()
-			context.update({'worker': worker, 'overhours': overhours})
+
+	def get(self, request, **kwargs) -> render:
+
+		return render(request, 'evidence/working_time_recorder.html', self.context)
+
+	def post(self, request, **kwargs) -> render:
+
+		if self.form.is_valid():
+			data = self.form.cleaned_data
+			start_work, end_work = data['start_work'], data['end_work']
 			jobhours = (end_work - start_work).total_seconds()/3600
 			data.__setitem__('jobhours', jobhours)
-			context.update({'start_work': start_work, 'end_work': end_work, 'jobhours': jobhours})
+			self.context.update({'start_work': start_work, 'end_work': end_work, 'jobhours': jobhours})
 			year, month = start_work.year, start_work.month
 
 			# check or data exisiting in WorkEvidence and EmployeeLeave table
-			check_leave = {'worker': worker, 'leave_date': start_work.date(),}
+			check_leave = {'worker': self.worker, 'leave_date': start_work.date()}
 			flag_leave = EmployeeLeave.objects.filter(**check_leave).exists()
-			mainquery = Q(worker=worker) & Q(start_work__year=year) & Q(start_work__month=month)
+			mainquery = Q(worker=self.worker) & Q(start_work__year=year) & Q(start_work__month=month)
 			workquery = Q(start_work__day=start_work.day) & Q(end_work__day=end_work.day)
 			flag_work = WorkEvidence.objects.filter(mainquery&workquery).exists()
 
 			if start_work < end_work:
 
 				if flag_work or flag_leave:
-					messages.error(request, f'For worker {worker} this date ({start_work.date()}) is existing in database...')
-					context.__setitem__('flag_work', flag_work)
-					context.__setitem__('flag_leave', flag_leave)
+					msg = f'For worker {self.worker} this date ({start_work.date()}) is existing in database...'
+					messages.error(request, msg)
+					self.context.update({'flag_work': flag_work, 'flag_leave': flag_leave})
 				else:
 					WorkEvidence.objects.create(**data)
-					messages.success(request, f'Succesful register new time working for {worker}')
-					employee_total_data(employee_id, year, month, context)
+					messages.success(request, f'Succesful register new time working for {self.worker}')
 
 			elif start_work == end_work:
-				msg = f'Start working ({start_work}) is the same like end working ({end_work}). Please correct it...'
+				msg = f'Start working ({start_work}) is the same like end working ({end_work}).\nPlease correct it...'
 				messages.error(request, msg)
 
 			else:
 				msg = f'Start working ({start_work}) is later than end working ({end_work}). Please correct it...'
 				messages.error(request, msg)
 
-			employee_total_data(employee_id, year, month, context)
+			employee_total_data(self.kwargs['employee_id'], year, month, self.context)
 
-		return render(request, 'evidence/working_time_recorder.html', context)
+		return render(request, 'evidence/working_time_recorder.html', self.context)
 
 
 class WorkingTimeRecorderEraseView(View):
