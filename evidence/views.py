@@ -40,7 +40,8 @@ class WorkingTimeRecorderView(View):
 		employees = employees.order_by('surname', 'forename')
 		query = Q(worker=worker) & (Q(overtime=1)|Q(overtime=2))
 		overhours = EmployeeData.objects.filter(query).exists()
-		context = {'worker': worker, 'employee_id': employee_id, 'employees': employees, 'overhours': overhours}
+		context = {'worker': worker, 'employee_id': employee_id,
+		           'employees': employees, 'overhours': overhours, 'wtr_flag': True}
 		employee_total_data(employee_id, now().year, now().month, context)
 
 		if work_hours:
@@ -58,7 +59,7 @@ class WorkingTimeRecorderView(View):
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
 		employees = employees.order_by('surname', 'forename')
 
-		context = {'form': form, 'employee_id': employee_id, 'employees': employees}
+		context = {'form': form, 'employee_id': employee_id, 'employees': employees, 'wtr_flag': True}
 
 		if form.is_valid():
 			data = form.cleaned_data
@@ -131,8 +132,8 @@ class LeaveTimeRecorderView(View):
 			leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [item.year for item in EmployeeLeave.objects.filter(worker=worker).dates('leave_date', 'year', order='DESC')]}
 		else:
 			leave_set = None
-		context = {'form': form, 'worker': worker, 'employee_id': employee_id,
-				   'employees': employees, 'year': now().year, 'leave_set': leave_set,
+		context = {'form': form, 'worker': worker, 'leave_set': leave_set, 'ltr_flag': True,
+				   'employees': employees, 'year': now().year, 'employee_id': employee_id,
 				   'total_leaves': total_leaves.count(), 'remaining_leave': remaining_leave}
 		context.__setitem__('leaves_pl', total_leaves.filter(leave_flag='paid_leave'))
 		context.__setitem__('leaves_upl', total_leaves.filter(leave_flag='unpaid_leave'))
@@ -145,7 +146,7 @@ class LeaveTimeRecorderView(View):
 		form = EmployeeLeaveForm(data=request.POST)
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
 		employees = employees.order_by('surname', 'forename')
-		context = {'form': form, 'employees': employees, 'employee_id': employee_id}
+		context = {'form': form, 'employees': employees, 'employee_id': employee_id, 'ltr_flag': True,}
 
 		if form.is_valid():
 			form.save(commit=False)
@@ -437,7 +438,7 @@ class AccountPaymentView(View):
 
 		# seting context
 		self.context = {'form': self.form, 'worker': self.worker, 'year': self.year,
-		                'employee_id': self.employee_id, 'month': self.month}
+		                'employee_id': self.employee_id, 'month': self.month, 'ap_flag': True,}
 
 		
 	def get(self, request, **kwargs) -> render:
