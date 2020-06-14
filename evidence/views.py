@@ -119,44 +119,47 @@ class WorkingTimeRecorderEraseView(View):
 
 class LeaveTimeRecorderView(View):
 	'''class implementing the method of adding leave time for specific employee'''
-	def get(self, request, employee_id:int) -> render:
-		initial=initial_leave_form(employee_id)
-		form = EmployeeLeaveForm(initial=initial)
+	def setup(self, request, **kwargs):
+		super(LeaveTimeRecorderView, self).setup(request, **kwargs)
+		self.request, self.kwargs = request, kwargs
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
 		employees = employees.order_by('surname', 'forename')
-		worker = initial['worker']
-		values = {'worker': worker, 'leave_date__year': now().year}
-		total_leaves = EmployeeLeave.objects.filter(**values).order_by('leave_date')
+		self.worker = Employee.objects.get(pk=self.kwargs['employee_id'])
+		self.values = {'worker': self.worker, 'leave_date__year': now().year}
+		total_leaves = EmployeeLeave.objects.filter(**self.values).order_by('leave_date')
 		remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
+		years = [item.year for item in EmployeeLeave.objects.filter(worker=self.worker).dates('leave_date', 'year', order='DESC')]
+		leave_set = {year:EmployeeLeave.objects.filter(worker=self.worker, leave_date__year=year).count() for year in years}
 
-		if EmployeeLeave.objects.filter(worker=worker).exists():
-			leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [item.year for item in EmployeeLeave.objects.filter(worker=worker).dates('leave_date', 'year', order='DESC')]}
-		else:
-			leave_set = None
-		context = {'form': form, 'worker': worker, 'leave_set': leave_set, 'ltr_flag': True,
-				   'employees': employees, 'year': now().year, 'employee_id': employee_id,
-				   'total_leaves': total_leaves.count(), 'remaining_leave': remaining_leave}
-		context.__setitem__('leaves_pl', total_leaves.filter(leave_flag='paid_leave'))
-		context.__setitem__('leaves_upl', total_leaves.filter(leave_flag='unpaid_leave'))
-		context.__setitem__('leaves_ml', total_leaves.filter(leave_flag='maternity_leave'))
+		if self.request.method == 'GET':
+			initial=initial_leave_form(self.kwargs['employee_id'])
+			self.form = EmployeeLeaveForm(initial=initial)
+		elif self.request.method == 'POST':
+			self.form = EmployeeLeaveForm(data=self.request.POST)
 
-		return render(request, 'evidence/leave_time_recorder.html', context)
+		self.context = {'form': self.form, 'remaining_leave': remaining_leave, 'worker': self.worker,
+		                'employees': employees, 'total_leaves': total_leaves.count(), 'ltr_flag': True,
+		                'year': now().year, 'employee_id': self.kwargs['employee_id'], 'leave_set': leave_set,}
 
-	def post(self, request, employee_id:int) -> render:
-		name_holiday, flag_weekend = False, False
-		form = EmployeeLeaveForm(data=request.POST)
-		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
-		employees = employees.order_by('surname', 'forename')
-		context = {'form': form, 'employees': employees, 'employee_id': employee_id, 'ltr_flag': True,}
+		flags = {'leaves_pl': 'paid_leave', 'leaves_upl': 'unpaid_leave', 'leaves_ml': 'maternity_leave'}
+		for key, value in flags.items():
+			self.context.__setitem__(key, total_leaves.filter(leave_flag=value))
 
-		if form.is_valid():
-			form.save(commit=False)
-			data = form.cleaned_data
-			worker, leave_date, leave_flag = data['worker'], data['leave_date'], data['leave_flag']
-			context.update({'worker': worker, 'leave_date': leave_date})
+	def get(self, request, **kwargs) -> render:
+
+		return render(request, 'evidence/leave_time_recorder.html', self.context)
+
+	def post(self, request, **kwargs) -> render:
+		flag_weekend, name_holiday = False, None
+
+		if self.form.is_valid():
+			self.form.save(commit=False)
+			data = self.form.cleaned_data
+			leave_date, leave_flag = data['leave_date'], data['leave_flag']
+			self.context.update({'leave_date': leave_date})
 
 			# check or data exisiting in WorkEvidence and EmployeeLeave table or isn't Sunday or Saturday
-			check_leave = {'worker': worker, 'leave_date': leave_date}
+			check_leave = {'worker': self.worker, 'leave_date': leave_date}
 			flag_leave = EmployeeLeave.objects.filter(**check_leave).exists()
 
 			if leave_date.isoweekday() == 7 or leave_date.isoweekday() == 6:
@@ -166,48 +169,43 @@ class LeaveTimeRecorderView(View):
 				if date_holiday == leave_date:
 					name_holiday = name
 
-			query = Q(worker=worker) & Q(start_work__date=leave_date)
+			query = Q(worker=self.worker) & Q(start_work__date=leave_date)
 			flag_work = WorkEvidence.objects.filter(query).exists()
 
 			if flag_leave:
-				msg = f'For worker {worker} this date ({leave_date}) is existing in database as leave day!'
+				msg = f'For worker {self.worker} this date ({leave_date}) is existing in database as leave day!'
 				messages.error(request, msg)
-				context.__setitem__('flag_leave', flag_leave)
+				self.context.__setitem__('flag_leave', flag_leave)
 
 			elif flag_work:
-				msg = f'For worker {worker} this date ({leave_date}) is existing in database as working day!'
+				msg = f'For worker {self.worker} this date ({leave_date}) is existing in database as working day!'
 				messages.error(request, msg)
-				context.__setitem__('flag_work', flag_work)
+				self.context.__setitem__('flag_work', flag_work)
 
 			elif flag_weekend:
 				msg = f'Selectet date {leave_date} is Saturday or Sunday. You can\'t set this as leave day!'
 				messages.error(request, msg)
-				context.__setitem__('flag_weekend', flag_weekend)
+				self.context.__setitem__('flag_weekend', flag_weekend)
 
 			elif name_holiday:
 				msg = f'Selectet date {leave_date} is holiday ({name_holiday}). You can\'t set this as leave day!'
 				messages.error(request, msg)
-				context.__setitem__('name_holiday', name_holiday)
+				self.context.__setitem__('name_holiday', name_holiday)
 
 			else:
-				form.save()
-				msg = f'Succesful register new leave day ({leave_date}) for {worker}'
+				self.form.save()
+				msg = f'Succesful register new leave day ({leave_date}) for {self.worker}'
 				messages.success(request, msg)
-				leave_set = {year:EmployeeLeave.objects.filter(worker=worker, leave_date__year=year).count() for year in [item.year for item in EmployeeLeave.objects.filter(worker=worker).dates('leave_date', 'year', order='DESC')]}
-				context.__setitem__('leave_flag', leave_flag)
-				context.__setitem__('leave_set', leave_set)
 
-			values = {'worker':worker, 'leave_date__year': now().year}
-			total_leaves = EmployeeLeave.objects.filter(**values).order_by('leave_date')
+			total_leaves = EmployeeLeave.objects.filter(**self.values).order_by('leave_date')
 			remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
+			years = [item.year for item in EmployeeLeave.objects.filter(worker=self.worker).dates('leave_date', 'year', order='DESC')]
+			leave_set = {year:EmployeeLeave.objects.filter(worker=self.worker, leave_date__year=year).count() for year in years}
 
-			context.__setitem__('remaining_leave', remaining_leave)
-			context.__setitem__('total_leaves', total_leaves.count())
-			context.__setitem__('leaves_pl', total_leaves.filter(leave_flag='paid_leave'))
-			context.__setitem__('leaves_upl', total_leaves.filter(leave_flag='unpaid_leave'))
-			context.__setitem__('leaves_ml', total_leaves.filter(leave_flag='maternity_leave'))
+			self.context.update({'leave_flag': leave_flag,'remaining_leave': remaining_leave,
+			                     'total_leaves': total_leaves.count(), 'leave_set': leave_set})
 
-		return render(request, 'evidence/leave_time_recorder.html', context)
+		return render(request, 'evidence/leave_time_recorder.html', self.context)
 
 
 class LeaveTimeRecorderEraseView(View):
