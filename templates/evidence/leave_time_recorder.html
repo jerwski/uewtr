@@ -61,7 +61,7 @@
           {% elif name_holiday %}
             <p class="uk-text-middle text-center">Selected date: <span class="text-danger">{{ leave_date|date:'l, d F Y' }}</span> is a holiday <span class="text-danger">({{ name_holiday }})</span></p>
           {% elif flag_weekend %}
-            <p class="uk-text-middle text-center">You can't add a leave on this day <span class="text-danger">{{ leave_date|date:'l, d F Y' }}</span></p>
+            <p class="uk-text-middle text-center">You can't add a leave on this day: <span class="text-danger">{{ leave_date|date:'l, d F Y' }}</span></p>
           {% else %}
             {% if leave_flag == 'unpaid_leave' %}
               <p class="uk-text-middle text-center">CAUTION: You've been adding <span class="text-danger">({{ leave_date|date:'l, d F Y' }})</span> one day of unpaid leave!</p>
