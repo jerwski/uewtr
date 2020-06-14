@@ -122,9 +122,10 @@ class LeaveTimeRecorderView(View):
 	def setup(self, request, **kwargs):
 		super(LeaveTimeRecorderView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
+		employee_id = self.kwargs['employee_id']
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
 		employees = employees.order_by('surname', 'forename')
-		self.worker = Employee.objects.get(pk=self.kwargs['employee_id'])
+		self.worker = Employee.objects.get(pk=employee_id)
 		self.values = {'worker': self.worker, 'leave_date__year': now().year}
 		total_leaves = EmployeeLeave.objects.filter(**self.values).order_by('leave_date')
 		remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
@@ -132,14 +133,14 @@ class LeaveTimeRecorderView(View):
 		leave_set = {year:EmployeeLeave.objects.filter(worker=self.worker, leave_date__year=year).count() for year in years}
 
 		if self.request.method == 'GET':
-			initial=initial_leave_form(self.kwargs['employee_id'])
+			initial=initial_leave_form(employee_id)
 			self.form = EmployeeLeaveForm(initial=initial)
 		elif self.request.method == 'POST':
 			self.form = EmployeeLeaveForm(data=self.request.POST)
 
 		self.context = {'form': self.form, 'remaining_leave': remaining_leave, 'worker': self.worker,
-		                'employees': employees, 'total_leaves': total_leaves.count(), 'ltr_flag': True,
-		                'year': now().year, 'employee_id': self.kwargs['employee_id'], 'leave_set': leave_set,}
+		                'year': now().year, 'total_leaves': total_leaves.count(), 'ltr_flag': True,
+		                'employees': employees, 'employee_id': employee_id, 'leave_set': leave_set,}
 
 		flags = {'leaves_pl': 'paid_leave', 'leaves_upl': 'unpaid_leave', 'leaves_ml': 'maternity_leave'}
 		for key, value in flags.items():
