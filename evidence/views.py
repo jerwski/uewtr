@@ -1,7 +1,7 @@
 # standard library
 import calendar
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 # pdfkit library
 import pdfkit
@@ -430,6 +430,12 @@ class AccountPaymentView(View):
 		self.month, self.year = now().month, now().year
 		self.initial = initial_account_form(self.employee_id)
 		self.worker = Employee.objects.get(pk=self.employee_id)
+		self.prevmonth, self.prevyear = previous_month_year(self.month, self.year)
+		earlier_date = date(self.prevyear, self.prevmonth, 1)
+		# set list of valid employees
+		q1 = Q(status=1)
+		q2 = Q(employeedata__end_contract__year__gte=self.prevyear, employeedata__end_contract__month__gte=self.prevmonth)
+		employees = Employee.objects.filter(q1|q2).order_by('surname', 'forename')
 
 		if self.request.method == 'GET':
 			self.form = AccountPaymentForm(initial=self.initial)
@@ -437,27 +443,21 @@ class AccountPaymentView(View):
 			self.form = AccountPaymentForm(data=self.request.POST)
 
 		# seting context
-		self.context = {'form': self.form, 'worker': self.worker, 'year': self.year,
-		                'employee_id': self.employee_id, 'month': self.month, 'ap_flag': True,}
+		self.context = {'form': self.form, 'worker': self.worker, 'earlier_date': earlier_date, 'month': self.month,
+		                'employee_id': self.employee_id, 'employees': employees, 'year': self.year, 'ap_flag': True}
 
 		
 	def get(self, request, **kwargs) -> render:
 		# view form of advances
-		earlier_date = self.initial['account_date']
-		prevmonth, prevyear = earlier_date.month, earlier_date.year
-		prevsalary = total_payment(self.employee_id, prevyear, prevmonth)
+		prevsalary = total_payment(self.employee_id, self.prevyear, self.prevmonth)
 		prevsalary = prevsalary['brutto']
 		salary = total_payment(self.employee_id, self.year, self.month)
 		salary = salary['brutto']
-		# set list of valid employees
-		q1 = Q(status=1)
-		q2 = Q(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
-		employees = Employee.objects.filter(q1|q2).order_by('surname', 'forename')
 
 		# check out loans, currloan = current loan, prevloan = previous loan
 		current_query = Q(worker=self.worker) & Q(account_date__year=self.year) & Q(account_date__month=self.month)
 		currloan = AccountPayment.objects.filter(current_query)
-		previous_query = Q(worker=self.worker) & Q(account_date__year=prevyear) & Q(account_date__month=prevmonth)
+		previous_query = Q(worker=self.worker) & Q(account_date__year=self.prevyear) & Q(account_date__month=self.prevmonth)
 		prevloan = AccountPayment.objects.filter(previous_query)
 
 		if currloan.exists():
@@ -475,10 +475,8 @@ class AccountPaymentView(View):
 		saldo, prevsaldo = round((salary - currloan), 2), round((prevsalary - prevloan), 2)
 
 		# update self.context
-		self.context.update({'employees': employees, 'saldo': saldo,
-		                     'salary': salary, 'currloan': currloan,
-		                     'prevloan': prevloan, 'prevsaldo': prevsaldo,
-		                     'prevsalary': prevsalary, 'earlier_date': earlier_date})
+		self.context.update({'saldo': saldo, 'prevsalary': prevsalary, 'currloan': currloan,
+		                     'prevloan': prevloan, 'prevsaldo': prevsaldo, 'salary': salary})
 
 		return render(request, 'evidence/account_payment.html', self.context)
 
@@ -494,13 +492,6 @@ class AccountPaymentView(View):
 			salary = total_payment(self.employee_id, account_date.year, account_date.month)
 			salary = salary['brutto']
 
-			# set list of valid employees
-			prevmonth, prevyear = previous_month_year(self.month, self.year)
-
-			q1 = Q(status=1)
-			q2 = Q(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
-			employees = Employee.objects.filter(q1|q2).order_by('surname', 'forename')
-
 			# check out advances
 			query = Q(worker=self.worker) & Q(account_date__year=account_date.year) & Q(account_date__month=account_date.month)
 			advances = AccountPayment.objects.filter(query).aggregate(ap=Sum('account_value'))
@@ -511,8 +502,7 @@ class AccountPaymentView(View):
 				advances = advances['ap'] + account_value
 
 			# updating context
-			self.context.update({'salary': salary, 'employees': employees,
-			                      'earlier_date': 'account_date', 'advances': advances})
+			self.context.update({'salary': salary, 'advances': advances})
 
 			if round(salary, 2) >= advances:
 				self.form.save(commit=True)
