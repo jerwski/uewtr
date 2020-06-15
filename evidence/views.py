@@ -434,7 +434,7 @@ class AccountPaymentView(View):
 		earlier_date = date(self.prevyear, self.prevmonth, 1)
 		# set list of valid employees
 		q1 = Q(status=1)
-		q2 = Q(employeedata__end_contract__year__gte=self.prevyear, employeedata__end_contract__month__gte=self.prevmonth)
+		q2 = Q(employeedata__end_contract__gte=earlier_date)
 		employees = Employee.objects.filter(q1|q2).order_by('surname', 'forename')
 
 		if self.request.method == 'GET':
