@@ -122,9 +122,10 @@ class LeaveTimeRecorderView(View):
 	def setup(self, request, **kwargs):
 		super(LeaveTimeRecorderView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
+		employee_id = self.kwargs['employee_id']
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
 		employees = employees.order_by('surname', 'forename')
-		self.worker = Employee.objects.get(pk=self.kwargs['employee_id'])
+		self.worker = Employee.objects.get(pk=employee_id)
 		self.values = {'worker': self.worker, 'leave_date__year': now().year}
 		total_leaves = EmployeeLeave.objects.filter(**self.values).order_by('leave_date')
 		remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
@@ -132,14 +133,14 @@ class LeaveTimeRecorderView(View):
 		leave_set = {year:EmployeeLeave.objects.filter(worker=self.worker, leave_date__year=year).count() for year in years}
 
 		if self.request.method == 'GET':
-			initial=initial_leave_form(self.kwargs['employee_id'])
+			initial=initial_leave_form(employee_id)
 			self.form = EmployeeLeaveForm(initial=initial)
 		elif self.request.method == 'POST':
 			self.form = EmployeeLeaveForm(data=self.request.POST)
 
 		self.context = {'form': self.form, 'remaining_leave': remaining_leave, 'worker': self.worker,
-		                'employees': employees, 'total_leaves': total_leaves.count(), 'ltr_flag': True,
-		                'year': now().year, 'employee_id': self.kwargs['employee_id'], 'leave_set': leave_set,}
+		                'year': now().year, 'total_leaves': total_leaves.count(), 'ltr_flag': True,
+		                'employees': employees, 'employee_id': employee_id, 'leave_set': leave_set,}
 
 		flags = {'leaves_pl': 'paid_leave', 'leaves_upl': 'unpaid_leave', 'leaves_ml': 'maternity_leave'}
 		for key, value in flags.items():
@@ -429,6 +430,12 @@ class AccountPaymentView(View):
 		self.month, self.year = now().month, now().year
 		self.initial = initial_account_form(self.employee_id)
 		self.worker = Employee.objects.get(pk=self.employee_id)
+		self.prevmonth, self.prevyear = previous_month_year(self.month, self.year)
+		earlier_date = date(self.prevyear, self.prevmonth, 1)
+		# set list of valid employees
+		q1 = Q(status=1)
+		q2 = Q(employeedata__end_contract__gte=earlier_date)
+		employees = Employee.objects.filter(q1|q2).order_by('surname', 'forename')
 
 		if self.request.method == 'GET':
 			self.form = AccountPaymentForm(initial=self.initial)
@@ -436,27 +443,21 @@ class AccountPaymentView(View):
 			self.form = AccountPaymentForm(data=self.request.POST)
 
 		# seting context
-		self.context = {'form': self.form, 'worker': self.worker, 'year': self.year,
-		                'employee_id': self.employee_id, 'month': self.month, 'ap_flag': True,}
+		self.context = {'form': self.form, 'worker': self.worker, 'earlier_date': earlier_date, 'month': self.month,
+		                'employee_id': self.employee_id, 'employees': employees, 'year': self.year, 'ap_flag': True}
 
 		
 	def get(self, request, **kwargs) -> render:
 		# view form of advances
-		earlier_date = self.initial['account_date']
-		prevmonth, prevyear = earlier_date.month, earlier_date.year
-		prevsalary = total_payment(self.employee_id, prevyear, prevmonth)
+		prevsalary = total_payment(self.employee_id, self.prevyear, self.prevmonth)
 		prevsalary = prevsalary['brutto']
 		salary = total_payment(self.employee_id, self.year, self.month)
 		salary = salary['brutto']
-		# set list of valid employees
-		q1 = Q(status=1)
-		q2 = Q(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
-		employees = Employee.objects.filter(q1|q2).order_by('surname', 'forename')
 
 		# check out loans, currloan = current loan, prevloan = previous loan
 		current_query = Q(worker=self.worker) & Q(account_date__year=self.year) & Q(account_date__month=self.month)
 		currloan = AccountPayment.objects.filter(current_query)
-		previous_query = Q(worker=self.worker) & Q(account_date__year=prevyear) & Q(account_date__month=prevmonth)
+		previous_query = Q(worker=self.worker) & Q(account_date__year=self.prevyear) & Q(account_date__month=self.prevmonth)
 		prevloan = AccountPayment.objects.filter(previous_query)
 
 		if currloan.exists():
@@ -474,10 +475,8 @@ class AccountPaymentView(View):
 		saldo, prevsaldo = round((salary - currloan), 2), round((prevsalary - prevloan), 2)
 
 		# update self.context
-		self.context.update({'employees': employees, 'saldo': saldo,
-		                     'salary': salary, 'currloan': currloan,
-		                     'prevloan': prevloan, 'prevsaldo': prevsaldo,
-		                     'prevsalary': prevsalary, 'earlier_date': earlier_date})
+		self.context.update({'saldo': saldo, 'prevsalary': prevsalary, 'currloan': currloan,
+		                     'prevloan': prevloan, 'prevsaldo': prevsaldo, 'salary': salary})
 
 		return render(request, 'evidence/account_payment.html', self.context)
 
@@ -493,13 +492,6 @@ class AccountPaymentView(View):
 			salary = total_payment(self.employee_id, account_date.year, account_date.month)
 			salary = salary['brutto']
 
-			# set list of valid employees
-			prevmonth, prevyear = previous_month_year(self.month, self.year)
-
-			q1 = Q(status=1)
-			q2 = Q(employeedata__end_contract__year__gte=prevyear, employeedata__end_contract__month__gte=prevmonth)
-			employees = Employee.objects.filter(q1|q2).order_by('surname', 'forename')
-
 			# check out advances
 			query = Q(worker=self.worker) & Q(account_date__year=account_date.year) & Q(account_date__month=account_date.month)
 			advances = AccountPayment.objects.filter(query).aggregate(ap=Sum('account_value'))
@@ -510,8 +502,7 @@ class AccountPaymentView(View):
 				advances = advances['ap'] + account_value
 
 			# updating context
-			self.context.update({'salary': salary, 'employees': employees,
-			                      'earlier_date': 'account_date', 'advances': advances})
+			self.context.update({'salary': salary, 'advances': advances})
 
 			if round(salary, 2) >= advances:
 				self.form.save(commit=True)
