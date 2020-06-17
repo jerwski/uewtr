@@ -1,7 +1,7 @@
 # standard library
 import calendar
 from collections import defaultdict
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 # pdfkit library
 import pdfkit
