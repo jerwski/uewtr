@@ -14,7 +14,9 @@
     {% include 'blocks/header.html' %}
     <div class="row">
       <div class="col-3">
-        <p class="uk-headline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
+        <div class="uk-headline">
+          <a href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a>
+        </div>
         <div class="uk-table-scroll-lg">
           <table class="uk-table">
             <tbody>
@@ -33,15 +35,17 @@
       </div>
       <div class="col-9">
         {% if worker.status %}
-          <p class="uk-headline">LEAVE EVIDENCE FOR: {{ worker|upper }}</p>
+          <div class="uk-headline">
+            LEAVE EVIDENCE FOR: {{ worker|upper }}
+          </div>
 
           <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
             <div class="row text-center">
-              <div class="col-4 offset-1">
+              <div class="col-4 mt-3 offset-1">
                 {% bootstrap_field form.worker %}
                 {% bootstrap_field form.leave_date size='medium' label_class='text-info font-italic font-weight-bold' %}
               </div>
-              <div class="col-7">
+              <div class="col-7 mt-3">
                 {% bootstrap_field form.leave_flag label_class='text-info font-italic font-weight-bold' %}
               </div>
             </div>

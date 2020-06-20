@@ -30,7 +30,7 @@
       <div class="col-3 mt-2">
         <a href="{% url 'account:admin_site' %}">
           <img class="d-block uk-header-logo mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
-          <span class="d-block uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
+          <span class="uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
         </a>
       </div>
       <div class="col-9 text-center">
@@ -45,8 +45,10 @@
     </div>
     <div class="row ml-3 mr-3 mb-2 uk-bg-bisque">
       <div class="col-3">
-        <p class="uk-headline">COMPANIES</p>
-          <table class="uk-table">
+        <div class="uk-headline">
+          COMPANIES
+        </div>
+          <table class="uk-table mt-3">
             <tbody>
             {% for company in companies %}
               <tr>
@@ -71,8 +73,11 @@
 
       <div class="col-9">
         {% if company_id %}
-          <p class="uk-headline">ADD RECORD TO CASH REGISTER FOR <a class="text-danger" href="{% url 'cashregister:change_company' company_id %}">{{ company }}</a></p>
-          <form action="." method="POST">{% csrf_token %}
+          <div class="uk-headline">
+            ADD RECORD TO CASH REGISTER FOR <a class="text-danger" href="{% url 'cashregister:change_company' company_id %}">{{ company }}</a>
+          </div>
+
+          <form class="mt-3" action="." method="POST">{% csrf_token %}
             {% bootstrap_field form.company %}
             <div class="row ml-5">
               <div class="col-4">
@@ -184,7 +189,10 @@
             </table>
           </div>
         {% else %}
-          <p class="uk-headline">ADD RECORD FOR {{ company }}</p>
+          <div class="uk-headline">
+            ADD RECORD FOR {{ company }}
+          </div>
+
           <div class="row">
             <div class="col text-center">
               <p class="uk-quiz-question">Please select company to add records into Cash

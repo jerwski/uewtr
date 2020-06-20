@@ -10,8 +10,10 @@
 
     <div class="row">
       <div class="col-4">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
-        <div class="uk-table-scroll-md">
+        <div class="uk-headline">
+          ACTIVE EMPLOYEES
+        </div>
+        <div class="uk-table-scroll-md mt-3">
           <table class="uk-table">
             <tbody>
             {% for employee in employees_st %}
@@ -32,8 +34,10 @@
         </div>
       </div>
       <div class="col-4">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">DEACTIVE EMPLOYEES</p>
-        <div class="uk-table-scroll-md">
+        <div class="uk-headline">
+          DEACTIVE EMPLOYEES
+        </div>
+        <div class="uk-table-scroll-md mt-3">
           <table class="uk-table">
             <tbody>
             {% for employee in employees_sf %}
@@ -50,29 +54,34 @@
         </div>
       </div>
       <div class="col-4">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">{% if new_employee %}ADD EMPLOYEE BASIC DATA{% else %}CHANGE EMPLOYEE BASIC DATA{% endif %}</p>
+        <div class="uk-headline">
+          {% if new_employee %}ADD EMPLOYEE BASIC DATA{% else %}CHANGE EMPLOYEE BASIC DATA{% endif %}
+        </div>
 
         <form action="." method="POST">{% csrf_token %}
           <div class="row">
-            <div class="col text-center">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text bg-info">Forename</span>
+            <div class="col text-center mt-3">
+              <div class="container">
+                <div class="input-group mt-1">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text bg-info">Forename</span>
+                  </div>
+                  {% bootstrap_field form.forename form_group_class='form-inline' show_label=False placeholder='Type forename...' %}
                 </div>
-                {% bootstrap_field form.forename form_group_class='form-inline' show_label=False placeholder='Type forename...' %}
-              </div>
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text bg-info">Surname&nbsp;&nbsp;</span>
+                <div class="input-group mt-1">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text bg-info">Surname&nbsp;&nbsp;</span>
+                  </div>
+                  {% bootstrap_field form.surname form_group_class='form-inline' show_label=False placeholder='Type surname...' %}
                 </div>
-                {% bootstrap_field form.surname form_group_class='form-inline' show_label=False placeholder='Type surname...' %}
-              </div>
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text bg-info">Pesel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <div class="input-group mt-1">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text bg-info">Pesel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  </div>
+                  {% bootstrap_field form.pesel form_group_class='form-inline' show_label=False placeholder='Type pesel...' %}
                 </div>
-                {% bootstrap_field form.pesel form_group_class='form-inline' show_label=False placeholder='Type pesel...' %}
               </div>
+
             </div>
           </div>
 

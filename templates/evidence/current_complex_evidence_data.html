@@ -22,9 +22,11 @@
         <p class="uk-text-middle">Application to handle employee working time in small business</p>
       </div>
     </div>
-    <div class="row ml-3 mr-3 mb-2 uk-bg-bisque">
+    <div class="row mx-3 uk-bg-bisque">
       <div class="col-3">
-        <p class="uk-headline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">EMPLOYED WORKERS</a></p>
+        <div class="uk-headline">
+          <a href="{% url 'employee:employee_basicdata' %}">EMPLOYED WORKERS</a>
+        </div>
         <div class="uk-table-scroll-lg">
           <table class="uk-table">
             <tbody>
@@ -43,11 +45,13 @@
       </div>
 
       <div class="col-6">
-        <p class="uk-headline text-danger">CURRENT DATA: {{ worker|upper }}</p>
+        <div class="uk-headline">
+          CURRENT DATA: {{ worker|upper }}
+        </div>
 
         <form action="{% url 'evidence:employee_complex_data' employee_id %}" method="POST">{% csrf_token %}
           <div class="row">
-            <div class="col-8 mt-1">
+            <div class="col-8 mt-3">
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <div class="input-group-text bg-info">Select date</div>
@@ -58,7 +62,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-4">
+            <div class="col-4 mt-3">
               <div class="btn-sm" role="group">
                 <button id="btnGroupDropHolidays" type="button" class="btn btn-outline-danger btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Holidays in {{ choice_date|date:'Y' }} year </button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDropHolidays">
@@ -211,14 +215,14 @@
         </div>
       </div>
       <div class="col-3">
-        <p class="uk-headline"><a class="text-danger" href="{% url 'evidence:workhours_print' employee_id month year %}">WORKING DAYS FOR: {{ choice_date|date:'m/Y' }}</a></p>
+        <div class="uk-headline">
+          <a href="{% url 'evidence:workhours_print' employee_id month year %}">WORKING DAYS FOR: {{ choice_date|date:'m/Y' }}</a>
+        </div>
         {% if work_hours %}
-          <div class="row text-primary font-weight-bold font-italic">
-            <div class="col-6">
-              <p>Work day{{ work_hours|length|pluralize:'s' }}: {{ work_hours|length }}</p>
-            </div>
-            <div class="col-6">
-              <p>Work hour{{ total_hours|pluralize:'s' }}: {{ total_hours|floatformat:2 }}</p>
+          <div class="row text-primary font-weight-bold font-italic mt-2">
+            <div class="col p-1 d-flex justify-content-around">
+              <div>Work day{{ work_hours|length|pluralize:'s' }}: {{ work_hours|length }}</div>
+              <div>Work hour{{ total_hours|pluralize:'s' }}: {{ total_hours|floatformat:2 }}</div>
             </div>
           </div>
           <div class="input-group">

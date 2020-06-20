@@ -11,7 +11,9 @@
   {% include 'blocks/header.html' %}
   <div class="row">
     <div class="col-3">
-      <p class="uk-headline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
+      <div class="uk-headline">
+        <a href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a>
+      </div>
       <div class="uk-table-scroll-lg">
         <table class="uk-table">
           <tbody>
@@ -30,7 +32,10 @@
     </div>
     <div class="col-9">
       {% if worker.status %}
-        <p class="uk-headline">WORK EVIDENCE FOR: {{ worker|upper }}</p>
+        <div class="uk-headline">
+          WORK EVIDENCE FOR: {{ worker|upper }}
+        </div>
+
         <div class="row">
           <div class="col-3 text-center">
             <div class="btn btn-group-sm btn-group-vertical" role="group">

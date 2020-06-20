@@ -4,8 +4,8 @@
   <div class="row">
     <div class="col-2 uk-bg-bisque">
       <a href="{% url 'account:admin_site' %}">
-        <img class="d-block uk-logo mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
-        <span class="d-block uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
+        <img class="uk-evilogo" src="{% static 'images/mainboard/logoUNI.png' %}" alt="logo unikolor">
+        <span class="uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
       </a>
     </div>
     <div class="col-10 text-center">
@@ -16,7 +16,7 @@
         {% include "blocks/alert.html" %}
       </div>
       <p class="uk-text-middle">Application to handle working time in small business</p>
-      <div class="mb-3">
+      <div class="container">
         {% include 'blocks/small_upper_buttons.html' %}
       </div>
     </div>

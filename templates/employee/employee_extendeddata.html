@@ -9,7 +9,9 @@
   {% include 'blocks/header.html' %}
     <div class="row">
       <div class="col-5">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">ACTIVE EMPLOYEES</p>
+        <div class="uk-headline">
+          ACTIVE EMPLOYEES
+        </div>
         <div class="uk-table-scroll-lg">
           <table class="uk-table">
             <tbody>
@@ -28,9 +30,11 @@
       </div>
 
       <div class="col-7">
-        <p class="text-center text-danger lead font-weight-normal bg-warning">{{ worker|upper }} - CHANGE EXTENDED DATA</p>
+        <div class="uk-headline">
+          {{ worker|upper }} - CHANGE EXTENDED DATA
+        </div>
 
-        <form action="{% url 'employee:employee_extendeddata' employee_id %}" method="POST">{% csrf_token %}
+        <form class="mt-3" action="{% url 'employee:employee_extendeddata' employee_id %}" method="POST">{% csrf_token %}
           <div class="row">
             <div class="col-6">
               {% bootstrap_field form.worker size='small' label_class='text-info font-italic font-weight-bold' %}
