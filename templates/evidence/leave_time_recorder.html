@@ -36,7 +36,7 @@
       <div class="col-9">
         {% if worker.status %}
           <div class="uk-headline">
-            LEAVE EVIDENCE FOR: {{ worker|upper }}
+            LEAVE EVIDENCE FOR:<span class="uk-text-value"> {{ worker|upper }}</span>
           </div>
 
           <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}

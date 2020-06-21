@@ -31,7 +31,7 @@
 
       <div class="col-7">
         <div class="uk-headline">
-          {{ worker|upper }} - CHANGE EXTENDED DATA
+          CHANGE EXTENDED DATA FOR<span class="uk-text-value"> {{ worker|upper }}</span>
         </div>
 
         <form class="mt-3" action="{% url 'employee:employee_extendeddata' employee_id %}" method="POST">{% csrf_token %}
@@ -62,12 +62,11 @@
 
           <div class="row text-center mt-2">
             <div class="col">
-              <div class="btn btn-sm btn-group" role="group">
-                <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                <a href="{% url 'logout' %}" class="btn btn-outline-info">Logout</a>
-                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
-                <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Back to add/change basic data</a>
-                <button type="submit" class="btn btn-outline-success">Confirm</button>
+              <div class="btn btn-sm btn-group btn-block" role="group">
+                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the Dashboard</a>
+                <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Back to the Add/Change of Basic Data</a>
+                <button type="submit" class="btn btn-outline-success">Confirm changes</button>
+
               </div>
             </div>
           </div>

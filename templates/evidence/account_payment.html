@@ -33,7 +33,7 @@
       {% if worker.status %}
         {% if salary or prevsalary %}
           <div class="uk-headline">
-            <p>ADVANCE FOR: {{ worker|upper }}</p>
+            ADVANCE FOR:<span class="uk-text-value"> {{ worker|upper }}</span>
           </div>
 
           <form action="{% url 'evidence:account_payment' employee_id %}" method="POST">{% csrf_token %}

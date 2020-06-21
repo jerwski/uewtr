@@ -33,7 +33,7 @@
     <div class="col-9">
       {% if worker.status %}
         <div class="uk-headline">
-          WORK EVIDENCE FOR: {{ worker|upper }}
+          WORK EVIDENCE FOR:<span class="uk-text-value"> {{ worker|upper }}</span>
         </div>
 
         <div class="row">
@@ -160,7 +160,7 @@
           <div class="row text-center">
             <div class="col-2"></div>
             <div class="col-8 btn btn-block mb-2">
-              <a href="{% url 'account:admin_site' %}" class="btn btn-lg btn-outline-dark btn-block">Back to the dashboard</a>
+              <a href="{% url 'account:admin_site' %}" class="btn btn-lg btn-outline-light btn-block">Back to the dashboard</a>
             </div>
             <div class="col-2"></div>
           </div>

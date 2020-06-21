@@ -46,7 +46,7 @@
 
       <div class="col-6">
         <div class="uk-headline">
-          CURRENT DATA: {{ worker|upper }}
+          CURRENT DATA:<span class="uk-text-value"> {{ worker|upper }}</span>
         </div>
 
         <form action="{% url 'evidence:employee_complex_data' employee_id %}" method="POST">{% csrf_token %}
@@ -65,14 +65,12 @@
             <div class="col-4 mt-3">
               <div class="btn-sm" role="group">
                 <button id="btnGroupDropHolidays" type="button" class="btn btn-outline-danger btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Holidays in {{ choice_date|date:'Y' }} year </button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDropHolidays">
-                  <table class="table table-sm table-hover table-borderless">
-                    <tbody>
-                    {% for key, value in holidays.items %}
-                      <tr class="font-weight-light font-italic"><td class="text-right text-danger" width="55%">{{ key }}:</td><td class="text-left text-dark">{{ value|date:'d-m-Y (D)' }}</td></tr>
-                    {% endfor %}
-                    </tbody>
-                  </table>
+                <div class="dropdown-menu uk-text-holiday" aria-labelledby="btnGroupDropHolidays">
+                  {% for key, value in holidays.items %}
+                    <hr class="small">
+                    <div class="d-flex justify-content-between"><div class="col-6">{{ key }}:</div><div class="col-6 uk-text-value">{{ value|date:'d-m-Y (D)' }}</div></div>
+                  {% endfor %}
+                  <hr class="small">
                 </div>
               </div>
             </div>
@@ -216,7 +214,7 @@
       </div>
       <div class="col-3">
         <div class="uk-headline">
-          <a href="{% url 'evidence:workhours_print' employee_id month year %}">WORKING DAYS FOR: {{ choice_date|date:'m/Y' }}</a>
+          <a href="{% url 'evidence:workhours_print' employee_id month year %}">WORKING DAYS FOR:<span class="uk-text-value"> {{ choice_date|date:'m/Y' }}</span></a>
         </div>
         {% if work_hours %}
           <div class="row text-primary font-weight-bold font-italic mt-2">
