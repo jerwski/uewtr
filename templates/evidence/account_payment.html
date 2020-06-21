@@ -9,8 +9,10 @@
 <div class="container uk-bg-bisque">
   {% include 'blocks/header.html' %}
   <div class="row">
-    <div class="col-sm-4">
-      <p class="uk-headline"><a class="text-danger" href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a></p>
+    <div class="col-4">
+      <div class="uk-headline">
+        <a href="{% url 'employee:employee_basicdata' %}">PRESENT EMPLOYEES</a>
+      </div>
       <div class="uk-table-scroll-lg">
         <table class="uk-table">
           <tbody>
@@ -30,7 +32,9 @@
     <div class="col-sm-8">
       {% if worker.status %}
         {% if salary or prevsalary %}
-          <p class="uk-headline">ADVANCE FOR: {{ worker|upper }}</p>
+          <div class="uk-headline">
+            ADVANCE FOR:<span class="uk-text-value"> {{ worker|upper }}</span>
+          </div>
 
           <form action="{% url 'evidence:account_payment' employee_id %}" method="POST">{% csrf_token %}
             <div class="row">

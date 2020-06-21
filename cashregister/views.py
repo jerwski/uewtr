@@ -89,91 +89,78 @@ class CompanyAddView(View):
 
 class CashRegisterView(View):
 	'''class implementing the method of adding records to the Cash Register'''
-
-	def get(self, request, company_id:int=None) -> HttpResponse:
-		check = CashRegister.objects.filter(company_id=company_id)
-		tags = CashRegister.objects.order_by('contents').distinct('contents').exclude(contents='z przeniesienia').values_list('contents', flat=True)
+	def setup(self, request, **kwargs):
+		super(CashRegisterView, self).setup(request, **kwargs)
+		self.request, self.kwargs, ctx = request, kwargs, 'contents'
+		tags = CashRegister.objects.order_by(ctx).distinct(ctx).exclude(contents='z przeniesienia').values_list(ctx, flat=True)
 		symbols = CashRegister.objects.order_by('symbol').distinct('symbol').values_list('symbol', flat=True)
 		companies = Company.objects.filter(status__range=[1, 3]).order_by('company')
-		context = {'companies': companies, 'tags': list(tags), 'symbols': list(symbols)}
+		self.context = {'companies': companies, 'tags': list(tags), 'symbols': list(symbols)}
 
-		if company_id:
+		if 'company_id' in self.kwargs.keys():
+			self.company_id = self.kwargs['company_id']
+			check = CashRegister.objects.filter(company_id=self.company_id)
 			month, year = now().month, now().year
-			company = Company.objects.get(pk=company_id)
-			registerdata = cashregisterdata(company_id, month, year)
-			context.update(dict(registerdata))
+			self.company = Company.objects.get(pk=self.company_id)
+			self.registerdata = cashregisterdata(self.company_id, month, year)
+			self.context.update(dict(self.registerdata))
 			records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
-			form = CashRegisterForm(initial={'company': company})
-			query = Q(company_id=company_id)&(Q(created__year=year)|Q(created__year=year-1))
+			query = Q(company_id=self.company_id)&(Q(created__year=year)|Q(created__year=year-1))
 			cr_data = CashRegister.objects.filter(query).exclude(contents='z przeniesienia')
 			cr_set = cr_data.datetimes('created','month', order='DESC')
-			context.update({'form': form, 'company': company, 'company_id': company_id,
-			                'cr_set': cr_set, 'records': records.order_by('-created')})
+			self.context.update({'company_id': self.company_id, 'company': self.company,
+			                     'records': records.order_by('-created'), 'cr_set': cr_set})
 
 			pm, py = previous_month_year(month, year)
 			previous = check.filter(created__month=pm, created__year=py)
 
 			if previous:
-				context.__setitem__('previous', True)
+				self.context.__setitem__('previous', True)
 			else:
-				context.__setitem__('previous', False)
+				self.context.__setitem__('previous', False)
 
-		return render(request, 'cashregister/cashregister.html', context)
+			if self.request.method == 'GET':
+				self.form = CashRegisterForm(initial={'company': self.company})
+			elif self.request.method == 'POST':
+				self.form = CashRegisterForm(data=self.request.POST)
 
-	def post(self, request, company_id:int=None) -> HttpResponseRedirect:
-		form = CashRegisterForm(data=request.POST)
-		check = CashRegister.objects.filter(company_id=company_id)
-		companies = Company.objects.filter(status__in=[1,2,3]).order_by('company')
-		context = {'form': form, 'companies': companies}
+			self.context.__setitem__('form', self.form)
 
-		if company_id:
-			month, year = now().month, now().year
-			company = Company.objects.get(pk=company_id)
-			registerdata = cashregisterdata(company_id, month, year)
-			context.update(dict(registerdata))
-			records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
-			query = Q(company_id=company_id)&(Q(created__year=year)|Q(created__year=year-1))
-			cr_data = CashRegister.objects.filter(query).exclude(contents='z przeniesienia')
-			cr_set = cr_data.datetimes('created','month', order='DESC')
-			context.update({'company': company, 'company_id': company_id,
-			                'cr_set': cr_set, 'records': records.order_by('-created')})
 
-			pm, py = previous_month_year(month, year)
-			previous = check.filter(created__month=pm, created__year=py)
+	def get(self, request, **kwargs) -> HttpResponse:
 
-			if previous:
-				context.__setitem__('previous', True)
-			else:
-				context.__setitem__('previous', False)
+		return render(request, 'cashregister/cashregister.html', self.context)
 
-			if form.is_valid():
-				form.save(commit=False)
-				data = form.cleaned_data
-				income, expenditure = [data[key] for key in ('income', 'expenditure')]
-				if income != 0 and expenditure != 0:
-					msg = f'One of the fields (income {income:.2f}PLN or expenditure {expenditure:.2f}PLN) must be zero and second have to be positive value!'
-					messages.warning(request, msg)
-					return render(request, 'cashregister/cashregister.html', context)
-				elif income or expenditure:
-					if income > 0:
-						form.save(commit=True)
-						msg = f'Succesful register new record in {company} (income={income:.2f}PLN)'
+	def post(self, request, **kwargs) -> HttpResponseRedirect:
+
+		if self.form.is_valid():
+			self.form.save(commit=False)
+			data = self.form.cleaned_data
+			income, expenditure = [data[key] for key in ('income', 'expenditure')]
+			if income != 0 and expenditure != 0:
+				msg = f'One of the fields (income {income:.2f}PLN or expenditure {expenditure:.2f}PLN) must be zero and second have to be positive value!'
+				messages.warning(request, msg)
+				return render(request, 'cashregister/cashregister.html', self.context)
+			elif income or expenditure:
+				if income > 0:
+					self.form.save(commit=True)
+					msg = f'Succesful register new record in {self.company} (income={income:.2f}PLN)'
+					messages.success(request, msg)
+				elif expenditure > 0:
+					if self.registerdata['status'] - expenditure > 0:
+						self.form.save(commit=True)
+						msg = f'Succesful register new record in {self.company} (expenditure={expenditure:.2f}PLN)'
 						messages.success(request, msg)
-					elif expenditure > 0:
-						if registerdata['status'] - expenditure > 0:
-							form.save(commit=True)
-							msg = f'Succesful register new record in {company} (expenditure={expenditure:.2f}PLN)'
-							messages.success(request, msg)
-						else:
-							msg = f"Expenditure ({expenditure:.2f}PLN) is greater than the cash register status ({registerdata['status']:.2f}PLN)!"
-							messages.warning(request, msg)
-			else:
-				contents = request.POST['contents']
-				if contents in contents_variants:
-					msg = f'<<{contents}>> is not allowed! Use any other...'
-					messages.info(request, msg)
+					else:
+						msg = f"Expenditure ({expenditure:.2f}PLN) is greater than the cash register status ({self.registerdata['status']:.2f}PLN)!"
+						messages.warning(request, msg)
+		else:
+			contents = request.POST['contents']
+			if contents in contents_variants:
+				msg = f'<<{contents}>> is not allowed! Use any other...'
+				messages.info(request, msg)
 
-		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
+		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[self.company_id]))
 
 
 class CashRegisterDelete(View):

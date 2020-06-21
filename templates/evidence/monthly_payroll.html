@@ -16,11 +16,11 @@
           <a class="btn btn-outline-success d-print-none" href="{% url 'evidence:leave_time_recorder_add' employee_id %}">Leave time recorder</a>
           <a class="btn btn-outline-secondary d-print-none" href="{% url 'evidence:account_payment' employee_id %}">Payment on account</a>
           {% if amountpay.brutto > 0 %}
-            <a class="btn btn-outline-info d-print-none" href="{% url 'evidence:monthly_payroll_print' month year %}">Print</a>
-            <a class="btn btn-outline-warning d-print-none" href="{% url 'evidence:monthly_payroll_pdf' month year %}">Send PDF</a>
+            <a class="btn btn-outline-info d-print-none" href="{% url 'evidence:monthly_payroll_print' month year %}">Print current payroll</a>
+            <a class="btn btn-outline-light d-print-none" href="{% url 'evidence:monthly_payroll_pdf' month year %}">Send current payroll as PDF</a>
           {% else %}
-            <a class="btn btn-outline-info d-print-none disabled" href="{% url 'evidence:monthly_payroll_print' month year %}">Print</a>
-            <a class="btn btn-outline-warning d-print-none disabled" href="{% url 'evidence:monthly_payroll_pdf' month year %}">Send PDF</a>
+            <a class="btn btn-outline-info d-print-none disabled" href="{% url 'evidence:monthly_payroll_print' month year %}">Print current payroll</a>
+            <a class="btn btn-outline-light d-print-none disabled" href="{% url 'evidence:monthly_payroll_pdf' month year %}">Send current payroll as PDF</a>
           {% endif %}
           <a class="btn btn-outline-danger d-print-none" href="{% url 'account:exit' %}">Exit</a>
         </div>
@@ -36,15 +36,18 @@
         <hr class="small">
         <div class="col">
           <a href="{% url 'account:admin_site' %}">
-            <img class="d-block uk-logo mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
-            <span class="d-block uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
+            <img class="uk-paylogo" src="{% static 'images/mainboard/logoUNI.png' %}" alt="logo unikolor">
+            <span class="uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
           </a>
         </div>
       </div>
       <div class="col-10">
         {% if amountpay.brutto %}
           {% include 'blocks/payrolldata_modal.html' %}
-          <p class="uk-headline">Total work hours: {{ total_work_hours }} hours.&nbsp;&nbsp;&nbsp;Total payment: {{ amountpay.brutto|money_format }}</p>
+          <div class="uk-headline d-flex justify-content-around">
+            <div>Total work hours: <span class="uk-text-value">{{ total_work_hours }} hour{{ total_work_hours|pluralize:'s' }}</span></div>
+            <div>Total payment: <span class="uk-text-value">{{ amountpay.brutto|money_format }}</span></div>
+          </div>
 
           <div class="input-group">
             <input class="form-control" id="myInput" type="text" placeholder="Search employee..." aria-label="Filtering table" aria-describedby="basic-addon">
