@@ -207,11 +207,12 @@ class EmployeeHourlyRateView(View):
 			last_hourly_rate = all_hourly_rate.last()
 			initial={'worker': self.worker, 'hourly_rate': f'{last_hourly_rate.hourly_rate:.2f}'}
 			self.form = EmployeeHourlyRateForm(initial=initial)
-			self.context.update({'form': self.form, 'all_hourly_rate': all_hourly_rate,
-			                     'last_hourly_rate': last_hourly_rate})
+			self.context.update({'all_hourly_rate': all_hourly_rate, 'last_hourly_rate': last_hourly_rate})
 		elif self.request.method == 'POST':
 			self.form = EmployeeHourlyRateForm(data=self.request.POST)
-			self.context.update({'form': self.form, 'update': now().date()})
+			self.context.update({'update': now().date()})
+
+		self.context.update({'form': self.form})
 	
 	def get(self, request, **kwargs)->render:
 		
