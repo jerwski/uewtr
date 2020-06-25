@@ -157,14 +157,16 @@ def initial_leave_form(employee_id:int) -> dict:
 def erase_records(employee_id:int) -> dict:
 	context = dict()
 	worker = Employee.objects.get(pk=employee_id)
-	opt1, opt2 = {'worker': worker, 'then': Value(1)}, {'default': Value(0), 'output_field': IntegerField()}
-	db = {EmployeeData._meta.verbose_name: EmployeeData, WorkEvidence._meta.verbose_name: WorkEvidence,
-		  EmployeeLeave._meta.verbose_name: EmployeeLeave, AccountPayment._meta.verbose_name: AccountPayment,
-		  EmployeeHourlyRate._meta.verbose_name: EmployeeHourlyRate, }
 
-	for model_name, model in db.items():
-		records = model.objects.aggregate(rec=Sum(Case(When(**opt1), **opt2)))
-		context.__setitem__(model_name, records['rec'])
+	if worker.status == False:
+		opt1, opt2 = {'worker': worker, 'then': Value(1)}, {'default': Value(0), 'output_field': IntegerField()}
+		db = {EmployeeData._meta.verbose_name: EmployeeData, WorkEvidence._meta.verbose_name: WorkEvidence,
+			  EmployeeLeave._meta.verbose_name: EmployeeLeave, AccountPayment._meta.verbose_name: AccountPayment,
+			  EmployeeHourlyRate._meta.verbose_name: EmployeeHourlyRate}
+
+		for model_name, model in db.items():
+			records = model.objects.aggregate(rec=Sum(Case(When(**opt1), **opt2)))
+			context.__setitem__(model_name, records['rec'])
 
 	return context
 

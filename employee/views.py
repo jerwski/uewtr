@@ -47,19 +47,14 @@ class EmployeeBasicDataView(View):
 				context.__setitem__('active', False)
 
 			form = EmployeeBasicDataForm(initial=initial)
-			context.__setitem__('form', form)
-			context.__setitem__('worker', worker)
-			context.__setitem__('status', worker.status)
-			context.__setitem__('employee_id', employee_id)
-			context.__setitem__('records',erase_records(employee_id,))
+			context.update({'form': form, 'worker': worker, 'employee_id': employee_id,
+			                'status': worker.status, 'records': erase_records(employee_id)})
 
 			return render(request, 'employee/employee_basicdata.html', context)
 
 		else:
 			form = EmployeeBasicDataForm()
-			context.__setitem__('form',form)
-			context.__setitem__('active', True)
-			context.__setitem__('new_employee', True)
+			context.update({'form': form, 'active': True, 'new_employee': True})
 
 			return render(request, 'employee/employee_basicdata.html', context)
 
@@ -70,8 +65,7 @@ class EmployeeBasicDataView(View):
 		employees = Employee.objects.all()
 
 		if employees.exists():
-			context.__setitem__('employees_st', employees.filter(status=True))
-			context.__setitem__('employees_sf', employees.filter(status=False))
+			context.update({'employees_st': employees.filter(status=True), 'employees_sf': employees.filter(status=False)})
 		else:
 			messages.success(request, r'No employee in database...')
 
@@ -84,7 +78,6 @@ class EmployeeBasicDataView(View):
 
 		if form.is_valid():
 			new_values = form.cleaned_data
-			print(new_values)
 
 			if new_values != old_values:
 				try:
@@ -191,54 +184,66 @@ class EmployeeExtendedDataView(View):
 
 class EmployeeHourlyRateView(View):
 	'''class implementing the method of changing the hourly rate for the employee by pk=employee_id'''
-	def get(self, request, employee_id:int)->render:
-		worker = Employee.objects.get(pk=employee_id)
+	def setup(self, request, *args, **kwargs):
+		super(EmployeeHourlyRateView, self).setup(request, **kwargs)
+		self.request, self.kwargs = request, kwargs
+		
+		if 'employee_id' in self.kwargs.keys():
+			self.employee_id = self.kwargs['employee_id']
+		
+		self.worker = Employee.objects.get(pk=self.employee_id)
 		employees = Employee.objects.filter(status=True)
-		all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=worker).order_by('update')
-		last_hourly_rate = all_hourly_rate.last()
-		initial={'worker': worker, 'hourly_rate': f'{last_hourly_rate.hourly_rate:.2f}'}
-		form = EmployeeHourlyRateForm(initial=initial)
-		context = {'employee_id': employee_id, 'worker': worker, 'employees': employees,
-				   'last_hourly_rate': last_hourly_rate, 'all_hourly_rate': all_hourly_rate, 'form': form}
-		return render(request, 'employee/employee_hourly_rate.html', context)
+		
+		self.context = {'worker': self.worker, 'employee_id': self.employee_id, 'employees': employees}
+		
+		if self.request.method == 'GET':
+			all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=self.worker).order_by('update')
+			last_hourly_rate = all_hourly_rate.last()
+			initial={'worker': self.worker, 'hourly_rate': f'{last_hourly_rate.hourly_rate:.2f}'}
+			self.form = EmployeeHourlyRateForm(initial=initial)
+			self.context.update({'all_hourly_rate': all_hourly_rate, 'last_hourly_rate': last_hourly_rate})
+		elif self.request.method == 'POST':
+			self.form = EmployeeHourlyRateForm(data=self.request.POST)
+			self.context.update({'update': now().date()})
 
-	def post(self, request, employee_id:int)->render:
-		employees = Employee.objects.filter(status=True)
-		form = EmployeeHourlyRateForm(data=request.POST)
-		context = {'form': form, 'employee_id': employee_id, 'employees': employees, 'update': now().date()}
+		self.context.update({'form': self.form})
+	
+	def get(self, request, **kwargs)->render:
+		
+		return render(request, 'employee/employee_hourly_rate.html', self.context)
 
-		if form.is_valid():
-			data = form.cleaned_data
-			worker = data['worker']
-			context.__setitem__('worker', worker)
-			values = {'worker': worker, 'update__year': now().year, 'update__month': now().month}
+	def post(self, request, **kwargs)->render:
+
+		if self.form.is_valid():
+			data = self.form.cleaned_data
+			values = {'worker': self.worker, 'update__year': now().year, 'update__month': now().month}
 
 			if EmployeeHourlyRate.objects.filter(**values).exclude(update__exact=now().date()).exists():
-				msg = f'Rate for employee ({worker}) is existing in database...'
+				msg = f'Rate for employee ({self.worker}) is existing in database...'
 				messages.error(request, msg)
-				context.__setitem__('check_rate', True)
+				self.context.__setitem__('check_rate', True)
 			else:
-				all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=worker).order_by('update')
+				all_hourly_rate = EmployeeHourlyRate.objects.filter(worker=self.worker).order_by('update')
 				last_exist_hourly_rate = all_hourly_rate.last()
 
 				if data['hourly_rate'] != last_exist_hourly_rate.hourly_rate:
 					defaults = {'hourly_rate': data['hourly_rate']}
-					kwargs = {'worker_id': employee_id, 'update': now().date()}
+					kwargs = {'worker_id': self.employee_id, 'update': now().date()}
 					obj, created = EmployeeHourlyRate.objects.update_or_create(defaults=defaults, **kwargs)
-					context.__setitem__('hourly_rate', obj.hourly_rate)
+					self.context.__setitem__('hourly_rate', obj.hourly_rate)
 
 					if created:
-						msg = f'For employee ({worker}) add new hourly rate ({obj.hourly_rate} PLN)'
+						msg = f'For employee ({self.worker}) add new hourly rate ({obj.hourly_rate} PLN)'
 						messages.success(request, msg)
 					else:
-						msg = f'For employee {worker} update hourly rate ({obj.hourly_rate} PLN)'
+						msg = f'For employee {self.worker} update hourly rate ({obj.hourly_rate} PLN)'
 						messages.success(request, msg)
 				else:
-					msg = f'Last hourly rate {last_exist_hourly_rate} for {worker} is the same like enterd.'
+					msg = f'Last hourly rate {last_exist_hourly_rate} for {self.worker} is the same like enterd.'
 					messages.success(request, msg)
-					context.__setitem__('last_exist_hourly_rate', last_exist_hourly_rate)
+					self.context.__setitem__('last_exist_hourly_rate', last_exist_hourly_rate)
 
-		return render(request, 'employee/employee_hourly_rate.html', context)
+		return render(request, 'employee/employee_hourly_rate.html', self.context)
 
 
 class EmployeeHourlyRateEraseView(View):
