@@ -47,19 +47,14 @@ class EmployeeBasicDataView(View):
 				context.__setitem__('active', False)
 
 			form = EmployeeBasicDataForm(initial=initial)
-			context.__setitem__('form', form)
-			context.__setitem__('worker', worker)
-			context.__setitem__('status', worker.status)
-			context.__setitem__('employee_id', employee_id)
-			context.__setitem__('records',erase_records(employee_id,))
+			context.update({'form': form, 'worker': worker, 'employee_id': employee_id,
+			                'status': worker.status, 'records': erase_records(employee_id)})
 
 			return render(request, 'employee/employee_basicdata.html', context)
 
 		else:
 			form = EmployeeBasicDataForm()
-			context.__setitem__('form',form)
-			context.__setitem__('active', True)
-			context.__setitem__('new_employee', True)
+			context.update({'form': form, 'active': True, 'new_employee': True})
 
 			return render(request, 'employee/employee_basicdata.html', context)
 
@@ -70,8 +65,7 @@ class EmployeeBasicDataView(View):
 		employees = Employee.objects.all()
 
 		if employees.exists():
-			context.__setitem__('employees_st', employees.filter(status=True))
-			context.__setitem__('employees_sf', employees.filter(status=False))
+			context.update({'employees_st': employees.filter(status=True), 'employees_sf': employees.filter(status=False)})
 		else:
 			messages.success(request, r'No employee in database...')
 

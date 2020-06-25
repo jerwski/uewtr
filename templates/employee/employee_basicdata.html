@@ -120,8 +120,12 @@
         <hr class="small">
         {% if records %}
           <div class="text-center uk-text-value">
-            <p>You can delete all records in datatabase for {{ worker }}...</p>
+            <p>You can delete all records in database for {{ worker }}...</p>
             <p class="text-danger blink">Think twice before you decide...</p>
+          </div>
+        {% elif records and emploee_id %}
+          <div class="text-center uk-text-value blink">
+            <p>If you want delete records in database for <span class="text-danger">{{ worker }}</span> set status on DEACTIVE...</p>
           </div>
         {% endif %}
       </div>
