@@ -128,12 +128,12 @@
           </div>
         </form>
         <hr class="small">
-        {% if records %}
+        {% if worker.status == False %}
           <div class="text-center uk-text-value">
             <p>You can delete all records in database for {{ worker }}...</p>
             <p class="text-danger blink">Think twice before you decide...</p>
           </div>
-        {% elif worker.status == False %}
+        {% elif worker.status == True %}
           <div class="text-center uk-text-value blink">
             <p>If you want delete records in database for <span class="text-danger">{{ worker }}</span> set status on DEACTIVE...</p>
           </div>

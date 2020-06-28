@@ -1,8 +1,8 @@
 
   <!-- Small modal -->
-  <button id="commitButton" type="button" class="btn btn-outline-danger" data-toggle="modal" data-target=".bd-example-modal-sm">Think twice before you decide.</button>
+  <button id="commitButton" type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#harderaseModal">Think twice before you decide.</button>
     <!-- Modal -->
-    <div class="modal fade bd-example-modal-sm" id="commitModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal fade bd-example-modal-sm" id="harderaseModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-sm">
         <div class="modal-content">
           <div class="modal-header bg-warning">
@@ -24,6 +24,7 @@
 
   <script>
     $('#closemod').click(function() {
-      $('#leaveModal').modal('hide');
+      $('#harderaseModal').modal('hide');
+      $('#eraseModal').modal('hide');
     });
   </script>

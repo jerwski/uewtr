@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.views.generic import View
 from django.utils.timezone import now
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, HttpResponsePermanentRedirect
 
 # my models
 from employee.models import Employee, EmployeeData, EmployeeHourlyRate
@@ -23,16 +23,16 @@ class EmployeeBasicDataView(View):
 	'''class implementing the method of adding/changing basic data for the new or existing employee'''
 	def setup(self, request, *args, **kwargs):
 		super(EmployeeBasicDataView, self).setup(request, **kwargs)
-		self.request, self.kwargs, self.context, self.employee_id = request, kwargs, dict(), None
+		self.request, self.kwargs, self.context, employee_id = request, kwargs, dict(), None
 		employees = Employee.objects.all()
 
 		if 'employee_id' in self.kwargs.keys():
-			self.employee_id = self.kwargs['employee_id']
-			self.worker = Employee.objects.get(pk=self.employee_id)
-			fields = list(self.worker.__dict__.keys())[4:]
-			self.initial = Employee.objects.filter(pk=self.employee_id).values(*fields)[0]
-			self.context = {'employee_id': self.employee_id, 'worker': self.worker}
-			extdata = EmployeeData.objects.filter(worker=self.worker)
+			employee_id = self.kwargs['employee_id']
+			worker = Employee.objects.get(pk=employee_id)
+			fields = list(worker.__dict__.keys())[4:]
+			initial = Employee.objects.filter(pk=employee_id).values(*fields)[0]
+			self.context = {'employee_id': employee_id, 'worker': worker}
+			extdata = EmployeeData.objects.filter(worker=worker)
 
 			if extdata:
 				self.context.__setitem__('extdata', True)
@@ -48,9 +48,9 @@ class EmployeeBasicDataView(View):
 			messages.warning(request, r'No employee in database...')
 
 		if self.request.method == 'GET':
-			if self.employee_id:
-				self.form = EmployeeBasicDataForm(initial=self.initial)
-				self.context.update({'records': erase_records(self.employee_id)})
+			if employee_id:
+				self.form = EmployeeBasicDataForm(initial=initial)
+				self.context.update({'records': erase_records(employee_id)})
 
 			else:
 				self.form = EmployeeBasicDataForm(initial={'status': 0})
@@ -58,8 +58,8 @@ class EmployeeBasicDataView(View):
 
 		elif self.request.method == 'POST':
 			self.form = EmployeeBasicDataForm(data=self.request.POST)
-			if self.employee_id:
-				self.old_values = Employee.objects.filter(pk=self.employee_id).values(*fields)[0]
+			if employee_id:
+				self.old_values = Employee.objects.filter(pk=employee_id).values(*fields)[0]
 			else:
 				self.old_values = {'pesel': request.POST['pesel']}
 
@@ -80,16 +80,17 @@ class EmployeeBasicDataView(View):
 					self.context.update({'employee_id': obj.id})
 
 					if created:
-						args = [obj.id,]
 						EmployeeHourlyRate.objects.create(worker=obj, update=now().date(), hourly_rate=8.00)
 						msg = f'Successful created basic data for employee {obj} with minimum rate 8.00 PLN/h'
 						messages.success(request, msg)
 
-						return HttpResponseRedirect(reverse('employee:employee_extendeddata', args=args))
+						return HttpResponseRedirect(reverse('employee:employee_extendeddata', args=[obj.id]))
 
 					else:
 						msg = f'Successful update data for employee {obj}'
 						messages.success(request, msg)
+
+						return HttpResponseRedirect(reverse('employee:employee_basicdata', args=[obj.id]))
 
 				except Employee.DoesNotExist:
 					messages.warning(request, r'Somthing wrong... try again!')
