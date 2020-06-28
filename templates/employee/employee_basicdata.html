@@ -58,40 +58,50 @@
           {% if new_employee %}ADD EMPLOYEE BASIC DATA{% else %}CHANGE EMPLOYEE BASIC DATA{% endif %}
         </div>
 
-        <form action="." method="POST">{% csrf_token %}
+        <form action="{% if employee_id %}{% url 'employee:employee_basicdata' employee_id %}{% else %}{% url 'employee:employee_basicdata' %}{% endif %}" method="POST">{% csrf_token %}
           <div class="row">
             <div class="col text-center mt-3">
-              <div class="container">
-                <div class="input-group mt-1">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text bg-info">Forename</span>
-                  </div>
-                  {% bootstrap_field form.forename form_group_class='form-inline' show_label=False placeholder='Type forename...' %}
+              <div class="input-group mt-1">
+                <div class="input-group-prepend">
+                  <span class="input-group-text bg-info">Forename</span>
                 </div>
-                <div class="input-group mt-1">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text bg-info">Surname&nbsp;&nbsp;</span>
-                  </div>
-                  {% bootstrap_field form.surname form_group_class='form-inline' show_label=False placeholder='Type surname...' %}
-                </div>
-                <div class="input-group mt-1">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text bg-info">Pesel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                  </div>
-                  {% bootstrap_field form.pesel form_group_class='form-inline' show_label=False placeholder='Type pesel...' %}
-                </div>
+                {% bootstrap_field form.forename form_group_class='form-inline' show_label=False placeholder='Type forename...' %}
               </div>
-
+              <div class="input-group mt-1">
+                <div class="input-group-prepend">
+                  <span class="input-group-text bg-info">Surname&nbsp;&nbsp;</span>
+                </div>
+                {% bootstrap_field form.surname form_group_class='form-inline' show_label=False placeholder='Type surname...' %}
+              </div>
+              <div class="input-group mt-1">
+                <div class="input-group-prepend">
+                  <span class="input-group-text bg-info">Pesel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                </div>
+                {% bootstrap_field form.pesel form_group_class='form-inline' show_label=False placeholder='Type pesel...' %}
+              </div>
             </div>
           </div>
 
           <div class="row">
-            <div class="col-6">
-              {% bootstrap_field form.leave size='small' label_class='uk-text-small font-italic font-weight-bold' %}
-            </div>
-            <div class="col-6">
-              {% bootstrap_field form.status size='small' label_class='uk-text-small font-italic font-weight-bold' %}
-            </div>
+            {% if employee_id and extdata %}
+              <div class="col-6">
+                {% bootstrap_field form.leave size='small' label_class='uk-text-small font-italic font-weight-bold' %}
+              </div>
+              <div class="col-6">
+                {% bootstrap_field form.status size='small' label_class='uk-text-small font-italic font-weight-bold' %}
+              </div>
+            {% else %}
+              <div class="col-3"></div>
+              <div class="col-6">
+                {% bootstrap_field form.leave size='small' label_class='uk-text-small font-italic font-weight-bold' %}
+              </div>
+              <div class="col-3 d-none">
+                {% bootstrap_field form.status size='small' label_class='uk-text-small font-italic font-weight-bold' %}
+              </div>
+            {% endif %}
+            {% if employee_id and extdata == False %}
+              <p class="uk-text-small">Until you complete employee <span class="text-danger">{{ worker }}</span> extend data, you won't be able to change his status to <span class="text-light">ACTIVE</span>.</p>
+            {% endif %}
           </div>
 
           <div class="row">
@@ -101,14 +111,14 @@
                   <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
                 </div>
               {% else %}
-                {% if status %}
+                {% if worker.status %}
                   <div class="btn-group btn-group-sm mt-5" role="group">
                     <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
                     <a href="{% url 'employee:employee_hourly_rate' employee_id %}" class="btn btn-outline-primary">Update rate</a>
                     <button type="submit" class="btn btn-outline-success">Confirm</button>
                   </div>
                 {% else %}
-                  <div class="btn-group btn-group-sm mt-5" role="group">
+                  <div class="btn-group btn-group-sm mt-1" role="group">
                     <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
                     <button type="submit" class="btn btn-outline-success">Confirm changes</button>
                   </div>
@@ -123,7 +133,7 @@
             <p>You can delete all records in database for {{ worker }}...</p>
             <p class="text-danger blink">Think twice before you decide...</p>
           </div>
-        {% elif records and emploee_id %}
+        {% elif worker.status == False %}
           <div class="text-center uk-text-value blink">
             <p>If you want delete records in database for <span class="text-danger">{{ worker }}</span> set status on DEACTIVE...</p>
           </div>

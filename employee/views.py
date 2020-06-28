@@ -21,74 +21,72 @@ from functions.archive import archiving_of_deleted_records
 
 class EmployeeBasicDataView(View):
 	'''class implementing the method of adding/changing basic data for the new or existing employee'''
-	def get(self, request, employee_id:int=None)->render:
-		context = dict()
+	def setup(self, request, *args, **kwargs):
+		super(EmployeeBasicDataView, self).setup(request, **kwargs)
+		self.request, self.kwargs, self.context, self.employee_id = request, kwargs, dict(), None
 		employees = Employee.objects.all()
+
+		if 'employee_id' in self.kwargs.keys():
+			self.employee_id = self.kwargs['employee_id']
+			self.worker = Employee.objects.get(pk=self.employee_id)
+			fields = list(self.worker.__dict__.keys())[4:]
+			self.initial = Employee.objects.filter(pk=self.employee_id).values(*fields)[0]
+			self.context = {'employee_id': self.employee_id, 'worker': self.worker}
+			extdata = EmployeeData.objects.filter(worker=self.worker)
+
+			if extdata:
+				self.context.__setitem__('extdata', True)
+			else:
+				self.context.__setitem__('extdata', False)
 
 		if employees.exists():
 			employees_st = employees.filter(status=True)
-			first_id = employees_st.first().id
 			employees_sf = employees.filter(status=False)
-			context.update({'employees_st': employees_st, 'employees_sf': employees_sf, 'employee_id': first_id})
+			self.context.update({'employees_st': employees_st, 'employees_sf': employees_sf})
 
 		else:
 			messages.warning(request, r'No employee in database...')
-			context.update({'employee_id': employee_id})
 
-		if employee_id:
-			worker = Employee.objects.get(pk=employee_id)
-			fields = list(worker.__dict__.keys())[4:]
-			initial = Employee.objects.filter(pk=employee_id).values(*fields)[0]
-			active = EmployeeData.objects.filter(worker=worker)
+		if self.request.method == 'GET':
+			if self.employee_id:
+				self.form = EmployeeBasicDataForm(initial=self.initial)
+				self.context.update({'records': erase_records(self.employee_id)})
 
-			if active:
-				context.__setitem__('active', True)
 			else:
-				context.__setitem__('active', False)
+				self.form = EmployeeBasicDataForm(initial={'status': 0})
+				self.context.update({'extdata': False, 'new_employee': True})
 
-			form = EmployeeBasicDataForm(initial=initial)
-			context.update({'form': form, 'worker': worker, 'employee_id': employee_id,
-			                'status': worker.status, 'records': erase_records(employee_id)})
+		elif self.request.method == 'POST':
+			self.form = EmployeeBasicDataForm(data=self.request.POST)
+			if self.employee_id:
+				self.old_values = Employee.objects.filter(pk=self.employee_id).values(*fields)[0]
+			else:
+				self.old_values = {'pesel': request.POST['pesel']}
 
-			return render(request, 'employee/employee_basicdata.html', context)
+		self.context.update({'form': self.form})
 
-		else:
-			form = EmployeeBasicDataForm()
-			context.update({'form': form, 'active': True, 'new_employee': True})
+	def get(self, request, **kwargs)->render:
 
-			return render(request, 'employee/employee_basicdata.html', context)
+		return render(request, 'employee/employee_basicdata.html', self.context)
 
-	def post(self, request, employee_id:int=None)->HttpResponseRedirect:
-		args = [employee_id]
-		form = EmployeeBasicDataForm(data=request.POST)
-		context = {'form': form}
-		employees = Employee.objects.all()
+	def post(self, request, **kwargs)->HttpResponseRedirect:
 
-		if employees.exists():
-			context.update({'employees_st': employees.filter(status=True), 'employees_sf': employees.filter(status=False)})
-		else:
-			messages.success(request, r'No employee in database...')
+		if self.form.is_valid():
+			new_values = self.form.cleaned_data
 
-		if employee_id:
-			employee = Employee.objects.get(pk=employee_id)
-			fields = list(employee.__dict__.keys())[4:]
-			old_values = Employee.objects.filter(pk=employee_id).values(*fields)[0]
-		else:
-			old_values = {'pesel': request.POST['pesel']}
-
-		if form.is_valid():
-			new_values = form.cleaned_data
-
-			if new_values != old_values:
+			if new_values != self.old_values:
 				try:
-					obj, created = Employee.objects.update_or_create(defaults=new_values, **old_values)
-					context.__setitem__('employee_id', obj.id)
+					obj, created = Employee.objects.update_or_create(defaults=new_values, **self.old_values)
+					self.context.update({'employee_id': obj.id})
 
 					if created:
-						args = [obj.id]
+						args = [obj.id,]
 						EmployeeHourlyRate.objects.create(worker=obj, update=now().date(), hourly_rate=8.00)
 						msg = f'Successful created basic data for employee {obj} with minimum rate 8.00 PLN/h'
 						messages.success(request, msg)
+
+						return HttpResponseRedirect(reverse('employee:employee_extendeddata', args=args))
+
 					else:
 						msg = f'Successful update data for employee {obj}'
 						messages.success(request, msg)
@@ -99,11 +97,11 @@ class EmployeeBasicDataView(View):
 			else:
 				messages.info(request, r'Nothing to change!')
 
-			return HttpResponseRedirect(reverse('employee:employee_basicdata', args=args))
+			return render(request, 'employee/employee_basicdata.html', self.context)
 		else:
-			context.__setitem__('new_employee', True)
+			self.context.__setitem__('new_employee', True)
 
-		return render(request, 'employee/employee_basicdata.html', context)
+		return render(request, 'employee/employee_basicdata.html', self.context)
 
 
 class EmployeeEraseAll(View):
@@ -154,8 +152,8 @@ class EmployeeExtendedDataView(View):
 			old_values = {'worker': worker}
 
 			if EmployeeData.objects.filter(worker=worker).exists():
-				employee_extendeddata = EmployeeData.objects.get(worker=worker)
-				fields = list(employee_extendeddata.__dict__.keys())[4:]
+				extdata = EmployeeData.objects.get(worker=worker)
+				fields = list(extdata.__dict__.keys())[4:]
 				old_values.update(EmployeeData.objects.filter(worker=worker).values(*fields)[0])
 				old_values.pop('worker_id')
 				old_values['overtime'] = str(old_values['overtime'])
