@@ -31,7 +31,7 @@ class EmployeeBasicDataView(View):
 			worker = Employee.objects.get(pk=employee_id)
 			fields = list(worker.__dict__.keys())[4:]
 			initial = Employee.objects.filter(pk=employee_id).values(*fields)[0]
-			self.context = {'employee_id': employee_id, 'worker': worker}
+			self.context = {'employee_id': employee_id, 'worker': worker, 'records': erase_records(employee_id)}
 			extdata = EmployeeData.objects.filter(worker=worker)
 
 			if extdata:
@@ -50,7 +50,6 @@ class EmployeeBasicDataView(View):
 		if self.request.method == 'GET':
 			if employee_id:
 				self.form = EmployeeBasicDataForm(initial=initial)
-				self.context.update({'records': erase_records(employee_id)})
 
 			else:
 				self.form = EmployeeBasicDataForm(initial={'status': 0})
@@ -73,6 +72,7 @@ class EmployeeBasicDataView(View):
 
 		if self.form.is_valid():
 			new_values = self.form.cleaned_data
+			new_values.update({'status': int(new_values['status']), 'leave': int(new_values['leave'])})
 
 			if new_values != self.old_values:
 				try:
@@ -123,39 +123,46 @@ class EmployeeEraseAll(View):
 
 class EmployeeExtendedDataView(View):
 	'''class implementing the method of adding/changing extended data for the employee by pk=employee_id'''
-	def get(self, request, employee_id:int)->render:
-		worker = Employee.objects.get(id=employee_id)
+	def setup(self, request, *args, **kwargs):
+		super(EmployeeExtendedDataView, self).setup(request, **kwargs)
+		self.request, self.kwargs = request, kwargs
+		self.employee_id = self.kwargs['employee_id']
+		self.worker = Employee.objects.get(id=self.employee_id)
 		employees = Employee.objects.filter(status=True)
+		self.extdata = EmployeeData.objects.filter(worker=self.worker)
+		self.context = {'employee_id': self.employee_id, 'employees': employees, 'worker': self.worker}
 
-		if EmployeeData.objects.filter(worker=worker).exists():
-			employee = EmployeeData.objects.get(worker=worker)
-			fields = list(employee.__dict__.keys())[4:]
-			old_values = EmployeeData.objects.filter(worker=worker).values(*fields)[0]
-			old_values.pop('worker_id')
-			old_values['worker'] = worker
-			form = EmployeeExtendedDataForm(initial=old_values)
-		else:
-			form = EmployeeExtendedDataForm(initial={'worker': worker})
+		if self.request.method == 'GET':
+			if self.extdata.exists():
+				employee = EmployeeData.objects.get(worker=self.worker)
+				fields = list(employee.__dict__.keys())[4:]
+				old_values = EmployeeData.objects.filter(worker=self.worker).values(*fields)[0]
+				old_values.pop('worker_id')
+				old_values['worker'] = self.worker
+				self.form = EmployeeExtendedDataForm(initial=old_values)
+			else:
+				self.form = EmployeeExtendedDataForm(initial={'worker': self.worker})
 
-		context = {'form': form, 'employee_id': employee_id, 'employees': employees, 'worker': worker}
+		elif self.request.method == 'POST':
+			self.form = EmployeeExtendedDataForm(data=self.request.POST)
 
-		return render(request, 'employee/employee_extendeddata.html', context)
 
-	def post(self, request, employee_id:int)->HttpResponseRedirect:
-		form = EmployeeExtendedDataForm(data=request.POST)
-		employees = Employee.objects.filter(status=True)
-		context = {'form': form, 'employee_id': employee_id, 'employees': employees}
+		self.context.update({'form': self.form})
 
-		if form.is_valid():
-			new_values = form.cleaned_data
-			worker = new_values['worker']
-			context.__setitem__('employee', worker)
-			old_values = {'worker': worker}
+	def get(self, request, **kwargs)->render:
 
-			if EmployeeData.objects.filter(worker=worker).exists():
-				extdata = EmployeeData.objects.get(worker=worker)
-				fields = list(extdata.__dict__.keys())[4:]
-				old_values.update(EmployeeData.objects.filter(worker=worker).values(*fields)[0])
+		return render(request, 'employee/employee_extendeddata.html', self.context)
+
+	def post(self, request, **kwargs)->HttpResponseRedirect:
+
+		if self.form.is_valid():
+			new_values = self.form.cleaned_data
+			old_values = {'worker': self.worker}
+
+			if self.extdata.exists():
+				employee = EmployeeData.objects.get(worker=self.worker)
+				fields = list(employee.__dict__.keys())[4:]
+				old_values.update(EmployeeData.objects.filter(worker=self.worker).values(*fields)[0])
 				old_values.pop('worker_id')
 				old_values['overtime'] = str(old_values['overtime'])
 
@@ -175,10 +182,10 @@ class EmployeeExtendedDataView(View):
 			else:
 				messages.info(request, r'Nothing to change!')
 
-			return HttpResponseRedirect(reverse('employee:employee_extendeddata', args=[employee_id]))
+			return HttpResponseRedirect(reverse('employee:employee_extendeddata', args=[self.employee_id]))
 
 		else:
-			return render(request, 'employee/employee_extendeddata.html', context)
+			return render(request, 'employee/employee_extendeddata.html', self.context)
 
 
 class EmployeeHourlyRateView(View):
