@@ -64,7 +64,7 @@
             <div class="col">
               <div class="btn btn-sm btn-group btn-block" role="group">
                 <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the Dashboard</a>
-                <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-primary">Back to the Add/Change of Basic Data</a>
+                <a href="{% url 'employee:employee_basicdata' employee_id %}" class="btn btn-outline-primary">Back to the Employee Change Basic Data</a>
                 <button type="submit" class="btn btn-outline-success">Confirm changes</button>
 
               </div>
