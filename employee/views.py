@@ -64,9 +64,11 @@ class EmployeeBasicDataView(View):
 
 		self.context.update({'form': self.form})
 
+
 	def get(self, request, **kwargs)->render:
 
 		return render(request, 'employee/employee_basicdata.html', self.context)
+
 
 	def post(self, request, **kwargs)->HttpResponseRedirect:
 
@@ -130,13 +132,16 @@ class EmployeeExtendedDataView(View):
 		self.worker = Employee.objects.get(id=self.employee_id)
 		employees = Employee.objects.filter(status=True)
 		self.extdata = EmployeeData.objects.filter(worker=self.worker)
+
+		if self.extdata.exists():
+			emplexdata = EmployeeData.objects.get(worker=self.worker)
+			self.fields = list(emplexdata.__dict__.keys())[4:]
+
 		self.context = {'employee_id': self.employee_id, 'employees': employees, 'worker': self.worker}
 
 		if self.request.method == 'GET':
 			if self.extdata.exists():
-				employee = EmployeeData.objects.get(worker=self.worker)
-				fields = list(employee.__dict__.keys())[4:]
-				old_values = EmployeeData.objects.filter(worker=self.worker).values(*fields)[0]
+				old_values = self.extdata.values(*self.fields)[0]
 				old_values.pop('worker_id')
 				old_values['worker'] = self.worker
 				self.form = EmployeeExtendedDataForm(initial=old_values)
@@ -146,12 +151,13 @@ class EmployeeExtendedDataView(View):
 		elif self.request.method == 'POST':
 			self.form = EmployeeExtendedDataForm(data=self.request.POST)
 
-
 		self.context.update({'form': self.form})
+
 
 	def get(self, request, **kwargs)->render:
 
 		return render(request, 'employee/employee_extendeddata.html', self.context)
+
 
 	def post(self, request, **kwargs)->HttpResponseRedirect:
 
@@ -160,9 +166,7 @@ class EmployeeExtendedDataView(View):
 			old_values = {'worker': self.worker}
 
 			if self.extdata.exists():
-				employee = EmployeeData.objects.get(worker=self.worker)
-				fields = list(employee.__dict__.keys())[4:]
-				old_values.update(EmployeeData.objects.filter(worker=self.worker).values(*fields)[0])
+				old_values.update(self.extdata.values(*self.fields)[0])
 				old_values.pop('worker_id')
 				old_values['overtime'] = str(old_values['overtime'])
 
@@ -213,10 +217,12 @@ class EmployeeHourlyRateView(View):
 			self.context.update({'update': now().date()})
 
 		self.context.update({'form': self.form})
-	
+
+
 	def get(self, request, **kwargs)->render:
 		
 		return render(request, 'employee/employee_hourly_rate.html', self.context)
+
 
 	def post(self, request, **kwargs)->render:
 
