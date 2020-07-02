@@ -341,51 +341,37 @@ def jpk_files(path:Path) -> list:
 
 def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 	'''return data from cash register'''
-	registerdata, saldo = defaultdict(float), 0
+	registerdata, prev_saldo, incomes, expenditures, saldo = dict(), 0 ,0, 0, 0
 	register = CashRegister.objects.filter(company_id=company_id)
-	check = register.filter(created__month=month, created__year=year)
+	current = register.filter(created__month=month, created__year=year)
 
-	pm, py = previous_month_year(month, year)
-	previous_data = register.filter(created__year=py, created__month=pm)
+	if register:
+		last_date = register.last().created.date()
+		last_month, last_year = last_date.month, last_date.year
 
-	if previous_data:
-		prev_incomes = previous_data.aggregate(inc=Sum('income'))
-		prev_expenditures = previous_data.aggregate(exp=Sum('expenditure'))
-		saldo = prev_incomes['inc'] - prev_expenditures['exp']
+		if current:
+			prev_saldo = current.get(contents='z przeniesienia').income
+			income = current.aggregate(inc=Sum('income'))
+			expenditures = current.aggregate(exp=Sum('expenditure'))
+			incomes, expenditures = income['inc'] - prev_saldo, expenditures['exp']
+			saldo = income['inc'] - expenditures
+		else:
+			last_data = register.filter(created__year=last_year, created__month=last_month)
+			income = last_data.aggregate(inc=Sum('income'))
+			expenditure = last_data.aggregate(exp=Sum('expenditure'))
+			saldo = income['inc'] - expenditure['exp']
+			prev_saldo = saldo
 
-	elif check:
-		incomes = check.aggregate(inc=Sum('income'))
-		expenditures = check.aggregate(exp=Sum('expenditure'))
+			transfer = {'company_id': company_id, 'symbol': f'RK {month}/{year}',
+			            'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
+			CashRegister.objects.create(**transfer)
 
-		if incomes['inc']!= None and expenditures['exp'] != None:
-			saldo = incomes['inc'] - expenditures['exp']
+		registerdata.update({'prev_saldo': prev_saldo, 'incomes': incomes, 'expenditures': expenditures, 'saldo': saldo})
+
 	else:
-		last = register.filter(income__gt=0).last()
-
-		if last is not None:
-			data = register.filter(created__year=last.created.date().year, created__month=last.created.date().month)
-			incomes = data.aggregate(inc=Sum('income'))
-			expenditures = data.aggregate(exp=Sum('expenditure'))
-			saldo = incomes['inc'] - expenditures['exp']
-			pm, py = last.created.date().month, last.created.date().year
-
-	# create new cashregister
-	if not register:
-		transfer = {'company_id': company_id,
-		            'symbol': f'RK {pm}/{py}',
-		            'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
+		transfer = {'company_id': company_id, 'symbol': f'RK {month}/{year}',
+		            'contents': 'z przeniesienia', 'income': 0, 'expenditure': 0}
 		CashRegister.objects.create(**transfer)
-		prev_date = now() - timedelta(days=now().day)
-		CashRegister.objects.filter(company_id=company_id).update(created=prev_date, updated=prev_date)
-
-	registerdata['saldo'] = saldo
-
-	presentdata = register.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
-	for item in presentdata:
-		registerdata['incomes'] += item.income
-		registerdata['expenditures'] += item.expenditure
-
-	registerdata['status'] = registerdata['incomes'] - registerdata['expenditures'] + saldo
 
 	return registerdata
 
@@ -399,7 +385,7 @@ def cashregisterhtml2pdf(company_id:int, month:int, year:int) -> bool:
 		# create cash register data as associative arrays for passed arguments
 		cashregister = cashregister.exclude(contents='z przeniesienia')
 		context = {'company': company, 'cashregister': cashregister, 'month': month, 'year': year}
-		registerdata = dict(cashregisterdata(company_id, month, year))
+		registerdata = cashregisterdata(company_id, month, year)
 		context.update(registerdata)
 		template = get_template(r'cashregister/cashregister_pdf.html')
 		html = template.render(context)
