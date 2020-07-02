@@ -24,7 +24,7 @@
                 <th>Poz.</th><th>Data</th><th>Komu</th><th>Dokument, treść</th><th>PRZYCHÓD</th><th>ROZCHÓD</th>
               </tr>
               <tr class="text-right">
-                <th colspan="4">Z przeniesienia:</th><th class="bg-white text-center" colspan="2">{{ saldo|money_format }}</th>
+                <th colspan="4">Z przeniesienia:</th><th class="bg-white text-center" colspan="2">{{ prev_saldo|money_format }}</th>
               </tr>
             </thead>
             <tbody>
@@ -36,7 +36,7 @@
             </tbody>
             <thead class="text-center thead-light">
               <tr>
-                <th colspan="2">Do przeniesienia:</th><th class="bg-white">{{ status|money_format }}</th>
+                <th colspan="2">Do przeniesienia:</th><th class="bg-white">{{ saldo|money_format }}</th>
                 <th class="text-right">Razem:</th><th>{{ incomes|money_format }}</th><th>{{ expenditures|money_format }}</th>
               </tr>
             </thead>

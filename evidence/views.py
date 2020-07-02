@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.db.models import Sum, Q
 from django.views.generic import View
 from django.utils.timezone import now
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, get_list_or_404, get_object_or_404
 
 # my forms
 from evidence.forms import WorkEvidenceForm, EmployeeLeaveForm, AccountPaymentForm, PeriodCurrentComplexDataForm, PeriodMonthlyPayrollForm
@@ -36,13 +36,19 @@ class WorkingTimeRecorderView(View):
 	def setup(self, request, **kwargs):
 		super(WorkingTimeRecorderView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
-		self.worker = Employee.objects.get(pk=self.kwargs['employee_id'])
+		ids = (item.id for item in get_list_or_404(Employee, status=True))
+
+		if 'employee_id' in self.kwargs.keys():
+			self.employee_id = self.kwargs['employee_id']
+
+		# self.worker = Employee.objects.get(pk=self.employee_id)
+		self.worker = get_object_or_404(Employee, pk=self.employee_id)
 		initial = {'worker': self.worker}
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
 		employees = employees.order_by('surname', 'forename')
 		query = Q(worker=self.worker) & (Q(overtime=1)|Q(overtime=2))
 		overhours = EmployeeData.objects.filter(query).exists()
-		self.context = {'worker': self.worker, 'employee_id': self.kwargs['employee_id'],
+		self.context = {'worker': self.worker, 'employee_id': self.employee_id,
 		                'employees': employees, 'overhours': overhours, 'wtr_flag': True}
 
 		if self.request.method == 'GET':
@@ -52,7 +58,7 @@ class WorkingTimeRecorderView(View):
 			else:
 				self.form = WorkEvidenceForm(initial=initial)
 
-			employee_total_data(self.kwargs['employee_id'], now().year, now().month, self.context)
+			employee_total_data(self.employee_id, now().year, now().month, self.context)
 
 		elif self.request.method == 'POST':
 			self.form = WorkEvidenceForm(data=self.request.POST)
@@ -99,7 +105,7 @@ class WorkingTimeRecorderView(View):
 				msg = f'Start working ({start_work}) is later than end working ({end_work}). Please correct it...'
 				messages.error(request, msg)
 
-			employee_total_data(self.kwargs['employee_id'], year, month, self.context)
+			employee_total_data(self.employee_id, year, month, self.context)
 
 		return render(request, 'evidence/working_time_recorder.html', self.context)
 

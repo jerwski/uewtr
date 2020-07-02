@@ -103,7 +103,7 @@ class CashRegisterView(View):
 			month, year = now().month, now().year
 			self.company = Company.objects.get(pk=self.company_id)
 			self.registerdata = cashregisterdata(self.company_id, month, year)
-			self.context.update(dict(self.registerdata))
+			self.context.update(self.registerdata)
 			records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
 			query = Q(company_id=self.company_id)&(Q(created__year=year)|Q(created__year=year-1))
 			cr_data = CashRegister.objects.filter(query).exclude(contents='z przeniesienia')
