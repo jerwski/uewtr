@@ -346,8 +346,7 @@ def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 	current = register.filter(created__month=month, created__year=year)
 
 	if register:
-		last_date = register.last().created.date()
-		last_month, last_year = last_date.month, last_date.year
+		last_month, last_year = register.last().created.month, register.last().created.year
 
 		if current:
 			prev_saldo = current.get(contents='z przeniesienia').income
