@@ -147,12 +147,12 @@ class CashRegisterView(View):
 					msg = f'Succesful register new record in {self.company} (income={income:.2f}PLN)'
 					messages.success(request, msg)
 				elif expenditure > 0:
-					if self.registerdata['status'] - expenditure > 0:
+					if self.registerdata['prev_saldo'] - expenditure > 0:
 						self.form.save(commit=True)
 						msg = f'Succesful register new record in {self.company} (expenditure={expenditure:.2f}PLN)'
 						messages.success(request, msg)
 					else:
-						msg = f"Expenditure ({expenditure:.2f}PLN) is greater than the cash register status ({self.registerdata['status']:.2f}PLN)!"
+						msg = f"Expenditure ({expenditure:.2f}PLN) is greater than the cash register status ({self.registerdata['prev_saldo']:.2f}PLN)!"
 						messages.warning(request, msg)
 		else:
 			contents = request.POST['contents']
