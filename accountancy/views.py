@@ -1,9 +1,9 @@
 # django library
 from django.urls import reverse
-from django.shortcuts import render
 from django.contrib import messages
 from django.utils.timezone import now
 from django.views.generic import View
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 
 # my models
@@ -26,7 +26,7 @@ class CustomerAddView(View):
 	def get(self, request, customer_id:int = None) -> render:
 		customers = Customer.objects.order_by('customer')
 		if customer_id:
-			customer = Customer.objects.get(pk=customer_id)
+			customer = get_object_or_404(Customer, pk=customer_id)
 			fields = list(customer.__dict__.keys())[4:]
 			initial = Customer.objects.filter(pk=customer_id).values(*fields)[0]
 			form = CustomerAddForm(initial=initial)
@@ -45,7 +45,7 @@ class CustomerAddView(View):
 		context = {'form': form, 'customers': customers, }
 
 		if customer_id:
-			customer = Customer.objects.get(pk=customer_id)
+			customer = get_object_or_404(Customer, pk=customer_id)
 			fields = list(customer.__dict__.keys())[4:]
 			old_values = Customer.objects.filter(pk=customer_id).values(*fields)[0]
 			old_values['status'] = str(old_values['status'])
@@ -97,12 +97,12 @@ class AccountancyDocumentView(View):
 		           'waybill': f'LKW-{number}/{now().month}/{now().year}',}
 
 		if company_id:
-			company = Company.objects.get(pk=company_id)
+			company = get_object_or_404(Company, pk=company_id)
 			context.__setitem__('company', company)
 			initial.__setitem__('company', company)
 
 		if customer_id:
-			customer = Customer.objects.get(pk=customer_id)
+			customer = get_object_or_404(Customer, pk=customer_id)
 			context.__setitem__('customer', customer)
 			initial.__setitem__('customer', customer)
 
@@ -113,7 +113,7 @@ class AccountancyDocumentView(View):
 
 
 	def post(self, request, company_id:int=None, customer_id:int=None) -> HttpResponseRedirect:
-		company = Company.objects.get(pk=company_id)
+		company = get_object_or_404(Company, pk=company_id)
 		form = AccountancyDocumentForm(data=request.POST)
 
 		if form.is_valid():
@@ -134,15 +134,15 @@ class AccountancyProductsAddView(View):
 	'''class enabling adding products into accountancy document'''
 
 	def get(self, request, company_id:int=None, customer_id:int=None, document_id:int=None, product_id:int=None, new_id:int=None) -> HttpResponse:
-		company = Company.objects.get(pk=company_id)
-		customer = Customer.objects.get(pk=customer_id)
-		document = AccountancyDocument.objects.get(pk=document_id)
+		company = get_object_or_404(Company, pk=company_id)
+		customer = get_object_or_404(Customer, pk=customer_id)
+		document = get_object_or_404(AccountancyDocument, pk=document_id)
 		context = {'company': company, 'customer': customer, 'document':document}
 		products = AccountancyProducts.objects.filter(document_id=document_id).order_by('-created')
 		products_name = Product.objects.order_by('name').values_list('name', flat=True)
 		context.update({'products': products, 'products_name': list(products_name)})
 		if product_id:
-			product = Product.objects.get(pk=product_id)
+			product = get_object_or_404(Product, pk=product_id)
 			initial = {'name': product.name, 'unit': product.unit, 'netto': product.netto, 'vat': int(product.vat)}
 			new_product_form = NewProductAddForm(initial=initial)
 			context.update({'product_id': product_id, 'product': product})
@@ -150,7 +150,7 @@ class AccountancyProductsAddView(View):
 			new_product_form = NewProductAddForm()
 
 		if new_id:
-			new_product = Product.objects.get(pk=new_id)
+			new_product = get_object_or_404(Product, pk=new_id)
 			context.__setitem__('new_name', new_product.name)
 
 		context.update({'new_product_form': new_product_form, 'company_id': company_id,
@@ -159,7 +159,7 @@ class AccountancyProductsAddView(View):
 		return render(request, 'accountancy/accountancy_document_add_product.html', context)
 
 	def post(self, request, company_id:int=None, customer_id:int=None, document_id:int=None, product_id:int=None) -> HttpResponse:
-		document = AccountancyDocument.objects.get(pk=document_id)
+		document = get_object_or_404(AccountancyDocument, pk=document_id)
 		products_name = Product.objects.order_by('name').values_list('name', flat=True)
 		
 		if product_id:
@@ -167,7 +167,7 @@ class AccountancyProductsAddView(View):
 			update = {'name': name, 'updated': now(), 'unit': unit, 'netto': netto, 'vat': vat}
 			try:
 				Product.objects.filter(pk=product_id).update(**update)
-				product = Product.objects.get(pk=product_id)
+				product = get_object_or_404(Product, pk=product_id)
 				kwargs = {'product': product, 'updated': now(), 'netto': netto, 'vat': vat}
 				AccountancyProducts.objects.filter(document=document, product_id=product_id).update(**kwargs)
 				messages.info(request, f'Product <<{product}>> has been updated...')
@@ -180,7 +180,7 @@ class AccountancyProductsAddView(View):
 			quanity = float(quanity)
 			
 			if name in products_name and quanity > 0:
-				product = Product.objects.get(name=name)
+				product = get_object_or_404(Product, name=name)
 				netto, vat = product.netto, product.vat
 				data = {'document': document, 'product': product, 'quanity': quanity, 'netto': netto, 'vat': vat}
 				AccountancyProducts.objects.create(**data)
@@ -218,7 +218,7 @@ class AccountancyProductDelete(View):
 
 	def get(self, request, record:int=None, company_id:int=None, customer_id:int=None, document_id:int=None) -> HttpResponseRedirect:
 		try:
-			record = AccountancyProducts.objects.get(pk=record)
+			record = get_object_or_404(AccountancyProducts, pk=record)
 			record.delete()
 			msg = f'Succesful erase record <<name: {record.product}, quanity: {record.quanity}>> in accountancy document <<{record.document}>> for {record.document.company}.'
 			messages.info(request, msg)

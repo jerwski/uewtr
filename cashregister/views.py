@@ -2,10 +2,10 @@
 from django.db.models import Q
 from django.urls import reverse
 from django.conf import settings
-from django.shortcuts import render
 from django.contrib import messages
 from django.utils.timezone import now
 from django.views.generic import View
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 
 # pdfkit library
@@ -34,7 +34,7 @@ class CompanyAddView(View):
 	def get(self, request, company_id:int = None) -> render:
 		companies = Company.objects.order_by('company')
 		if company_id:
-			company = Company.objects.get(pk=company_id)
+			company = get_object_or_404(Company, pk=company_id)
 			fields = list(company.__dict__.keys())[4:]
 			initial = Company.objects.filter(pk=company_id).values(*fields)[0]
 			form = CompanyAddForm(initial=initial)
@@ -53,7 +53,7 @@ class CompanyAddView(View):
 		context = {'form': form, 'companies': companies}
 
 		if company_id:
-			company = Company.objects.get(pk=company_id)
+			company = get_object_or_404(Company, pk=company_id)
 			fields = list(company.__dict__.keys())[4:]
 			old_values = Company.objects.filter(pk=company_id).values(*fields)[0]
 			old_values['status'] = str(old_values['status'])
@@ -101,7 +101,7 @@ class CashRegisterView(View):
 			self.company_id = self.kwargs['company_id']
 			check = CashRegister.objects.filter(company_id=self.company_id)
 			month, year = now().month, now().year
-			self.company = Company.objects.get(pk=self.company_id)
+			self.company = get_object_or_404(Company, pk=self.company_id)
 			self.registerdata = cashregisterdata(self.company_id, month, year)
 			self.context.update(self.registerdata)
 			records = check.filter(created__month=month, created__year=year).exclude(contents='z przeniesienia')
@@ -136,7 +136,8 @@ class CashRegisterView(View):
 		if self.form.is_valid():
 			self.form.save(commit=False)
 			data = self.form.cleaned_data
-			income, expenditure = [data[key] for key in ('income', 'expenditure')]
+			income, expenditure = [round(data[key], 2) for key in ('income', 'expenditure')]
+			print(f'Income: {income}\nExpenditure: {expenditure}\nPrev_saldo: {self.registerdata["prev_saldo"]}')
 			if income != 0 and expenditure != 0:
 				msg = f'One of the fields (income {income:.2f}PLN or expenditure {expenditure:.2f}PLN) must be zero and second have to be positive value!'
 				messages.warning(request, msg)
@@ -147,7 +148,7 @@ class CashRegisterView(View):
 					msg = f'Succesful register new record in {self.company} (income={income:.2f}PLN)'
 					messages.success(request, msg)
 				elif expenditure > 0:
-					if self.registerdata['prev_saldo'] - expenditure > 0:
+					if self.registerdata['prev_saldo'] - expenditure >= 0:
 						self.form.save(commit=True)
 						msg = f'Succesful register new record in {self.company} (expenditure={expenditure:.2f}PLN)'
 						messages.success(request, msg)
@@ -167,7 +168,7 @@ class CashRegisterDelete(View):
 	'''class enabling deleting records in the cash report'''
 
 	def get(self, request, company_id:int, record:int) -> HttpResponseRedirect:
-		record = CashRegister.objects.get(pk=record)
+		record = get_object_or_404(CashRegister, pk=record)
 		if record:
 			record.delete()
 			msg = f'Succesful erase record <<{record.symbol}, {record.contents} in Cash register for {record.company}'
@@ -225,7 +226,7 @@ class CashRegisterSendView(View):
 	def get(self, request, company_id:int) -> HttpResponseRedirect:
 
 		if check_FTPconn():
-			company = Company.objects.get(pk=company_id)
+			company = get_object_or_404(Company, pk=company_id)
 
 			month, year = now().month, now().year
 			month, year = previous_month_year(month, year)

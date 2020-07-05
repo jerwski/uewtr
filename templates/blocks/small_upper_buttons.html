@@ -1,7 +1,7 @@
   <!-- Small buttons -->
 
 {% if worker.status %}
-  <div class="uk-header-button" role="group">
+  <div class="uk-header-button shadow p-3 mb-5 rounded" role="group">
 
     <a href="{% url 'evidence:working_time_recorder_add' employee_id %}" {% if wtr_flag %}class="btn btn-outline-primary active" role="button" aria-pressed="true"{% else %}class="btn btn-outline-primary"{% endif %}>Working Time Recorder</a>
 
@@ -15,7 +15,7 @@
 
   </div>
 {% else %}
-  <div class="uk-header-button" role="group">
+  <div class="uk-header-button shadow p-3 mb-5 rounded" role="group">
     <a href="#" class="btn btn-outline-primary disabled">Working Time Recorder</a>
     <a href="#" class="btn btn-outline-danger disabled">Leave Time Recorder</a>
     <a href="#" class="btn btn-outline-dark disabled">Payment on Account</a>

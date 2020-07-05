@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.utils.timezone import now
 from django.core.serializers import serialize
+from django.shortcuts import get_object_or_404
 from django.core.management import call_command
 
 
@@ -248,7 +249,7 @@ def archiving_of_deleted_records(employee_id):
 			models = apps.all_models[app]
 			for model in models.values():
 				if model._meta.model_name=='employee':
-					all_records.append(model.objects.get(pk=employee_id))
+					all_records.append(get_object_or_404(model, pk=employee_id))
 				else:
 					all_records += list(model.objects.filter(worker_id=employee_id))
 		path = Path(f'{settings.BACKUP_ERASE_WORKER}/{employee_id}').with_suffix('.json')

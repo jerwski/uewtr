@@ -5,6 +5,7 @@ from collections import namedtuple
 # Django library
 from django.test import TestCase
 from django.db.models import Sum, Q
+from django.shortcuts import get_object_or_404
 
 # my models
 from employee.models import Employee
@@ -20,8 +21,7 @@ class WorkingHourTests(TestCase):
         # create dictionary from start and end elements
         dataset = zip(start,end)
         employe = Employee.objects.create(forename='Forename', surname='Surname', pesel='73021602009', status=True)
-        pk = employe.id
-        worker = Employee.objects.get(pk=pk)
+        worker = get_object_or_404(Employee, pk=employe.id)
         # create data in evidence_workevidence table
         for k,v in dataset:
             WorkEvidence.objects.create(worker=worker, start_work=k, end_work=v, jobhours=8)

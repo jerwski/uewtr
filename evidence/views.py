@@ -41,7 +41,7 @@ class WorkingTimeRecorderView(View):
 		if 'employee_id' in self.kwargs.keys():
 			self.employee_id = self.kwargs['employee_id']
 
-		# self.worker = Employee.objects.get(pk=self.employee_id)
+		# self.worker = get_object_or_404(Employee, pk=self.employee_id)
 		self.worker = get_object_or_404(Employee, pk=self.employee_id)
 		initial = {'worker': self.worker}
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
@@ -131,7 +131,7 @@ class LeaveTimeRecorderView(View):
 		employee_id = self.kwargs['employee_id']
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
 		employees = employees.order_by('surname', 'forename')
-		self.worker = Employee.objects.get(pk=employee_id)
+		self.worker = get_object_or_404(Employee, pk=employee_id)
 		self.values = {'worker': self.worker, 'leave_date__year': now().year}
 		total_leaves = EmployeeLeave.objects.filter(**self.values).order_by('leave_date')
 		remaining_leave = 26 - total_leaves.filter(leave_flag='paid_leave').count()
@@ -296,7 +296,7 @@ class SendLeavesDataPdf(View):
 
 			if pdf:
 				# send e-mail with attached leaves_data in pdf format
-				worker = Employee.objects.get(pk=employee_id)
+				worker = get_object_or_404(Employee, pk=employee_id)
 				mail = {'subject': f'list of leave for {worker} ({date.today().year})r.',
 						'message': f'List of leave in attachment {worker} za {date.today().year}r.',
 						'sender': settings.EMAIL_HOST_USER,
@@ -435,7 +435,7 @@ class AccountPaymentView(View):
 		self.employee_id = self.kwargs['employee_id']
 		self.month, self.year = now().month, now().year
 		self.initial = initial_account_form(self.employee_id)
-		self.worker = Employee.objects.get(pk=self.employee_id)
+		self.worker = get_object_or_404(Employee, pk=self.employee_id)
 		self.prevmonth, self.prevyear = previous_month_year(self.month, self.year)
 		earlier_date = date(self.prevyear, self.prevmonth, 1)
 		# set list of valid employees
@@ -562,7 +562,7 @@ class EmployeeCurrentComplexDataView(View):
 		super(EmployeeCurrentComplexDataView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
 		employee_id = self.kwargs['employee_id']
-		worker = Employee.objects.get(pk=employee_id)
+		worker = get_object_or_404(Employee, pk=employee_id)
 		leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
 
 		if self.request.method == 'GET':

@@ -7,7 +7,6 @@ from datetime import datetime
 
 # django library
 from django.conf import settings
-from django.shortcuts import render
 from django.contrib import messages
 from django.utils.timezone import now
 from django.contrib.auth import logout
@@ -15,6 +14,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.core.management import call_command
 from django.views.generic import CreateView, View
+from django.shortcuts import render, get_object_or_404
+
 
 # my models
 from account.models import Quiz
@@ -226,7 +227,7 @@ class QuizView(View):
 		if quiz_id:
 			try:
 				query, answer, answers = quizset(_queryset)
-				quiz = Quiz.objects.get(pk=quiz_id)
+				quiz = get_object_or_404(Quiz, pk=quiz_id)
 				points, set_of_questions = quiz.points, quiz.set_of_questions
 				start_play, end_play = quiz.start_play, quiz.end_play
 	
@@ -262,7 +263,7 @@ class QuizView(View):
 
 	def post(self, request, quiz_id:int)->render:
 		your_answer = request.POST['your_answer']
-		quiz = Quiz.objects.get(pk=quiz_id)
+		quiz = get_object_or_404(Quiz, pk=quiz_id)
 		points, set_of_questions = quiz.points, quiz.set_of_questions
 		query, answer, answers = quiz.query, quiz.answer, quiz.answers.split(';')
 		start_play, end_play = quiz.start_play, quiz.end_play
