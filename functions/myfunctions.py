@@ -30,6 +30,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.utils.timezone import now
 from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
 from django.db.models import Case, Count, IntegerField, Max, Q, Sum, Value, When
 
@@ -66,36 +67,40 @@ def initial_worktime_form(work_hours:int) -> dict:
 	hours = dict(zip([12, 14, 16, 18, 6], [6, 6, 6, 6, 22]))
 	start, end = now().date(), now().date()
 
-	if start.isoweekday()==1:
-		if work_hours==12:
+	if start.isoweekday() == 1:
+		if work_hours == 12:
 			start = start - timedelta(days=2)
 			end = end - timedelta(days=2)
-		elif work_hours==6:
+		elif work_hours == 6:
 			start = start - timedelta(days=3)
 			end = end - timedelta(days=2)
 		else:
 			start = start - timedelta(days=3)
 			end = end - timedelta(days=3)
+
+	if start.isoweekday() == 6:
+		if work_hours in [14, 16, 18]:
+			start = start - timedelta(days=1)
+			end = end - timedelta(days=1)
+		elif work_hours == 6:
+			start = start - timedelta(days=1)
+
+	elif start.isoweekday() == 7:
+		if work_hours in [14, 16, 18]:
+			start = start - timedelta(days=2)
+			end = end - timedelta(days=2)
+		elif work_hours == 12:
+			start = start - timedelta(days=1)
+			end = end - timedelta(days=1)
+		else:
+			start = start - timedelta(days=1)
 	else:
-		if work_hours==6:
+		if work_hours == 6:
 			start = start - timedelta(days=1)
 			end = end
-		elif work_hours==12:
-			if start.isoweekday()==7:
-				start = start - timedelta(days=1)
-				end = end - timedelta(days=1)
-			elif start.isoweekday()==2:
-				start = start - timedelta(days=3)
-				end = end - timedelta(days=3)
-			elif start.isoweekday()==3:
-				start = start - timedelta(days=4)
-				end = end - timedelta(days=4)
-			elif start.isoweekday()==4:
-				start = start - timedelta(days=5)
-				end = end - timedelta(days=5)
-			elif start.isoweekday()==5:
-				start = start - timedelta(days=6)
-				end = end - timedelta(days=6)
+		elif work_hours == 12:
+			start = start - timedelta(days=start.isoweekday()+1)
+			end = end - timedelta(days=start.isoweekday()+1)
 		else:
 			start = start - timedelta(days=1)
 			end = end - timedelta(days=1)
@@ -110,7 +115,6 @@ def initial_worktime_form(work_hours:int) -> dict:
 
 def previous_month_year(month, year):
 	'''return previous month and year'''
-
 	if month==1:
 		month, year = 12, year - 1
 	else:
@@ -121,7 +125,7 @@ def previous_month_year(month, year):
 
 def initial_account_form(employee_id:int) -> dict:
 	'''return initial date for AccountPaymentForm'''
-	worker = Employee.objects.get(pk=employee_id)
+	worker = get_object_or_404(Employee, pk=employee_id)
 	jobdays = workingdays(now().year, now().month)
 	payday = date(now().year, now().month, 10)
 	nowadays = now().date()
@@ -143,7 +147,7 @@ def initial_account_form(employee_id:int) -> dict:
 
 def initial_leave_form(employee_id:int) -> dict:
 	'''return initial leave_flag for EmployeeLeaveForm'''
-	worker = Employee.objects.get(pk=employee_id)
+	worker = get_object_or_404(Employee, pk=employee_id)
 	leave_date = now().date() - timedelta(days=1)
 	initial = {'worker': worker, 'leave_date': leave_date}
 	if worker.leave==1:
@@ -156,7 +160,7 @@ def initial_leave_form(employee_id:int) -> dict:
 
 def erase_records(employee_id:int) -> dict:
 	context = dict()
-	worker = Employee.objects.get(pk=employee_id)
+	worker = get_object_or_404(Employee, pk=employee_id)
 
 	if worker.status == False:
 		opt1, opt2 = {'worker': worker, 'then': Value(1)}, {'default': Value(0), 'output_field': IntegerField()}
@@ -181,7 +185,7 @@ def data_chart(employee_id:int, year:int) -> tuple:
 
 
 def plot_chart(employee_id:int, year:int):
-	worker = Employee.objects.get(pk=employee_id)
+	worker = get_object_or_404(Employee, pk=employee_id)
 	income, total_income = data_chart(employee_id, year)
 	plt.style.use('dark_background')
 	fig, ax = plt.subplots(figsize=(9, 6))
@@ -239,7 +243,7 @@ def payrollhtml2pdf(month:int, year:int) -> bool:
 def leavehtml2pdf(employee_id:int, year:int) -> bool:
 	'''convert html annuall leave time for each employee in current year to pdf'''
 	month_name = list(calendar.month_name)[1:]
-	worker = Employee.objects.get(pk=employee_id)
+	worker = get_object_or_404(Employee, pk=employee_id)
 	employee = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
 	if employee.exists():
 		employee = employee.order_by('leave_date')
@@ -255,7 +259,7 @@ def leavehtml2pdf(employee_id:int, year:int) -> bool:
 
 def workhourshtml2pdf(employee_id:int, month:int, year:int) -> bool:
 	'''convert html workhours for curent employee in month and year parameters to pdf'''
-	worker = Employee.objects.get(pk=employee_id)
+	worker = get_object_or_404(Employee, pk=employee_id)
 	employee_leave = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year, leave_date__month=month)
 	work_hours = WorkEvidence.objects.filter(worker=worker, start_work__year=year, start_work__month=month)
 	context = {'work_hours': work_hours.order_by('start_work'), 'worker': worker, 'month': month, 'year': year}
@@ -283,7 +287,7 @@ def workhourshtml2pdf(employee_id:int, month:int, year:int) -> bool:
 
 def accountpaymenthtml2pdf(employee_id:int, month:int, year:int) -> bool:
 	'''convert html statement of advances to pdf'''
-	worker = Employee.objects.get(pk=employee_id)
+	worker = get_object_or_404(Employee, pk=employee_id)
 	context = {'worker': worker, 'month': month, 'year': year}
 
 	if worker:
@@ -346,8 +350,7 @@ def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 	current = register.filter(created__month=month, created__year=year)
 
 	if register:
-		last_date = register.last().created.date()
-		last_month, last_year = last_date.month, last_date.year
+		last_month, last_year = register.last().created.month, register.last().created.year
 
 		if current:
 			prev_saldo = current.get(contents='z przeniesienia').income
@@ -362,15 +365,15 @@ def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 			saldo = income['inc'] - expenditure['exp']
 			prev_saldo = saldo
 
-			transfer = {'company_id': company_id, 'symbol': f'RK {month}/{year}',
-			            'contents': 'z przeniesienia', 'income': saldo, 'expenditure': 0}
+			transfer = {'company_id': company_id, 'symbol': f'RK {month}/{year}', 'income': saldo,
+			            'contents': 'z przeniesienia', 'expenditure': expenditures}
 			CashRegister.objects.create(**transfer)
 
 		registerdata.update({'prev_saldo': prev_saldo, 'incomes': incomes, 'expenditures': expenditures, 'saldo': saldo})
 
 	else:
-		transfer = {'company_id': company_id, 'symbol': f'RK {month}/{year}',
-		            'contents': 'z przeniesienia', 'income': 0, 'expenditure': 0}
+		transfer = {'company_id': company_id, 'symbol': f'RK {month}/{year}', 'income': incomes,
+		            'contents': 'z przeniesienia', 'expenditure': expenditures}
 		CashRegister.objects.create(**transfer)
 
 	return registerdata
@@ -378,7 +381,7 @@ def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 
 def cashregisterhtml2pdf(company_id:int, month:int, year:int) -> bool:
 	'''convert html cash register for last month to pdf'''
-	company = Company.objects.get(pk=company_id)
+	company = get_object_or_404(Company, pk=company_id)
 	cashregister = CashRegister.objects.filter(company_id=company_id, created__month=month, created__year=year)
 
 	if cashregister.exists():
@@ -409,7 +412,7 @@ def make_attachment(html, filename) -> HttpResponse:
 
 def cashaccept2pdf(record:int, number=1):
 	'''convert html cash pay/accept for given record to pdf'''
-	data = CashRegister.objects.get(pk=record)
+	data = get_object_or_404(CashRegister, pk=record)
 	context = {'data': data}
 	company, created, month, year = data.company, data.created, data.created.month, data.created.year
 	check = Q(company=company, created__month=month, created__year=year)

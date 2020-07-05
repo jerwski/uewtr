@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.views.generic import View
 from django.utils.timezone import now
-from django.shortcuts import render, HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 
 # my models
 from employee.models import Employee, EmployeeData, EmployeeHourlyRate
@@ -28,7 +28,7 @@ class EmployeeBasicDataView(View):
 
 		if 'employee_id' in self.kwargs.keys():
 			employee_id = self.kwargs['employee_id']
-			worker = Employee.objects.get(pk=employee_id)
+			worker = get_object_or_404(Employee, pk=employee_id)
 			fields = list(worker.__dict__.keys())[4:]
 			initial = Employee.objects.filter(pk=employee_id).values(*fields)[0]
 			self.context = {'employee_id': employee_id, 'worker': worker, 'records': erase_records(employee_id)}
@@ -110,7 +110,7 @@ class EmployeeBasicDataView(View):
 class EmployeeEraseAll(View):
 	'''class implementing the method for erasing all data in database for the employee by pk=employee_id'''
 	def get(self, request, employee_id:int)->HttpResponseRedirect:
-		worker = Employee.objects.get(pk=employee_id)
+		worker = get_object_or_404(Employee, pk=employee_id)
 
 		if worker:
 			archiving_of_deleted_records(employee_id)
@@ -129,12 +129,12 @@ class EmployeeExtendedDataView(View):
 		super(EmployeeExtendedDataView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
 		self.employee_id = self.kwargs['employee_id']
-		self.worker = Employee.objects.get(id=self.employee_id)
+		self.worker = get_object_or_404(Employee, id=self.employee_id)
 		employees = Employee.objects.filter(status=True)
 		self.extdata = EmployeeData.objects.filter(worker=self.worker)
 
 		if self.extdata.exists():
-			emplexdata = EmployeeData.objects.get(worker=self.worker)
+			emplexdata = get_object_or_404(EmployeeData, worker=self.worker)
 			self.fields = list(emplexdata.__dict__.keys())[4:]
 
 		self.context = {'employee_id': self.employee_id, 'employees': employees, 'worker': self.worker}
@@ -201,7 +201,7 @@ class EmployeeHourlyRateView(View):
 		if 'employee_id' in self.kwargs.keys():
 			self.employee_id = self.kwargs['employee_id']
 		
-		self.worker = Employee.objects.get(pk=self.employee_id)
+		self.worker = get_object_or_404(Employee, pk=self.employee_id)
 		employees = Employee.objects.filter(status=True)
 		
 		self.context = {'worker': self.worker, 'employee_id': self.employee_id, 'employees': employees}
@@ -261,7 +261,7 @@ class EmployeeHourlyRateView(View):
 class EmployeeHourlyRateEraseView(View):
 	'''class implementing the method of deleting the new hourly rate entered for the employee by pk=employee_id'''
 	def get(self, request, employee_id:int)->HttpResponseRedirect:
-		worker = Employee.objects.get(id=employee_id)
+		worker = get_object_or_404(Employee, pk=employee_id)
 		check = EmployeeHourlyRate.objects.filter(worker=worker, update__exact=now().date())
 
 		if check.exists():
