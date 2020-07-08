@@ -78,7 +78,7 @@ def initial_worktime_form(work_hours:int) -> dict:
 			start = start - timedelta(days=3)
 			end = end - timedelta(days=3)
 
-	if start.isoweekday() == 6:
+	elif start.isoweekday() == 6:
 		if work_hours in [14, 16, 18]:
 			start = start - timedelta(days=1)
 			end = end - timedelta(days=1)

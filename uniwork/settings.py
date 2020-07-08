@@ -41,7 +41,7 @@ SECRET_KEY = get_setting('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if socket.gethostname() in get_setting('home_hosts'):
-    DEBUG = True
+    DEBUG = False
 elif socket.gethostname() in get_setting('office_hosts'):
     DEBUG = True
 else:
@@ -160,8 +160,10 @@ USE_TZ = get_setting('USE_TZ')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-STATIC_ROOT = 'deployment/static'
 STATIC_URL = get_setting('STATIC_URL')
+MEDIA_URL = '/media/'
+STATIC_ROOT = 'deployment/static'
+MEDIA_ROOT = 'deployment/media'
 STATICFILES_DIRS = [Path.joinpath(BASE_DIR, Path(STATIC_URL).name),]
 CSS_FILE = [Path.joinpath(BASE_DIR, get_setting('css_style')),]
 LOGIN_URL = get_setting('LOGIN_URL')
