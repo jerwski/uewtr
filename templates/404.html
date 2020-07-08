@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}HTML500{% endblock %}
+
+{% block content %}
+
+  <div class="jumbotron text-center">
+    <p class="uk-text-large">Page 404 Error</p>
+    {% if user.is_authenticated %}
+      <div class="container">
+        <p class="uk-text-middle">User <em class="text-danger font-weight-bold">{{ user }}</em></p><br>
+        <p class="uk-text-value">Something's wrong.<br>Object do not exist...{{ request.path }}</p>
+      </div>
+
+    {% endif %}
+
+      <div class="btn-group btn-group-lg">
+        <a class="btn btn-outline-light" href="/admin/">Admin Data Base</a>
+        <a class="btn btn-outline-info" href="{% url 'login' %}">Back to login</a>
+        <a href="{% url 'logout' %}" class="btn btn-md btn-outline-dark">Logout</a>
+        <a class="btn btn-outline-danger" href="https://www.google.com/">Exit</a>
+      </div>
+  </div>
+  <div class="container text-center">
+    <div class="row">
+      <div class="col-3"></div>
+        <div class="col-6">
+          <img src="{% static 'images/mainboard/logoUNI.png' %}" alt="logo"  width="50%">
+          <p class="uk-text-logo text-center">&copy;Copyright UNIKOLOR Jerzy Wygonowski</p>
+          {% include 'blocks/alert.html' %}
+        </div>
+      <div class="col-3"></div>
+    </div>
+  </div>
+
+{% endblock %}
