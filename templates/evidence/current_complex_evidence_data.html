@@ -8,7 +8,7 @@
 {% block content %}
 
   <div class="container-fluid">
-    <div class="row ml-3 mr-3 mt-2 uk-bg-bisque">
+    <div class="row mx-3 mt-2 uk-bg-bisque">
       <div class="col-3 mt-2">
         <a href="{% url 'account:admin_site' %}">
           <img class="d-block uk-header-logo mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
@@ -17,9 +17,12 @@
       </div>
       <div class="col-9 text-center">
         <div class="uk-header-title">
-          <p class="uk-text-large">Working Time Recorder</p>
+          <p class="uk-text-large">Complex Evidence Data For Employee</p>
         </div>
-        <p class="uk-text-middle">Application to handle employee working time in small business</p>
+{#        <p class="uk-text-middle">Application to handle employee working time in small business</p>#}
+        <div class="container">
+          {% include 'blocks/small_upper_buttons.html' %}
+        </div>
       </div>
     </div>
     <div class="row mx-3 uk-bg-bisque">
@@ -205,10 +208,9 @@
         {% endif %}
         <div class="row">
           <div class="col btn btn-group" role="group">
-            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the dashboard</a>
             <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
             {% include 'blocks/plot_chart_modal.html' %}
-            <a href="{% url 'evidence:monthly_payroll_view' month year %}" class="btn btn-outline-success">Monthly Payroll</a>
+            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the Administration Dashboard</a>
           </div>
         </div>
       </div>
