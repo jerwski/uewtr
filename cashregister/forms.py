@@ -19,9 +19,9 @@ class CompanyAddForm(forms.ModelForm):
 	SUSPENDED = 2
 	LIQUIDATION = 3
 	STATUS_CHOICE = ((CLOSED, 'Closed'), (OPERATING, 'Operating'), (SUSPENDED,'Suspended'), (LIQUIDATION, 'Liquidation'))
-
+	attrs={'class':'btn-sm btn-outline-light'}
 	status = forms.ChoiceField(label="Select the status type...", required=True,
-							   widget=RadioSelectButtonGroup, choices=STATUS_CHOICE, initial=1)
+							   widget=RadioSelectButtonGroup(attrs=attrs), choices=STATUS_CHOICE, initial=1)
 
 	class Meta:
 		model = Company

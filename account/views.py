@@ -26,7 +26,7 @@ from account.forms import UserCreateForm
 
 # my function
 from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset, dirdata, previous_month_year
-from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_FTPconn, invoices_backup, cmp_fixtures
+from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_FTPconn, invoices_backup, cmp_fixtures, exec_script
 
 
 # Create your views here.
@@ -323,7 +323,11 @@ def exit(request)->HttpResponseRedirect:
 			backup()
 			remgarbage(*paths)
 			logout(request)
-		if check_FTPconn():
-			return HttpResponseRedirect(r'https://www.google.pl/')
-		else:
+		try:
+			if check_FTPconn():
+				return HttpResponseRedirect(r'https://www.google.pl/')
+		except:
 			return render(request, '500.html', {'error': 'Occurred problem with FTP connection'})
+		finally:
+			if platform.system() == 'Darwin':
+				exec_script()

@@ -1,4 +1,5 @@
 # standard library
+import os
 import shutil
 import hashlib
 from ftplib import FTP
@@ -259,3 +260,11 @@ def archiving_of_deleted_records(employee_id):
 	except:
 		print(f'Serialization error...')
 		pass
+
+def exec_script():
+	script = """
+			osascript -e 'tell application "System Events"
+			tell application "Terminal" to activate
+			keystroke "c" using {control down}
+			end tell'"""
+	os.system(script)

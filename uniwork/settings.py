@@ -161,10 +161,8 @@ USE_TZ = get_setting('USE_TZ')
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATIC_URL = get_setting('STATIC_URL')
-MEDIA_URL = '/media/'
-STATIC_ROOT = 'deployment/static'
-MEDIA_ROOT = 'deployment/media'
-STATICFILES_DIRS = [Path.joinpath(BASE_DIR, Path(STATIC_URL).name),]
+STATIC_ROOT = Path.joinpath(BASE_DIR, 'dpstatic')
+STATICFILES_DIRS = [Path.joinpath(BASE_DIR, Path(STATIC_URL).name)]
 CSS_FILE = [Path.joinpath(BASE_DIR, get_setting('css_style')),]
 LOGIN_URL = get_setting('LOGIN_URL')
 LOGIN_REDIRECT_URL = 'account:admin_site'
