@@ -36,7 +36,6 @@ class WorkingTimeRecorderView(View):
 	def setup(self, request, **kwargs):
 		super(WorkingTimeRecorderView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
-		ids = (item.id for item in get_list_or_404(Employee, status=True))
 
 		if 'employee_id' in self.kwargs.keys():
 			self.employee_id = self.kwargs['employee_id']
@@ -575,15 +574,11 @@ class EmployeeCurrentComplexDataView(View):
 			month, year = choice_date.month, choice_date.year
 			form = PeriodCurrentComplexDataForm(data={'choice_date':choice_date})
 
-		if month == 12:
-			cut_off_month, cut_off_year = 1, year + 1
-		else:
-			cut_off_month, cut_off_year = month + 1, year
-
-		cut_off_date = datetime.strptime(f'{cut_off_month}/{cut_off_year}','%m/%Y')
-		q1 = Q(employeedata__start_contract__lt=cut_off_date)
-		q2 = Q(employeedata__end_contract__gte=choice_date) | Q(employeedata__end_contract__isnull=True)
-		employees = Employee.objects.filter(q1 & q2).order_by('surname', 'forename')
+		day = calendar.monthrange(year, month)[1]
+		q1 = Q(employeedata__end_contract__lt=date(year, month, 1))
+		q2 = Q(employeedata__start_contract__gt=date(year, month, day))
+		employees = Employee.objects.all()
+		employees = employees.exclude(q1|q2).order_by('surname', 'forename')
 		query = Q(worker=worker, start_work__year=year, start_work__month=month)
 		work_hours = WorkEvidence.objects.filter(query)
 		holidays = holiday(year)
