@@ -81,9 +81,6 @@ class AdminView(View):
 			if socket.gethostname() == settings.SERIALIZE_HOST:
 				context.__setitem__('serialize', True)
 
-				if cmp_fixtures():
-					context.__setitem__('compare', True)
-
 			if check_FTPconn():
 				try:
 					with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
@@ -92,13 +89,13 @@ class AdminView(View):
 							if files:
 								context.__setitem__('ftp_files', True)
 							else:
-								print(f'There aren\'t new fixtures on FTP...')
+								messages.info(request, f'There aren\'t new fixtures... Directory: {settings.FTP_SERIALIZE}')
 						except:
 							context.__setitem__('ftp_files', False)
 				except:
-					print(f'Occurred problem with FTP connection... Directory: {settings.FTP_SERIALIZE}')
+					messages.error(request, f'Occurred problem with FTP connection... Directory: {settings.FTP_SERIALIZE}')
 			else:
-				print(r'Occurred problem with FTP connection...')
+				messages.error(request, r'Occurred problem with FTP connection...')
 
 			return render(request, 'account/admin.html', context)
 
@@ -121,7 +118,7 @@ class RestoreDataBase(View):
 class SerializeView(View):
 	'''class to serializng database'''
 	def get(self, request)->HttpResponseRedirect:
-		if check_FTPconn():
+		if check_FTPconn() and cmp_fixtures():
 			root = Path(settings.FTP_SERIALIZE)
 			try:
 				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
@@ -136,11 +133,13 @@ class SerializeView(View):
 							print(f'\nFile <<{file.name}>> was sent to the FTP directory <<{settings.FTP_SERIALIZE}>>')
 						file.unlink()
 				Path.rmdir(settings.TEMP_SERIALIZE)
+				messages.info(request, r'All fixtures have been serializing...')
 			except:
-				print(f'Occurred problem with FTP connection. Directory: {settings.FTP_SERIALIZE}')
+				msg = f'Occurred problem with FTP connection. Directory: {settings.FTP_SERIALIZE}'
+				messages.error(request, msg)
 
 		else:
-			print(r'Occurred problem with FTP connection...')
+			messages.info(request, r'All files are up to date...')
 
 		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
 
