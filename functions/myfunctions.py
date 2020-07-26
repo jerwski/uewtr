@@ -41,7 +41,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 from accountancy.models import AccountancyDocument, AccountancyProducts
 
 # my functions
-from functions.payment import total_payment, workingdays
+from functions.payment import total_payment, workingdays, holiday
 
 # utility tags
 from employee.templatetags.utility_tags import money_format
@@ -148,12 +148,26 @@ def initial_account_form(employee_id:int) -> dict:
 def initial_leave_form(employee_id:int) -> dict:
 	'''return initial leave_flag for EmployeeLeaveForm'''
 	worker = get_object_or_404(Employee, pk=employee_id)
-	leave_date = now().date() - timedelta(days=1)
+	present, state = now().date(), True
+	leave_date = present - timedelta(days=1)
+
+	while state:
+		if leave_date in holiday(present.year).values():
+			leave_date -= timedelta(days=1)
+		else:
+			state = False
+
+	if leave_date.isoweekday() == 7:
+		leave_date = leave_date - timedelta(days=2)
+	elif leave_date.isoweekday() == 6:
+		leave_date = leave_date - timedelta(days=1)
+
 	initial = {'worker': worker, 'leave_date': leave_date}
+
 	if worker.leave==1:
-		initial.__setitem__('leave_flag', ['paid_leave', ])
+		initial.__setitem__('leave_flag', ['paid_leave',])
 	else:
-		initial.__setitem__('leave_flag', ['unpaid_leave', ])
+		initial.__setitem__('leave_flag', ['unpaid_leave',])
 
 	return initial
 
