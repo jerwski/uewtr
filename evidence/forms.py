@@ -63,8 +63,8 @@ class EmployeeLeaveForm(forms.ModelForm):
 
 	worker = forms.ModelChoiceField(widget=forms.HiddenInput(attrs={'readonly': True}), queryset=query)
 	leave_date = forms.DateField(label='Select a date of leave...', widget=DatePicker(options=options, attrs=attrs))
-	leave_flag = forms.ChoiceField(label="Select a kind of leave...", required=True,
-								   widget=RadioSelectButtonGroup, choices=LEAVEKIND)
+	leave_flag = forms.ChoiceField(label="Select a kind of leave...", required=True, choices=LEAVEKIND,
+								   widget=RadioSelectButtonGroup(attrs={'class':'btn-sm btn-outline-light'}))
 
 	class Meta:
 		model = EmployeeLeave

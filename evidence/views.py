@@ -138,7 +138,7 @@ class LeaveTimeRecorderView(View):
 		leave_set = {year:EmployeeLeave.objects.filter(worker=self.worker, leave_date__year=year).count() for year in years}
 
 		if self.request.method == 'GET':
-			initial=initial_leave_form(employee_id)
+			initial = initial_leave_form(employee_id)
 			self.form = EmployeeLeaveForm(initial=initial)
 		elif self.request.method == 'POST':
 			self.form = EmployeeLeaveForm(data=self.request.POST)

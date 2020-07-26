@@ -88,8 +88,6 @@ class AdminView(View):
 							files = [name for name, facts in myFTP.mlsd(settings.FTP_SERIALIZE) if facts['type']=='file']
 							if files:
 								context.__setitem__('ftp_files', True)
-							else:
-								messages.info(request, f'There aren\'t new fixtures... Directory: {settings.FTP_SERIALIZE}')
 						except:
 							context.__setitem__('ftp_files', False)
 				except:
