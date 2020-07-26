@@ -149,10 +149,11 @@ def initial_leave_form(employee_id:int) -> dict:
 	'''return initial leave_flag for EmployeeLeaveForm'''
 	worker = get_object_or_404(Employee, pk=employee_id)
 	present, state = now().date(), True
+	year = present.year
 	leave_date = present - timedelta(days=1)
 
 	while state:
-		if leave_date in holiday(present.year).values():
+		if leave_date in holiday(year).values():
 			leave_date -= timedelta(days=1)
 		else:
 			state = False
