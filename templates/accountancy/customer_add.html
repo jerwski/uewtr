@@ -10,7 +10,7 @@
   <div class="container">
     <div class="row m-3">
       <div class="col-2 text-left">
-        <a href="{% url 'account:admin_site' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" width="92%"></a>
+        <a href="{% url 'account:dashboard' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" width="92%"></a>
         <p class="uk-text-logo">&copy;Copyright UNIKOLOR Jerzy Wygonowski</p>
       </div>
       <div class="col-8 mb-3 mt-2 text-center text-dark">
@@ -83,7 +83,7 @@
             <div class="col-sm-12">
               <div class="btn-group btn-group-sm mb-2" role="group">
                 <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+                <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Dashboard</a>
                 {% if customer_id %}
                   <a href="{% url 'accountancy:add_customer' %}" class="btn btn-outline-primary">Add new customer</a>
                 {% endif %}

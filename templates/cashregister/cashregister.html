@@ -28,7 +28,7 @@
   <div class="container-fluid">
     <div class="row ml-3 mr-3 mt-2 uk-bg-bisque">
       <div class="col-3 mt-2">
-        <a href="{% url 'account:admin_site' %}">
+        <a href="{% url 'account:dashboard' %}">
           <img class="d-block uk-header-logo mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
           <span class="uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
         </a>
@@ -216,7 +216,7 @@
                 <a href="{% url 'cashregister:send_register' company_id %}" class="btn btn-outline-info disabled">Send
                   last register</a>
               {% endif %}
-              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+              <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Dashboard</a>
               <a class="btn btn-outline-light" href="/admin/">Admin Data Base</a>
             </div>
           </div>

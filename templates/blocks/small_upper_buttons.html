@@ -9,7 +9,7 @@
 
     <a href="{% url 'evidence:account_payment' employee_id %}" {% if ap_flag %}class="btn btn-outline-dark active" role="button" aria-pressed="true"{% else %}class="btn btn-outline-dark"{% endif %}>Payment on Account</a>
 
-    <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
+    <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-light">Cash register</a>
 
     <a href="{% url 'evidence:monthly_payroll_view' %}" class="btn btn-outline-success">Monthly Payroll</a>
 
@@ -19,7 +19,7 @@
     <a href="#" class="btn btn-outline-primary disabled">Working Time Recorder</a>
     <a href="#" class="btn btn-outline-danger disabled">Leave Time Recorder</a>
     <a href="#" class="btn btn-outline-dark disabled">Payment on Account</a>
-    <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
+    <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-light">Cash register</a>
     <a href="{% url 'evidence:monthly_payroll_view' %}" class="btn btn-outline-success">Monthly Payroll</a>
   </div>
 {% endif %}

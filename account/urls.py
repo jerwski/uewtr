@@ -11,9 +11,7 @@ app_name = 'account'
 
 urlpatterns = [
     path('register/', login_required(views.RegisterView.as_view()), name='register'),
-    path('admin-site/', views.AdminView.as_view(), name='admin_site'),
-    # path('load-invoices-backup-file/', login_required(views.Invoices2Ftp.as_view()), name='invoices_backup', ),
-	# path('send/JPK/', login_required(views.JPK2Accountancy.as_view()), name='send_jpk_files'),
+    path('dashboard/', views.AdminView.as_view(), name='dashboard'),
 	path('serialize/', login_required(views.SerializeView.as_view()), name='serialize_database'),
 	path('deserialize/', login_required(views.DeserializeView.as_view()), name='deserialize_database'),
 	path('load-database/', login_required(views.RestoreDataBase.as_view()), name='load-database'),

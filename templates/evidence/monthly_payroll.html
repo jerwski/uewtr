@@ -11,7 +11,7 @@
     <div class="row">
       <div class="col-2 text-center">
         <div class="btn btn-group-vertical mt-3" role="group">
-          <a class="btn btn-outline-dark d-print-none" href="{% url 'account:admin_site' %}">Dashboard</a>
+          <a class="btn btn-outline-dark d-print-none" href="{% url 'account:dashboard' %}">Dashboard</a>
           <a class="btn btn-outline-primary d-print-none" href="{% url 'evidence:working_time_recorder_add' employee_id %}">Work time recorder</a>
           <a class="btn btn-outline-success d-print-none" href="{% url 'evidence:leave_time_recorder_add' employee_id %}">Leave time recorder</a>
           <a class="btn btn-outline-secondary d-print-none" href="{% url 'evidence:account_payment' employee_id %}">Payment on account</a>
@@ -35,7 +35,7 @@
 
         <hr class="small">
         <div class="col">
-          <a href="{% url 'account:admin_site' %}">
+          <a href="{% url 'account:dashboard' %}">
             <img class="uk-paylogo" src="{% static 'images/mainboard/logoUNI.png' %}" alt="logo unikolor">
             <span class="uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
           </a>

@@ -11,7 +11,7 @@
 
     <div class="row">
       <div class="col-2 mt-2">
-        <a href="{% url 'account:admin_site' %}">
+        <a href="{% url 'account:dashboard' %}">
           <img class="d-block uk-logo mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
           <span class="d-block uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
         </a>
@@ -103,7 +103,7 @@
           <div class="col-12 text-center">
             <div class="btn-group mb-2" role="group">
               <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-              <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+              <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Dashboard</a>
               {% if company_id %}
                 <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Add company</a>
               {% endif %}
