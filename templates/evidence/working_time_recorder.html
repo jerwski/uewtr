@@ -93,7 +93,7 @@
               <p class="text-center uk-text-middle"><span>{{ start_work|date:'d M Y H:i' }} - {{ end_work|date:'d M Y H:i' }}</span></p>
               <div class="row mb-3">
                 <div class="col-6 btn-sm">
-                  <a href="{% url 'account:admin_site' %}" class="btn btn-sm btn-outline-dark btn-block">Back to the dashboard</a>
+                  <a href="{% url 'account:dashboard' %}" class="btn btn-sm btn-outline-dark btn-block">Back to the dashboard</a>
                 </div>
                 <div class="col-6 btn-sm">
                   {% if jobhours != 8 %}
@@ -160,7 +160,7 @@
           <div class="row text-center">
             <div class="col-2"></div>
             <div class="col-8 btn btn-block mb-2">
-              <a href="{% url 'account:admin_site' %}" class="btn btn-lg btn-outline-light btn-block">Back to the dashboard</a>
+              <a href="{% url 'account:dashboard' %}" class="btn btn-lg btn-outline-light btn-block">Back to the dashboard</a>
             </div>
             <div class="col-2"></div>
           </div>

@@ -149,13 +149,13 @@
               <div class="btn btn-group">
                 {% if total_leaves > 0 %}
                   <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                  <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Dashboard</a>
+                  <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Dashboard</a>
                   {% include 'blocks/leave_print_modal.html' %}
                   <a href="{% url 'evidence:leaves_data_pdf' employee_id %}" class="btn btn-outline-info">Send current employee leave set</a>
                   <a class="btn btn-outline-light" href="/admin/">Admin Data Base</a>
                 {% else %}
                   <a href="{% url 'account:exit' %}" class="btn btn-lg btn-outline-danger">Exit</a>
-                  <a href="{% url 'account:admin_site' %}" class="btn btn-lg btn-outline-dark">Dashboard</a>
+                  <a href="{% url 'account:dashboard' %}" class="btn btn-lg btn-outline-dark">Dashboard</a>
                   {% include 'blocks/leave_print_modal.html' %}
                   <a class="btn btn-lg btn-outline-light" href="/admin/">Admin Data Base</a>
                 {% endif %}

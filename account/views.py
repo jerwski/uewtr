@@ -139,7 +139,7 @@ class SerializeView(View):
 		else:
 			messages.info(request, r'All files are up to date...')
 
-		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
+		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
 
 
 class DeserializeView(View):
@@ -166,7 +166,7 @@ class DeserializeView(View):
 		readfixture(request, settings.ADMIN_SERIALIZE)
 		messages.info(request, f'\nAll database have been deserializing....')
 
-		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
+		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
 
 
 # FUNCTION REMOVED!!!
@@ -185,7 +185,7 @@ class Invoices2Ftp(View):
 		else:
 			messages.info(request, f'\nYou have not permission to make a invoices backup...')
 
-		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
+		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
 
 
 # FUNCTION REMOVED!!!
@@ -212,7 +212,7 @@ class JPK2Accountancy(View):
 		else:
 			messages.error(request, 'Occurred problem with FTP connection...')
 
-		return HttpResponseRedirect(reverse_lazy('account:admin_site'))
+		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
 
 
 class QuizView(View):

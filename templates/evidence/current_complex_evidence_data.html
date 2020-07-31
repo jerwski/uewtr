@@ -10,7 +10,7 @@
   <div class="container-fluid">
     <div class="row mx-3 mt-2 uk-bg-bisque">
       <div class="col-3 mt-2">
-        <a href="{% url 'account:admin_site' %}">
+        <a href="{% url 'account:dashboard' %}">
           <img class="d-block uk-header-logo mx-auto" src="{% static 'images/mainboard/logoUNI.png' %}" alt="Logo Unikolor">
           <span class="d-block uk-text-logo">&copy;Copyright<br>UNIKOLOR Jerzy Wygonowski</span>
         </a>
@@ -210,7 +210,7 @@
           <div class="col btn btn-group" role="group">
             <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
             {% include 'blocks/plot_chart_modal.html' %}
-            <a href="{% url 'account:admin_site' %}" class="btn btn-outline-dark">Back to the Administration Dashboard</a>
+            <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Back to the Administration Dashboard</a>
           </div>
         </div>
       </div>

@@ -262,9 +262,11 @@ def archiving_of_deleted_records(employee_id):
 		pass
 
 def exec_script():
-	script = """
-			osascript -e 'tell application "System Events"
+	app_down = """
+			osascript -e 'if application "Terminal" is running then
 			tell application "Terminal" to activate
+			tell application "System Events"
 			keystroke "c" using {control down}
-			end tell'"""
-	os.system(script)
+			end tell
+			end if'"""
+	os.system(app_down)
