@@ -137,7 +137,6 @@ class CashRegisterView(View):
 			self.form.save(commit=False)
 			data = self.form.cleaned_data
 			income, expenditure = [round(data[key], 2) for key in ('income', 'expenditure')]
-			print(f'Income: {income}\nExpenditure: {expenditure}\nPrev_saldo: {self.registerdata["prev_saldo"]}')
 			if income != 0 and expenditure != 0:
 				msg = f'One of the fields (income {income:.2f}PLN or expenditure {expenditure:.2f}PLN) must be zero and second have to be positive value!'
 				messages.warning(request, msg)
