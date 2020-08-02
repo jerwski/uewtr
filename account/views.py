@@ -128,7 +128,7 @@ class SerializeView(View):
 					for file in list(Path.iterdir(settings.TEMP_SERIALIZE)):
 						with file.open('rb') as fixture:
 							myFTP.storbinary(f'STOR {file.name}', fixture)
-							print(f'\nFile <<{file.name}>> was sent to the FTP directory <<{settings.FTP_SERIALIZE}>>')
+						messages.info(request, f'\nFile <<{file.name}>> was sent on the FTP server')
 						file.unlink()
 				Path.rmdir(settings.TEMP_SERIALIZE)
 				messages.info(request, r'All fixtures have been serializing...')
@@ -157,11 +157,11 @@ class DeserializeView(View):
 					for file in files:
 						myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
 						myFTP.delete(file)
-						print(f'\nFile <<{file}>> is safe in <<{settings.ADMIN_SERIALIZE}>>')
+						messages.info(request, f'\nThe file <<{file}>> has been copied into<<{settings.ADMIN_SERIALIZE}>>')
 			except:
-				print(f'There aren\'t files in {settings.FTP_SERIALIZE}')
+				messages.info(request, f'There aren\'t files in {settings.FTP_SERIALIZE}')
 		else:
-			print(r'Occurred problem with FTP connection...')
+			messages.info(request, r'Occurred problem with FTP connection...')
 
 		readfixture(request, settings.ADMIN_SERIALIZE)
 		messages.info(request, f'\nAll database have been deserializing....')
@@ -170,49 +170,49 @@ class DeserializeView(View):
 
 
 # FUNCTION REMOVED!!!
-class Invoices2Ftp(View):
-	'''class that allows archiving the database of issued invoices'''
-	def get(self, request)->HttpResponseRedirect:
-		backup_file = settings.INVOICE_ZIP.with_suffix('.zip').expanduser()
-		ftp_invoice_dir = settings.FTP_INVOICE_DIR.name
-		args = (backup_file, ftp_invoice_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
-		if socket.gethostname() in settings.OFFICE_HOSTS:
-			if invoices_backup():
-				uploadFileFTP(*args)
-				messages.info(request, f'\nInvoices archive is safe...')
-			else:
-				messages.info(request, f'\nArchive files are indentical...')
-		else:
-			messages.info(request, f'\nYou have not permission to make a invoices backup...')
-
-		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
+# class Invoices2Ftp(View):
+# 	'''class that allows archiving the database of issued invoices'''
+# 	def get(self, request)->HttpResponseRedirect:
+# 		backup_file = settings.INVOICE_ZIP.with_suffix('.zip').expanduser()
+# 		ftp_invoice_dir = settings.FTP_INVOICE_DIR.name
+# 		args = (backup_file, ftp_invoice_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
+# 		if socket.gethostname() in settings.OFFICE_HOSTS:
+# 			if invoices_backup():
+# 				uploadFileFTP(*args)
+# 				messages.info(request, f'\nInvoices archive is safe...')
+# 			else:
+# 				messages.info(request, f'\nArchive files are indentical...')
+# 		else:
+# 			messages.info(request, f'\nYou have not permission to make a invoices backup...')
+#
+# 		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
 
 
 # FUNCTION REMOVED!!!
-class JPK2Accountancy(View):
-	'''class to send JPK files to accountancy'''
-	def get(self, request):
-		if check_FTPconn():
-			files = jpk_files(settings.INVOICE_WORKPATH)
-
-			if files:
-				stamp = now().strftime("%A %d %B %Y %H%M%S.%f")
-				# send e-mail with attached cash register as file in pdf format
-				month, year = previous_month_year(now().month, now().year)
-				mail = {'subject': f'pliki JPK za okres {month}/{year}',
-				        'message': f'W załączniku pliki JPK za okres {month}/{year}r.',
-				        'sender' : settings.EMAIL_HOST_USER, 'recipient': [settings.ACCOUNTANT_MAIL],
-				        'attachments': files, 'cc': [settings.CC_MAIL]}
-				sendemail(**mail)
-				messages.info(request, f'JPK files on {month}/{year} was sending to accountancy....')
-
-				for nr, file in enumerate(files,1):
-					file, parent, suffix = Path(file), Path(file).parent, Path(file).suffix
-					file.rename(parent/f'sent{nr}{stamp}{suffix}')
-		else:
-			messages.error(request, 'Occurred problem with FTP connection...')
-
-		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
+# class JPK2Accountancy(View):
+# 	'''class to send JPK files to accountancy'''
+# 	def get(self, request):
+# 		if check_FTPconn():
+# 			files = jpk_files(settings.INVOICE_WORKPATH)
+#
+# 			if files:
+# 				stamp = now().strftime("%A %d %B %Y %H%M%S.%f")
+# 				# send e-mail with attached cash register as file in pdf format
+# 				month, year = previous_month_year(now().month, now().year)
+# 				mail = {'subject': f'pliki JPK za okres {month}/{year}',
+# 				        'message': f'W załączniku pliki JPK za okres {month}/{year}r.',
+# 				        'sender' : settings.EMAIL_HOST_USER, 'recipient': [settings.ACCOUNTANT_MAIL],
+# 				        'attachments': files, 'cc': [settings.CC_MAIL]}
+# 				sendemail(**mail)
+# 				messages.info(request, f'JPK files on {month}/{year} was sending to accountancy....')
+#
+# 				for nr, file in enumerate(files,1):
+# 					file, parent, suffix = Path(file), Path(file).parent, Path(file).suffix
+# 					file.rename(parent/f'sent{nr}{stamp}{suffix}')
+# 		else:
+# 			messages.error(request, 'Occurred problem with FTP connection...')
+#
+# 		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
 
 
 class QuizView(View):
