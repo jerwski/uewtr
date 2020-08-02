@@ -27,11 +27,10 @@ def fcsum(path):
 	fh = hashlib.sha256()
 
 	with open(path, 'rb') as file:
-		while True:
-			chunk = file.read(fh.block_size)
+		while (chunk := file.read(fh.block_size)) != '':
+			fh.update(chunk)
 			if not chunk:
 				break
-			fh.update(chunk)
 		result = fh.hexdigest()
 
 		return result
