@@ -483,6 +483,8 @@ class AccountPaymentView(View):
 		self.context.update({'saldo': saldo, 'prevsalary': prevsalary, 'currloan': currloan,
 		                     'prevloan': prevloan, 'prevsaldo': prevsaldo, 'salary': salary})
 
+		# print(f'request.GET\n"saldo":{saldo}\n"prevsalary":{prevsalary}\n"currloan":{currloan}\n"prevloan":{prevloan}\n"prevsaldo":{prevsaldo}\n"salary":{salary}')
+
 		return render(request, 'evidence/account_payment.html', self.context)
 
 	def post(self, request, **kwargs) -> render:
@@ -515,7 +517,7 @@ class AccountPaymentView(View):
 			else:
 				msg = f'The sum of advances ({advances:,.2f} PLN) is greater than the income earned so far ({salary:,.2f} PLN). The advance can not be paid...'
 				messages.error(request, msg)
-
+		print(f'request.POST\n"salary":{salary}\n"advances":{advances}\n"account_value":{account_value}')
 		return render(request, 'evidence/account_payment.html', self.context)
 
 
