@@ -84,7 +84,7 @@ class PeriodMonthlyPayrollForm(forms.Form):
 			   'buttons': {'showToday': True, 'showClear': True, 'showClose': True}}
 	attrs = {'prepend': 'fas fa-calendar-check', 'append': 'fas fa-calendar-check', 'input_toggle': False, 'icon_toggle': True}
 
-	choice_date = forms.DateField(label='Select a month on year...', widget=DatePicker(options=options, attrs=attrs))
+	choice_date = forms.DateField(label='Select a month and year...', widget=DatePicker(options=options, attrs=attrs))
 
 
 class AccountPaymentForm(forms.ModelForm):
