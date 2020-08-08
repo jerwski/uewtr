@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.db.models import Sum, Q
 from django.views.generic import View
 from django.utils.timezone import now
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect, get_list_or_404, get_object_or_404
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect, get_object_or_404
 
 # my forms
 from evidence.forms import WorkEvidenceForm, EmployeeLeaveForm, AccountPaymentForm, PeriodCurrentComplexDataForm, PeriodMonthlyPayrollForm
