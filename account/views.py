@@ -25,8 +25,8 @@ from employee.models import Employee
 from account.forms import UserCreateForm
 
 # my function
-from functions.myfunctions import remgarbage, sendemail, jpk_files, quizdata, quizset, dirdata, previous_month_year
-from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_FTPconn, invoices_backup, cmp_fixtures, exec_script
+from functions.myfunctions import remgarbage, quizdata, quizset, dirdata
+from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_FTPconn, cmp_fixtures, exec_script
 
 
 # Create your views here.
@@ -71,12 +71,6 @@ class AdminView(View):
 				created = datetime.fromtimestamp(backup.stat().st_mtime)
 				context.update({'nodata': True, 'backup': str(backup), 'created': created})
 				return render(request, '500.html', context)
-
-			# functions removed
-			# if list(settings.INVOICE_WORKPATH.rglob(r'JPK/0001/jpk_fa_*.xml')):
-			# 	context.__setitem__('jpk', True)
-			# if settings.INVOICE_ZIP.expanduser().with_suffix('.zip').is_file():
-			# 	context.__setitem__('upload', True)
 
 			if socket.gethostname() == settings.SERIALIZE_HOST:
 				context.__setitem__('serialize', True)
@@ -167,52 +161,6 @@ class DeserializeView(View):
 		messages.info(request, f'\nAll database have been deserializing....')
 
 		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
-
-
-# FUNCTION REMOVED!!!
-# class Invoices2Ftp(View):
-# 	'''class that allows archiving the database of issued invoices'''
-# 	def get(self, request)->HttpResponseRedirect:
-# 		backup_file = settings.INVOICE_ZIP.with_suffix('.zip').expanduser()
-# 		ftp_invoice_dir = settings.FTP_INVOICE_DIR.name
-# 		args = (backup_file, ftp_invoice_dir, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
-# 		if socket.gethostname() in settings.OFFICE_HOSTS:
-# 			if invoices_backup():
-# 				uploadFileFTP(*args)
-# 				messages.info(request, f'\nInvoices archive is safe...')
-# 			else:
-# 				messages.info(request, f'\nArchive files are indentical...')
-# 		else:
-# 			messages.info(request, f'\nYou have not permission to make a invoices backup...')
-#
-# 		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
-
-
-# FUNCTION REMOVED!!!
-# class JPK2Accountancy(View):
-# 	'''class to send JPK files to accountancy'''
-# 	def get(self, request):
-# 		if check_FTPconn():
-# 			files = jpk_files(settings.INVOICE_WORKPATH)
-#
-# 			if files:
-# 				stamp = now().strftime("%A %d %B %Y %H%M%S.%f")
-# 				# send e-mail with attached cash register as file in pdf format
-# 				month, year = previous_month_year(now().month, now().year)
-# 				mail = {'subject': f'pliki JPK za okres {month}/{year}',
-# 				        'message': f'W załączniku pliki JPK za okres {month}/{year}r.',
-# 				        'sender' : settings.EMAIL_HOST_USER, 'recipient': [settings.ACCOUNTANT_MAIL],
-# 				        'attachments': files, 'cc': [settings.CC_MAIL]}
-# 				sendemail(**mail)
-# 				messages.info(request, f'JPK files on {month}/{year} was sending to accountancy....')
-#
-# 				for nr, file in enumerate(files,1):
-# 					file, parent, suffix = Path(file), Path(file).parent, Path(file).suffix
-# 					file.rename(parent/f'sent{nr}{stamp}{suffix}')
-# 		else:
-# 			messages.error(request, 'Occurred problem with FTP connection...')
-#
-# 		return HttpResponseRedirect(reverse_lazy('account:dashboard'))
 
 
 class QuizView(View):
