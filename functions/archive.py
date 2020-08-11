@@ -123,7 +123,7 @@ def make_archives(archive_name, root_backup, archive_file):
 		try:
 			shutil.make_archive(archive_name, 'zip', root_backup)
 			print(f'The archive <<{archive_file.name}>> has been packaged...')
-		except FileNotFoundError as error:
+		except FileExistsError as error:
 			print(f'Archiving has failed => Error code: {error}')
 	else:
 		print(f'Directory {root_backup} is empty...')
