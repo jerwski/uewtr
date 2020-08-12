@@ -97,7 +97,7 @@ def mkfixture(path:Path):
 		for app in settings.FIXTURES_APPS:
 			models = apps.all_models[app]
 			for name, model in models.items():
-				with Path.cwd().joinpath(f'{path}/{name}').with_suffix('.json').open('w') as fixture:
+				with Path.cwd().joinpath(f'{path}/{name}').with_suffix('.json').open('w', encoding='UTF-8') as fixture:
 					serialize('json', model.objects.all(), indent=4, stream=fixture)
 	except:
 		print(f'Serialization error...')
