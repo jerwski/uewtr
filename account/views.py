@@ -8,18 +8,22 @@ from datetime import datetime
 # django library
 from django.conf import settings
 from django.contrib import messages
+from django.dispatch import receiver
 from django.utils.timezone import now
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
+from django.db.models.signals import post_save
 from django.core.management import call_command
 from django.views.generic import CreateView, View
 from django.shortcuts import render, get_object_or_404
 
 
 # my models
+from employee.models import *
+from evidence.models import *
 from account.models import Quiz
-from employee.models import Employee
+from cashregister.models import *
 
 # my forms
 from account.forms import UserCreateForm
@@ -30,6 +34,19 @@ from functions.archive import mkfixture, readfixture, make_archives, uploadFileF
 
 
 # Create your views here.
+
+@receiver(post_save, sender=Company, weak=False)
+@receiver(post_save, sender=Employee, weak=False)
+@receiver(post_save, sender=CashRegister, weak=False)
+@receiver(post_save, sender=EmployeeData, weak=False)
+@receiver(post_save, sender=WorkEvidence, weak=False)
+@receiver(post_save, sender=EmployeeLeave, weak=False)
+@receiver(post_save, sender=AccountPayment, weak=False)
+@receiver(post_save, sender=EmployeeHourlyRate, weak=False)
+def set_backup(sender, **kwargs):
+	if sender:
+		backup_models.append(sender.__name__.lower())
+		return backup_models
 
 
 class RegisterView(CreateView):
@@ -50,7 +67,8 @@ class AdminView(View):
 			employee = Employee.objects.all()
 			
 			if request.session.get('check_update', True):
-				global _queryset
+				global _queryset, backup_models
+				backup_models = list()
 				_queryset = quizdata()
 				if socket.gethostname() in settings.HOME_HOSTS:
 					args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
@@ -189,11 +207,11 @@ class QuizView(View):
 	
 				set_of_questions += 1
 				defaults = {'query': query, 'set_of_questions': set_of_questions,
-				            'answer': answer, 'answers': ';'.join(answers)}
+							'answer': answer, 'answers': ';'.join(answers)}
 				Quiz.objects.filter(pk=quiz_id).update(**defaults)
 				poll = len(_queryset) - 3
 				data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'playtime': playtime, 'poll': poll,
-				        'answers': answers, 'set_of_questions': set_of_questions, 'percent': percent}
+						'answers': answers, 'set_of_questions': set_of_questions, 'percent': percent}
 				context.update(data)
 			except:
 				logout(request)
@@ -221,7 +239,7 @@ class QuizView(View):
 
 		percent = 20 * points / set_of_questions
 		context = {'query': query, 'answers': answers, 'percent': percent, 'playtime': playtime,
-		           'set_of_questions': set_of_questions, 'quiz_id': quiz_id, 'points': points}
+				   'set_of_questions': set_of_questions, 'quiz_id': quiz_id, 'points': points}
 
 		if your_answer == answer:
 			points += 5
@@ -246,7 +264,7 @@ def exit(request)->HttpResponseRedirect:
 
 	if socket.gethostname() in settings.OFFICE_HOSTS:
 		backup()
-		mkfixture(settings.ADMIN_SERIALIZE)
+		mkfixture(settings.ADMIN_SERIALIZE, backup_models=backup_models)
 		make_archives(settings.ARCHIVE_NAME, settings.ADMIN_SERIALIZE, settings.ARCHIVE_FILE)
 		remgarbage(*paths)
 
@@ -264,15 +282,21 @@ def exit(request)->HttpResponseRedirect:
 				logout(request)
 
 	elif socket.gethostname() in settings.HOME_HOSTS:
-		if request.user.is_authenticated:
+
+		if backup_models:
 			backup()
+		else:
+			print(r'All fixtures are up to date...')
+
+		if request.user.is_authenticated:
 			remgarbage(*paths)
 			logout(request)
+
 		try:
 			if check_FTPconn():
 				return HttpResponseRedirect(r'https://www.google.pl/')
 		except:
-			return render(request, '500.html', {'error': 'Occurred problem with FTP connection'})
+			return render(request, '500.html', {'error': 'Occurred problem with network...'})
 		finally:
 			if platform.system() == 'Darwin':
 				exec_script()

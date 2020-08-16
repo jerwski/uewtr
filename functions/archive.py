@@ -49,7 +49,7 @@ def cmp_fixtures():
 		if not Path.exists(path):
 			Path.mkdir(path)
 	try:
-		mkfixture(settings.TEMP_SERIALIZE)
+		mkfixture(settings.TEMP_SERIALIZE, backup_models=None)
 		old_files = list(settings.ADMIN_SERIALIZE.iterdir())
 		new_files = list(settings.TEMP_SERIALIZE.iterdir())
 
@@ -88,7 +88,7 @@ def backup():
 			print(f'Something wrong... Error: {error}')
 
 
-def mkfixture(path:Path):
+def mkfixture(path:Path, backup_models:list=None):
 	'''create fixtures in json format'''
 	try:
 		if not Path.exists(path):
@@ -97,8 +97,13 @@ def mkfixture(path:Path):
 		for app in settings.FIXTURES_APPS:
 			models = apps.all_models[app]
 			for name, model in models.items():
-				with Path.cwd().joinpath(f'{path}/{name}').with_suffix('.json').open('w', encoding='UTF-8') as fixture:
-					serialize('json', model.objects.all(), indent=4, stream=fixture)
+				if backup_models:
+					if name in backup_models:
+						with Path.cwd().joinpath(f'{path}/{name}').with_suffix('.json').open('w', encoding='UTF-8') as fixture:
+							serialize('json', model.objects.all(), indent=4, stream=fixture)
+				else:
+					with Path.cwd().joinpath(f'{path}/{name}').with_suffix('.json').open('w', encoding='UTF-8') as fixture:
+						serialize('json', model.objects.all(), indent=4, stream=fixture)
 	except:
 		print(f'Serialization error...')
 		pass
@@ -127,34 +132,6 @@ def make_archives(archive_name, root_backup, archive_file):
 			print(f'Archiving has failed => Error code: {error}')
 	else:
 		print(f'Directory {root_backup} is empty...')
-
-
-#FUNCTION DEPRECIATED
-def invoices_backup() -> bool:
-	'''create compressed in zip format archive file with invoices'''
-	root_backup = settings.INVOICE_BACKUP.expanduser()
-	base_name = settings.INVOICE_ZIP.expanduser()
-	backup_file = base_name.with_suffix('.zip')
-	make_archives(base_name, root_backup, backup_file)
-	if check_FTPconn():
-		try:
-			with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
-				ftpdirs = (name for name, facts in myFTP.mlsd())
-				files = (name for name, facts in myFTP.mlsd(settings.FTP_INVOICE_DIR) if facts['type']=='file')
-				if settings.FTP_INVOICE_DIR.name not in ftpdirs:
-					return True
-				else:
-					if settings.FTP_INVOICE_FILE.name in ftpdirs and backup_file.name in files:
-						if myFTP.size(f'{settings.FTP_INVOICE_DIR}/{backup_file.name}') != backup_file.stat().st_size:
-							return True
-						else:
-							return False
-					else:
-						return True
-		except:
-			print(f'Occurred problem with FTP connection...')
-	else:
-		return False
 
 
 def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, username:str, password:str):
