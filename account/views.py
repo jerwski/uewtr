@@ -35,6 +35,9 @@ from functions.archive import mkfixture, readfixture, make_archives, uploadFileF
 
 # Create your views here.
 
+_queryset = quizdata()
+backup_models = []
+
 @receiver(post_save, sender=Company, weak=False)
 @receiver(post_save, sender=Employee, weak=False)
 @receiver(post_save, sender=CashRegister, weak=False)
@@ -67,9 +70,6 @@ class AdminView(View):
 			employee = Employee.objects.all()
 			
 			if request.session.get('check_update', True):
-				global _queryset, backup_models
-				backup_models = list()
-				_queryset = quizdata()
 				if socket.gethostname() in settings.HOME_HOSTS:
 					args = (settings.FTP, settings.FTP_USER, settings.FTP_LOGIN, settings.ARCHIVE_FILE, settings.ROOT_BACKUP)
 					getArchiveFilefromFTP(request, *args)
