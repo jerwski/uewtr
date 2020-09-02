@@ -263,10 +263,10 @@ def exit(request)->HttpResponseRedirect:
 	args = (settings.ARCHIVE_FILE, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
 
 	if socket.gethostname() in settings.OFFICE_HOSTS:
+		remgarbage(*paths)
 		backup()
 		mkfixture(settings.ADMIN_SERIALIZE, backup_models=backup_models)
 		make_archives(settings.ARCHIVE_NAME, settings.ADMIN_SERIALIZE, settings.ARCHIVE_FILE)
-		remgarbage(*paths)
 
 		try:
 			if check_FTPconn():
