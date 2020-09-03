@@ -147,7 +147,7 @@ class CashRegisterView(View):
 					msg = f'Succesful register new record in {self.company} (income={income:.2f}PLN)'
 					messages.success(request, msg)
 				elif expenditure > 0:
-					if self.registerdata['prev_saldo'] - expenditure >= 0:
+					if self.registerdata['saldo'] - expenditure >= 0:
 						self.form.save(commit=True)
 						msg = f'Succesful register new record in {self.company} (expenditure={expenditure:.2f}PLN)'
 						messages.success(request, msg)
