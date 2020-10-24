@@ -169,7 +169,7 @@ class DeserializeView(View):
 					for file in files:
 						myFTP.retrbinary(f'RETR {file}', open(f'{settings.ADMIN_SERIALIZE}/{file}', 'wb').write)
 						myFTP.delete(file)
-						messages.info(request, f'\nThe file <<{file}>> has been copied into<<{settings.ADMIN_SERIALIZE}>>')
+						# messages.info(request, f'\nThe file <<{file}>> has been copied into<<{settings.ADMIN_SERIALIZE}>>')
 			except:
 				messages.info(request, f'There aren\'t files in {settings.FTP_SERIALIZE}')
 		else:
