@@ -126,7 +126,7 @@ elif socket.gethostname() in get_setting('office_hosts'):
         }
     }
 else:
-    raise ConnectionError
+    print(f'This host <<{socket.gethostname()}>> is not allowed...\n')
 
 
 # Password validation
