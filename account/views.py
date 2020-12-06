@@ -8,11 +8,11 @@ from datetime import datetime
 # django library
 from django.conf import settings
 from django.contrib import messages
+from django.urls import reverse_lazy
 from django.dispatch import receiver
 from django.utils.timezone import now
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
-from django.urls import reverse, reverse_lazy
 from django.db.models.signals import post_save
 from django.core.management import call_command
 from django.views.generic import CreateView, View
