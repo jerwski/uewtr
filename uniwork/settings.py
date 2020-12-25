@@ -22,13 +22,13 @@ from django.core.exceptions import ImproperlyConfigured
 
 # read enviroment settings
 def get_setting(setting):
-    try:
-        with Path('mysetting.json').open('r') as file:
-            data = json.loads(file.read())
-        return data[setting]
-    except KeyError:
-        error_msg = f'{setting} - set as an environment variable'
-        raise ImproperlyConfigured(error_msg)
+	try:
+		with Path('mysetting.json').open('r') as file:
+			data = json.loads(file.read())
+		return data[setting]
+	except KeyError:
+		error_msg = f'{setting} - set as an environment variable'
+		raise ImproperlyConfigured(error_msg)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,11 +41,11 @@ SECRET_KEY = get_setting('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if socket.gethostname() in get_setting('home_hosts'):
-    DEBUG = False
+	DEBUG = True
 elif socket.gethostname() in get_setting('office_hosts'):
-    DEBUG = True
+	DEBUG = True
 else:
-    DEBUG = False
+	DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
@@ -53,48 +53,48 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'account.apps.AccountConfig',
-    'employee.apps.EmployeeConfig',
-    'evidence.apps.EvidenceConfig',
-    'accountancy.apps.AccountancyConfig',
-    'cashregister.apps.CashregisterConfig',
-    'bootstrap4',
-    'tempus_dominus',
+	'django.contrib.admin',
+	'django.contrib.auth',
+	'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.messages',
+	'django.contrib.staticfiles',
+	'account.apps.AccountConfig',
+	'employee.apps.EmployeeConfig',
+	'evidence.apps.EvidenceConfig',
+	'accountancy.apps.AccountancyConfig',
+	'cashregister.apps.CashregisterConfig',
+	'bootstrap4',
+	'tempus_dominus',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.admindocs.middleware.XViewMiddleware',
+	'django.middleware.security.SecurityMiddleware',
+	'django.contrib.sessions.middleware.SessionMiddleware',
+	'django.middleware.common.CommonMiddleware',
+	'django.middleware.csrf.CsrfViewMiddleware',
+	'django.contrib.auth.middleware.AuthenticationMiddleware',
+	'django.contrib.messages.middleware.MessageMiddleware',
+	'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django.contrib.admindocs.middleware.XViewMiddleware',
 ]
 
 ROOT_URLCONF = 'uniwork.urls'
 
 TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+	{
+		'BACKEND': 'django.template.backends.django.DjangoTemplates',
 		'DIRS': [BASE_DIR.joinpath('templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+		'APP_DIRS': True,
+		'OPTIONS': {
+			'context_processors': [
+				'django.template.context_processors.debug',
+				'django.template.context_processors.request',
+				'django.contrib.auth.context_processors.auth',
+				'django.contrib.messages.context_processors.messages',
+			],
+		},
+	},
 ]
 
 WSGI_APPLICATION = 'uniwork.wsgi.application'
@@ -104,47 +104,47 @@ WSGI_APPLICATION = 'uniwork.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 if socket.gethostname() in get_setting('home_hosts'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': get_setting('NAME'),
-            'USER': get_setting('USER_HL'),
-            'PASSWORD': get_setting('PASSWORD_HL'),
-            'HOST': '127.0.0.1',
-            'PORT': '5432',
-        }
-    }
+	DATABASES = {
+		'default': {
+			'ENGINE': 'django.db.backends.postgresql',
+			'NAME': get_setting('NAME'),
+			'USER': get_setting('USER_HL'),
+			'PASSWORD': get_setting('PASSWORD_HL'),
+			'HOST': '127.0.0.1',
+			'PORT': '5432',
+		}
+	}
 elif socket.gethostname() in get_setting('office_hosts'):
-        DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': get_setting('NAME'),
-            'USER': get_setting('USER_OL'),
-            'PASSWORD': get_setting('PASSWORD_OL'),
-            'HOST': '127.0.0.1',
-            'PORT': '5432',
-        }
-    }
+		DATABASES = {
+		'default': {
+			'ENGINE': 'django.db.backends.postgresql',
+			'NAME': get_setting('NAME'),
+			'USER': get_setting('USER_OL'),
+			'PASSWORD': get_setting('PASSWORD_OL'),
+			'HOST': '127.0.0.1',
+			'PORT': '5432',
+		}
+	}
 else:
-    print(f'This host <<{socket.gethostname()}>> is not allowed...\n')
+	print(f'This host <<{socket.gethostname()}>> is not allowed...\n')
 
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+	{
+		'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+	},
+	{
+		'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+	},
+	{
+		'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+	},
+	{
+		'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+	},
 ]
 
 

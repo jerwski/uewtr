@@ -15,13 +15,8 @@
           <a class="btn btn-outline-primary d-print-none" href="{% url 'evidence:working_time_recorder_add' employee_id %}">Work time recorder</a>
           <a class="btn btn-outline-success d-print-none" href="{% url 'evidence:leave_time_recorder_add' employee_id %}">Leave time recorder</a>
           <a class="btn btn-outline-secondary d-print-none" href="{% url 'evidence:account_payment' employee_id %}">Payment on account</a>
-          {% if amountpay.brutto > 0 %}
-            <a class="btn btn-outline-info d-print-none" href="{% url 'evidence:monthly_payroll_print' month year %}">Print current payroll</a>
-            <a class="btn btn-outline-light d-print-none" href="{% url 'evidence:monthly_payroll_pdf' month year %}">Send current payroll as PDF</a>
-          {% else %}
-            <a class="btn btn-outline-info d-print-none disabled" href="{% url 'evidence:monthly_payroll_print' month year %}">Print current payroll</a>
-            <a class="btn btn-outline-light d-print-none disabled" href="{% url 'evidence:monthly_payroll_pdf' month year %}">Send current payroll as PDF</a>
-          {% endif %}
+          {% include 'blocks/payroll_print_modal.html' %}
+          {% include 'blocks/payroll_send_modal.html' %}
           <a class="btn btn-outline-danger d-print-none" href="{% url 'account:exit' %}">Exit</a>
         </div>
         <hr class="small">

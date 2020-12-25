@@ -25,7 +25,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # my function
 from functions.archive import check_FTPconn
 from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
-from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year, workhourshtml2pdf, make_attachment, accountpaymenthtml2pdf
+from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year, workhourshtml2pdf, make_attachment, accountpaymenthtml2pdf, dphtmpd
 
 
 # Create your views here.
@@ -374,24 +374,27 @@ class MonthlyPayrollView(View):
 
 class MonthlyPayrollPrintView(View):
 	'''class representing the view of monthly payroll print'''
+
 	def get(self, request, month:int, year:int):
 		'''send montly payroll as pdf attachmnet on browser'''
-		html = payrollhtml2pdf(month, year)
 
-		if html:
-			# create pdf file with following options
-			options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
-					   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
-					   'orientation': 'landscape','no-outline': None, 'quiet': '', }
-			pdf = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
+		if request.GET['ppRadio'] == 'simple':
+
+			response = payrollhtml2pdf(month, year, option='print')
+
+			if response:
+				return response
+			else:
+				messages.warning(request, r'Nothing to print...')
+
+		elif request.GET['ppRadio'] == 'detailed':
+			multipdfile = dphtmpd(month, year)
 			filename = f'payroll_{month}_{year}.pdf'
-			# send montly pyroll as attachment
-			response = HttpResponse(pdf, content_type='application/pdf')
-			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+			with open(multipdfile, 'rb') as pdfile:
+				response = HttpResponse(pdfile, content_type='application/pdf')
+				response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
 
 			return response
-		else:
-			messages.warning(request, r'Nothing to print...')
 
 		return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
 
@@ -400,26 +403,31 @@ class SendMonthlyPayrollPdf(View):
 	'''class representing the view for sending monthly payroll as pdf file'''
 	def get(self, request, month:int, year:int) -> HttpResponseRedirect:
 		# convert html file (evidence/monthly_payroll_pdf.html) to pdf file
+
 		if check_FTPconn():
-			html = payrollhtml2pdf(month, year)
-			if html:
-				# create pdf file and save on templates/pdf/payroll_{}_{}.pdf.format(choice_date.month, choice_date.year)
-				options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
-						   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
-						   'orientation': 'landscape','no-outline': None, 'quiet': '', }
-				# create pdf file
-				pdfile = f'templates/pdf/payroll_{month}_{year}.pdf'
-				pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
-				# send e-mail with attached payroll as file in pdf format
-				mail = {'subject': f'payrol for {month}/{year} r.',
-						'message': f'Payroll in attachment {month}-{year}...',
-						'sender': settings.EMAIL_HOST_USER,
-						'recipient':  [settings.CC_MAIL],
-						'attachments': [pdfile]}
-				sendemail(**mail)
-				messages.info(request, f'The file <<{pdfile}>> was sending....')
+
+			if request.GET['spRadio'] == 'simple':
+				multipdfile = payrollhtml2pdf(month, year, option='send')
+				subject = f'Detailed multi-page payroll for {month}-{year}'
+				message = f'Detailed multi-page payroll for {month}-{year} in attachment...'
+
+			elif request.GET['spRadio'] == 'detailed':
+				multipdfile = dphtmpd(month, year)
+				subject = f'Simplified payroll for {month}-{year}'
+				message = f'Simplified payroll for {month}-{year} in attachment...'
+
 			else:
 				messages.warning(request, r'Nothing to send...')
+
+			# send e-mail with attached payroll as file in pdf format
+			mail = {'subject': subject,
+			        'message': message,
+			        'sender': settings.EMAIL_HOST_USER,
+			        'recipient':  [settings.CC_MAIL],
+			        'attachments': [multipdfile]}
+			sendemail(**mail)
+			messages.info(request, f'The file <<{multipdfile}>> was sending....')
+
 		else:
 			messages.error(request, 'FTP connection failure...')
 

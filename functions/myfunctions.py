@@ -3,6 +3,7 @@ import os
 import sys
 import shutil
 import calendar
+import platform
 from io import BytesIO
 from pathlib import Path
 from collections import deque
@@ -24,6 +25,9 @@ from PIL import Image
 
 # num2words library
 import num2words
+
+# PyPDF4 library
+from PyPDF4 import PdfFileMerger
 
 # django library
 from django.conf import settings
@@ -224,7 +228,7 @@ def plot_chart(employee_id:int, year:int):
 	chart.show()
 
 
-def payrollhtml2pdf(month:int, year:int) -> bool:
+def payrollhtml2pdf(month:int, year:int, option=None):
 	'''convert html file (evidence/monthly_payroll_pdf.html) to pdf file'''
 	heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota', 'Niedziela', 'Zaliczka',
 			 'Do wypłaty', 'Data i podpis']
@@ -250,9 +254,110 @@ def payrollhtml2pdf(month:int, year:int) -> bool:
 
 		template = get_template('evidence/monthly_payroll_pdf.html')
 		html = template.render(context)
-		return html
+		# create pdf file with following options
+		options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
+				   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
+				   'orientation': 'landscape','no-outline': None, 'quiet': '', }
+
+		if option == 'print':
+			pdfile = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
+			filename = f'payroll_{month}_{year}_simple.pdf'
+			# create montly pyroll pdf as attachment
+			response = HttpResponse(pdfile, content_type='application/pdf')
+			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+
+			return response
+
+		elif option == 'send':
+			# create pdf file
+			pdfile = f'templates/pdf/payroll_{month}_{year}.pdf'
+			pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
+
+			return pdfile
+
 	else:
 		return False
+
+
+def dphtmpd(month:int, year:int):
+	'''dphtmpd = detailed payroll html to multi-page pdf document'''
+	pdfs, multipdf = [], f'templates/pdf/payroll_{month}_{year}.pdf'
+	# all required data
+	leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
+	heads = ['Kwota brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Za soboty', 'Za niedziele', 'Zaliczka', 'Do wypłaty']
+	total_work_days = len(list(workingdays(year, month)))
+	holidays = holiday(year).values()
+	day = calendar.monthrange(year, month)[1]
+	query = Q(employeedata__end_contract__lt=date(year, month, 1)) | Q(employeedata__start_contract__gt=date(year, month, day))
+	employees = Employee.objects.all().exclude(query).order_by('surname', 'forename')
+
+	if employees.exists():
+		# create data for payroll as associative arrays for all employees
+		payroll_set = {employee: total_payment(employee.id, year, month) for employee in employees}
+
+
+	# tworzę kontekst
+	context = {'month': month, 'year': year, 'heads': heads, 'total_work_days': total_work_days,}
+	# opcje dla utworzenia pliku pdf
+	options = {'page-size': 'A5', 'margin-top': '0.25in', 'margin-right': '0.2in',
+	           'margin-bottom': '0.1in', 'margin-left': '0.2in', 'encoding': "UTF-8",
+	           'orientation': 'landscape','no-outline': None, 'quiet': '',}
+
+	# tworzę zastaw danych dla każdego pracownika
+	for key, value in payroll_set.items():
+		worker = key
+		payroll = value
+		employeedata = get_object_or_404(EmployeeData, worker=worker)
+		# dane do wypłaty
+		salary = payroll['salary']
+		# godziny pracy w dniach wolnych w danym miesiącu
+		mainquery = Q(worker=worker) & Q(start_work__year=year) & Q(start_work__month=month)
+		exclude_holidays = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
+		# za soboty
+		saturdaysquery = Q(start_work__week_day=7) & (Q(end_work__week_day=7) | Q(end_work__week_day=1))
+		saturday_hours = WorkEvidence.objects.filter(mainquery&saturdaysquery).exclude(exclude_holidays)
+		saturday_hours = saturday_hours.aggregate(sh=Sum('jobhours'))['sh']
+		# za niedziele
+		sundaysquery = Q(start_work__week_day=1) & Q(end_work__week_day=1)
+		sunday_hours = WorkEvidence.objects.filter(mainquery&sundaysquery).exclude(exclude_holidays)
+		sunday_hours = sunday_hours.aggregate(sh=Sum('jobhours'))['sh']
+		# za święta
+		holidays_query = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
+		holiday_hours = WorkEvidence.objects.filter(mainquery&holidays_query)
+		holiday_hours = holiday_hours.aggregate(sh=Sum('jobhours'))['sh']
+		# wszystkie godzin w danym miesiącu
+		total_work_hours = WorkEvidence.objects.filter(mainquery)
+		total_work_hours = total_work_hours.aggregate(twh=Sum('jobhours'))['twh']
+		# urlopy
+		year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
+		query = Q(worker=worker, leave_date__year=year, leave_date__month=month)
+		mls = EmployeeLeave.objects.filter(query)
+		month_leaves = {kind:mls.filter(leave_flag=kind).count() for kind in leave_kind}
+		month_dates = {kind:[item.leave_date for item in mls.filter(leave_flag=kind)] for kind in leave_kind}
+		year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
+		# uaktualnienie kontekstu
+		context.update({'worker': worker, 'payroll': payroll, 'salary': salary, 'employeedata': employeedata,
+		                'saturday_hours': saturday_hours, 'month_leaves': month_leaves, 'month_dates': month_dates,
+		                'sunday_hours': sunday_hours, 'year_leaves': year_leaves, 'total_work_hours': total_work_hours,
+		                'holiday_hours': holiday_hours})
+		# create pdf file with following options
+		template = get_template('evidence/monthly_detailed_payroll_pdf.html')
+		html = template.render(context)
+		pdfile = f'templates/pdf/{worker.surname} {worker.forename} lp_{month}_{year}.pdf'
+		pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
+		# dołączam do listy plików pdf
+		pdfs.append(Path(pdfile))
+
+	# tworzę wielostronicowy plik pdf
+	merger = PdfFileMerger()
+	for filename in pdfs:
+		merger.append(filename.as_posix())
+		filename.unlink()
+
+	# plik ze wszystkimi stronami:
+	merger.write(multipdf)
+
+	return multipdf
 
 
 def leavehtml2pdf(employee_id:int, year:int) -> bool:
@@ -381,14 +486,14 @@ def cashregisterdata(company_id:int, month:int, year:int) -> dict:
 			prev_saldo = saldo
 
 			transfer = {'company_id': company_id, 'symbol': f'RK {month}/{year}', 'income': saldo,
-			            'contents': 'z przeniesienia', 'expenditure': expenditures}
+						'contents': 'z przeniesienia', 'expenditure': expenditures}
 			CashRegister.objects.create(**transfer)
 
 		registerdata.update({'prev_saldo': prev_saldo, 'incomes': incomes, 'expenditures': expenditures, 'saldo': saldo})
 
 	else:
 		transfer = {'company_id': company_id, 'symbol': f'RK {month}/{year}', 'income': incomes,
-		            'contents': 'z przeniesienia', 'expenditure': expenditures}
+					'contents': 'z przeniesienia', 'expenditure': expenditures}
 		CashRegister.objects.create(**transfer)
 
 	return registerdata
@@ -532,3 +637,15 @@ def last_relased_accountancy_document(company_id:int=None) -> int:
 		number = 1
 
 	return number
+
+
+def rempid():
+	if platform.system() == 'Darwin':
+		path2pid = Path('/Users/jurgen/Library/Application Support/Postgres/var-11/')
+		pidfile = 'postmaster.pid'
+		# if old .pid file exist should be removed
+		pid = path2pid/pidfile
+
+		if pid.exists():
+			pid.unlink()
+			print(f'After removed {pid} file you should be restart your PostgreSQL Database')

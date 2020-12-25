@@ -257,13 +257,15 @@ class QuizView(View):
 def exit(request)->HttpResponseRedirect:
 	'''backups features and exit from the application'''
 	if platform.system() == 'Darwin':
-		paths = (Path('/Users/jurgen/Downloads'), Path('/private/var/tmp'))
+		paths = (Path('/Users/jurgen/Downloads'), Path('/private/var/tmp'), Path('templates/pdf'))
 	else:
-		paths = (Path(r'templates/pdf'), Path('~/Downloads').expanduser())
+		paths = (Path('templates/pdf'), Path('~/Downloads').expanduser())
+	# remove unused files
+	remgarbage(*paths)
+
 	args = (settings.ARCHIVE_FILE, settings.FTP_DIR, settings.FTP, settings.FTP_USER, settings.FTP_LOGIN)
 
 	if socket.gethostname() in settings.OFFICE_HOSTS:
-		remgarbage(*paths)
 		backup()
 		mkfixture(settings.ADMIN_SERIALIZE, backup_models=backup_models)
 		make_archives(settings.ARCHIVE_NAME, settings.ADMIN_SERIALIZE, settings.ARCHIVE_FILE)
@@ -289,7 +291,6 @@ def exit(request)->HttpResponseRedirect:
 			print(r'All fixtures are up to date...')
 
 		if request.user.is_authenticated:
-			remgarbage(*paths)
 			logout(request)
 
 		try:
