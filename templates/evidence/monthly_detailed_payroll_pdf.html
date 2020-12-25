@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load utility_tags %}
+
+{% block title %}Lista płac za {{ month }}/{{ year }}{% endblock %}
+
+{% block content %}
+
+  <div class="container-fluid">
+
+    <div class="container">
+      <div class="uk-evidence-box">
+        <div class="row">
+          <div class="col">
+            <p class="uk-text-middle">Wynagrodzenie dla {{ worker }} za {{ month }}/{{ year }}r.<span class="uk-text-value small"> ({{ total_work_days }} dni roboczych)</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <table class="table table-sm table-borderless text-center">
+        <tbody>
+        <tr>
+          <th>Ilość roboczogodzin:</th><td>{{ total_work_hours }} godz.</td><th>Soboty:</th><td>{% if saturday_hours %}{{ saturday_hours|floatformat:2 }}{% else %}0{% endif %} godz.</td><th>Niedziele:</th><td>{% if sunday_hours %}{{ sunday_hours|floatformat:2 }}{% else %}0{% endif %} godz.</td><th>Święta:</th><td>{% if holiday_hours %}{{ holiday_hours|floatformat:2 }}{% else %}0{% endif %} godz.</td>
+        </tr>
+        <tr>&nbsp;</tr>
+        </tbody>
+      </table>
+    </div>
+
+{#należności#}
+
+    <div class="container-fluid">
+        <table class="table table-sm text-center font-weight-bolder">
+          <thead class="bg-info">
+          <tr class="text-white">
+            {% for head in heads %}<th>{{ head }}</th>{% endfor %}
+          </tr>
+          </thead>
+          <tbody>
+            <tr class="text-dark">
+            {% for data in payroll.values %}
+              <td>{{ data|money_format }}</td>
+            {% endfor %}
+            </tr>
+             <tr>
+              <td class="{% if salary > 0 %}text-success{% else %}text-danger{% endif %}" colspan="6">KWOTA DO WYPŁATY:</td>
+              <td class="{% if salary > 0 %}text-success{% else %}text-danger{% endif %}" colspan="2">{{ salary|money_format }}</td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+
+
+{#urlopy#}
+      <div class="container">
+        <div class="row">
+          <div class="col uk-evidence-headline">
+            Ilość dni urlopu w zależności od rodzaju urlopu w okresie {{ month }}/{{ year }}
+          </div>
+        </div>
+        <table class="table table-sm text-center">
+          <tbody>
+
+            <tr>
+              {% for key,value in month_leaves.items %}
+                {% if key == 'unpaid_leave' %}
+                  <th>Urlop bezpłatny:</th>
+                  <td class="text-danger">{{ value|floatformat:0 }}{% if value == 1 %} dzień{% else %} dni{% endif %}</td>
+                {% elif key == 'paid_leave' %}
+                  <th>Urlop płatny:</th>
+                  <td class="text-danger">{{ value|floatformat:0 }}{% if value == 1 %} dzień{% else %} dni{% endif %}</td>
+                  {% elif key == 'maternity_leave' %}
+                  <th>Urlop macierzyński:</th>
+                  <td class="text-danger">{{ value|floatformat:0 }}{% if value == 1 %} dzień{% else %} dni{% endif %}</td>
+                {% endif %}
+              {% endfor %}
+            </tr>
+
+            <tr class="text-center">
+              <td colspan="2">
+                {% for key, value in month_dates.items|dictsort:1 %}
+                  {% if key == 'unpaid_leave' %}
+                    {% if value|length > 0 %}
+                      {% for item in value %}
+                        <a class="text-primary">{{ item|date:'d,' }}</a>
+                      {% endfor %}
+                    {% else %}
+                      ******
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </td>
+              <td colspan="2">
+                {% for key, value in month_dates.items|dictsort:1 %}
+                  {% if key == 'paid_leave' %}
+                    {% if value|length > 0 %}
+                      {% for item in value %}
+                        <a class="text-primary">{{ item|date:'d,' }}
+                      {% endfor %}
+                    {% else %}
+                      ******
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </td>
+              <td colspan="2">
+                {% for key, value in month_dates.items|dictsort:1 %}
+                  {% if key == 'maternity_leave' %}
+                    {% if value|length > 0 %}
+                      {% for item in value %}
+                        <a class="text-primary">{{ item|date:'d,' }}
+                      {% endfor %}
+                    {% else %}
+                      ******
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col uk-evidence-headline">
+            Wykorzystane dni urlopu w {{ year }} roku
+          </div>
+        </div>
+        <table class="table table-sm text-center">
+          <tbody>
+            <tr>
+              {% for key,value in year_leaves.items %}
+                {% if key == 'unpaid_leave' %}
+                  <th>Urlop bezpłatny:</th>
+                  <td class="text-danger">{{ value|floatformat:0 }}{% if value == 1 %} dzień{% else %} dni{% endif %}</td>
+                {% elif key == 'paid_leave' %}
+                  <th>Urlop płatny:</th>
+                  <td class="text-danger">{{ value|floatformat:0 }}{% if value == 1 %} dzień{% else %} dni{% endif %}</td>
+                {% elif key == 'maternity_leave' %}
+                  <th>Urlop macierzyński:</th>
+                  <td class="text-danger">{{ value|floatformat:0 }}{% if value == 1 %} dzień{% else %} dni{% endif %}</td>
+                {% endif %}
+              {% endfor %}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-6 offset-6">
+            <hr class="lead">
+            <a class="text-right uk-text-value">Podpis pracownika:</a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            <a class="uk-text-logo text-left">Data wydruku: {% now "l, jS F Y H:i" %}</a>
+          </div>
+        </div>
+      </div>
+  </div>
+{% endblock %}
