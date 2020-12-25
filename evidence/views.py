@@ -425,8 +425,11 @@ class SendMonthlyPayrollPdf(View):
 			        'sender': settings.EMAIL_HOST_USER,
 			        'recipient':  [settings.CC_MAIL],
 			        'attachments': [multipdfile]}
-			sendemail(**mail)
-			messages.info(request, f'The file <<{multipdfile}>> was sending....')
+			try:
+				sendemail(**mail)
+				messages.info(request, f'The file <<{multipdfile}>> was sending....')
+			except:
+				messages.warning(request, r'Payroll isn\'t sending...')
 
 		else:
 			messages.error(request, 'FTP connection failure...')
