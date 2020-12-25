@@ -350,9 +350,14 @@ def dphtmpd(month:int, year:int):
 
 	# tworzę wielostronicowy plik pdf
 	merger = PdfFileMerger()
+
 	for filename in pdfs:
-		merger.append(filename.as_posix())
-		filename.unlink()
+		try:
+			merger.append(filename.as_posix())
+		except:
+			print(f'File for multi-page odf document aren\'t exist')
+		finally:
+			filename.unlink()
 
 	# plik ze wszystkimi stronami:
 	merger.write(multipdf)
