@@ -5,24 +5,26 @@
     <div class="modal fade bd-example-modal-sm" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-sm">
         <div class="modal-content">
-          <div class="modal-header bg-info">
-            <h5 class="modal-title" id="alertModal">Alert</h5>
+          <div class="modal-header uk-mybg">
+            <h5 class="modal-title text-white text-uppercase" id="alertModal">Attention!</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span class="fas fa-times-circle" aria-hidden="true"></span>
+              <span class="fas fa-times" aria-hidden="true"></span>
             </button>
           </div>
           <div class="modal-body">
             {% for message in messages %}
-              <p class="text-center text-danger"><small>{{ message }}</small></p>
+              <p class="text-center uk-text-alert"><small>{{ message }}</small></p>
             {% endfor %}
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer uk-bg-bisque">
             <button type="button" class="btn btn-sm btn-outline-info" data-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
     </div>
+
   {% endif %}
+
 
 <!-- blinkin message button after hideTime: seconds-->
 <script>

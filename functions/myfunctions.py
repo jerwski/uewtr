@@ -296,46 +296,46 @@ def dphtmpd(month:int, year:int):
 		payroll_set = {employee: total_payment(employee.id, year, month) for employee in employees}
 
 
-	# tworzę kontekst
+	# create context
 	context = {'month': month, 'year': year, 'heads': heads, 'total_work_days': total_work_days,}
 	# opcje dla utworzenia pliku pdf
 	options = {'page-size': 'A5', 'margin-top': '0.25in', 'margin-right': '0.2in',
 	           'margin-bottom': '0.1in', 'margin-left': '0.2in', 'encoding': "UTF-8",
 	           'orientation': 'landscape','no-outline': None, 'quiet': '',}
 
-	# tworzę zastaw danych dla każdego pracownika
+	# create dataset for ech active employee
 	for key, value in payroll_set.items():
 		worker = key
 		payroll = value
 		employeedata = get_object_or_404(EmployeeData, worker=worker)
-		# dane do wypłaty
+		# payroll data
 		salary = payroll['salary']
-		# godziny pracy w dniach wolnych w danym miesiącu
+		# workhours in holidays
 		mainquery = Q(worker=worker) & Q(start_work__year=year) & Q(start_work__month=month)
 		exclude_holidays = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
-		# za soboty
+		# Saturdays
 		saturdaysquery = Q(start_work__week_day=7) & (Q(end_work__week_day=7) | Q(end_work__week_day=1))
 		saturday_hours = WorkEvidence.objects.filter(mainquery&saturdaysquery).exclude(exclude_holidays)
 		saturday_hours = saturday_hours.aggregate(sh=Sum('jobhours'))['sh']
-		# za niedziele
+		# Sundays
 		sundaysquery = Q(start_work__week_day=1) & Q(end_work__week_day=1)
 		sunday_hours = WorkEvidence.objects.filter(mainquery&sundaysquery).exclude(exclude_holidays)
 		sunday_hours = sunday_hours.aggregate(sh=Sum('jobhours'))['sh']
-		# za święta
+		# holidays
 		holidays_query = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
 		holiday_hours = WorkEvidence.objects.filter(mainquery&holidays_query)
 		holiday_hours = holiday_hours.aggregate(sh=Sum('jobhours'))['sh']
-		# wszystkie godzin w danym miesiącu
+		# total workhours
 		total_work_hours = WorkEvidence.objects.filter(mainquery)
 		total_work_hours = total_work_hours.aggregate(twh=Sum('jobhours'))['twh']
-		# urlopy
+		# leaves
 		year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
 		query = Q(worker=worker, leave_date__year=year, leave_date__month=month)
 		mls = EmployeeLeave.objects.filter(query)
 		month_leaves = {kind:mls.filter(leave_flag=kind).count() for kind in leave_kind}
 		month_dates = {kind:[item.leave_date for item in mls.filter(leave_flag=kind)] for kind in leave_kind}
 		year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
-		# uaktualnienie kontekstu
+		# update context
 		context.update({'worker': worker, 'payroll': payroll, 'salary': salary, 'employeedata': employeedata,
 		                'saturday_hours': saturday_hours, 'month_leaves': month_leaves, 'month_dates': month_dates,
 		                'sunday_hours': sunday_hours, 'year_leaves': year_leaves, 'total_work_hours': total_work_hours,
@@ -345,21 +345,22 @@ def dphtmpd(month:int, year:int):
 		html = template.render(context)
 		pdfile = f'templates/pdf/{worker.surname} {worker.forename} lp_{month}_{year}.pdf'
 		pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
-		# dołączam do listy plików pdf
+		# join pdf file for each active employee
 		pdfs.append(Path(pdfile))
 
-	# tworzę wielostronicowy plik pdf
+	# create multi-pages pdf file
 	merger = PdfFileMerger()
 
 	if pdfs:
 		try:
 			for filename in pdfs:
 				merger.append(filename.as_posix())
+			# write multi-pages pdf file:
+			merger.write(multipdf)
 		except:
 			print(f'File for multi-page odf document aren\'t exist')
 		finally:
-			# plik ze wszystkimi stronami:
-			merger.write(multipdf)
+			# remove pdf file
 			for filename in pdfs:
 				filename.unlink()
 
