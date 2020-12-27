@@ -30,7 +30,7 @@ from account.forms import UserCreateForm
 
 # my function
 from functions.myfunctions import remgarbage, quizdata, quizset, dirdata
-from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, check_FTPconn, cmp_fixtures, exec_script
+from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, checkWiFi, cmp_fixtures, exec_script
 
 
 # Create your views here.
@@ -93,7 +93,7 @@ class AdminView(View):
 			if socket.gethostname() == settings.SERIALIZE_HOST:
 				context.__setitem__('serialize', True)
 
-			if check_FTPconn():
+			if checkWiFi():
 				try:
 					with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
 						try:
@@ -128,7 +128,7 @@ class RestoreDataBase(View):
 class SerializeView(View):
 	'''class to serializng database'''
 	def get(self, request)->HttpResponseRedirect:
-		if check_FTPconn() and cmp_fixtures():
+		if checkWiFi() and cmp_fixtures():
 			root = Path(settings.FTP_SERIALIZE)
 			try:
 				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
@@ -161,7 +161,7 @@ class DeserializeView(View):
 		if not Path.exists(settings.ADMIN_SERIALIZE):
 			Path.mkdir(settings.ADMIN_SERIALIZE)
 
-		if check_FTPconn():
+		if checkWiFi():
 			try:
 				with FTP(settings.FTP, settings.FTP_USER, settings.FTP_LOGIN) as myFTP:
 					myFTP.cwd(settings.FTP_SERIALIZE)
@@ -271,7 +271,7 @@ def exit(request)->HttpResponseRedirect:
 		make_archives(settings.ARCHIVE_NAME, settings.ADMIN_SERIALIZE, settings.ARCHIVE_FILE)
 
 		try:
-			if check_FTPconn():
+			if checkWiFi():
 				uploadFileFTP(*args)
 				return HttpResponseRedirect(r'https://www.google.pl/')
 			else:
@@ -294,7 +294,7 @@ def exit(request)->HttpResponseRedirect:
 			logout(request)
 
 		try:
-			if check_FTPconn():
+			if checkWiFi():
 				return HttpResponseRedirect(r'https://www.google.pl/')
 		except:
 			return render(request, '500.html', {'error': 'Occurred problem with network...'})

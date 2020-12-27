@@ -12,7 +12,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 import pdfkit
 
 # my functions
-from functions.archive import check_FTPconn
+from functions.archive import checkWiFi
 from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf, make_attachment, previous_month_year
 
 # my models
@@ -224,7 +224,7 @@ class CashRegisterSendView(View):
 
 	def get(self, request, company_id:int) -> HttpResponseRedirect:
 
-		if check_FTPconn():
+		if checkWiFi():
 			company = get_object_or_404(Company, pk=company_id)
 
 			month, year = now().month, now().year

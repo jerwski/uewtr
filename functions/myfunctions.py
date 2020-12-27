@@ -360,9 +360,9 @@ def dphtmpd(month:int, year:int):
 		except:
 			print(f'File for multi-page odf document aren\'t exist')
 		finally:
-			# remove pdf file
-			for filename in pdfs:
-				filename.unlink()
+			# remove component file of multi-page pdf
+			for file in pdfs:
+				file.unlink()
 
 	return multipdf
 
