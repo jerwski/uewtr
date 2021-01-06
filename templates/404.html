@@ -9,7 +9,7 @@
     <p class="uk-text-large">Page 404 Error</p>
     {% if user.is_authenticated %}
       <div class="container">
-        <p class="uk-text-middle">User <em class="text-danger font-weight-bold">{{ user }}</em></p><br>
+        <p class="uk-text-middle">User <em class="text-danger fw-bold">{{ user }}</em></p><br>
         <p class="uk-text-value">Something's wrong.<br>Object do not exist...{{ request.path }}</p>
       </div>
 

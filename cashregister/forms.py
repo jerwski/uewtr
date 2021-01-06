@@ -8,7 +8,7 @@ from bootstrap4.widgets import RadioSelectButtonGroup
 from cashregister.models import Company, CashRegister
 
 # my validators
-from validators.my_validator import positive_value, from_transfer
+from validators.my_validator import from_transfer, positive_value
 
 # Create your forms here
 

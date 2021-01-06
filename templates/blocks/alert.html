@@ -1,29 +1,32 @@
 
   {% if messages %}
-    <button id="alertButton" type="button" class="btn btn-sm btn-outline-danger blink" data-toggle="modal" data-target=".bd-example-modal-sm">Alert!!!</button><script>hideAfterSomeTime()</script>
-    <!-- Modal -->
-    <div class="modal fade bd-example-modal-sm" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header uk-mybg">
-            <h5 class="modal-title text-white text-uppercase" id="alertModal">Attention!</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span class="fas fa-times" aria-hidden="true"></span>
-            </button>
-          </div>
-          <div class="modal-body">
-            {% for message in messages %}
-              <p class="text-center uk-text-alert"><small>{{ message }}</small></p>
-            {% endfor %}
-          </div>
-          <div class="modal-footer uk-bg-bisque">
-            <button type="button" class="btn btn-sm btn-outline-info" data-dismiss="modal">Close</button>
-          </div>
+
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-sm btn-outline-danger blink" id= "alertButton" data-bs-toggle="modal" data-bs-target="#alertModal">
+    Alert!!!
+  </button><script>hideAfterSomeTime()</script>
+
+  <!-- Modal -->
+  <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header uk-bg-light text-white">
+          <h5 class="modal-title" id="alertModalLabel">Attention!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body uk-bg-bisque">
+          {% for message in messages %}
+            <p class="text-center uk-text-alert">{{ message }}</p>
+          {% endfor %}
+        </div>
+        <div class="modal-footer uk-bg-bisque">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
+  </div>
 
-  {% endif %}
+{% endif %}
 
 
 <!-- blinkin message button after hideTime: seconds-->

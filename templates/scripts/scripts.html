@@ -1,9 +1,10 @@
+
 <!-- search table-->
   <script>
     $(document).ready(function(){
-    $("#myInput").on("keyup", function() {var value =
+    $("#mySEARCH").on("keyup", function() {var value =
       $(this).val().toLowerCase();
-        $("#searchTable").find("tr").filter(function() {
+        $("#STable").find("tr").filter(function() {
           $(this).toggle(
             $(this).text().toLowerCase().indexOf(value) > -1)})
         ;})
@@ -30,7 +31,7 @@
   <script>
     function hideAfterSomeTime(hideTime) {
 	  // 10000 = 10 seconds
-	  window.setTimeout("document.getElementById('alertButton').style.display='none'", (hideTime)?hideTime:3500);
+	  window.setTimeout("document.getElementById('alertButton').style.display='none'", (hideTime)?hideTime:5500);
     }
   </script>
 

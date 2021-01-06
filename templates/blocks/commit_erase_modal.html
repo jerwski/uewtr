@@ -1,22 +1,19 @@
-
-  <!-- Small modal -->
-  <button id="commitButton" type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#harderaseModal">Think twice before you decide.</button>
+  <!-- Button trigger modal -->
+  <button id="commitButton" type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#harderaseModal">Think twice before you decide.</button>
     <!-- Modal -->
-    <div class="modal fade bd-example-modal-sm" id="harderaseModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal fade bd-example-modal-sm" id="harderaseModal" tabindex="-1" aria-labelledby="heModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-sm">
         <div class="modal-content">
-          <div class="modal-header bg-warning">
-            <h5 class="modal-title" id="alertModal">COMMIT...</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span class="fas fa-times" aria-hidden="true"></span>
-            </button>
+          <div class="modal-header uk-bg-dark text-white">
+            <h5 class="modal-title" id="harderaseModal">COMMIT...</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
-            <p class="text-danger font-weight-bold font-italic">You try do erase all bellow records for {{ worker }}...</p>
+          <div class="modal-body uk-bg-bisque">
+            <p class="text-danger fw-bold fst-italic">You try do erase all bellow records for {{ worker }}...</p>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
-            <a id="closemod" href="{% url 'employee:employee_erase_all_records' employee_id %}" class="btn btn-outline-danger">Yes I do delete...</a>
+          <div class="modal-footer uk-bg-bisque">
+            <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Close</button>
+            <a id="closemod" href="{% url 'employee:employee_erase_all_records' employee_id %}" class="btn btn-sm btn-outline-danger">Yes I do delete...</a>
           </div>
         </div>
       </div>

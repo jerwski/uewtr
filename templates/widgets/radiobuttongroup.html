@@ -1,0 +1,10 @@
+
+<!-- RadiobutonGroup -->
+ <div class="btn-group">
+   {% for group, options, index in widget.optgroups %}
+     {% for option in options %}
+       <input type="radio" class="btn-check" name="{{ option.name }}" id="{{ option.attrs.id }}" autocomplete="off" {% if option.value != None %} value="{{ option.value|stringformat:'s' }}" {% if option.attrs.checked %}checked="checked"{% endif %}{% if widget.required %} required{% endif %}{% endif %}>
+       <label class="btn btn-outline-light" for="{{ option.attrs.id }}">{{ option.label }}</label>
+     {% endfor %}
+   {% endfor %}
+ </div>

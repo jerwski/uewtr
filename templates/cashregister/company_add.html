@@ -40,7 +40,7 @@
         </div>
         <div class="uk-table-scroll-md">
           <table class="uk-table">
-            <thead class="text-dark font-weight-bold"><tr><th>Company</th><th>NIP</th></tr></thead>
+            <thead class="text-dark fw-bold"><tr><th>Company</th><th>NIP</th></tr></thead>
               <tbody id="searchTable">
               {% for company in companies %}
                 <tr>
@@ -66,26 +66,26 @@
 
           <div class="row">
             <div class="col-12">
-              {% bootstrap_field form.company size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.company size='small' label_class='text-info fst-italic fw-bold' %}
             </div>
           </div>
 
           <div class="row">
             <div class="col-6">
-              {% bootstrap_field form.nip size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.street size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.phone size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.nip size='small' label_class='text-info fst-italic fw-bold' %}
+              {% bootstrap_field form.street size='small' label_class='text-info fst-italic fw-bold' %}
+              {% bootstrap_field form.phone size='small' label_class='text-info fst-italic fw-bold' %}
             </div>
             <div class="col-6">
-              {% bootstrap_field form.postal size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.city size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.account size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.postal size='small' label_class='text-info fst-italic fw-bold' %}
+              {% bootstrap_field form.city size='small' label_class='text-info fst-italic fw-bold' %}
+              {% bootstrap_field form.account size='small' label_class='text-info fst-italic fw-bold' %}
             </div>
           </div>
 
           <div class="row">
             <div class="col-12 mb-1 text-center">
-              {% bootstrap_field form.status label_class='text-light font-italic font-weight-bold' %}
+              {% bootstrap_field form.status label_class='text-light fst-italic fw-bold' %}
             </div>
           </div>
 

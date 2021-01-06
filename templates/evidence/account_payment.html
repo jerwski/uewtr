@@ -19,9 +19,9 @@
           {% for employee in employees %}
             <tr>
               {% if employee_id == employee.id %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
+                <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold text-danger" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
               {% else %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
+                <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold" href="{{ employee.account_payment_employee_id }}">{{ employee }}</a></td>
               {% endif %}
             </tr>
           {% endfor %}
@@ -39,16 +39,16 @@
           <div class="row">
             <div class="col-6">
               {% bootstrap_field form.worker size='medium' %}
-              {% bootstrap_field form.account_date size='medium' label_class='text-primary font-weight-bold' %}
+              {% bootstrap_field form.account_date size='medium' label_class='text-info fw-bold' %}
             </div>
             <div class="col-6">
-              {% bootstrap_field form.account_value size='medium' label_class='text-primary font-weight-bold' placeholder='The account should be min. 10 PLN' %}
+              {% bootstrap_field form.account_value size='medium' label_class='text-info fw-bold' placeholder='The account should be min. 10 PLN' %}
             </div>
           </div>
-          {% bootstrap_field form.notice size='medium' label_class='text-primary font-weight-bold' placeholder='Please indicate the circumstances of the down payment...' %}
+          {% bootstrap_field form.notice size='medium' label_class='text-info fw-bold' placeholder='Please indicate the circumstances of the down payment...' %}
           <div class="col">
-            <div class="btn btn-block mb-2">
-              <button type="submit" class="btn btn-lg btn-outline-success btn-block">Confirm the down payment</button>
+            <div class="d-grid mx-auto my-3">
+              <button type="submit" class="btn btn-lg btn-outline-success">Confirm the down payment</button>
             </div>
           </div>
         </form>
@@ -56,8 +56,8 @@
         {% if request.method == 'POST' %}
           {% if salary >= advances %}
             <p class="text-center uk-text-middle">Granted an advance payment of: <span class="text-danger">{{ account_value|money_format }}</span></p>
-            <div class="btn-sm mb-lg-4">
-              <a href="{% url 'evidence:account_recorder_erase' employee_id account_date account_value %}" class="btn btn-sm btn-danger btn-block"><span class="font-weight-bold blink">Erase the down payment ({{ account_value|money_format }})</span></a>
+            <div class="d-grid mx-auto">
+              <a href="{% url 'evidence:account_recorder_erase' employee_id account_date account_value %}" class="btn btn-sm btn-danger"><span class="fw-bold blink">Erase the down payment ({{ account_value|money_format }})</span></a>
             </div>
           {% else %}
               <p class="text-center uk-text-middle">The sum of advances <span class="text-danger">{{ advances|money_format }}</span> is greater than the income earned so far <span class="text-danger">{{ salary|money_format }}</span>. The advance can't be paid!</p>
@@ -74,7 +74,7 @@
               </div>
             </div>
             <div class="uk-evidence-data-box">
-              <div class="row text-info font-weight-bold">
+              <div class="row text-info fw-bold">
                 <div class="col-3">
                   <div>Preiod:</div>
                 </div>
@@ -121,8 +121,8 @@
           </div>
         {% endif %}
         <div class="col">
-          <div class="btn btn-block mb-2">
-            <a href="{% url 'account:dashboard' %}" class="btn btn-lg btn-outline-dark btn-block">Back to the dashboard</a>
+          <div class="d-grid mx-auto my-3">
+            <a href="{% url 'account:dashboard' %}" class="btn btn-lg btn-outline-dark">Back to the dashboard</a>
           </div>
         </div>
       {% else %}

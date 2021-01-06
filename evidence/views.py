@@ -25,7 +25,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # my function
 from functions.archive import checkWiFi
 from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
-from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year, workhourshtml2pdf, make_attachment, accountpaymenthtml2pdf, dphtmpd
+from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year, workhourshtml2pdf, make_attachment, accountpaymenthtml2pdf, dphtmpd, payroll_set
 
 
 # Create your views here.
@@ -299,7 +299,7 @@ class SendLeavesDataPdf(View):
 				mail = {'subject': f'list of leave for {worker} ({date.today().year})r.',
 						'message': f'List of leave in attachment {worker} za {date.today().year}r.',
 						'sender': settings.EMAIL_HOST_USER,
-						'recipient':  [settings.CC_MAIL],
+						'recipient':  [settings.ACCOUNTANT_MAIL],
 						'attachments': [pdfile]}
 				sendemail(**mail)
 				messages.info(request, f'The file <<{pdfile}>> was sending....')
@@ -333,6 +333,7 @@ class MonthlyPayrollView(View):
 			month, year = choice_date.month, choice_date.year
 			form = PeriodMonthlyPayrollForm(data={'choice_date':choice_date})
 
+		total_work_hours = len(list(workingdays(year, month))) * 8
 		heads = ['Employee', 'Total Pay', 'Basic Pay', 'Leave Pay', 'Overhours',
 		         'Saturday Pay', 'Sunday Pay', 'Account Pay', 'Value remaining']
 		employees = Employee.objects.all()
@@ -343,14 +344,8 @@ class MonthlyPayrollView(View):
 		else:
 			employee_id = employee_id.first().id
 
-		# create list of employee
-		day = calendar.monthrange(year, month)[1]
-		q1 = Q(employeedata__end_contract__lt=date(year, month, 1))
-		q2 = Q(employeedata__start_contract__gt=date(year, month, day))
-		employees = employees.exclude(q1|q2).order_by('surname', 'forename')
-		total_work_hours = len(list(workingdays(year, month))) * 8
 		# create data for payroll as associative arrays for every engaged employee
-		payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
+		payroll = payroll_set(month, year)
 		# create defaultdict with summary payment
 		amountpay = defaultdict(float)
 
@@ -423,7 +418,7 @@ class SendMonthlyPayrollPdf(View):
 			mail = {'subject': subject,
 			        'message': message,
 			        'sender': settings.EMAIL_HOST_USER,
-			        'recipient':  [settings.CC_MAIL],
+			        'recipient':  [settings.ACCOUNTANT_MAIL],
 			        'attachments': [multipdfile]}
 			try:
 				sendemail(**mail)

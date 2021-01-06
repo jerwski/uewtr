@@ -36,9 +36,9 @@
             {% for employee in employees %}
               <tr>
                 {% if employee_id == employee.id %}
-                  <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{% employee_complex_data_pass employee.employee_complex_data month year %}">{{ employee }}</a></td>
+                  <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold text-danger" href="{% employee_complex_data_pass employee.employee_complex_data month year %}">{{ employee }}</a></td>
                 {% else %}
-                  <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{% employee_complex_data_pass employee.employee_complex_data month year %}">{{ employee }}</a></td>
+                  <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold" href="{% employee_complex_data_pass employee.employee_complex_data month year %}">{{ employee }}</a></td>
                 {% endif %}
               </tr>
             {% endfor %}
@@ -54,27 +54,25 @@
 
         <form action="{% url 'evidence:employee_complex_data' employee_id %}" method="POST">{% csrf_token %}
           <div class="row">
-            <div class="col-8 mt-3">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <div class="input-group-text bg-info">Select date</div>
-                </div>
+            <div class="d-grid col-8 mt-3">
+              <div class="input-group">
+                <span class="input-group-text bg-info text-white">Select date</span>
                 {% bootstrap_field form.choice_date form_group_class='form-inline' show_label=False %}
-                <div class="input-group-append">
-                  <button type="submit" class="btn btn-outline-success">Confirm</button>
-                </div>
+                <span><button type="submit" class="btn btn-outline-success">Confirm</button></span>
               </div>
             </div>
-            <div class="col-4 mt-3">
-              <div class="btn-sm" role="group">
-                <button id="btnGroupDropHolidays" type="button" class="btn btn-outline-danger btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Holidays in {{ choice_date|date:'Y' }} year </button>
-                <div class="dropdown-menu uk-text-holiday" aria-labelledby="btnGroupDropHolidays">
+            <div class="d-grid col-4 mx-auto">
+              <div class="dropdown mt-3">
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">Show holidays in {{ choice_date|date:'Y' }} year</button>
+                <ul class="dropdown-menu uk-text-holiday dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                   {% for key, value in holidays.items %}
-                    <hr class="small">
-                    <div class="d-flex justify-content-between"><div class="col-6">{{ key }}:</div><div class="col-6 uk-text-value">{{ value|date:'d-m-Y (D)' }}</div></div>
+                    <li class="text-center">
+                      <p class="uk-text-logo">{{ key }}</p>
+                      <p class="uk-text-value">{{ value|date:'d-m-Y (D)' }}</p>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
                   {% endfor %}
-                  <hr class="small">
-                </div>
+                </ul>
               </div>
             </div>
           </div>
@@ -105,21 +103,21 @@
                   <div class="col-4">
                     {% for d in sml %}
                       {% if d.leave_flag == 'unpaid_leave' %}
-                        {{ d.leave_date|date:'j/m,' }}
+                        {{ d.leave_date|date:'j,' }}
                       {% endif %}
                     {% endfor %}
                   </div>
                   <div class="col-4">
                     {% for d in sml %}
                       {% if d.leave_flag == 'paid_leave' %}
-                        {{ d.leave_date|date:'j/m,' }}
+                        {{ d.leave_date|date:'j,' }}
                       {% endif %}
                     {% endfor %}
                   </div>
                   <div class="col-4">
                     {% for d in sml %}
                       {% if d.leave_flag == 'maternity_leave' %}
-                        {{ d.leave_date|date:'j/m,' }}
+                        {{ d.leave_date|date:'j,' }}
                       {% endif %}
                     {% endfor %}
                   </div>
@@ -210,6 +208,7 @@
           <div class="col btn btn-group" role="group">
             <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
             {% include 'blocks/plot_chart_modal.html' %}
+            <a class="btn btn-outline-light" href="/admin/">Admin</a>
             <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Back to the Administration Dashboard</a>
           </div>
         </div>
@@ -219,46 +218,40 @@
           <a href="{% url 'evidence:workhours_print' employee_id month year %}">WORKING DAYS FOR:<span class="uk-text-value"> {{ choice_date|date:'m/Y' }}</span></a>
         </div>
         {% if work_hours %}
-          <div class="row text-primary font-weight-bold font-italic mt-2">
+          <div class="row text-primary fw-bold fst-italic mt-2">
             <div class="col p-1 d-flex justify-content-around">
               <div>Work day{{ work_hours|length|pluralize:'s' }}: {{ work_hours|length }}</div>
               <div>Work hour{{ total_hours|pluralize:'s' }}: {{ total_hours|floatformat:2 }}</div>
             </div>
           </div>
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text fas fa-search" id="basic-addon"></span>
-            </div>
-            <input class="form-control" id="myInput" type="text" placeholder="Search..." aria-label="Filtering table" aria-describedby="basic-addon">
-            <div class="input-group-append">
-              <a class="btn btn-outline-light" href="/admin/">Admin</a>
-            </div>
-          </div>
+          <!-- Search field -->
+            {% include 'blocks/search_strip.html' %}
+          <!-- Table with work hourse -->
           <div class="uk-table-scroll-md">
             <table class="uk-table">
               <thead>
                 <tr class="text-dark text-center">
                   <th>Nr</th>
                   <th>Data</th>
-                  <th class="text-right">Start</th>
+                  <th class="text-end">Start</th>
                   <th>End</th>
                   <th>Hours</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="STable">
               {% for hours in work_hours %}
                 <tr>
-                  <td class="text-right text-secondary">{{ forloop.counter }}.</td>
+                  <td class="text-end text-secondary">{{ forloop.counter }}.</td>
                   {% if hours.start_work|date:'w' == '0' %}
-                    <td class="text-right text-danger">{{ hours.start_work|date:'d l' }}</td>
+                    <td class="text-end text-danger">{{ hours.start_work|date:'d l' }}</td>
                   {% elif hours.start_work|date:'w' == '6' %}
-                    <td class="text-right text-primary">{{ hours.start_work|date:'d l' }}</td>
+                    <td class="text-end text-primary">{{ hours.start_work|date:'d l' }}</td>
                   {% else %}
-                    <td class="text-right">{{ hours.start_work|date:'d l' }}</td>
+                    <td class="text-end">{{ hours.start_work|date:'d l' }}</td>
                   {% endif %}
                   <td class="text-success">{{ hours.start_work|time:'H:i' }}</td>
                   <td class="text-success">{{ hours.end_work|time:'H:i' }}</td>
-                  <td class="text-right text-info font-weight-bold">{{ hours.jobhours|floatformat:2 }}</td>
+                  <td class="text-end text-info fw-bold">{{ hours.jobhours|floatformat:2 }}</td>
                 </tr>
               {% endfor %}
               </tbody>
@@ -266,7 +259,7 @@
             </table>
           </div>
         {% else %}
-          <p class="text-justify text-danger font-weight-bold font-italic">For selected date <mark>{{ choice_date|date:'m/Y' }}</mark> there aren't register working days in database. Please select another date...</p>
+          <p class="text-justify text-danger fw-bold fst-italic">For selected date <mark>{{ choice_date|date:'m/Y' }}</mark> there aren't register working days in database. Please select another date...</p>
         {% endif %}
       </div>
     </div>

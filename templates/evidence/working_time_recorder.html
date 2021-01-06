@@ -20,9 +20,9 @@
           {% for employee in employees %}
             <tr>
               {% if employee_id == employee.id %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
+                <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold text-danger" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
               {% else %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
+                <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold" href="{{ employee.work_employee_id }}">{{ employee }}</a></td>
               {% endif %}
             </tr>
           {% endfor %}
@@ -37,39 +37,47 @@
         </div>
 
         <div class="row">
-          <div class="col-3 text-center">
+          <div class="col-2 text-center">
             <div class="btn btn-group-sm btn-group-vertical" role="group">
               <a href="{% url 'evidence:working_time_recorder_add' employee_id %}" class="btn btn-sm btn-outline-light">Insert hours</a>
               <a href="{% url 'evidence:working_time_recorder_add' employee_id 12 %}" class="btn btn-sm btn-outline-info">6:00-12:00</a>
               <a href="{% url 'evidence:working_time_recorder_add' employee_id 14 %}" class="btn btn-sm btn-outline-success">6:00-14:00</a>
               <a href="{% url 'evidence:working_time_recorder_add' employee_id 16 %}" class="btn btn-sm btn-outline-primary">6:00-16:00</a>
               <a href="{% url 'evidence:working_time_recorder_add' employee_id 18 %}" class="btn btn-sm btn-outline-danger">6:00-18:00</a>
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id 6 %}" class="btn btn-sm btn-outline-dark font-weight-bold">22:00-6:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 6 %}" class="btn btn-sm btn-outline-dark fw-bold">22:00-6:00</a>
             </div>
           </div>
-          <div class="col-9">
+          <div class="col-8">
             <form action="{% url 'evidence:working_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
               {% bootstrap_field form.worker %}
-              <div class="row mt-4">
+              <div class="row text-center mt-4">
                 <div class='col-6'>
-                  <div class="form-group">
-                    {% bootstrap_field form.start_work size='small' label_class='text-primary font-weight-bold' placeholder='Select start of job...' %}
+                  <div class="input-group">
+                    {% bootstrap_field form.start_work size='small' label_class='text-light fw-bold' placeholder='Select start of job...' %}
                   </div>
                 </div>
                 <div class='col-6'>
-                  <div class="form-group">
-                    {% bootstrap_field form.end_work size='small' label_class='text-primary font-weight-bold' placeholder='Select end of job...' %}
+                  <div class="input-group">
+                    {% bootstrap_field form.end_work size='small' label_class='text-light fw-bold' placeholder='Select end of job...' %}
                   </div>
                 </div>
               </div>
-              <div class="row mt-3">
-                <div class="col text-center">
-                  <div class="btn btn-block mb-2">
-                    <button type="submit" class="btn btn-lg btn-outline-success btn-block">Confirm</button>
-                  </div>
+              <div class="row mt-5">
+                <div class="d-grid col mx-auto">
+                  <button type="submit" class="btn btn-lg btn-outline-success">Confirm</button>
                 </div>
               </div>
             </form>
+          </div>
+          <div class="col-2 text-center">
+            <div class="btn btn-group-sm btn-group-vertical" role="group">
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id %}" class="btn btn-sm btn-outline-light">Insert hours</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 12 %}" class="btn btn-sm btn-outline-info">6:00-12:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 14 %}" class="btn btn-sm btn-outline-success">6:00-14:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 16 %}" class="btn btn-sm btn-outline-primary">6:00-16:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 18 %}" class="btn btn-sm btn-outline-danger">6:00-18:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 6 %}" class="btn btn-sm btn-outline-dark fw-bold">22:00-6:00</a>
+            </div>
           </div>
         </div>
 
@@ -83,23 +91,23 @@
             <div class="row">
               <div class="col">
                 <div class="btn-sm mb-2">
-                  <a class="btn btn-outline-light btn-block font-weight-bold" href="/admin/">Admin Data Base</a>
+                  <a class="btn btn-outline-light btn-block fw-bold" href="/admin/">Admin Data Base</a>
                 </div>
               </div>
             </div>
           {% else %}
             {% if jobhours %}
-              <p class="text-center text-primary font-weight-bold">For <span class="text-danger">{{ worker }}</span> adding <span class="text-danger uk-text-middle blink">{{ jobhours|floatformat:2 }}</span> hour{{ total_hours|pluralize:'s' }}.<span class="text-danger"> Are you sure???</span></p>
+              <p class="text-center text-primary fw-bold">For <span class="text-danger">{{ worker }}</span> adding <span class="text-danger uk-text-middle blink">{{ jobhours|floatformat:2 }}</span> hour{{ total_hours|pluralize:'s' }}.<span class="text-danger"> Are you sure???</span></p>
               <p class="text-center uk-text-middle"><span>{{ start_work|date:'d M Y H:i' }} - {{ end_work|date:'d M Y H:i' }}</span></p>
               <div class="row mb-3">
-                <div class="col-6 btn-sm">
-                  <a href="{% url 'account:dashboard' %}" class="btn btn-sm btn-outline-dark btn-block">Back to the dashboard</a>
+                <div class="d-grid col-5 mx-auto">
+                  <a href="{% url 'account:dashboard' %}" class="btn btn-sm btn-outline-light">Back to the dashboard</a>
                 </div>
-                <div class="col-6 btn-sm">
+                <div class="d-grid col-5 mx-auto">
                   {% if jobhours != 8 %}
-                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><span class="font-weight-bold blink">Erase expanded jobhours ({{ jobhours|floatformat:2 }} hours)</span></a>
+                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger"><span class="fwt-bold blink">Erase expanded jobhours ({{ jobhours|floatformat:2 }} hours)</span></a>
                   {% else %}
-                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger btn-block"><span class="font-weight-bold blink">Erase standard jobhours ({{ jobhours|floatformat:2 }} hours)</span></a>
+                    <a href="{% url 'evidence:working_time_recorder_erase' employee_id start_work end_work %}" class="btn btn-sm btn-danger"><span class="fw-bold blink">Erase standard jobhours ({{ jobhours|floatformat:2 }} hours)</span></a>
                   {% endif %}
                 </div>
               </div>
@@ -157,12 +165,10 @@
         </div>
 
         {% if request.method == "GET" %}
-          <div class="row text-center">
-            <div class="col-2"></div>
-            <div class="col-8 btn btn-block mb-2">
+          <div class="row my-3 text-center">
+            <div class="d-grid col-10 mx-auto">
               <a href="{% url 'account:dashboard' %}" class="btn btn-lg btn-outline-light btn-block">Back to the dashboard</a>
             </div>
-            <div class="col-2"></div>
           </div>
         {% endif %}
       {% else %}

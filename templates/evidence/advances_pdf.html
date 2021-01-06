@@ -8,8 +8,8 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
-        <p class="text-info lead text-center font-weight-bold">{{ worker|capfirst }} PESEL: {{ worker.pesel }}</p>
-        <p class="text-primary lead text-center font-weight-bold bg-warning">Zestawienie wypłaconych zaliczek za miesiąc:&nbsp;{% if month == 1 %}Styczeń{% elif month == 2 %}Luty{% elif month == 3 %}Marzec{% elif month == 4 %}Kwiecień{% elif month == 5 %}Maj{% elif month == 6 %}Czerwiec{% elif month == 7 %}Lipiec{% elif month == 8 %}Sierpień{% elif month == 9 %}Wrzesień{% elif month == 10 %}Październik{% elif month == 11 %}Listopad{% elif month == 12 %}Grudzień{% endif %}&nbsp;{{ year }}&nbsp;rok.</p>
+        <p class="text-info lead text-center fw-bold">{{ worker|capfirst }} PESEL: {{ worker.pesel }}</p>
+        <p class="text-primary lead text-center fw-bold bg-warning">Zestawienie wypłaconych zaliczek za miesiąc:&nbsp;{% if month == 1 %}Styczeń{% elif month == 2 %}Luty{% elif month == 3 %}Marzec{% elif month == 4 %}Kwiecień{% elif month == 5 %}Maj{% elif month == 6 %}Czerwiec{% elif month == 7 %}Lipiec{% elif month == 8 %}Sierpień{% elif month == 9 %}Wrzesień{% elif month == 10 %}Październik{% elif month == 11 %}Listopad{% elif month == 12 %}Grudzień{% endif %}&nbsp;{{ year }}&nbsp;rok.</p>
 
         <table class="table table-sm table-bordered table-striped font-weight-light" style="width:100%">
           <colgroup>
@@ -22,27 +22,27 @@
             <tr class="text-dark text-center">
               <th>Nr</th>
               <th>Data zaliczki</th>
-              <th class="text-right">Kwota zaliczki</th>
+              <th class="text-end">Kwota zaliczki</th>
               <th>Powód wypłacenia zaliczki</th>
             </tr>
           </thead>
           <tbody>
             {% for advance in advances %}
               <tr>
-                <td class="text-right text-secondary">{{ forloop.counter }}</td>
-                <td class="text-right">{{ advance.account_date|date:'l, jS F Y' }}</td>
-                <td class="text-right text-info font-weight-bold">{{ advance.account_value|money_format }}</td>
+                <td class="text-end text-secondary">{{ forloop.counter }}</td>
+                <td class="text-end">{{ advance.account_date|date:'l, jS F Y' }}</td>
+                <td class="text-end text-info fw-bold">{{ advance.account_value|money_format }}</td>
                 <td class="text-center text-success">{{ advance.notice }}</td>
               </tr>
             {% endfor %}
-              <tr class="text-primary font-weight-bold text-right">
+              <tr class="text-primary fw-bold text-end">
                 <td colspan="2">Suma zaliczek:</td>
                 <td>{{ total_account|money_format }}</td>
               </tr>
           </tbody>
         </table>
         <div class="col-4">
-          <p class="uk-text-logo text-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+          <p class="uk-text-logo text-start">Data wydruku: {% now "l, jS F Y H:i" %}</p>
         </div>
       </div>
     </div>

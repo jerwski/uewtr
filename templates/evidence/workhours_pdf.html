@@ -8,10 +8,10 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
-        <p class="text-info lead text-center font-weight-bold">{{ worker|capfirst }} PESEL: {{ worker.pesel }}</p>
-        <p class="text-primary lead text-center font-weight-bold bg-warning">Zestawienie godzin pracy za miesiąc:&nbsp;{% if month == 1 %}Styczeń{% elif month == 2 %}Luty{% elif month == 3 %}Marzec{% elif month == 4 %}Kwiecień{% elif month == 5 %}Maj{% elif month == 6 %}Czerwiec{% elif month == 7 %}Lipiec{% elif month == 8 %}Sierpień{% elif month == 9 %}Wrzesień{% elif month == 10 %}Październik{% elif month == 11 %}Listopad{% elif month == 12 %}Grudzień{% endif %}&nbsp;{{ year }}&nbsp;rok.<br>Ilość przepracowanych dni roboczych:&nbsp;{{ work_hours|length }}&nbsp;&nbsp;&nbsp;&nbsp;Ilość przepracowanych godzin:&nbsp;{{ total_hours|floatformat:2 }}</p>
+        <p class="text-info lead text-center fw-bold">{{ worker|capfirst }} PESEL: {{ worker.pesel }}</p>
+        <p class="text-primary lead text-center fw-bold bg-warning">Zestawienie godzin pracy za miesiąc:&nbsp;{% if month == 1 %}Styczeń{% elif month == 2 %}Luty{% elif month == 3 %}Marzec{% elif month == 4 %}Kwiecień{% elif month == 5 %}Maj{% elif month == 6 %}Czerwiec{% elif month == 7 %}Lipiec{% elif month == 8 %}Sierpień{% elif month == 9 %}Wrzesień{% elif month == 10 %}Październik{% elif month == 11 %}Listopad{% elif month == 12 %}Grudzień{% endif %}&nbsp;{{ year }}&nbsp;rok.<br>Ilość przepracowanych dni roboczych:&nbsp;{{ work_hours|length }}&nbsp;&nbsp;&nbsp;&nbsp;Ilość przepracowanych godzin:&nbsp;{{ total_hours|floatformat:2 }}</p>
 
-        <table class="table table-sm table-bordered table-striped font-weight-light" style="width:100%">
+        <table class="table table-sm table-bordered table-striped fw-light" style="width:100%">
           <colgroup>
             <col span="1" style="width:6%">
             <col span="1" style="width:30%">
@@ -25,23 +25,23 @@
               <th>Data dnia roboczego</th>
               <th>Godzina rozpoczęcia pracy</th>
               <th>Godzina zakończenia pracy</th>
-              <th class="text-right">Ilość godzin</th>
+              <th class="text-end">Ilość godzin</th>
             </tr>
           </thead>
           <tbody>
             {% for hours in work_hours %}
               <tr>
-                <td class="text-right text-secondary">{{ forloop.counter }}</td>
+                <td class="text-end text-secondary">{{ forloop.counter }}</td>
                 {% if hours.start_work|date:'w' == '0' %}
-                  <td class="text-right text-danger">{{ hours.start_work|date:'l, jS F Y' }}</td>
+                  <td class="text-end text-danger">{{ hours.start_work|date:'l, jS F Y' }}</td>
                 {% elif hours.start_work|date:'w' == '6' %}
-                  <td class="text-right text-primary">{{ hours.start_work|date:'l, jS F Y' }}</td>
+                  <td class="text-end text-primary">{{ hours.start_work|date:'l, jS F Y' }}</td>
                 {% else %}
-                  <td class="text-right">{{ hours.start_work|date:'l, jS F Y' }}</td>
+                  <td class="text-end">{{ hours.start_work|date:'l, jS F Y' }}</td>
                 {% endif %}
                 <td class="text-center text-success">{{ hours.start_work|time:'H:i' }}</td>
                 <td class="text-center text-success">{{ hours.end_work|time:'H:i' }}</td>
-                <td class="text-right text-info font-weight-bold">{{ hours.jobhours|floatformat:2 }}</td>
+                <td class="text-end text-info fw-bold">{{ hours.jobhours|floatformat:2 }}</td>
               </tr>
             {% endfor %}
           </tbody>
@@ -50,7 +50,7 @@
           <p class="text-danger lead">Nieobecność w pracy: <a class="text-monospace, text-dark">{% for item in leave_data %}{{ item|date:'d-m-Y' }}, {% endfor %}</a> </p>
         {% endif %}
         <div class="col-4">
-          <p class="uk-text-logo text-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+          <p class="uk-text-logo text-start">Data wydruku: {% now "l, jS F Y H:i" %}</p>
         </div>
       </div>
     </div>

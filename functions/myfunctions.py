@@ -54,7 +54,7 @@ from employee.templatetags.utility_tags import money_format
 # Create your functions here
 
 
-def sendemail(subject:str, message:str, sender:int, recipient:list, attachments:list, cc=None):
+def sendemail(subject:str, message:str, sender:str, recipient:list, attachments:list, cc=None):
 	email = EmailMessage(subject, message, sender, recipient, cc)
 
 	for attachment in attachments:
@@ -228,52 +228,67 @@ def plot_chart(employee_id:int, year:int):
 	chart.show()
 
 
+def payroll_set(month:int, year:int):
+	day = calendar.monthrange(year, month)[1]
+	# query for employee with valid contract
+	val_con = Q(employeedata__end_contract__lt=date(year, month, 1)) | Q(employeedata__start_contract__gt=date(year, month, day))
+	employees = Employee.objects.all().exclude(val_con).order_by('surname', 'forename')
+	# query for paid leave employee
+	qleave=Q(employeeleave__leave_date__year=year, employeeleave__leave_date__month=month) & Q(employeeleave__leave_flag='paid_leave')
+	emplq=Employee.objects.filter(qleave).distinct()
+	# query for working employee
+	weviq=Q(workevidence__start_work__year=year) & Q(workevidence__start_work__month=month) & Q(workevidence__jobhours__isnull=False)
+	empweq=Employee.objects.filter(weviq).distinct()
+
+	if employees.exists():
+		# create data for payroll as associative arrays for all validate employees
+		payroll = {emp: total_payment(emp.id, year, month) for emp in employees if emp in emplq or emp in empweq}
+
+		return payroll
+
+	else:
+		return None
+
+
 def payrollhtml2pdf(month:int, year:int, option=None):
 	'''convert html file (evidence/monthly_payroll_pdf.html) to pdf file'''
 	heads = ['Imię i Nazwisko', 'Brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Sobota', 'Niedziela', 'Zaliczka',
 			 'Do wypłaty', 'Data i podpis']
 	total_work_hours = len(list(workingdays(year, month))) * 8
-	employees = Employee.objects.all()
-	# building complex query for actual list of employee
-	day = calendar.monthrange(year, month)[1]
-	query = Q(employeedata__end_contract__lt=date(year, month, 1)) | Q(
-			employeedata__start_contract__gt=date(year, month, day))
-	employees = employees.exclude(query).order_by('surname', 'forename')
-	if employees.exists():
-		# create data for payroll as associative arrays for all employees
-		payroll = {employee: total_payment(employee.id, year, month) for employee in employees}
-		# create defaultdict with summary payment
-		amountpay = defaultdict(float)
-		for item in payroll.values():
-			if item['accountpay']!=item['brutto']:
-				for k, v in item.items():
-					amountpay[k] += v
+	# create data for payroll as associative arrays for all employees
+	payroll = payroll_set(month, year)
+	# create defaultdict with summary payment
+	amountpay = defaultdict(float)
+	for item in payroll.values():
+		if item['accountpay']!=item['brutto']:
+			for k, v in item.items():
+				amountpay[k] += v
 
-		context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay), 'year': year, 'month': month,
-				   'total_work_hours': total_work_hours}
+	context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay),
+	           'year': year, 'month': month, 'total_work_hours': total_work_hours}
 
-		template = get_template('evidence/monthly_payroll_pdf.html')
-		html = template.render(context)
-		# create pdf file with following options
-		options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
-				   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
-				   'orientation': 'landscape','no-outline': None, 'quiet': '', }
+	template = get_template('evidence/monthly_payroll_pdf.html')
+	html = template.render(context)
+	# create pdf file with following options
+	options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
+	           'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
+	           'orientation': 'landscape','no-outline': None, 'quiet': '', }
 
-		if option == 'print':
-			pdfile = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
-			filename = f'payroll_{month}_{year}_simple.pdf'
-			# create montly pyroll pdf as attachment
-			response = HttpResponse(pdfile, content_type='application/pdf')
-			response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
+	if option == 'print':
+		pdfile = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
+		filename = f'payroll_{month}_{year}_simple.pdf'
+		# create montly pyroll pdf as attachment
+		response = HttpResponse(pdfile, content_type='application/pdf')
+		response['Content-Disposition'] = 'attachment; filename="' + filename + '"'
 
-			return response
+		return response
 
-		elif option == 'send':
-			# create pdf file
-			pdfile = f'templates/pdf/payroll_{month}_{year}.pdf'
-			pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
+	elif option == 'send':
+		# create pdf file
+		pdfile = f'templates/pdf/payroll_{month}_{year}.pdf'
+		pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
 
-			return pdfile
+		return pdfile
 
 	else:
 		return False
@@ -287,15 +302,7 @@ def dphtmpd(month:int, year:int):
 	heads = ['Kwota brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Za soboty', 'Za niedziele', 'Zaliczka', 'Do wypłaty']
 	total_work_days = len(list(workingdays(year, month)))
 	holidays = holiday(year).values()
-	day = calendar.monthrange(year, month)[1]
-	query = Q(employeedata__end_contract__lt=date(year, month, 1)) | Q(employeedata__start_contract__gt=date(year, month, day))
-	employees = Employee.objects.all().exclude(query).order_by('surname', 'forename')
-
-	if employees.exists():
-		# create data for payroll as associative arrays for all employees
-		payroll_set = {employee: total_payment(employee.id, year, month) for employee in employees}
-
-
+	payroll = payroll_set(month, year)
 	# create context
 	context = {'month': month, 'year': year, 'heads': heads, 'total_work_days': total_work_days,}
 	# opcje dla utworzenia pliku pdf
@@ -303,13 +310,13 @@ def dphtmpd(month:int, year:int):
 	           'margin-bottom': '0.1in', 'margin-left': '0.2in', 'encoding': "UTF-8",
 	           'orientation': 'landscape','no-outline': None, 'quiet': '',}
 
-	# create dataset for ech active employee
-	for key, value in payroll_set.items():
+	# create dataset for each active employee
+	for key, value in payroll.items():
 		worker = key
-		payroll = value
+		payroll_val = value
 		employeedata = get_object_or_404(EmployeeData, worker=worker)
 		# payroll data
-		salary = payroll['salary']
+		salary = payroll_val['salary']
 		# workhours in holidays
 		mainquery = Q(worker=worker) & Q(start_work__year=year) & Q(start_work__month=month)
 		exclude_holidays = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
@@ -336,7 +343,7 @@ def dphtmpd(month:int, year:int):
 		month_dates = {kind:[item.leave_date for item in mls.filter(leave_flag=kind)] for kind in leave_kind}
 		year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 		# update context
-		context.update({'worker': worker, 'payroll': payroll, 'salary': salary, 'employeedata': employeedata,
+		context.update({'worker': worker, 'payroll': payroll_val, 'salary': salary, 'employeedata': employeedata,
 		                'saturday_hours': saturday_hours, 'month_leaves': month_leaves, 'month_dates': month_dates,
 		                'sunday_hours': sunday_hours, 'year_leaves': year_leaves, 'total_work_hours': total_work_hours,
 		                'holiday_hours': holiday_hours})

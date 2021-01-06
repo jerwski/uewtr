@@ -71,10 +71,8 @@ class EmployeeBasicDataView(View):
 
 
 	def post(self, request, **kwargs)->HttpResponseRedirect:
-
 		if self.form.is_valid():
 			new_values = self.form.cleaned_data
-			new_values.update({'status': int(new_values['status']), 'leave': int(new_values['leave'])})
 
 			if new_values != self.old_values:
 				try:
@@ -168,7 +166,6 @@ class EmployeeExtendedDataView(View):
 			if self.extdata.exists():
 				old_values.update(self.extdata.values(*self.fields)[0])
 				old_values.pop('worker_id')
-				old_values['overtime'] = str(old_values['overtime'])
 
 			if new_values != old_values:
 				try:

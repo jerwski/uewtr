@@ -1,25 +1,24 @@
 {% load utility_tags %}
 
-  <!-- Small modal -->
-<p class="text-center mt-3"><a class="uk-text-middle" href="payrolldata_modal.html" data-toggle="modal" data-target=".usage-modal">Monthly payroll for {{ month }}/{{ year }}</a></p>
-    <!-- Modal -->
-    <div class="modal fade usage-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header uk-bg-burlywood">
-            <h5 class="modal-title" id="alertModal">Summary of payroll data for the {{ month }}/{{ year }}</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span class="fas fa-times" aria-hidden="true"></span>
-            </button>
-          </div>
-          <div class="modal-body uk-bg-bisque">
-            <div class="row text-right">
+  <!-- Button trigger modal -->
+  <p class="text-center mt-3"><a class="uk-text-middle" href="payrolldata_modal.html" data-bs-toggle="modal" data-bs-target="#pdModal">Monthly payroll for {{ month }}/{{ year }}</a></p>
+
+  <!-- Modal -->
+  <div class="modal fade" id="pdModal" tabindex="-1" role="dialog" aria-labelledby="pdModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header uk-bg-light text-white">
+          <h6 class="modal-title" id="pdModal">Payroll data statement for {{ month }}/{{ year }}</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body uk-bg-bisque">
+          <div class="row text-end">
               <div class="col-6">
                 <table class="table table-sm">
                   <tbody>
                     {% for head in heads %}
                       {% if head != 'Employee' %}
-                        <tr class="font-weight-bold">{{ head }}:&nbsp;</tr><br>
+                        <tr class="fw-bold">{{ head }}:&nbsp;</tr><br>
                       {% endif %}
                     {% endfor %}
                   </tbody>
@@ -29,17 +28,17 @@
                 <table class="table table-sm">
                   <tbody>
                     {% for value in amountpay.values %}
-                      <tr class="text-white font-weight-bold">{{ value|money_format }}</tr><br>
+                      <tr class="text-white fw-bold">{{ value|money_format }}</tr><br>
                     {% endfor %}
                   </tbody>
                 </table>
               </div>
-              <div class="col-2"></div>
-            </div>
           </div>
-          <div class="modal-footer uk-bg-bisque">
-            <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
-          </div>
+        </div>
+        <div class="modal-footer uk-bg-bisque">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
+  </div>
+

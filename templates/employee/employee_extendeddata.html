@@ -18,9 +18,9 @@
             {% for employee in employees %}
               <tr>
               {% if employee_id == employee.id %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
+                <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold text-danger" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
               {% else %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
+                <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold" href="{{ employee.employee_change_extend_data_id }}">{{ employee }}</a></td>
               {% endif %}
               </tr>
             {% endfor %}
@@ -37,32 +37,32 @@
         <form class="mt-3" action="{% url 'employee:employee_extendeddata' employee_id %}" method="POST">{% csrf_token %}
           <div class="row">
             <div class="col-6">
-              {% bootstrap_field form.worker size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.birthday size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.phone size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.workplace size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.start_contract size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.end_contract size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.worker %}
+              {% bootstrap_field form.birthday label_class='text-info fst-italic fw-light' %}
+              {% bootstrap_field form.phone label_class='text-info fst-italic fw-light' %}
+              {% bootstrap_field form.workplace label_class='text-info fst-italic fw-light' %}
+              {% bootstrap_field form.start_contract label_class='text-info fst-italic fw-light' %}
+              {% bootstrap_field form.end_contract label_class='text-info fst-italic fw-light' %}
             </div>
             <div class="col-6">
-              {% bootstrap_field form.postal size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.city size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.street size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.house size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.flat size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.postal label_class='text-info fst-italic fw-light' %}
+              {% bootstrap_field form.city label_class='text-info fst-italic fw-light' %}
+              {% bootstrap_field form.street label_class='text-info fst-italic fw-light' %}
+              {% bootstrap_field form.house label_class='text-info fst-italic fw-light' %}
+              {% bootstrap_field form.flat label_class='text-info fst-italic fw-light' %}
             </div>
           </div>
 
           <div class="row text-center">
-            <div class="col">
-              <span class="uk-text-small font-italic font-weight-bold">Select the contract type:</span>
+            <div class="col mt-3">
+              <span class="uk-text-small fst-italic fw-bold">Select the contract type:</span>
               {% bootstrap_field form.overtime form_group_class='form-group' show_label=False %}
             </div>
           </div>
-
+          <hr>
           <div class="row text-center mt-2">
-            <div class="col">
-              <div class="btn btn-sm btn-group btn-block" role="group">
+            <div class="d-grid mx-auto">
+              <div class=" btn-group">
                 <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Back to the Dashboard</a>
                 <a href="{% url 'employee:employee_basicdata' employee_id %}" class="btn btn-outline-primary">Back to the Employee Change Basic Data</a>
                 <button type="submit" class="btn btn-outline-success">Confirm changes</button>

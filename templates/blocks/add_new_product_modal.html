@@ -17,18 +17,18 @@
           <form action="{% url 'accountancy:new_product' company_id customer_id document_id %}" method="POST">{% csrf_token %}
             <div class="row">
               <div class="col-8">
-                {% bootstrap_field new_product_form.name size='small' label_class='text-info font-italic font-weight-normal' %}
+                {% bootstrap_field new_product_form.name size='small' label_class='text-info fst-italic font-weight-normal' %}
               </div>
               <div class="col-4">
-                {% bootstrap_field new_product_form.unit size='small' label_class='text-info font-italic font-weight-normal' %}
+                {% bootstrap_field new_product_form.unit size='small' label_class='text-info fst-italic font-weight-normal' %}
               </div>
             </div>
             <div class="row">
               <div class="col-6">
-                {% bootstrap_field new_product_form.netto size='small' label_class='text-info font-italic font-weight-normal' %}
+                {% bootstrap_field new_product_form.netto size='small' label_class='text-info fst-italic font-weight-normal' %}
               </div>
               <div class="col-6">
-                {% bootstrap_field new_product_form.vat size='small' label_class='text-info font-italic font-weight-normal' %}
+                {% bootstrap_field new_product_form.vat size='small' label_class='text-info fst-italic font-weight-normal' %}
               </div>
             </div>
             <div class="modal-footer">

@@ -31,7 +31,7 @@
 {#należności#}
 
     <div class="container-fluid">
-        <table class="table table-sm text-center font-weight-bolder">
+        <table class="table table-sm text-center fw-bolder">
           <thead class="bg-info">
           <tr class="text-white">
             {% for head in heads %}<th>{{ head }}</th>{% endfor %}
@@ -83,7 +83,7 @@
                   {% if key == 'unpaid_leave' %}
                     {% if value|length > 0 %}
                       {% for item in value %}
-                        <a class="text-primary">{{ item|date:'d,' }}</a>
+                        {{ item|date:'d,' }}
                       {% endfor %}
                     {% else %}
                       ******
@@ -96,7 +96,7 @@
                   {% if key == 'paid_leave' %}
                     {% if value|length > 0 %}
                       {% for item in value %}
-                        <a class="text-primary">{{ item|date:'d,' }}
+                        {{ item|date:'d,' }}
                       {% endfor %}
                     {% else %}
                       ******
@@ -109,7 +109,7 @@
                   {% if key == 'maternity_leave' %}
                     {% if value|length > 0 %}
                       {% for item in value %}
-                        <a class="text-primary">{{ item|date:'d,' }}
+                        {{ item|date:'d,' }}
                       {% endfor %}
                     {% else %}
                       ******
@@ -153,12 +153,12 @@
         <div class="row">
           <div class="col-6 offset-6">
             <hr class="lead">
-            <a class="text-right uk-text-value">Podpis pracownika:</a>
+            <p class="text-start uk-text-value">Podpis pracownika:</p>
           </div>
         </div>
         <div class="row">
           <div class="col-4">
-            <a class="uk-text-logo text-left">Data wydruku: {% now "l, jS F Y H:i" %}</a>
+            <p class="text-start uk-text-logo">Data wydruku: {% now "l, jS F Y H:i" %}</p>
           </div>
         </div>
       </div>

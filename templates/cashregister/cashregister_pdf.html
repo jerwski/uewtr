@@ -10,8 +10,8 @@
         <div class="col-sm">
           <table class="table table-borderless">
             <tbody class="font-weight-normal">
-            <tr><td>{{ company.company }}<br>{{ company.postal }} {{ company.city }}<br>ul. {{ company.street }}<br>NIP: {{ company.nip }}</td><td class="text-center lead font-weight-bold">RAPORT KASOWY Nr: {{ month }}/{{ year }}<br><em class="small">Za okres: {{ month }}/{{ year }}</em></td></tr>
-              <tr><td>&nbsp;</td><td class="text-right">Konto przeciwstawne: {{ company.account }}</td></tr>
+            <tr><td>{{ company.company }}<br>{{ company.postal }} {{ company.city }}<br>ul. {{ company.street }}<br>NIP: {{ company.nip }}</td><td class="text-center lead fw-bold">RAPORT KASOWY Nr: {{ month }}/{{ year }}<br><em class="small">Za okres: {{ month }}/{{ year }}</em></td></tr>
+              <tr><td>&nbsp;</td><td class="text-end">Konto przeciwstawne: {{ company.account }}</td></tr>
             </tbody>
           </table>
         </div>
@@ -23,25 +23,25 @@
               <tr class="text-center">
                 <th>Poz.</th><th>Data</th><th>Komu</th><th>Dokument, treść</th><th>PRZYCHÓD</th><th>ROZCHÓD</th>
               </tr>
-              <tr class="text-right">
+              <tr class="text-end">
                 <th colspan="4">Z przeniesienia:</th><th class="bg-white text-center" colspan="2">{{ prev_saldo|money_format }}</th>
               </tr>
             </thead>
             <tbody>
               {% for item in cashregister %}
                 <tr>
-                  <td class="text-right">{{ forloop.counter }}.</td><td>{{ item.created|date:'d-m-Y' }}</td><td>{{ item.symbol }}</td><td>{{ item.contents }}</td><td class="text-right">{% if item.income > 0 %}{{ item.income|money_format }}{% else %}-----{% endif %}</td><td class="text-right">{% if item.expenditure > 0 %}{{ item.expenditure|money_format }}{% else %}-----{% endif %}</td>
+                  <td class="text-end">{{ forloop.counter }}.</td><td>{{ item.created|date:'d-m-Y' }}</td><td>{{ item.symbol }}</td><td>{{ item.contents }}</td><td class="text-end">{% if item.income > 0 %}{{ item.income|money_format }}{% else %}-----{% endif %}</td><td class="text-end">{% if item.expenditure > 0 %}{{ item.expenditure|money_format }}{% else %}-----{% endif %}</td>
                   </tr>
               {% endfor %}
             </tbody>
             <thead class="text-center thead-light">
               <tr>
                 <th colspan="2">Do przeniesienia:</th><th class="bg-white">{{ saldo|money_format }}</th>
-                <th class="text-right">Razem:</th><th>{{ incomes|money_format }}</th><th>{{ expenditures|money_format }}</th>
+                <th class="text-end">Razem:</th><th>{{ incomes|money_format }}</th><th>{{ expenditures|money_format }}</th>
               </tr>
             </thead>
           </table>
-            <p class="uk-text-small text-left">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+            <p class="uk-text-small text-start">Data wydruku: {% now "l, jS F Y H:i" %}</p>
         </div>
       </div>
     </div>

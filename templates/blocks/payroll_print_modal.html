@@ -1,21 +1,21 @@
-<!-- Modal for data to will be erase if you want -->
+  <!-- Button trigger modal -->
   {% if amountpay.brutto > 0 %}
-    <button id="ppButton" type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#ppModal">Print current payroll</button>
+    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#ppModal">Print current payroll</button>
   {% else %}
-    <button id="ppButton" type="button" class="btn btn-outline-danger disabled" data-toggle="modal" data-target="#ppModal">Print current payroll</button>
+    <button type="button" class="btn btn-outline-info disabled" data-bs-toggle="modal" data-bs-target="#ppModal">Print current payroll</button>
   {% endif %}
 
   <!-- Modal -->
   <div class="modal fade" id="ppModal" tabindex="-1" role="dialog" aria-labelledby="ppModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
+        <!-- Header -->
+        <div class="modal-header uk-bg-light text-white">
           <h6 class="modal-title" id="ppModal">Select a kind of payroll for {{ month }}/{{ year }} to print...</h6>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span class="fas fa-times" aria-hidden="true"></span>
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+        <!-- Body -->
+        <div class="modal-body uk-bg-bisque">
           <form action="{% url 'evidence:monthly_payroll_print' month year %}" method="GET">{% csrf_token %}
 
             <div class="form-check form-check-inline">
@@ -26,10 +26,10 @@
               <input class="form-check-input" type="radio" name="ppRadio" id="pplineRadio2" value="detailed">
               <label class="form-check-label" for="pplineRadio2">Detailed payroll</label>
             </div>
-
-            <div class="modal-footer">
+            <!-- Footer -->
+            <div class="modal-footer uk-bg-bisque">
               <div class="btn-group" role="group" aria-label="Kind of payroll">
-                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Close window</button>
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close window</button>
                 <button id="closemodal" type="submit" class="btn btn-outline-success">Print selected payroll</button>
               </div>
             </div>
