@@ -338,7 +338,7 @@ def dphtmpd(month:int, year:int):
 		# leaves
 		year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
 		query = Q(worker=worker, leave_date__year=year, leave_date__month=month)
-		mls = EmployeeLeave.objects.filter(query)
+		mls = EmployeeLeave.objects.filter(query).order_by('leave_date')
 		month_leaves = {kind:mls.filter(leave_flag=kind).count() for kind in leave_kind}
 		month_dates = {kind:[item.leave_date for item in mls.filter(leave_flag=kind)] for kind in leave_kind}
 		year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}

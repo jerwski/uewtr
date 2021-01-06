@@ -36,7 +36,7 @@
                     <tbody id="pltTable">
                       {% for year, value in total_brutto_set.items %}
                         <tr>
-                          <td>
+                          <td class="text-start">
                             <input type="radio" id="{{ year }}" name="plot_year" class="form-check-input" value="{{ year }}" required>
                             <label class="form-check-label text-info" for="{{ year }}">{{ year }} year (total brutto income: {{ value|money_format }})</label>
                           </td>

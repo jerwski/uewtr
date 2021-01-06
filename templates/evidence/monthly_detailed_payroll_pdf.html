@@ -79,7 +79,7 @@
 
             <tr class="text-center">
               <td colspan="2">
-                {% for key, value in month_dates.items|dictsort:1 %}
+                {% for key, value in month_dates.items %}
                   {% if key == 'unpaid_leave' %}
                     {% if value|length > 0 %}
                       {% for item in value %}
@@ -92,7 +92,7 @@
                 {% endfor %}
               </td>
               <td colspan="2">
-                {% for key, value in month_dates.items|dictsort:1 %}
+                {% for key, value in month_dates.items %}
                   {% if key == 'paid_leave' %}
                     {% if value|length > 0 %}
                       {% for item in value %}
@@ -105,7 +105,7 @@
                 {% endfor %}
               </td>
               <td colspan="2">
-                {% for key, value in month_dates.items|dictsort:1 %}
+                {% for key, value in month_dates.items %}
                   {% if key == 'maternity_leave' %}
                     {% if value|length > 0 %}
                       {% for item in value %}
