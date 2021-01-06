@@ -12,7 +12,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 import pdfkit
 
 # my functions
-from functions.archive import check_FTPconn
+from functions.archive import checkWiFi
 from functions.myfunctions import cashregisterdata, cashregisterhtml2pdf, sendemail, cashaccept2pdf, make_attachment, previous_month_year
 
 # my models
@@ -22,7 +22,7 @@ from cashregister.models import Company, CashRegister
 from cashregister.forms import CompanyAddForm, CashRegisterForm
 
 # my validators
-from validators.my_validator import contents_variants
+from validators.my_validator import contenst_variants
 
 
 # Create your views here.
@@ -156,7 +156,7 @@ class CashRegisterView(View):
 						messages.warning(request, msg)
 		else:
 			contents = request.POST['contents']
-			if contents in contents_variants:
+			if contents in contenst_variants:
 				msg = f'<<{contents}>> is not allowed! Use any other...'
 				messages.info(request, msg)
 
@@ -170,7 +170,7 @@ class CashRegisterDelete(View):
 		record = get_object_or_404(CashRegister, pk=record)
 		if record:
 			record.delete()
-			msg = f'Succesful erase record <<{record.symbol}, {record.contents} in Cash register for {record.company}'
+			msg = f'Succesful erase record <<{record.symbol}>>, {record.contents} in Cash register for {record.company}'
 			messages.info(request, msg)
 		return HttpResponseRedirect(reverse('cashregister:cash_register', args=[company_id]))
 
@@ -224,7 +224,7 @@ class CashRegisterSendView(View):
 
 	def get(self, request, company_id:int) -> HttpResponseRedirect:
 
-		if check_FTPconn():
+		if checkWiFi():
 			company = get_object_or_404(Company, pk=company_id)
 
 			month, year = now().month, now().year
@@ -242,7 +242,9 @@ class CashRegisterSendView(View):
 				# send e-mail with attached cash register as file in pdf format
 				mail = {'subject': f'cash register for {month}/{year} r.',
 				        'message': f'Cash Register for {company} on {month}/{year} in attachment ...',
-				        'sender': settings.EMAIL_HOST_USER, 'recipient': ['projekt@unikolor.com'], 'attachments': [pdfile]}
+				        'sender': settings.EMAIL_HOST_USER,
+						'recipient':  [settings.ACCOUNTANT_MAIL],
+				        'attachments': [pdfile]}
 				sendemail(**mail)
 				messages.info(request, f'Cash register for {company} on {month}/{year} was sending....')
 			else:

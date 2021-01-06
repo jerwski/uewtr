@@ -23,9 +23,9 @@
             {% for employee in employees %}
               <tr>
                 {% if employee_id == employee.id %}
-                  <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
+                  <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold text-danger" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
                 {% else %}
-                  <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
+                  <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold" href="{{ employee.leave_employee_id }}">{{ employee }}</a></td>
                 {% endif %}
               </tr>
             {% endfor %}
@@ -41,19 +41,36 @@
 
           <form action="{% url 'evidence:leave_time_recorder_add' employee_id %}" method="POST">{% csrf_token %}
             <div class="row text-center">
-              <div class="col-4 mt-3 offset-1">
+              <div class="col-1"></div>
+              <div class="d-grid col-4 mx-auto mt-3">
+                <p class="text-light fst-italic lead">Select a date of leave...</p>
                 {% bootstrap_field form.worker %}
-                {% bootstrap_field form.leave_date size='medium' label_class='text-info font-italic font-weight-bold' %}
+                {% bootstrap_field form.leave_date size='small' show_label=False %}
               </div>
-              <div class="col-7 mt-3">
-                {% bootstrap_field form.leave_flag label_class='text-info font-italic font-weight-bold' %}
-              </div>
+
+              <div class="d-grid col-6 mx-auto mt-3">
+                <p class="text-light fst-italic lead">Select a kind of leave...</p>
+                {% bootstrap_field form.leave_flag show_label=False %}
+
+
+{#                <div class="btn-group">#}
+{#                  <!-- radiobutton unpaid leave -->#}
+{#                  <input type="radio" class="btn-check" name="leave_flag" id="unpaid_leave" autocomplete="off" value="unpaid_leave"{% if worker.leave == 0 %} checked{% endif %}>#}
+{#                  <label class="btn btn-outline-light" for="unpaid_leave">Unpaid leave</label>#}
+{#                <!-- radiobutton paid leave -->#}
+{#                  <input type="radio" class="btn-check" name="leave_flag" id="paid_leave" autocomplete="off" value="paid_leave"{% if worker.leave == 1 %} checked{% endif %}>#}
+{#                  <label class="btn btn-outline-light" for="paid_leave">Paid leave</label>#}
+{#                <!-- radiobutton maternity leave -->#}
+{#                  <input type="radio" class="btn-check" name="leave_flag" id="maternity_leave" autocomplete="off" value="maternity_leave">#}
+{#                  <label class="btn btn-outline-light" for="maternity_leave">Maternity leave</label>#}
+{#                </div>#}
+{#              </div>#}
+
+              <div class="col-1"></div>
             </div>
             <div class="row">
-              <div class="col">
-                <div class="btn btn-block mb-2">
-                  <button type="submit" class="btn btn-lg btn-outline-success btn-block">Confirm the leave day you entered</button>
-                </div>
+              <div class="d-grid col-10 mx-auto mt-3">
+                <button type="submit" class="btn btn-lg btn-outline-success btn-block">Confirm the leave day you entered</button>
               </div>
             </div>
           </form>
@@ -69,18 +86,18 @@
           {% else %}
             {% if leave_flag == 'unpaid_leave' %}
               <p class="uk-text-middle text-center">CAUTION: You've been adding <span class="text-danger">({{ leave_date|date:'l, d F Y' }})</span> one day of unpaid leave!</p>
-              <div class="btn-sm mb-2">
-                <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block"><span class="font-weight-bold blink">Erase the unpaid leave day you entered</span></a>
+              <div class="d-grid col-10 mx-auto mt-3">
+                <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-danger btn-block"><span class="fw-bold blink">Erase the unpaid leave day you entered</span></a>
               </div>
             {% elif leave_flag == 'paid_leave' %}
               <p class="uk-text-middle text-center">CAUTION: You've been adding <span class="text-danger">{{ leave_date|date:'l, d F Y' }}</span> one day of paid leave!</p>
-              <div class="btn-sm mb-2">
-                <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block"><span class="font-weight-bold blink">Erase the paid leave day you entered</span></a>
+              <div class="d-grid col-10 mx-auto mt-3">
+                <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-danger btn-block"><span class="fw-bold blink">Erase the paid leave day you entered</span></a>
               </div>
             {% elif leave_flag == 'maternity_leave' %}
               <p class="uk-text-middle text-center">CAUTION: You've been adding <span class="text-danger">({{ leave_date|date:'l, d F Y' }})</span> one day of maternity leave!</p>
-              <div class="btn-sm mb-2">
-                <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-sm btn-danger btn-block"><span class="font-weight-bold blink">Erase the materinty leave day you entered</span></a>
+              <div class="d-grid col-10 mx-auto mt-3">
+                <a href="{% url 'evidence:leave_time_recorder_erase' employee_id leave_date %}" class="btn btn-danger btn-block"><span class="fw-bold blink">Erase the materinty leave day you entered</span></a>
               </div>
             {% endif %}
           {% endif %}
@@ -88,20 +105,20 @@
           <div class="container">
             <div class="uk-evidence-box">
               <div class="row">
-                <div class="col uk-evidence-headline">
-                  <div><a class="text-white" href="{% url 'evidence:leaves_data_print' employee_id %}">TOTAL LEAVES INFO FOR <span class="text-white">{{ worker }}</span> IN {% now 'Y' %} YEAR</a></div>
+                <div class="col uk-evidence-headline mt-3">
+                  <a class="text-white" href="{% url 'evidence:leaves_data_print' employee_id %}">TOTAL LEAVES INFO FOR <span class="text-white">{{ worker }}</span> IN {% now 'Y' %} YEAR</a>
                 </div>
               </div>
             </div>
             <div class="row mt-4">
               <div class="col-4">
-                <p class="text-right text-uppercase">Total leave in {% now 'Y' %} year:</p>
+                <p class="text-end text-uppercase">Total leave in {% now 'Y' %} year:</p>
               </div>
               <div class="col-2">
-                <p class="text-danger font-weight-bold">{{ total_leaves|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</p>
+                <p class="text-danger fw-bold">{{ total_leaves|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</p>
               </div>
               <div class="col-4">
-                <p class="text-right text-uppercase">
+                <p class="text-end text-uppercase">
                   {% if remaining_leave < 0 %}
                     Days of leave exceeded by:
                   {% elif remaining_leave <= 26 and worker.leave %}
@@ -111,33 +128,33 @@
               </div>
               <div class="col-2">
                 {% if worker.leave %}
-                  <p class="text-danger font-weight-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</p>
+                  <p class="text-danger fw-bold">{{ remaining_leave|floatformat:0 }} day{{ total_leaves|pluralize:'s' }}</p>
                 {% endif %}
               </div>
             </div>
             <div class="row">
               {% if leaves_pl %}
                 <div class="col-4">
-                  <p class="text-right text-uppercase">Date of paid leave:</p>
+                  <p class="text-end text-uppercase">Date of paid leave:</p>
                 </div>
                 <div class="col-8">
-                  <p class="text-danger font-italic text-justify">{% for date in leaves_pl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</p>
+                  <p class="text-danger fst-italic text-justify">{% for date in leaves_pl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</p>
                 </div>
               {% endif %}
               {% if leaves_ml %}
                 <div class="col-4">
-                  <p class="text-right text-uppercase">Date of maternity leave:</p>
+                  <p class="text-end text-uppercase">Date of maternity leave:</p>
                 </div>
                 <div class="col-8">
-                  <p class="text-danger font-italic text-justify">{% for date in leaves_ml %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</p>
+                  <p class="text-danger fst-italic text-justify">{% for date in leaves_ml %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</p>
                 </div>
               {% endif %}
               {% if leaves_upl %}
                 <div class="col-4">
-                  <p class="text-right text-uppercase">Date of unpaid leave:</p>
+                  <p class="text-end text-uppercase">Date of unpaid leave:</p>
                 </div>
                 <div class="col-8">
-                  <p class="text-danger font-italic text-justify">{% for date in leaves_upl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</p>
+                  <p class="text-danger fst-italic text-justify">{% for date in leaves_upl %}{{ date.leave_date|date:'d/m' }}, {% endfor %}</p>
                 </div>
               {% endif %}
             </div>
@@ -146,19 +163,16 @@
           <div class="row">
             <div class="col-12 text-center">
               <hr>
-              <div class="btn btn-group">
-                {% if total_leaves > 0 %}
-                  <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-                  <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Dashboard</a>
-                  {% include 'blocks/leave_print_modal.html' %}
-                  <a href="{% url 'evidence:leaves_data_pdf' employee_id %}" class="btn btn-outline-info">Send current employee leave set</a>
-                  <a class="btn btn-outline-light" href="/admin/">Admin Data Base</a>
-                {% else %}
-                  <a href="{% url 'account:exit' %}" class="btn btn-lg btn-outline-danger">Exit</a>
-                  <a href="{% url 'account:dashboard' %}" class="btn btn-lg btn-outline-dark">Dashboard</a>
-                  {% include 'blocks/leave_print_modal.html' %}
-                  <a class="btn btn-lg btn-outline-light" href="/admin/">Admin Data Base</a>
-                {% endif %}
+              <div class="d-grid mx-auto">
+                <div class=" btn-group">
+                    <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+                    <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Dashboard</a>
+                    {% include 'blocks/leave_print_modal.html' %}
+                    {% if total_leaves > 0 %}
+                      <a href="{% url 'evidence:leaves_data_pdf' employee_id %}" class="btn btn-outline-info">Send current employee leave set</a>
+                    {% endif %}
+                    <a class="btn btn-outline-light" href="/admin/">Admin Data Base</a>
+                </div>
               </div>
             </div>
           </div>

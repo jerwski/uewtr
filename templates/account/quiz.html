@@ -10,11 +10,9 @@
 {% block content %}
 
   <div class="container">
-
     <div class="row">
       <div class="col-lg text-center">
         <p class="uk-text-large">&reg;UNIKOLOR QUIZ</p>
-        <p class="uk-text-middle">Latin sentences</p>
         <div class="btn-group mb-5">
           <a class="btn btn-lg btn-outline-danger" href="{% url 'account:exit' %}">Exit</a>
           {% include 'blocks/latina_auxilium_modal.html' %}
@@ -25,7 +23,7 @@
           {% endif %}
         </div>
         {% if set_of_questions %}
-          <h3 class="text-dark">Query number: <em class="text-danger font-weight-bold">{{ set_of_questions }}</em>&nbsp;&nbsp;&nbsp;Your points: <em class="text-success font-weight-bold">{{ points }}</em>&nbsp;&nbsp;&nbsp;Percent of good answers: <em class="text-primary font-weight-bold">{{ percent|floatformat:0 }}%</em>&nbsp;&nbsp;&nbsp;Your time: <em class="text-info font-weight-bold">{{ playtime }}</em></h3>
+          <h3 class="text-dark">Query number: <em class="text-danger fw-bold">{{ set_of_questions }}</em>&nbsp;&nbsp;&nbsp;Your points: <em class="text-success fw-bold">{{ points }}</em>&nbsp;&nbsp;&nbsp;Percent of good answers: <em class="text-primary fw-bold">{{ percent|floatformat:0 }}%</em>&nbsp;&nbsp;&nbsp;Your time: <em class="text-info fw-bold">{{ playtime }}</em></h3>
         {% else %}
           <div class="text-center mt-5">
             <p class="uk-text-middle">Please select **Start the quiz** button...</p>
@@ -33,59 +31,49 @@
         {% endif %}
       </div>
     </div>
-
-    <div class="row">
-      <div class="col">
-        {% if quiz_id %}
-          <div class="container uk-bg-bisque">
-            {% if query %}
-              <p class="uk-text-small text-danger">Questions pool: {{ poll }}</p>
-            {% endif %}
-            <p class="uk-quiz-question">{{ query }}</p>
-          </div>
-          <div class="container">
-            <form action="{% url 'account:quiz' quiz_id %}" method="POST">{% csrf_token %}
-              <div class="row">
-                <div class="col-3"></div>
-                <div class="col-9">
-                  <div class="form-check custom-control custom-radio text-primary font-weight-bold">
-                    <ul>
-                      {% for answer in answers %}
-                        <li class="uk-quiz-answers">
-                          <input type="radio" id="answer_{{ forloop.counter }}" name="your_answer" class="custom-control-input" value="{{ answer }}" required>
-                          <label class="custom-control-label" for="answer_{{ forloop.counter }}">{{ answer }}</label>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  </div>
-                </div>
-                <div class="col-1"></div>
-                <div class="container">
-                  <div class="row">
-                    <div class="col text-center btn">
-                      {% if query %}
-                        <button type="submit" class="btn btn-success mr-5">Confirm the selection</button>
-                        <a class="btn btn-light" href="{% url 'account:quiz' quiz_id %}">Next query...</a>
-                      {% else %}
-                        <a class="btn btn-lg btn-primary" href="{% url 'account:quiz' quiz_id %}">Start the quiz</a>
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-              </form>
+    {% if quiz_id %}
+      <div class="row {% if query %}uk-bg-bisque{% endif %}">
+        <div class="col text-center">
+          {% if query %}
+            <p class="uk-text-middle">Latin sentences</p><span class="uk-text-small text-danger">Questions pool {{ poll }}</span>
+          {% endif %}
+          <p class="uk-quiz-question">{{ query }}</p>
+        </div>
+      </div>
+      <form action="{% url 'account:quiz' quiz_id %}" method="POST">{% csrf_token %}
+        <div class="row">
+          <div class="d-grid gap-2 col-10 mx-auto">
+            <div class="form-check fw-bold">
+              <ul class="uk-quiz-answers list-unstyled">
+                {% for answer in answers %}
+                  <li>
+                    <input type="radio" id="answer_{{ forloop.counter }}" name="your_answer" class="form-check-input" value="{{ answer }}" required>
+                    <label class="form-check-label" for="answer_{{ forloop.counter }}">{{ answer }}</label>
+                  </li>
+                {% endfor %}
+              </ul>
             </div>
           </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="container">
-        <div class="text-center mt-5">
-          <a href="{% url 'account:dashboard' %}">
-            <img class="mx-auto" src="{% static 'images/quiz/gotowork.png' %}" width="25%" alt="Logo Unikolor">
-            <span class="d-block uk-text-logo">&copy;Copyright UNIKOLOR Jerzy Wygonowski</span>
-          </a>
         </div>
+        <div class="row">
+          <div class="col-6 mx-auto btn-group">
+            {% if query %}
+              <button type="submit" class="btn btn-outline-success">Confirm the selection</button>
+              <a class="btn btn-outline-light" href="{% url 'account:quiz' quiz_id %}">Next query...</a>
+            {% else %}
+              <a class="btn btn-lg btn-info" href="{% url 'account:quiz' quiz_id %}">Start the quiz</a>
+            {% endif %}
+          </div>
+        </div>
+      </form>
+    {% endif %}
+    <div class="row">
+      <div class="text-center mt-5">
+        <a href="{% url 'account:dashboard' %}">
+          <img class="mx-auto" src="{% static 'images/quiz/gotowork.png' %}" width="25%" alt="Logo Unikolor">
+          <span class="d-block uk-text-logo">&copy;Copyright UNIKOLOR Jerzy Wygonowski</span>
+        </a>
+      </div>
     </div>
   </div>
 

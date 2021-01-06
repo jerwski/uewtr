@@ -1,51 +1,52 @@
-<!-- Modal for data to will be erase if you want -->
+  <!-- Button trigger modal -->
   {% if leave_set %}
-    <button id="leaveButton" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#leaveModal">Print selected leave data</button>
+    <button id="leaveButton" type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#leaveModal">Print selected leave data</button>
   {% else %}
-    <button id="leaveButton" type="button" class="btn btn-outline-primary disabled" data-toggle="modal" data-target="#leaveModal">Print selected leave data</button>
+    <button id="leaveButton" type="button" class="btn btn-outline-primary disabled" data-bs-toggle="modal" data-bs-target="#leaveModal">Print selected leave data</button>
   {% endif %}
 
   <!-- Modal -->
   <div class="modal fade" id="leaveModal" tabindex="-1" role="dialog" aria-labelledby="myLeaveModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
+
+        <!-- Header -->
+        <div class="modal-header uk-bg-light text-white">
           <h6 class="modal-title" id="leaveModal">Check year to print leave for {{ worker }}</h6>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span class="fas fa-times-circle" aria-hidden="true"></span>
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+
+        <!-- Body -->
+        <div class="modal-body uk-bg-bisque">
           <form action="{% url 'evidence:leaves_data_print' employee_id %}" method="POST">{% csrf_token %}
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text fas fa-search" id="basic-addon"></span>
-              </div>
-              <input class="form-control" id="myLY" type="text" placeholder="Search leave year... backspace show all" aria-label="Filtering table" aria-describedby="basic-addon">
-              <div class="input-group-append">
-                <span class="input-group-text fas fa-eraser" id="clear"></span>
+            <!-- Search field -->
+            {% include 'blocks/search_strip.html' %}
+            <div class="row">
+              <div class="d-grid gap-2 col-8 mx-auto">
+                <div class="uk-table-scroll-sm">
+                  <table class="table table-borderless table-sm">
+                    <tbody id="STable">
+                    {% for leave_year, leave_value in leave_set.items %}
+                      <tr>
+                        <td>
+                          <div class="form-check ml-5 text-start">
+                            <input type="radio" id="{{ leave_year }}" name="leave_year" class="form-check-input" value="{{ leave_year }}" required>
+                            <label {% if leave_value == 0 %}class="form-check-label text-secondary"{% else %}class="form-check-label text-info"{% endif %} for="{{ leave_year }}">{{ leave_year }} year (total leave: {{ leave_value }} day{{ leave_value|pluralize:'s' }})</label>
+                          </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-            <div class="uk-table-scroll-sm">
-              <table class="table table-borderless table-sm">
-                <tbody id="LYTable">
-                {% for leave_year, leave_value in leave_set.items %}
-                  <tr>
-                    <td>
-                      <div class="form-check custom-control custom-radio ml-5 text-left">
-                        <input type="radio" id="{{ leave_year }}" name="leave_year" class="custom-control-input" value="{{ leave_year }}" required {% if leave_value == 0 %}disabled{% endif %}>
-                        <label {% if leave_value == 0 %}class="custom-control-label text-secondary"{% else %}class="custom-control-label text-primary"{% endif %} for="{{ leave_year }}">{{ leave_year }} year (total leave: {{ leave_value }} day{{ leave_value|pluralize:'s' }})</label>
-                      </div>
-                    </td>
-                  </tr>
-                {% endfor %}
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-              <div class="btn-group" role="group" aria-label="Basic example">
-                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Close window</button>
-                <button id="leavesub" type="submit" class="btn btn-outline-success">Print leave data</button>
+
+            <!-- Footer -->
+            <div class="modal-footer uk-bg-bisque">
+              <div class="btn-group" role="group" aria-label="myLeaveModalLabel">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close window</button>
+                <button id="closemodal" type="submit" class="btn btn-outline-success">Print leave data</button>
               </div>
             </div>
           </form>
@@ -57,25 +58,8 @@
 <!-- hide modal-->
   <script>
 
-    $('#leavesub').click(function() {
+    $('#closemodal').click(function() {
      $('#leaveModal').modal('hide');
   });
 
-    $('#clear').click(function() {
-      $('#myLY').val('');
-      document.getElementById("myLY").focus();
-   });
-
-  </script>
-
-<!-- search table-->
-  <script>
-    $(document).ready(function(){
-    $("#myLY").on("keyup", function() {var value =
-      $(this).val().toLowerCase();
-        $("#LYTable").find("tr").filter(function() {
-          $(this).toggle(
-            $(this).text().toLowerCase().indexOf(value) > -1)})
-        ;})
-    ;});
   </script>

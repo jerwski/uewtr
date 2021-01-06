@@ -1,21 +1,19 @@
-<!-- Modal for data to will be erase if you want -->
+<!-- Button trigger modal -->
   {% if amountpay.brutto > 0 %}
-    <button id="spButton" type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#spModal">Send current payroll</button>
+    <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#spModal">Send current payroll</button>
   {% else %}
-    <button id="spButton" type="button" class="btn btn-outline-info disabled" data-toggle="modal" data-target="#spModal">Send current payroll</button>
+    <button type="button" class="btn btn-outline-light disabled" data-bs-toggle="modal" data-bs-target="#spModal">Print current payroll</button>
   {% endif %}
 
-  <!-- Modal -->
+<!-- Modal -->
   <div class="modal fade" id="spModal" tabindex="-1" role="dialog" aria-labelledby="spModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
+        <div class="modal-header uk-bg-light text-white">
           <h6 class="modal-title" id="spModal">Select a kind of payroll for {{ month }}/{{ year }} to send...</h6>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span class="fas fa-times-circle" aria-hidden="true"></span>
-          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body uk-bg-bisque">
           <form action="{% url 'evidence:monthly_payroll_send' month year %}" method="GET">{% csrf_token %}
 
             <div class="form-check form-check-inline">
@@ -27,9 +25,9 @@
               <label class="form-check-label" for="splineRadio2">Detailed payroll</label>
             </div>
 
-            <div class="modal-footer">
+            <div class="modal-footer uk-bg-bisque">
               <div class="btn-group" role="group" aria-label="Kind of payroll">
-                <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Close window</button>
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close window</button>
                 <button id="closemodal" type="submit" class="btn btn-outline-success">Send selected payroll</button>
               </div>
             </div>

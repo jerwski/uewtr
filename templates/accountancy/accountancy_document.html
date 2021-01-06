@@ -17,7 +17,7 @@
             {% for company in companies %}
               <tr>
                 {% if company_id == company.id %}
-                  <td><a class="text-danger font-weight-bold" href="{{ company.create_doc }}">{{ company }}</a></td>
+                  <td><a class="text-danger fw-bold" href="{{ company.create_doc }}">{{ company }}</a></td>
                 {% else %}
                   <td><a href="{{ company.create_doc }}">{{ company }}</a></td>
                 {% endif %}
@@ -52,7 +52,7 @@
                 <tr>
                   <td class="text-primary"><a href="{{ document.edit_document }}">{{ document }}</a></td>
                   <td>{{ document.created|date:'d-m-Y' }} ({{ document.created|day_since }})</td>
-                  <td class="text-danger text-right">{{ document.get_total_brutto_absolute|money_format }}</td>
+                  <td class="text-danger text-end">{{ document.get_total_brutto_absolute|money_format }}</td>
                 </tr>
               {% endfor %}
               </tbody>
@@ -83,7 +83,7 @@
                     <td>{{ forloop.counter }}</td>
 
                     {% if customer_id == customer.id %}
-                      <td><a class="text-danger font-weight-bold" href="{% url 'accountancy:accountancy' company_id customer.id %}">{{ customer }}</a></td>
+                      <td><a class="text-danger fw-bold" href="{% url 'accountancy:accountancy' company_id customer.id %}">{{ customer }}</a></td>
                     {% else %}
                       <td><a href="{% url 'accountancy:accountancy' company_id customer.id %}">{{ customer }}</a></td>
                     {% endif %}
@@ -103,12 +103,12 @@
             <div class="row">
               <div class="col-4">
                 <table class="table table-sm table-hover">
-                  <tbody class="small text-info font-weight-light font-italic">
-                    <tr><th class="text-secondary font-italic">Odbiorca:</th><th>{{ customer }}</th></tr>
-                    <tr><th class="text-secondary font-italic">Adres:</th><th>{{ customer.postal }}&nbsp;{{ customer.city }}</th></tr>
-                    <tr><th class="text-secondary font-italic">ul.</th><th>{{ customer.street }}</th></tr>
-                    <tr><th class="text-secondary font-italic">tel.:</th><th>{{ customer.phone }}</th></tr>
-                    <tr><th class="text-secondary font-italic">email:</th><th>{{ customer.email }}</th></tr>
+                  <tbody class="small text-info fw-light fst-italic">
+                    <tr><th class="text-secondary fst-italic">Odbiorca:</th><th>{{ customer }}</th></tr>
+                    <tr><th class="text-secondary fst-italic">Adres:</th><th>{{ customer.postal }}&nbsp;{{ customer.city }}</th></tr>
+                    <tr><th class="text-secondary fst-italic">ul.</th><th>{{ customer.street }}</th></tr>
+                    <tr><th class="text-secondary fst-italic">tel.:</th><th>{{ customer.phone }}</th></tr>
+                    <tr><th class="text-secondary fst-italic">email:</th><th>{{ customer.email }}</th></tr>
                   </tbody>
                 </table>
               </div>
@@ -117,24 +117,24 @@
                   {% bootstrap_field form.company %}{% bootstrap_field form.customer %}
                   <div class="row">
                     <div class="col-4">
-                      {% bootstrap_field form.number size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                      {% bootstrap_field form.number size='small' label_class='text-primary fw-bold fst-italic small' %}
                     </div>
                     <div class="col-4">
-                      {% bootstrap_field form.conveyance size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                      {% bootstrap_field form.conveyance size='small' label_class='text-primary fw-bold fst-italic small' %}
                     </div>
                     <div class="col-4">
-                      {% bootstrap_field form.waybill size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                      {% bootstrap_field form.waybill size='small' label_class='text-primary fw-bold fst-italic small' %}
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-4">
-                      {% bootstrap_field form.date_of_shipment size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                      {% bootstrap_field form.date_of_shipment size='small' label_class='text-primary fw-bold fst-italic small' %}
                     </div>
                     <div class="col-4">
-                      {% bootstrap_field form.invoice size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                      {% bootstrap_field form.invoice size='small' label_class='text-primary fw-bold fst-italic small' %}
                     </div>
                     <div class="col-4">
-                      {% bootstrap_field form.order size='small' label_class='text-primary font-weight-bold font-italic small' %}
+                      {% bootstrap_field form.order size='small' label_class='text-primary fw-bold fst-italic small' %}
                     </div>
                   </div>
                   <div class="row text-center">
@@ -150,7 +150,7 @@
           <p class="text-center text-danger lead font-weight-normal bg-warning">ADD RECORD FOR {{ company }}</p>
           <div class="row">
             <div class="col text-center">
-              <p class="text-danger lead font-weight-bold font-italic">Please select company to create accountancy document...</p>
+              <p class="text-danger lead fw-bold fst-italic">Please select company to create accountancy document...</p>
             </div>
           </div>
         {% endif %}

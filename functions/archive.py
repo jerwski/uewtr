@@ -1,6 +1,7 @@
 # standard library
 import os
 import shutil
+import socket
 import hashlib
 from ftplib import FTP
 from pathlib import Path
@@ -34,13 +35,13 @@ def fcsum(path):
 		return result
 
 
-def check_FTPconn() -> bool:
-	try:
-		conn = FTP(settings.FTP)
-		conn.login(user=settings.FTP_USER, passwd=settings.FTP_LOGIN)
-		return True
-	except:
+def checkWiFi() -> bool:
+	IPaddress = socket. gethostbyname(socket. gethostname())
+
+	if IPaddress == '127.0.0.1':
 		return False
+	else:
+		return True
 
 
 def cmp_fixtures():
@@ -136,7 +137,7 @@ def make_archives(archive_name, root_backup, archive_file):
 
 def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, username:str, password:str):
 	'''sending compressed in zip format archive file with fixtures on ftp server'''
-	if check_FTPconn():
+	if checkWiFi():
 		try:
 			with FTP(server, username, password) as myFTP:
 				print(f'\nConnected to FTP...<<{myFTP.host}>>')
@@ -163,7 +164,7 @@ def uploadFileFTP(sourceFilePath:Path, destinationDirectory:Path, server:str, us
 
 def getArchiveFilefromFTP(request, server:str, username:str, password:str, archive_file, root_backup) -> bool:
 	'''loading compressed in zip format archive file with fixtures on ftp server'''
-	if check_FTPconn():
+	if checkWiFi():
 		if not Path.exists(root_backup):
 			Path.mkdir(root_backup)
 		try:

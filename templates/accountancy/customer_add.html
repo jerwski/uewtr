@@ -9,7 +9,7 @@
 
   <div class="container">
     <div class="row m-3">
-      <div class="col-2 text-left">
+      <div class="col-2 text-start">
         <a href="{% url 'account:dashboard' %}"><img src="{% static 'images/mainboard/logoUNI.png' %}" width="92%"></a>
         <p class="uk-text-logo">&copy;Copyright UNIKOLOR Jerzy Wygonowski</p>
       </div>
@@ -17,7 +17,7 @@
           <p class="uk-text-large">Working Time Recorder</p>
           <p class="uk-text-middle">Application to handle employee working time in small business</p>
         </div>
-        <div class="col-2 text-right">{% include 'blocks/alert.html' %}</div>
+        <div class="col-2 text-end">{% include 'blocks/alert.html' %}</div>
     </div>
     <div class="row">
       <div class="col-sm-6">
@@ -29,7 +29,7 @@
           </div>
         </div>
         <table class="table table-hover table-sm ">
-          <thead class="text-info font-weight-bold"><tr><th>CUSTOMER</th><th>NIP</th></tr></thead>
+          <thead class="text-info fw-bold"><tr><th>CUSTOMER</th><th>NIP</th></tr></thead>
         </table>
         <div class="uk-table-scroll-md">
           <table class="table table-sm">
@@ -58,24 +58,24 @@
         <form action="." method="POST">{% csrf_token %}
           <div class="row">
             <div class="col-sm-12">
-              {% bootstrap_field form.customer size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.customer size='small' label_class='text-info fst-italic fw-bold' %}
             </div>
           </div>
           <div class="row">
             <div class="col-6">
-              {% bootstrap_field form.nip size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.street size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.phone size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.nip size='small' label_class='text-info fst-italic fw-bold' %}
+              {% bootstrap_field form.street size='small' label_class='text-info fst-italic fw-bold' %}
+              {% bootstrap_field form.phone size='small' label_class='text-info fst-italic fw-bold' %}
             </div>
             <div class="col-6">
-              {% bootstrap_field form.postal size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.city size='small' label_class='text-info font-italic font-weight-bold' %}
-              {% bootstrap_field form.email size='small' label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.postal size='small' label_class='text-info fst-italic fw-bold' %}
+              {% bootstrap_field form.city size='small' label_class='text-info fst-italic fw-bold' %}
+              {% bootstrap_field form.email size='small' label_class='text-info fst-italic fw-bold' %}
             </div>
           </div>
           <div class="row text-center">
             <div class="col-sm-12 mb-1">
-              {% bootstrap_field form.status label_class='text-info font-italic font-weight-bold' %}
+              {% bootstrap_field form.status label_class='text-info fst-italic fw-bold' %}
             </div>
           </div>
           <hr>

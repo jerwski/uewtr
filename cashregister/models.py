@@ -5,6 +5,10 @@ from django.urls import reverse
 # my mixin
 from account.mixins import CreationModificationDateMixin
 
+
+# my validators
+from validators.my_validator import from_transfer, positive_value
+
 # Create your models here.
 
 
@@ -37,9 +41,9 @@ class Company(CreationModificationDateMixin):
 class CashRegister(CreationModificationDateMixin):
 	company = models.ForeignKey(Company, on_delete=models.DO_NOTHING)
 	symbol = models.CharField(max_length=200,)
-	contents = models.CharField(max_length=250,)
-	income = models.FloatField(default=0.0,)
-	expenditure = models.FloatField(default=0.0,)
+	contents = models.CharField(max_length=250, validators=[from_transfer])
+	income = models.FloatField(default=0.0, validators=[positive_value])
+	expenditure = models.FloatField(default=0.0, validators=[positive_value])
 	cashaccept = models.SmallIntegerField(null=True, blank=True)
 
 	class Meta:

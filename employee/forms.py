@@ -7,8 +7,11 @@ from tempus_dominus.widgets import DatePicker
 # my models
 from employee.models import Employee, EmployeeData, EmployeeHourlyRate
 
-# bootstrap4 widget
-from bootstrap4.widgets import RadioSelectButtonGroup
+# my function
+from functions.widgets import RadioSelectButtonGroup
+
+# my validators
+from validators.my_validator import check_pesel
 
 
 # Create your forms here.
@@ -36,7 +39,7 @@ class EmployeeBasicDataForm(forms.ModelForm):
 	# fields
 	forename = forms.CharField(max_length=100)
 	surname = forms.CharField(max_length=100)
-	pesel = forms.CharField(min_length=11, max_length=11)
+	pesel = forms.CharField(min_length=11, max_length=11, validators=[check_pesel])
 	leave = forms.ChoiceField(label="Leave choice:", widget=RadioSelectButtonGroup(attrs=attrs),
 							  required=True, choices=LEAVE_CHOICE)
 	status = forms.ChoiceField(label="Status choice:", widget=RadioSelectButtonGroup(attrs=attrs),

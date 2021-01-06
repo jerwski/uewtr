@@ -1,32 +1,30 @@
 
-  <!-- Small modal -->
-  <a class="uk-text-large" href="drive_usage_modal.html" data-toggle="modal" data-target=".usage-modal">Administration Dashboard</a>
-    <!-- Modal -->
-    <div class="modal fade usage-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header bg-warning">
-            <h5 class="modal-title" id="alertModal">Drives usage</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span class="fas fa-times-circle" aria-hidden="true"></span>
-            </button>
+<!-- Button trigger modal -->
+
+<a class="uk-text-large" href="drive_usage_modal.html" data-bs-toggle="modal" data-bs-target="#spaceModal">Administration Dashboard</a>
+
+<!-- Modal -->
+<div class="modal fade" id="spaceModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header text-white uk-bg-light">
+        <h5 class="modal-title" id="exampleModalLabel">Drive usage</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body uk-bg-bisque">
+        {% for key, value in usage.items %}
+          <div class="d-block">
+            <p class="uk-text-middle">Drive {{ key }}</p>
+            <p class="uk-text-small">total={{ value.total }}<br>used={{ value.used }}<br>free={{ value.free }}</p>
+            <div class="progress">
+              <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: {{ value.percent|floatformat:2 }}" aria-valuenow="{{ value.used }}" aria-valuemin="0" aria-valuemax="{{ value.total }}">{{ value.percent|floatformat:2 }}</div>
+            </div>
           </div>
-          <div class="modal-body">
-            {% for key, value in usage.items %}
-              <div class="container text-center">
-                <div class="d-block">
-                  <p class="uk-text-middle">Drive {{ key }}</p>
-                  <p class="uk-text-small">total={{ value.total }}<br>used={{ value.used }}<br>free={{ value.free }}</p>
-                  <div class="progress">
-                    <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ value.percent|floatformat:2 }}%" aria-valuenow="{{ value.used }}" aria-valuemin="0" aria-valuemax="{{ value.total }}">{{ value.percent|floatformat:2 }}%</div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
-          </div>
-        </div>
+        {% endfor %}
+      </div>
+      <div class="modal-footer uk-bg-bisque">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
+  </div>
+</div>

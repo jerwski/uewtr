@@ -1,46 +1,92 @@
 {% load static %}
 {% load utility_tags %}
 
-<!-- Modal for data to will be erase if you want -->
-{% if total_brutto_set %}
-  <button id="plotchartButton" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#plotModal">Annual income chart</button>
-{% else %}
-  <button id="plotchartButton" type="button" class="btn btn-outline-primary disabled" data-toggle="modal" data-target="#plotModal">No data to plot chart</button>
-{% endif %}
+  <!-- Button trigger modal -->
+  {% if total_brutto_set %}
+    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#plotModal">Print selected cashregister</button>
+  {% else %}
+    <button type="button" class="btn btn-outline-primary disabled" data-bs-toggle="modal" data-bs-target="#plotModal">Print selected cashregister</button>
+  {% endif %}
 
-<!-- Modal -->
-<div class="modal fade" id="plotModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white text-center">
-        <h6 class="modal-title" id="leaveModal">Check year to print chart for {{ worker }}</h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span class="fas fa-times-circle" aria-hidden="true"></span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form action="{% url 'evidence:plot_chart' employee_id month year %}" method="POST">{% csrf_token %}
-          {% for year, value in total_brutto_set.items %}
-            <div class="form-check custom-control custom-radio ml-5 text-left">
-              <input type="radio" id="{{ year }}" name="plot_year" class="custom-control-input" value="{{ year }}" required>
-              <label class="custom-control-label" for="{{ year }}">{{ year }} year (total brutto income: {{ value|money_format }})</label>
+  <!-- Modal -->
+  <div class="modal fade" id="plotModal" tabindex="-1" role="dialog" aria-labelledby="plotModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Header -->
+        <div class="modal-header uk-bg-light text-white">
+          <h6 class="modal-title" id="plotModal">Check cashregister to print...</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- Body -->
+        <div class="modal-body uk-bg-bisque">
+          <form action="{% url 'evidence:plot_chart' employee_id month year %}" method="POST">{% csrf_token %}
+
+            <!-- search strip -->
+            <div class="input-group">
+              <span class="input-group-text fas fa-search"></span>
+              <input class="form-control" id="pltSEARCH" type="text" placeholder="Search item... Use backspace to view all items..." aria-label="Filtering table">
+              <span class="input-group-text fas fa-eraser" id="pltclear"></span>
             </div>
-          {% endfor %}
-          <div class="modal-footer">
-            <div class="btn-group" role="group" aria-label="Basic example">
-              <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Close window</button>
-              <button id="closemod" type="submit" class="btn btn-outline-success">Show chart</button>
+
+            <!-- body of form -->
+            <div class="row">
+              <div class="col offset-1">
+                <div class="uk-table-scroll-sm">
+                  <table class="table table-borderless table-sm">
+                    <tbody id="pltTable">
+                      {% for year, value in total_brutto_set.items %}
+                        <tr>
+                          <td>
+                            <input type="radio" id="{{ year }}" name="plot_year" class="form-check-input" value="{{ year }}" required>
+                            <label class="form-check-label text-info" for="{{ year }}">{{ year }} year (total brutto income: {{ value|money_format }})</label>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
-          </div>
-        </form>
+
+            <!-- Footer -->
+            <div class="modal-footer uk-bg-bisque">
+              <div class="btn-group" role="group" aria-label="plotModalLabel">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close window</button>
+                <button id="closemodal" type="submit" class="btn btn-outline-success">Print cashregister</button>
+              </div>
+            </div>
+          </form>
+
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-  $('#closemod').click(function() {
-   $('#leaveModal').modal('hide');
-});
-</script>
+<!-- hide modal-->
+  <script>
 
+    $('#closemodal').click(function() {
+        $('#plotModal').modal('hide');
+    });
+
+  </script>
+
+<!-- clear search strip -->
+  <script>
+    $('#pltclear').click(function() {
+        $('#pltSEARCH').val('');
+        document.getElementById("pltSEARCH").focus();
+    });
+  </script>
+
+<!-- search table-->
+  <script>
+    $(document).ready(function(){
+        $("#pltSEARCH").on("keyup", function() {var value =
+            $(this).val().toLowerCase();
+        $("#pltTable").find("tr").filter(function() {
+            $(this).toggle(
+                $(this).text().toLowerCase().indexOf(value) > -1)})
+        ;})
+    ;});
+  </script>

@@ -161,7 +161,7 @@ USE_TZ = get_setting('USE_TZ')
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATIC_URL = get_setting('STATIC_URL')
-STATIC_ROOT = Path.joinpath(BASE_DIR, 'mystatic')
+# STATIC_ROOT = Path.joinpath(BASE_DIR, 'mystatic')
 STATICFILES_DIRS = [Path.joinpath(BASE_DIR, Path(STATIC_URL).name)]
 CSS_FILE = [Path.joinpath(BASE_DIR, get_setting('css_style')),]
 LOGIN_URL = get_setting('LOGIN_URL')

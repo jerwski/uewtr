@@ -19,12 +19,12 @@
             {% for employee in employees_st %}
               <tr>
                 {% if request.path == '/employee/add_change/basicdata/' %}
-                  <td class="text-right">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                  <td class="text-end">{{ forloop.counter }}.</td><td><a class="fw-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
                 {% else %}
                   {% if employee_id == employee.id %}
-                    <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                    <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
                   {% else %}
-                    <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                    <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
                   {% endif %}
                 {% endif %}
               </tr>
@@ -43,9 +43,9 @@
             {% for employee in employees_sf %}
               <tr>
               {% if employee_id == employee.id %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold text-danger" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
               {% else %}
-                <td class="text-right" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="font-weight-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
+                <td class="text-end" id="{{ employee_id }}">{{ forloop.counter }}.</td><td><a class="fw-bold" href="{{ employee.get_absolute_url }}">{{ employee }}</a></td>
               {% endif %}
               </tr>
             {% endfor %}
@@ -61,23 +61,20 @@
         <form action="{% if employee_id %}{% url 'employee:employee_basicdata' employee_id %}{% else %}{% url 'employee:employee_basicdata' %}{% endif %}" method="POST">{% csrf_token %}
           <div class="row">
             <div class="col text-center mt-3">
+              <!-- Forename -->
               <div class="input-group mt-1">
-                <div class="input-group-prepend">
-                  <span class="input-group-text bg-info">Forename</span>
-                </div>
-                {% bootstrap_field form.forename form_group_class='form-inline' show_label=False placeholder='Type forename...' %}
+                <span class="input-group-text bg-light text-white" id="basic-addon1">Forename</span>
+                <input type="text" class="form-control" placeholder="Enter forename" aria-label="Forename" aria-describedby="basic-addon1" name="forename" value="{{ worker.forename }}" required>
               </div>
+              <!-- Surname -->
               <div class="input-group mt-1">
-                <div class="input-group-prepend">
-                  <span class="input-group-text bg-info">Surname&nbsp;&nbsp;</span>
-                </div>
-                {% bootstrap_field form.surname form_group_class='form-inline' show_label=False placeholder='Type surname...' %}
+                <span class="input-group-text bg-light text-white" id="basic-addon2">Surname&nbsp;&nbsp;</span>
+                <input type="text" class="form-control" placeholder="Enter surname" aria-label="Surname" aria-describedby="basic-addon2" name="surname" value="{{ worker.surname }}" required>
               </div>
+              <!-- Pesel -->
               <div class="input-group mt-1">
-                <div class="input-group-prepend">
-                  <span class="input-group-text bg-info">Pesel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                </div>
-                {% bootstrap_field form.pesel form_group_class='form-inline' show_label=False placeholder='Type pesel...' %}
+                <span class="input-group-text bg-light text-white" id="basic-addon3">Pesel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <input type="text" class="form-control" placeholder="Enter valid pesel (max. 11 digits)" aria-label="Pesel" aria-describedby="basic-addon3" name="pesel" value="{{ worker.pesel }}" required>
               </div>
             </div>
           </div>
@@ -85,18 +82,18 @@
           <div class="row">
             {% if employee_id and extdata %}
               <div class="col-6">
-                {% bootstrap_field form.leave size='small' label_class='uk-text-small font-italic font-weight-bold' %}
+                {% bootstrap_field form.leave size='small' label_class='uk-text-small fst-italic fw-bold' %}
               </div>
               <div class="col-6">
-                {% bootstrap_field form.status size='small' label_class='uk-text-small font-italic font-weight-bold' %}
+                {% bootstrap_field form.status size='small' label_class='uk-text-small fst-italic fw-bold' %}
               </div>
             {% else %}
               <div class="col-3"></div>
               <div class="col-6">
-                {% bootstrap_field form.leave size='small' label_class='uk-text-small font-italic font-weight-bold' %}
+                {% bootstrap_field form.leave size='small' label_class='uk-text-small fst-italic fw-bold' %}
               </div>
               <div class="col-3 d-none">
-                {% bootstrap_field form.status size='small' label_class='uk-text-small font-italic font-weight-bold' %}
+                {% bootstrap_field form.status size='small' label_class='uk-text-small fst-italic fw-bold' %}
               </div>
             {% endif %}
             {% if employee_id and extdata == False %}
@@ -104,59 +101,77 @@
             {% endif %}
           </div>
 
-          <div class="row">
+          <div class="row mt-4">
             <div class="col text-center">
               {% if new_employee %}
-                <div class="btn btn-sm btn-block mt-5">
-                  <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
+                <div class="d-grid gap-3 mt-4">
+                  <button type="submit" class="btn btn-outline-success">Confirm</button>
                 </div>
               {% else %}
-                {% if worker.status %}
-                  <div class="btn-group btn-group-sm mt-5" role="group">
-                    <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
-                    <a href="{% url 'employee:employee_hourly_rate' employee_id %}" class="btn btn-outline-primary">Update rate</a>
-                    <button type="submit" class="btn btn-outline-success">Confirm</button>
-                  </div>
-                {% else %}
-                  <div class="btn-group btn-group-sm mt-1" role="group">
-                    <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
-                    <button type="submit" class="btn btn-outline-success">Confirm changes</button>
-                  </div>
+                <div class="d-grid mt-4">
+                  {% if worker.status %}
+                    <div class="btn-group" role="group" aria-label="basic mixed styles">
+                      <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
+                      <a href="{% url 'employee:employee_hourly_rate' employee_id %}" class="btn btn-outline-primary">Update rate</a>
+                      <button type="submit" class="btn btn-outline-success">Confirm</button>
+                    </div>
+                  {% else %}
+                    <div class="btn-group" role="group" aria-label="Basic mixed styles">
+                      <a href="{% url 'employee:employee_extendeddata' employee_id %}" class="btn btn-outline-danger">Change extend data</a>
+                      <button type="submit" class="btn btn-outline-success">Confirm changes</button>
+                    </div>
+                </div>
+                  {% endif %}
                 {% endif %}
-              {% endif %}
             </div>
           </div>
         </form>
-        <hr class="small">
         {% if worker.status == False %}
-          <div class="text-center uk-text-value">
+          <div class="text-center uk-text-value my-3">
             <p>You can delete all records in database for {{ worker }}...</p>
             <p class="text-danger blink">Think twice before you decide...</p>
           </div>
         {% elif worker.status == True %}
-          <div class="text-center uk-text-value blink">
-            <p>If you want delete records in database for <span class="text-danger">{{ worker }}</span> set status on DEACTIVE...</p>
+          <div class="text-center uk-text-value my-2 blink">
+            <p>If you want delete records in database for<br><span class="text-danger">{{ worker }}</span><br>set status on DEACTIVE...</p>
           </div>
         {% endif %}
       </div>
     </div>
 
-    <div class="row">
-        <div class="col-8 text-center">
-          <div class="btn btn-group btn-block" role="group">
-            <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Dashboard</a>
-            {% if not new_employee %}
-              <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-outline-info">Add new employee</a>
-            {% endif %}
-          </div>
+    <div class="row text-center">
+      <div class="d-grid col-8 py-3">
+        <div class="btn-group">
+          <a href="{% url 'account:dashboard' %}" class="btn btn-sm btn-outline-dark">Dashboard</a>
+          <a href="{% url 'employee:employee_basicdata' %}" class="btn btn-sm btn-outline-primary{% if new_employee %} disabled{% endif %}">Add new employee</a>
         </div>
+      </div>
+      <div class="d-grid col-4 py-3">
         {% if records %}
-          <div class="col-4 text-center">
-            {% include 'blocks/erase_modal.html' %}
-          </div>
+          {% include 'blocks/erase_modal.html' %}
         {% endif %}
+      </div>
     </div>
-
   </div>
+
+    <!-- blinkin after hideTime: seconds-->
+  <script>
+    $('.blink').each(function() {
+      var elem = $(this);
+      // count the blinks
+      var count = 1;
+      var intervalId = setInterval(function() {
+         if (elem.css('visibility') == 'hidden') {
+            elem.css('visibility', 'visible');
+            // increment counter when showing to count # of blinks and stop when visible
+            if (count++ === 3) {
+              clearInterval(intervalId);
+              }
+          } else {
+              elem.css('visibility', 'hidden');
+          }
+       }, 200);
+    });
+  </script>
 
 {% endblock %}

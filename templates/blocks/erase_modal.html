@@ -1,58 +1,36 @@
   <!-- Modal for data to will be erase if you want -->
-    <div class="btn btn-group">
-      <button id="eraseButton" type="button" class="btn btn-outline-light" data-toggle="modal" data-target="#eraseModal">Erase all records for {{ worker }}</button>
+    <div class="btn-group" role="group" aria-label="basic mixed styles">
+      <button id="eraseButton" type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#eraseModal">Erase all records for {{ worker }}</button>
     </div>
     <!-- Modal -->
     <div class="modal fade" id="eraseModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header bg-danger text-white">
-            <p class="modal-title lead" id="eraseModal">You try do erase all records bellow for<br><span class="font-weight-bold">{{ worker }}</span><br><span class="small">Think twice before you decide...</span></p>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span class="fas fa-times-circle" aria-hidden="true"></span>
+          <div class="modal-header uk-bg-light text-white">
+            <p class="modal-title lead" id="eraseModal">You try do erase all records bellow for<br><span class="fw-bold">{{ worker }}</span><br><span class="small">Think twice before you decide...</span></p>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </button>
           </div>
-          <div class="modal-body bg-info">
+          <div class="modal-body uk-bg-bisque">
             <table class="table table-sm table-borderless">
               <colgroup>
                 <col span="1" style="width: 50%">
                 <col span="1" style="width: 50%">
               </colgroup>
               <tbody>
-                <tr><th class="text-right">Model</th><th>Amount of records</th></tr>
+                <tr><th class="text-end">Model</th><th>Amount of records</th></tr>
                 {% for key, value in records.items %}
                   <tr>
-                    <td class="text-right">{{ key|capfirst }} :</td><td>{{ value }}</td>
+                    <td class="text-end">{{ key|capfirst }} :</td><td>{{ value }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-info" data-dismiss="modal">Close</button>
+          <div class="modal-footer uk-bg-bisque">
+            <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Close window</button>
             {% include 'blocks/commit_erase_modal.html' %}
           </div>
         </div>
       </div>
     </div>
-
-
-  <!-- blinkin after hideTime: seconds-->
-  <script>
-    $('.blink').each(function() {
-      var elem = $(this);
-      // count the blinks
-      var count = 1;
-      var intervalId = setInterval(function() {
-         if (elem.css('visibility') == 'hidden') {
-            elem.css('visibility', 'visible');
-            // increment counter when showing to count # of blinks and stop when visible
-            if (count++ === 3) {
-              clearInterval(intervalId);
-              }
-          } else {
-              elem.css('visibility', 'hidden');
-          }
-       }, 200);
-    });
-  </script>

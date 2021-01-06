@@ -1,20 +1,18 @@
-  <!-- Button to Open the Modal -->
-  <button type="button" class="btn btn-lg btn-outline-light" data-toggle="modal" data-target="#myModal">Auxillium</button>
+ <!-- Button trigger modal -->
+  <button type="button" class="btn btn-lg btn-outline-light" data-bs-toggle="modal" data-bs-target="#quizModal">Auxillium</button>
 
-  <!-- The Modal -->
-  <div class="modal" id="myModal">
+  <!-- Modal -->
+  <div class="modal fade" id="quizModal" tabindex="-1" role="dialog" aria-labelledby="quizModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-
-        <!-- Modal Header -->
-        <div class="modal-header bg-danger text-white">
-          <h4 class="modal-title">Latina Auxillium</h4>
-          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        <!-- Header -->
+        <div class="modal-header uk-bg-light text-white">
+          <h6 class="modal-title" id="quizModal">Latina Auxillium</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-
-        <!-- Modal body -->
-        <div class="modal-body">
-          <ul class="text-justify">
+        <!-- Body -->
+        <div class="modal-body uk-bg-bisque">
+          <ul class="text-start text-info">
             <li>Dyftongi lub dwuznaki „ae” i „oe” czytamy jak „e”, np. „coelum” (niebo) przeczytamy jako „celum”, Caesar przeczytamy jako „Cesar”.</li>
             <li>„Qu” czytamy jak „kw”, np. „quorum” przeczytamy jako „kworum”.</li>
             <li>„C” przed samogłoskami „e”, „i” czytamy jako „c” – i znów mamy słowo „Caesar” oraz „cito” (szybko).</li>
@@ -25,12 +23,12 @@
             <li>„G” czytamy jak nasze „g”.</li>
           </ul>
         </div>
-
-        <!-- Modal footer -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        <!-- Footer -->
+        <div class="modal-footer uk-bg-bisque">
+          <div class="btn-group" role="group" aria-label="myLeaveModalLabel">
+            <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close window</button>
+          </div>
         </div>
-
       </div>
     </div>
   </div>

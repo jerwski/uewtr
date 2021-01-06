@@ -15,16 +15,20 @@
           <a class="btn btn-outline-primary d-print-none" href="{% url 'evidence:working_time_recorder_add' employee_id %}">Work time recorder</a>
           <a class="btn btn-outline-success d-print-none" href="{% url 'evidence:leave_time_recorder_add' employee_id %}">Leave time recorder</a>
           <a class="btn btn-outline-secondary d-print-none" href="{% url 'evidence:account_payment' employee_id %}">Payment on account</a>
+
           {% include 'blocks/payroll_print_modal.html' %}
           {% include 'blocks/payroll_send_modal.html' %}
+
           <a class="btn btn-outline-danger d-print-none" href="{% url 'account:exit' %}">Exit</a>
         </div>
         <hr class="small">
 
         <form action="{% url 'evidence:monthly_payroll_view' %}" method="POST">{% csrf_token %}
-          {% bootstrap_field form.choice_date label_class='text-primary font-weight-bold' %}
-          <div class="btn btn-block">
-            <button type="submit" class="btn btn-lg btn-outline-success btn-block">Confirm date</button>
+
+          {% bootstrap_field form.choice_date label_class='text-info fw-bold' %}
+
+          <div class="d-grid mx-auto mt-3">
+            <button type="submit" class="btn btn-lg btn-outline-success">Confirm date</button>
           </div>
         </form>
 
@@ -38,28 +42,25 @@
       </div>
       <div class="col-10">
         {% if amountpay.brutto %}
+
           {% include 'blocks/payrolldata_modal.html' %}
+
           <div class="uk-headline d-flex justify-content-around">
             <div>Total work hours: <span class="uk-text-value">{{ total_work_hours }} hour{{ total_work_hours|pluralize:'s' }}</span></div>
             <div>Total payment: <span class="uk-text-value">{{ amountpay.brutto|money_format }}</span></div>
           </div>
 
-          <div class="input-group">
-            <input class="form-control" id="myInput" type="text" placeholder="Search employee..." aria-label="Filtering table" aria-describedby="basic-addon">
-            <div class="input-group-append">
-              <span class="input-group-text fas fa-search" id="basic-addon"></span>
-            </div>
-          </div>
+          {% include 'blocks/search_strip.html' %}
 
           <table class="uk-table table-striped">
             <thead class="text-center uk-bg-burlywood">
               <tr>{% for head in heads %}<th>{{ head }}</th>{% endfor %}</tr>
             </thead>
-            <tbody id="searchTable">
+            <tbody id="STable">
             {% for name, data in payroll.items %}
               {% if data.brutto > 0 %}
-                <tr class="text-dark text-right">
-                  <td class="text-left font-weight-bold font-italic"><a class="text-primary" href="{% employee_complex_data_pass name.employee_complex_data month year %}">{{ forloop.counter }}.&nbsp;{{ name }}</a></td>
+                <tr class="text-end">
+                  <td class="text-start fw-bold fst-italic"><a class="text-primary" href="{% employee_complex_data_pass name.employee_complex_data month year %}">{{ forloop.counter }}.&nbsp;{{ name }}</a></td>
                   <td>{{ data.brutto|money_format }}</td>
                   <td>{{ data.basicpay|money_format }}</td>
                   <td>{{ data.leavepay|money_format }}</td>
@@ -72,7 +73,7 @@
               {% endif %}
             {% endfor %}
             </tbody>
-            <thead class="text-right uk-bg-burlywood">
+            <thead class="text-end uk-bg-burlywood">
               <tr>
                 <th>TOTAL PAYMENT:</th>
                 {% for value in amountpay.values %}
@@ -91,3 +92,15 @@
   </div>
 
 {% endblock %}
+
+<!-- search table-->
+  <script>
+    $(document).ready(function(){
+    $("#mySEARCH").on("keyup", function() {var value =
+      $(this).val().toLowerCase();
+        $("#STable").find("tr").filter(function() {
+          $(this).toggle(
+            $(this).text().toLowerCase().indexOf(value) > -1)})
+        ;})
+    ;});
+  </script>
