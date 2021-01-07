@@ -21,7 +21,7 @@
       <table class="table table-sm table-borderless text-center">
         <tbody>
         <tr>
-          <th>Ilość roboczogodzin:</th><td>{{ total_work_hours }} godz.</td><th>Soboty:</th><td>{% if saturday_hours %}{{ saturday_hours|floatformat:2 }}{% else %}0{% endif %} godz.</td><th>Niedziele:</th><td>{% if sunday_hours %}{{ sunday_hours|floatformat:2 }}{% else %}0{% endif %} godz.</td><th>Święta:</th><td>{% if holiday_hours %}{{ holiday_hours|floatformat:2 }}{% else %}0{% endif %} godz.</td>
+          <th>Ilość roboczogodzin: </th><td>{% if total_work_hours %}{{ total_work_hours|floatformat:2 }}{% else %}0{% endif %} godz.</td><th>Soboty:</th><td>{% if saturday_hours %}{{ saturday_hours|floatformat:2 }}{% else %}0{% endif %} godz.</td><th>Niedziele:</th><td>{% if sunday_hours %}{{ sunday_hours|floatformat:2 }}{% else %}0{% endif %} godz.</td><th>Święta:</th><td>{% if holiday_hours %}{{ holiday_hours|floatformat:2 }}{% else %}0{% endif %} godz.</td>
         </tr>
         <tr>&nbsp;</tr>
         </tbody>
@@ -79,7 +79,7 @@
 
             <tr class="text-center">
               <td colspan="2">
-                {% for key, value in month_dates.items|dictsort:1 %}
+                {% for key, value in month_dates.items %}
                   {% if key == 'unpaid_leave' %}
                     {% if value|length > 0 %}
                       {% for item in value %}
@@ -92,7 +92,7 @@
                 {% endfor %}
               </td>
               <td colspan="2">
-                {% for key, value in month_dates.items|dictsort:1 %}
+                {% for key, value in month_dates.items %}
                   {% if key == 'paid_leave' %}
                     {% if value|length > 0 %}
                       {% for item in value %}
@@ -105,7 +105,7 @@
                 {% endfor %}
               </td>
               <td colspan="2">
-                {% for key, value in month_dates.items|dictsort:1 %}
+                {% for key, value in month_dates.items %}
                   {% if key == 'maternity_leave' %}
                     {% if value|length > 0 %}
                       {% for item in value %}
@@ -151,14 +151,14 @@
 
       <div class="container">
         <div class="row">
-          <div class="col-6 offset-6">
-            <hr class="lead">
-            <p class="text-start uk-text-value">Podpis pracownika:</p>
+          <div class="col-4">
+            <p class="text-start uk-text-logo">Data wydruku: {% now "l, jS F Y H:i" %}</p>
           </div>
         </div>
         <div class="row">
-          <div class="col-4">
-            <p class="text-start uk-text-logo">Data wydruku: {% now "l, jS F Y H:i" %}</p>
+          <div class="col-6 offset-6 mt-5">
+            <p class="text-start uk-text-value">Podpis pracownika:</p>
+            <hr class="lead">
           </div>
         </div>
       </div>
