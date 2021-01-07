@@ -296,7 +296,9 @@ def payrollhtml2pdf(month:int, year:int, option=None):
 
 def dphtmpd(month:int, year:int):
 	'''dphtmpd = detailed payroll html to multi-page pdf document'''
-	pdfs, multipdf = [], f'templates/pdf/payroll_{month}_{year}.pdf'
+	multipdf = f'templates/pdf/payroll_{month}_{year}.pdf'
+	# create multi-pages pdf menager
+	merger = PdfFileMerger()
 	# all required data
 	leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
 	heads = ['Kwota brutto', 'Podstawa', 'Urlop', 'Nadgodziny', 'Za soboty', 'Za niedziele', 'Zaliczka', 'Do wypłaty']
@@ -352,24 +354,11 @@ def dphtmpd(month:int, year:int):
 		html = template.render(context)
 		pdfile = f'templates/pdf/{worker.surname} {worker.forename} lp_{month}_{year}.pdf'
 		pdfkit.from_string(html, pdfile, options=options, css=settings.CSS_FILE)
-		# join pdf file for each active employee
-		pdfs.append(Path(pdfile))
+		# merge all pdf file
+		merger.append(pdfile)
 
-	# create multi-pages pdf file
-	merger = PdfFileMerger()
-
-	if pdfs:
-		try:
-			for filename in pdfs:
-				merger.append(filename.as_posix())
-			# write multi-pages pdf file:
-			merger.write(multipdf)
-		except:
-			print(f'File for multi-page odf document aren\'t exist')
-		finally:
-			# remove component file of multi-page pdf
-			for file in pdfs:
-				file.unlink()
+	# writete multi-pages pdf file
+	merger.write(multipdf)
 
 	return multipdf
 
