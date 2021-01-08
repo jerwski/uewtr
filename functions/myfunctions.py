@@ -227,7 +227,7 @@ def plot_chart(employee_id:int, year:int):
 	chart = Image.open(imgdata)
 	chart.show()
 
-# TODO: ustawić wyeliminowanie pracowników z salary=0 dla wydruku detalicznego
+
 def payroll_set(month:int, year:int):
 	day = calendar.monthrange(year, month)[1]
 	# query for employee with valid contract
