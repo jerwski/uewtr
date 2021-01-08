@@ -44,8 +44,8 @@
             {% endfor %}
             </tr>
              <tr>
-              <td class="{% if salary > 0 %}text-success{% else %}text-danger{% endif %}" colspan="6">KWOTA DO WYPŁATY:</td>
-              <td class="{% if salary > 0 %}text-success{% else %}text-danger{% endif %}" colspan="2">{{ salary|money_format }}</td>
+              <td class="text-success" colspan="6">KWOTA DO WYPŁATY:</td>
+              <td class="text-success" colspan="2">{{ salary|money_format }}</td>
             </tr>
           </tbody>
         </table>

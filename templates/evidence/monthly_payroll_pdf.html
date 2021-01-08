@@ -18,20 +18,17 @@
           </thead>
           <tbody>
           {% for name, data in payroll.items %}
-            {% if data.salary > 0 %}
-              <tr class="text-end text-dark">
-                <td class="text-start fst-italic">{{ name }}</td>
-                <td>{{ data.brutto|money_format }}</td>
-                <td>{{ data.basicpay|money_format }}</td>
-                <td>{{ data.leavepay|money_format }}</td>
-                <td>{{ data.overhourspay|money_format }}</td>
-                <td>{{ data.satpay|money_format }}</td>
-                <td>{{ data.sunpay|money_format }}</td>
-                <td>{{ data.accountpay|money_format }}</td>
-                <td>{{ data.salary|money_format }}</td>
-                <td>&nbsp;</td>
-              </tr>
-            {% endif %}
+            <tr class="text-end text-dark">
+              <td class="text-start fst-italic">{{ name }}</td>
+              <td>{{ data.brutto|money_format }}</td>
+              <td>{{ data.basicpay|money_format }}</td>
+              <td>{{ data.leavepay|money_format }}</td>
+              <td>{{ data.overhourspay|money_format }}</td>
+              <td>{{ data.satpay|money_format }}</td>
+              <td>{{ data.sunpay|money_format }}</td>
+              <td>{{ data.accountpay|money_format }}</td>
+              <td>{{ data.salary|money_format }}</td>
+            </tr>
           {% endfor %}
           <tr><td class="text-success text-end fw-bold fst-italic">TOTAL:</td>
           {% for value in amountpay.values %}
