@@ -311,6 +311,15 @@ def dphtmpd(month:int, year:int):
 	           'margin-bottom': '0.1in', 'margin-left': '0.2in', 'encoding': "UTF-8",
 	           'orientation': 'landscape','no-outline': None, 'quiet': '',}
 
+	# holidays workhours query
+	holq =Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
+	# Saturday worhours query
+	satq = Q(start_work__week_day=7) & (Q(end_work__week_day=7) | Q(end_work__week_day=1))
+	# Sunday worhours query
+	sunq = Q(start_work__week_day=1) & Q(end_work__week_day=1)
+	# leaves
+	leaq = Q(leave_date__year=year, leave_date__month=month)
+
 	# create dataset for each active employee
 	for key, value in payroll.items():
 		worker, payroll_val = key, value
@@ -319,36 +328,31 @@ def dphtmpd(month:int, year:int):
 		# eliminate no salary worker
 		if salary > 0:
 			employeedata = get_object_or_404(EmployeeData, worker=worker)
-			# workhours in holidays
-			mainquery = Q(worker=worker) & Q(start_work__year=year) & Q(start_work__month=month)
-			exclude_holidays = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
+			# main query
+			mainquery = WorkEvidence.objects.filter(worker=worker, start_work__year=year, start_work__month=month)
 			# Saturdays
-			saturdaysquery = Q(start_work__week_day=7) & (Q(end_work__week_day=7) | Q(end_work__week_day=1))
-			saturday_hours = WorkEvidence.objects.filter(mainquery&saturdaysquery).exclude(exclude_holidays)
+			saturday_hours = mainquery.filter(satq).exclude(holq)
 			saturday_hours = saturday_hours.aggregate(sh=Sum('jobhours'))['sh']
 			# Sundays
-			sundaysquery = Q(start_work__week_day=1) & Q(end_work__week_day=1)
-			sunday_hours = WorkEvidence.objects.filter(mainquery&sundaysquery).exclude(exclude_holidays)
+			sunday_hours = mainquery.filter(sunq).exclude(holq)
 			sunday_hours = sunday_hours.aggregate(sh=Sum('jobhours'))['sh']
 			# holidays
-			holidays_query = Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
-			holiday_hours = WorkEvidence.objects.filter(mainquery&holidays_query)
+			holiday_hours = mainquery.filter(holq)
 			holiday_hours = holiday_hours.aggregate(sh=Sum('jobhours'))['sh']
 			# total workhours
-			total_work_hours = WorkEvidence.objects.filter(mainquery)
-			total_work_hours = total_work_hours.aggregate(twh=Sum('jobhours'))['twh']
+			total_work_hours = mainquery.aggregate(twh=Sum('jobhours'))['twh']
 			# leaves
 			year_leaves = EmployeeLeave.objects.filter(worker=worker, leave_date__year=year)
-			query = Q(worker=worker, leave_date__year=year, leave_date__month=month)
-			mls = EmployeeLeave.objects.filter(query).order_by('leave_date')
+			mls = EmployeeLeave.objects.filter(worker=worker).filter(leaq).order_by('leave_date')
 			month_leaves = {kind:mls.filter(leave_flag=kind).count() for kind in leave_kind}
 			month_dates = {kind:[item.leave_date for item in mls.filter(leave_flag=kind)] for kind in leave_kind}
 			year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 			# update context
-			context.update({'worker': worker, 'payroll': payroll_val, 'salary': salary, 'employeedata': employeedata,
-			                'saturday_hours': saturday_hours, 'month_leaves': month_leaves, 'month_dates': month_dates,
-			                'sunday_hours': sunday_hours, 'year_leaves': year_leaves, 'total_work_hours': total_work_hours,
-			                'holiday_hours': holiday_hours})
+			context.update({'worker': worker, 'payroll': payroll_val, 'salary': salary,
+			                'employeedata': employeedata, 'saturday_hours': saturday_hours,
+			                'month_leaves': month_leaves, 'month_dates': month_dates,
+			                'sunday_hours': sunday_hours, 'year_leaves': year_leaves,
+			                'total_work_hours': total_work_hours, 'holiday_hours': holiday_hours})
 			# create pdf file with following options
 			template = get_template('evidence/monthly_detailed_payroll_pdf.html')
 			html = template.render(context)

@@ -3,9 +3,9 @@
 
   <!-- Button trigger modal -->
   {% if total_brutto_set %}
-    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#plotModal">Print selected cashregister</button>
+    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#plotModal">Show icomes chart</button>
   {% else %}
-    <button type="button" class="btn btn-outline-primary disabled" data-bs-toggle="modal" data-bs-target="#plotModal">Print selected cashregister</button>
+    <button type="button" class="btn btn-outline-primary disabled" data-bs-toggle="modal" data-bs-target="#plotModal">Show icomes chart</button>
   {% endif %}
 
   <!-- Modal -->
@@ -14,7 +14,7 @@
       <div class="modal-content">
         <!-- Header -->
         <div class="modal-header uk-bg-light text-white">
-          <h6 class="modal-title" id="plotModal">Check cashregister to print...</h6>
+          <h6 class="modal-title" id="plotModal">Select year to show icomes chart...</h6>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <!-- Body -->
@@ -52,7 +52,7 @@
             <div class="modal-footer uk-bg-bisque">
               <div class="btn-group" role="group" aria-label="plotModalLabel">
                 <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close window</button>
-                <button id="closemodal" type="submit" class="btn btn-outline-success">Print cashregister</button>
+                <button id="closemodal" type="submit" class="btn btn-outline-success">Show icomes chart</button>
               </div>
             </div>
           </form>
