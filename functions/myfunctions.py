@@ -307,15 +307,14 @@ def dphtmpd(month:int, year:int):
 	# create context
 	context = {'month': month, 'year': year, 'heads': heads, 'total_work_days': total_work_days,}
 	# opcje dla utworzenia pliku pdf
-	options = {'page-size': 'A5', 'margin-top': '0.25in', 'margin-right': '0.2in',
-	           'margin-bottom': '0.1in', 'margin-left': '0.2in', 'encoding': "UTF-8",
-	           'orientation': 'landscape','no-outline': None, 'quiet': '',}
+	options = {'page-size': 'A5', 'margin-top': '0.25in', 'margin-right': '0.2in', 'margin-bottom': '0.1in',
+	           'margin-left': '0.2in', 'encoding': "UTF-8", 'orientation': 'landscape','no-outline': None, 'quiet': '',}
 
 	# holidays workhours query
 	holq =Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
-	# Saturday worhours query
+	# Saturday workhours query
 	satq = Q(start_work__week_day=7) & (Q(end_work__week_day=7) | Q(end_work__week_day=1))
-	# Sunday worhours query
+	# Sunday workhours query
 	sunq = Q(start_work__week_day=1) & Q(end_work__week_day=1)
 	# leaves
 	leaq = Q(leave_date__year=year, leave_date__month=month)
@@ -338,7 +337,7 @@ def dphtmpd(month:int, year:int):
 			sunday_hours = sunday_hours.aggregate(sh=Sum('jobhours'))['sh']
 			# holidays
 			holiday_hours = mainquery.filter(holq)
-			holiday_hours = holiday_hours.aggregate(sh=Sum('jobhours'))['sh']
+			holiday_hours = holiday_hours.aggregate(hh=Sum('jobhours'))['hh']
 			# total workhours
 			total_work_hours = mainquery.aggregate(twh=Sum('jobhours'))['twh']
 			# leaves

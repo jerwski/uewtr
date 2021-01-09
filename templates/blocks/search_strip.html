@@ -1,15 +1,18 @@
 <!-- search strip -->
 <div class="input-group">
   <span class="input-group-text fas fa-search"></span>
-  <input class="form-control" id="mySEARCH" type="text" placeholder="Search item... Use backspace to view all items..." aria-label="Filtering table">
+  <input class="form-control" id="mySEARCH" type="text" placeholder="Search item... Use any key to view all items..." aria-label="Filtering table">
   <span class="input-group-text fas fa-eraser" id="clear"></span>
 </div>
 
 <!-- clear search strip -->
   <script>
+
     $('#clear').click(function() {
+
       $('#mySEARCH').val('');
       document.getElementById("mySEARCH").focus();
    });
 
   </script>
+
