@@ -403,13 +403,13 @@ class SendMonthlyPayrollPdf(View):
 
 			if request.GET['spRadio'] == 'simple':
 				multipdfile = payrollhtml2pdf(month, year, option='send')
-				subject = f'Detailed multi-page payroll for {month}-{year}'
-				message = f'Detailed multi-page payroll for {month}-{year} in attachment...'
+				subject = f'Simplified payroll for {month}/{year}'
+				message = f'Simplified payroll for {month}/{year} in attachment...'
 
 			elif request.GET['spRadio'] == 'detailed':
 				multipdfile = dphtmpd(month, year)
-				subject = f'Simplified payroll for {month}-{year}'
-				message = f'Simplified payroll for {month}-{year} in attachment...'
+				subject = f'Detailed multi-page payroll for {month}/{year}'
+				message = f'Detailed multi-page payroll for {month}/{year} in attachment...'
 
 			else:
 				messages.warning(request, r'Nothing to send...')

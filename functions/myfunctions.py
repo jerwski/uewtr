@@ -306,7 +306,7 @@ def dphtmpd(month:int, year:int):
 	payroll = payroll_set(month, year)
 	# create context
 	context = {'month': month, 'year': year, 'heads': heads, 'total_work_days': total_work_days,}
-	# opcje dla utworzenia pliku pdf
+	# options to create pdf file
 	options = {'page-size': 'A5', 'margin-top': '0.25in', 'margin-right': '0.2in', 'margin-bottom': '0.1in',
 	           'margin-left': '0.2in', 'encoding': "UTF-8", 'orientation': 'landscape','no-outline': None, 'quiet': '',}
 
