@@ -614,7 +614,7 @@ def quizset(iterable):
 
 def dirdata() -> dict:
 	usage = dict()
-	if 'darwin' in sys.platform:
+	if 'Darwin' in sys.platform:
 		usage.__setitem__('Macintosh HD', shutil.disk_usage('/')._asdict())
 	elif 'win' in sys.platform:
 		drivers = [chr(x)+':' for x in range(65,90) if os.path.exists(chr(x)+':')]

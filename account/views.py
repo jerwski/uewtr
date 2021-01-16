@@ -65,8 +65,7 @@ class AdminView(View):
 	def get(self, request)->HttpResponseRedirect:
 		if request.user.is_superuser or request.user.is_staff:
 			user = request.user.username
-			context = {'user': user}
-			context.update({'usage': dirdata()})
+			context = {'user': user, 'usage': dirdata()}
 			employee = Employee.objects.all()
 			
 			if request.session.get('check_update', True):
@@ -83,11 +82,13 @@ class AdminView(View):
 					employee_id = employee.filter(status=True).first().id
 				else:
 					employee_id = employee.first().id
-				context.update({'employee_id': employee_id, 'nodata': False})
+				# update context
+				context |= ({'employee_id': employee_id, 'nodata': False})
 			else:
 				backup = settings.ARCHIVE_ROOT
 				created = datetime.fromtimestamp(backup.stat().st_mtime)
-				context.update({'nodata': True, 'backup': str(backup), 'created': created})
+				# update context
+				context |= ({'nodata': True, 'backup': str(backup), 'created': created})
 				return render(request, '500.html', context)
 
 			if socket.gethostname() == settings.SERIALIZE_HOST:
@@ -212,7 +213,7 @@ class QuizView(View):
 				poll = len(_queryset) - 3
 				data = {'quiz_id': quiz_id, 'query': query, 'points': points, 'playtime': playtime, 'poll': poll,
 						'answers': answers, 'set_of_questions': set_of_questions, 'percent': percent}
-				context.update(data)
+				context |= (data)
 			except:
 				logout(request)
 				return HttpResponseRedirect(reverse_lazy('login'))
@@ -220,7 +221,8 @@ class QuizView(View):
 		else:
 			Quiz.objects.all().delete()
 			quiz = Quiz.objects.create(player=user, start_play=now(), set_of_questions=0, points=0)
-			context.update({'start_play': now(), 'quiz_id': quiz.id})
+			# update context
+			context |= ({'start_play': now(), 'quiz_id': quiz.id})
 
 		return render(request, 'account/quiz.html', context)
 
@@ -249,7 +251,8 @@ class QuizView(View):
 
 		else:
 			points -= 3
-			context.update({'points': points, 'poll': len(_queryset)})
+			# update context
+			context |= ({'points': points, 'poll': len(_queryset)})
 			Quiz.objects.filter(pk=quiz_id).update(points=points, end_play=now())
 			return render(request, 'account/quiz.html', context)
 

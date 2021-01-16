@@ -9,7 +9,7 @@ path='/Users/jurgen/UniApps/uniwork/venv/lib/python3.9/site-packages/django/form
 
 class RadioSelectButtonGroup(RadioSelect):
     """
-    This widget renders a Bootstrap 4 set of buttons horizontally instead of typical radio buttons.
+    This widget renders a Bootstrap 5 set of buttons horizontally instead of typical radio buttons.
     """
 
     template_name = 'widgets/radiobuttongroup.html'

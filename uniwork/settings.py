@@ -59,6 +59,7 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'django.forms',
 	'account.apps.AccountConfig',
 	'employee.apps.EmployeeConfig',
 	'evidence.apps.EvidenceConfig',
@@ -84,7 +85,7 @@ ROOT_URLCONF = 'uniwork.urls'
 TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
-		'DIRS': [BASE_DIR.joinpath('templates')],
+		'DIRS': [BASE_DIR.joinpath('templates'),],
 		'APP_DIRS': True,
 		'OPTIONS': {
 			'context_processors': [
@@ -149,6 +150,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 DJANGO_WATCHMAN_TIMEOUT = 1
+
+# for overriding the default widget's template
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
