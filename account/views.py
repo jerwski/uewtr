@@ -276,9 +276,6 @@ def exit(request)->HttpResponseRedirect:
 		try:
 			if checkWiFi():
 				uploadFileFTP(*args)
-				return HttpResponseRedirect(r'https://www.google.pl/')
-			else:
-				return render(request, '500.html', {'error': 'Occurred problem with FTP connection...'})
 		except:
 			pass
 
@@ -292,15 +289,11 @@ def exit(request)->HttpResponseRedirect:
 			backup()
 		else:
 			print(r'All fixtures are up to date...')
-
+			
 		if request.user.is_authenticated:
 			logout(request)
 
-		try:
-			if checkWiFi():
-				return HttpResponseRedirect(r'https://www.google.pl/')
-		except:
-			return render(request, '500.html', {'error': 'Occurred problem with network...'})
-		finally:
-			if platform.system() == 'Darwin':
+		if platform.system() == 'Darwin':
 				exec_script()
+
+	return HttpResponseRedirect(r'https://www.google.pl/')

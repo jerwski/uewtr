@@ -4,8 +4,6 @@ from django.forms import RadioSelect
 
 # create your widgets
 
-path='/Users/jurgen/UniApps/uniwork/venv/lib/python3.9/site-packages/django/forms/templates/widgets/radiobuttongroup.html'
-
 
 class RadioSelectButtonGroup(RadioSelect):
     """
