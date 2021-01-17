@@ -41,7 +41,7 @@ SECRET_KEY = get_setting('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if socket.gethostname() in get_setting('home_hosts'):
-	DEBUG = True
+	DEBUG = False
 elif socket.gethostname() in get_setting('office_hosts'):
 	DEBUG = True
 else:
