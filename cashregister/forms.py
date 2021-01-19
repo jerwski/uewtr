@@ -1,8 +1,8 @@
 # django library
 from django import forms
 
-# bootstrap4 widget
-from bootstrap4.widgets import RadioSelectButtonGroup
+# my widget
+from functions.widgets import RadioSelectButtonGroup
 
 # my views
 from cashregister.models import Company, CashRegister

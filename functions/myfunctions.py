@@ -614,11 +614,13 @@ def quizset(iterable):
 
 def dirdata() -> dict:
 	usage = dict()
-	if 'Darwin' in sys.platform:
+	if platform.system() == 'Darwin':
 		usage.__setitem__('Macintosh HD', shutil.disk_usage('/')._asdict())
-	elif 'win' in sys.platform:
+	elif platform.system() == 'Windows':
 		drivers = [chr(x)+':' for x in range(65,90) if os.path.exists(chr(x)+':')]
 		usage = {drive: shutil.disk_usage(drive)._asdict() for drive in drivers}
+	else:
+		usage |= {'unknown':{'total': 'You should check someself'}}
 
 	for key, value in usage.items():
 		percent = value['used'] * 100 / value['total']

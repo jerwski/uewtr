@@ -7,7 +7,7 @@ from tempus_dominus.widgets import DatePicker
 # my models
 from employee.models import Employee, EmployeeData, EmployeeHourlyRate
 
-# my function
+# my widgets
 from functions.widgets import RadioSelectButtonGroup
 
 # my validators

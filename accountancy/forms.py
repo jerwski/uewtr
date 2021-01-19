@@ -5,10 +5,10 @@ from django import forms
 
 # my views
 from cashregister.models import Company
-from accountancy.models import Customer, Product, AccountancyDocument, AccountancyProducts
+from accountancy.models import Customer, Product, AccountancyDocument
 
-# bootstrap4 widget
-from bootstrap4.widgets import RadioSelectButtonGroup
+# my widget
+from functions.widgets import RadioSelectButtonGroup
 
 
 # datetime widget
