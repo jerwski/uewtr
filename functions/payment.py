@@ -258,7 +258,7 @@ def employee_total_data(employee_id:int, year:int, month:int, context:dict) -> d
 def data_modal_chart(employee_id:int) -> dict:
     '''creates a set of brutto income each subsequent year for a given employee'''
     months = range(1,13)
-    years = set(WorkEvidence.objects.filter(worker_id=employee_id).values_list('start_work__year', flat=True))
+    years = [item.year for item in WorkEvidence.objects.filter(worker_id=employee_id).dates('start_work', 'year', order='DESC')]
     total_brutto_set = {year:sum(total_payment(employee_id,year,month)['brutto'] for month in months) for year in years}
 
     return total_brutto_set

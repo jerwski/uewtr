@@ -1,6 +1,5 @@
 # standard library
 import os
-import sys
 import shutil
 import calendar
 import platform
@@ -264,14 +263,14 @@ def payrollhtml2pdf(month:int, year:int, option=None):
 			amountpay[k] += v
 
 	context = {'heads': heads, 'payroll': payroll, 'amountpay': dict(amountpay),
-	           'year': year, 'month': month, 'total_work_hours': total_work_hours}
+			   'year': year, 'month': month, 'total_work_hours': total_work_hours}
 
 	template = get_template('evidence/monthly_payroll_pdf.html')
 	html = template.render(context)
 	# create pdf file with following options
 	options = {'page-size': 'A4', 'margin-top': '0.2in', 'margin-right': '0.1in',
-	           'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
-	           'orientation': 'landscape','no-outline': None, 'quiet': '', }
+			   'margin-bottom': '0.1in', 'margin-left': '0.1in', 'encoding': "UTF-8",
+			   'orientation': 'landscape','no-outline': None, 'quiet': '', }
 
 	if option == 'print':
 		pdfile = pdfkit.from_string(html, False, options=options, css=settings.CSS_FILE)
@@ -308,7 +307,7 @@ def dphtmpd(month:int, year:int):
 	context = {'month': month, 'year': year, 'heads': heads, 'total_work_days': total_work_days,}
 	# options to create pdf file
 	options = {'page-size': 'A5', 'margin-top': '0.25in', 'margin-right': '0.2in', 'margin-bottom': '0.1in',
-	           'margin-left': '0.2in', 'encoding': "UTF-8", 'orientation': 'landscape','no-outline': None, 'quiet': '',}
+			   'margin-left': '0.2in', 'encoding': "UTF-8", 'orientation': 'landscape','no-outline': None, 'quiet': '',}
 
 	# holidays workhours query
 	holq =Q(start_work__date__in=list(holidays)) & Q(end_work__date__in=list(holidays))
@@ -348,10 +347,10 @@ def dphtmpd(month:int, year:int):
 			year_leaves = {kind:year_leaves.filter(leave_flag=kind).count() for kind in leave_kind}
 			# update context
 			context.update({'worker': worker, 'payroll': payroll_val, 'salary': salary,
-			                'employeedata': employeedata, 'saturday_hours': saturday_hours,
-			                'month_leaves': month_leaves, 'month_dates': month_dates,
-			                'sunday_hours': sunday_hours, 'year_leaves': year_leaves,
-			                'total_work_hours': total_work_hours, 'holiday_hours': holiday_hours})
+							'employeedata': employeedata, 'saturday_hours': saturday_hours,
+							'month_leaves': month_leaves, 'month_dates': month_dates,
+							'sunday_hours': sunday_hours, 'year_leaves': year_leaves,
+							'total_work_hours': total_work_hours, 'holiday_hours': holiday_hours})
 			# create pdf file with following options
 			template = get_template('evidence/monthly_detailed_payroll_pdf.html')
 			html = template.render(context)
@@ -612,10 +611,10 @@ def quizset(iterable):
 		return None
 
 
-def dirdata() -> dict:
+def spaceusage() -> dict:
 	usage = dict()
 	if platform.system() == 'Darwin':
-		usage.__setitem__('Macintosh HD', shutil.disk_usage('/')._asdict())
+		usage |= {'Macintosh HD': shutil.disk_usage('/')._asdict()}
 	elif platform.system() == 'Windows':
 		drivers = [chr(x)+':' for x in range(65,90) if os.path.exists(chr(x)+':')]
 		usage = {drive: shutil.disk_usage(drive)._asdict() for drive in drivers}
@@ -657,3 +656,28 @@ def rempid():
 		if pid.exists():
 			pid.unlink()
 			print(f'After removed {pid} file you should be restart your PostgreSQL Database')
+
+
+# with statement
+class FileTimeWriter():
+
+	def __init__(self, file_name, mode='w', encoding='utf-8'):
+		self.file_name = file_name
+		self.mode = mode
+		self.encoding = encoding
+
+	def __enter__(self):
+		self.file = open(self.file_name, self.mode, encoding=self.encoding)
+		self.open_t = now()
+		self.file.write(f'File open at: {self.open_t}\n')
+		return self.file
+
+	def __exit__(self, exc_type, exc_val, exc_tb):
+		self.close_t = now()
+		self.file.write(f'\nFile closed at: {self.close_t}')
+		self.file.close()
+
+# using with statement with FileTimeWriter
+
+# with FileTimeWriter('myfile.txt') as file:
+# 	file.write('Hello World')

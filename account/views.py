@@ -29,7 +29,7 @@ from cashregister.models import *
 from account.forms import UserCreateForm
 
 # my function
-from functions.myfunctions import remgarbage, quizdata, quizset, dirdata
+from functions.myfunctions import remgarbage, quizdata, quizset, spaceusage
 from functions.archive import mkfixture, readfixture, make_archives, uploadFileFTP, backup, getArchiveFilefromFTP, checkWiFi, cmp_fixtures, exec_script
 
 
@@ -65,7 +65,7 @@ class AdminView(View):
 	def get(self, request)->HttpResponseRedirect:
 		if request.user.is_superuser or request.user.is_staff:
 			user = request.user.username
-			context = {'user': user, 'usage': dirdata()}
+			context = {'user': user, 'usage': spaceusage()}
 			employee = Employee.objects.all()
 			
 			if request.session.get('check_update', True):

@@ -34,6 +34,7 @@ urlpatterns = [
     path('evidence/', include('evidence.urls', namespace='evidence')),
     path('cashregister/', include('cashregister.urls', namespace='cashregister')),
     path('favicon/.ico', RedirectView.as_view(url='/static/images/favicon.ico')),
+	path('django-doc/', RedirectView.as_view(url='https://docs.djangoproject.com'), name='django-doc'),
 ]
 
 admin.site.site_title = '/admin/'
