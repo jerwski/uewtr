@@ -47,7 +47,7 @@
           </tbody>
         </table>
         {% if leave_data %}
-          <p class="text-danger lead">Nieobecność w pracy: <a class="text-monospace, text-dark">{% for item in leave_data %}{{ item|date:'d-m-Y' }}, {% endfor %}</a> </p>
+          <p class="text-danger">Nieobecność w pracy: <i class="text-info">{% for item in leave_data %}{{ item|date:'d/m' }}; {% endfor %}</i></p>
         {% endif %}
         <div class="col-4">
           <p class="uk-text-logo text-start">Data wydruku: {% now "l, jS F Y H:i" %}</p>

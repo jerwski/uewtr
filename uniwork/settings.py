@@ -149,6 +149,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# controlled primary key
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 DJANGO_WATCHMAN_TIMEOUT = 1
 
 # for overriding the default widget's template
