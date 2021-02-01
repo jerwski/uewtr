@@ -15,9 +15,11 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body uk-bg-bisque">
-          {% for message in messages %}
-            <p class="text-center uk-text-alert">{{ message }}</p>
-          {% endfor %}
+          {% if messages %}
+            {% for message in messages %}
+              <p class="text-center uk-text-alert">{{ message }}</p>
+            {% endfor %}
+          {% endif %}
         </div>
         <div class="modal-footer uk-bg-bisque">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
