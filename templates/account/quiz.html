@@ -42,7 +42,7 @@
       </div>
       <form action="{% url 'account:quiz' quiz_id %}" method="POST">{% csrf_token %}
         <div class="row">
-          <div class="d-grid gap-2 col-8 mx-auto">
+          <div class="d-grid gap-auto col-6 mx-auto">
             <div class="form-check fw-bold">
               <ul class="uk-quiz-answers list-unstyled">
                 {% for answer in answers %}
