@@ -47,8 +47,8 @@ class WorkingTimeRecorderView(View):
 		employees = employees.order_by('surname', 'forename')
 		query = Q(worker=self.worker) & (Q(overtime=1)|Q(overtime=2))
 		overhours = EmployeeData.objects.filter(query).exists()
-		self.context = {'worker': self.worker, 'employee_id': self.employee_id,
-		                'employees': employees, 'overhours': overhours, 'wtr_flag': True}
+		ctx_data = {'employee_id': self.employee_id, 'employees': employees, 'overhours': overhours, 'wtr_flag': True}
+		self.context = initial | ctx_data
 
 		if self.request.method == 'GET':
 			if 'work_hours' in self.kwargs.keys():
