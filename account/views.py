@@ -264,6 +264,7 @@ def exit(request)->HttpResponseRedirect:
 		paths = (Path('/Users/jurgen/Downloads'), Path('/private/var/tmp'), Path('templates/pdf'))
 	else:
 		paths = (Path('templates/pdf'), Path('~/Downloads').expanduser())
+
 	# remove unused files
 	remgarbage(*paths)
 
