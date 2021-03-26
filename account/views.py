@@ -254,6 +254,7 @@ class QuizView(View):
 			# update context
 			context |= ({'points': points, 'poll': len(_queryset)})
 			Quiz.objects.filter(pk=quiz_id).update(points=points, end_play=now())
+
 			return render(request, 'account/quiz.html', context)
 
 
