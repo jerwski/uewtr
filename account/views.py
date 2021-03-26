@@ -221,6 +221,7 @@ class QuizView(View):
 		else:
 			Quiz.objects.all().delete()
 			quiz = Quiz.objects.create(player=user, start_play=now(), set_of_questions=0, points=0)
+
 			# update context
 			context |= ({'start_play': now(), 'quiz_id': quiz.id})
 
