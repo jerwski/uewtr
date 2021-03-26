@@ -260,6 +260,7 @@ class QuizView(View):
 
 def exit(request)->HttpResponseRedirect:
 	'''backups features and exit from the application'''
+
 	if platform.system() == 'Darwin':
 		paths = (Path('/Users/jurgen/Downloads'), Path('/private/var/tmp'), Path('templates/pdf'))
 	else:
