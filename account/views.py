@@ -157,6 +157,7 @@ class SerializeView(View):
 
 class DeserializeView(View):
 	'''class to deserializng database'''
+
 	def get(self, request)->HttpResponseRedirect:
 
 		if not Path.exists(settings.ADMIN_SERIALIZE):
