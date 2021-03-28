@@ -25,7 +25,7 @@ from evidence.models import WorkEvidence, EmployeeLeave, AccountPayment
 # my function
 from functions.archive import checkWiFi
 from functions.payment import holiday, total_payment, workingdays, employee_total_data, data_modal_chart
-from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year, workhourshtml2pdf, make_attachment, accountpaymenthtml2pdf, dphtmpd, payroll_set
+from functions.myfunctions import payrollhtml2pdf, leavehtml2pdf, plot_chart, sendemail, initial_leave_form, initial_worktime_form, initial_account_form, previous_month_year, workhourshtml2pdf, make_attachment, accountpaymenthtml2pdf, dphtmpd, payroll_set, employee_records
 
 
 # Create your views here.
@@ -567,6 +567,7 @@ class EmployeeCurrentComplexDataView(View):
 		super(EmployeeCurrentComplexDataView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
 		employee_id = self.kwargs['employee_id']
+		records = employee_records(employee_id)
 		worker = get_object_or_404(Employee, pk=employee_id)
 		leave_kind = ('unpaid_leave', 'paid_leave', 'maternity_leave')
 
@@ -597,7 +598,7 @@ class EmployeeCurrentComplexDataView(View):
 		total_brutto_set = data_modal_chart(employee_id)
 		self.context = {'form': form, 'employee_id': employee_id, 'choice_date': choice_date, 'month_leaves': month_leaves,
 		                'year_leaves': year_leaves, 'month': month, 'employees': employees, 'holidays' : holidays,
-		                'worker': worker, 'total_brutto_set': total_brutto_set, 'year': year,
+		                'worker': worker, 'total_brutto_set': total_brutto_set, 'year': year, 'records': records,
 		                'sml': sml.order_by('leave_date'), 'work_hours': work_hours.order_by('start_work')}
 		employee_total_data(employee_id, year, month, self.context)
 

@@ -12,7 +12,7 @@ from employee.models import Employee, EmployeeData, EmployeeHourlyRate
 from employee.forms import EmployeeBasicDataForm, EmployeeExtendedDataForm, EmployeeHourlyRateForm
 
 # my functions
-from functions.myfunctions import erase_records
+from functions.myfunctions import employee_records
 from functions.archive import archiving_of_deleted_records
 
 
@@ -31,13 +31,17 @@ class EmployeeBasicDataView(View):
 			worker = get_object_or_404(Employee, pk=employee_id)
 			fields = list(worker.__dict__.keys())[4:]
 			initial = Employee.objects.filter(pk=employee_id).values(*fields)[0]
-			self.context = {'employee_id': employee_id, 'worker': worker, 'records': erase_records(employee_id)}
+			self.context = {'employee_id': employee_id, 'worker': worker}
 			extdata = EmployeeData.objects.filter(worker=worker)
 
 			if extdata:
 				self.context.__setitem__('extdata', True)
 			else:
 				self.context.__setitem__('extdata', False)
+
+			if worker.status == False:
+				records = employee_records(employee_id)
+				self.context |= {'records': records}
 
 		if employees.exists():
 			employees_st = employees.filter(status=True)
@@ -135,7 +139,7 @@ class EmployeeExtendedDataView(View):
 			emplexdata = get_object_or_404(EmployeeData, worker=self.worker)
 			self.fields = list(emplexdata.__dict__.keys())[4:]
 
-		self.context = {'employee_id': self.employee_id, 'employees': employees, 'worker': self.worker}
+		self.context = {'employee_id': self.employee_id, 'worker': self.worker, 'employees': employees,}
 
 		if self.request.method == 'GET':
 			if self.extdata.exists():

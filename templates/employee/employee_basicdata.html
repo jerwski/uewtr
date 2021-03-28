@@ -146,7 +146,7 @@
         </div>
       </div>
       <div class="d-grid col-4 py-3">
-        {% if records %}
+        {% if worker.status == False %}
           {% include 'blocks/erase_modal.html' %}
         {% endif %}
       </div>

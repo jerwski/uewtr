@@ -176,11 +176,11 @@ def initial_leave_form(employee_id:int) -> dict:
 	return initial
 
 
-def erase_records(employee_id:int) -> dict:
+def employee_records(employee_id:int) -> dict:
 	context = dict()
 	worker = get_object_or_404(Employee, pk=employee_id)
 
-	if worker.status == False:
+	if worker:
 		opt1, opt2 = {'worker': worker, 'then': Value(1)}, {'default': Value(0), 'output_field': IntegerField()}
 		db = {EmployeeData._meta.verbose_name: EmployeeData, WorkEvidence._meta.verbose_name: WorkEvidence,
 			  EmployeeLeave._meta.verbose_name: EmployeeLeave, AccountPayment._meta.verbose_name: AccountPayment,
