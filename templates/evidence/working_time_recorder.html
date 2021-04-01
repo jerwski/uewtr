@@ -72,11 +72,11 @@
           <div class="col-2 text-center">
             <div class="btn btn-group-sm btn-group-vertical" role="group">
               <a href="{% url 'evidence:working_time_recorder_add' employee_id %}" class="btn btn-sm btn-outline-light">Insert hours</a>
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id 12 %}" class="btn btn-sm btn-outline-info">6:00-12:00</a>
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id 14 %}" class="btn btn-sm btn-outline-success">6:00-14:00</a>
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id 16 %}" class="btn btn-sm btn-outline-primary">6:00-16:00</a>
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id 18 %}" class="btn btn-sm btn-outline-danger">6:00-18:00</a>
-              <a href="{% url 'evidence:working_time_recorder_add' employee_id 6 %}" class="btn btn-sm btn-outline-dark fw-bold">22:00-6:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 10 %}" class="btn btn-sm btn-outline-info">6:00-10:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 11 %}" class="btn btn-sm btn-outline-success">6:00-11:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 15 %}" class="btn btn-sm btn-outline-primary">6:00-15:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 17 %}" class="btn btn-sm btn-outline-danger">6:00-17:00</a>
+              <a href="{% url 'evidence:working_time_recorder_add' employee_id 5 %}" class="btn btn-sm btn-outline-dark fw-bold">22:00-5:00</a>
             </div>
           </div>
         </div>
@@ -87,12 +87,10 @@
           <p class="uk-text-middle text-center">The start date is the same like the end date! <span class="text-danger blink">Please correct it!</span></p>
         {% else %}
           {% if flag_work or flag_leave %}
-            <p class="uk-text-middle text-center">Record for this day <span class="text-danger">{{ start_work|date:'l, d F Y' }}</span> is existing in database! <span class="text-danger blink">Please check it or correct!</span></p>
+            <p class="uk-text-middle text-center">Record for this day <span class="text-danger">{{ start_work|date:'l, d F Y' }}</span> is existing in database!<br><span class="text-danger blink">Please check it or correct!</span></p>
             <div class="row">
-              <div class="col">
-                <div class="btn-sm mb-2">
-                  <a class="btn btn-outline-light btn-block fw-bold" href="/admin/">Admin Data Base</a>
-                </div>
+              <div class="d-grid col-10 mx-auto my-2">
+                <a class="btn btn-sm btn-outline-light fw-bold" href="/admin/">Admin Data Base</a>
               </div>
             </div>
           {% else %}

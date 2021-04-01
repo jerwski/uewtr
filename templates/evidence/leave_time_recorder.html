@@ -51,23 +51,9 @@
               <div class="d-grid col-6 mx-auto mt-3">
                 <p class="text-light fst-italic lead">Select a kind of leave...</p>
                 {% bootstrap_field form.leave_flag show_label=False %}
-
-
-{#                <div class="btn-group">#}
-{#                  <!-- radiobutton unpaid leave -->#}
-{#                  <input type="radio" class="btn-check" name="leave_flag" id="unpaid_leave" autocomplete="off" value="unpaid_leave"{% if worker.leave == 0 %} checked{% endif %}>#}
-{#                  <label class="btn btn-outline-light" for="unpaid_leave">Unpaid leave</label>#}
-{#                <!-- radiobutton paid leave -->#}
-{#                  <input type="radio" class="btn-check" name="leave_flag" id="paid_leave" autocomplete="off" value="paid_leave"{% if worker.leave == 1 %} checked{% endif %}>#}
-{#                  <label class="btn btn-outline-light" for="paid_leave">Paid leave</label>#}
-{#                <!-- radiobutton maternity leave -->#}
-{#                  <input type="radio" class="btn-check" name="leave_flag" id="maternity_leave" autocomplete="off" value="maternity_leave">#}
-{#                  <label class="btn btn-outline-light" for="maternity_leave">Maternity leave</label>#}
-{#                </div>#}
-{#              </div>#}
-
+              </div>
               <div class="col-1"></div>
-            </div>
+
             <div class="row">
               <div class="d-grid col-10 mx-auto mt-3">
                 <button type="submit" class="btn btn-lg btn-outline-success btn-block">Confirm the leave day you entered</button>

@@ -40,14 +40,15 @@ class WorkingTimeRecorderView(View):
 		if 'employee_id' in self.kwargs.keys():
 			self.employee_id = self.kwargs['employee_id']
 
-		# self.worker = get_object_or_404(Employee, pk=self.employee_id)
 		self.worker = get_object_or_404(Employee, pk=self.employee_id)
 		initial = {'worker': self.worker}
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
 		employees = employees.order_by('surname', 'forename')
 		query = Q(worker=self.worker) & (Q(overtime=1)|Q(overtime=2))
 		overhours = EmployeeData.objects.filter(query).exists()
-		ctx_data = {'employee_id': self.employee_id, 'employees': employees, 'overhours': overhours, 'wtr_flag': True}
+		records = employee_records(self.employee_id)
+		ctx_data = {'employee_id': self.employee_id, 'employees': employees,
+		            'overhours': overhours, 'wtr_flag': True, 'records': records}
 		self.context = initial | ctx_data
 
 		if self.request.method == 'GET':
@@ -128,6 +129,7 @@ class LeaveTimeRecorderView(View):
 		super(LeaveTimeRecorderView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
 		employee_id = self.kwargs['employee_id']
+		records = employee_records(employee_id)
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
 		employees = employees.order_by('surname', 'forename')
 		self.worker = get_object_or_404(Employee, pk=employee_id)
@@ -144,8 +146,8 @@ class LeaveTimeRecorderView(View):
 			self.form = EmployeeLeaveForm(data=self.request.POST)
 
 		self.context = {'form': self.form, 'remaining_leave': remaining_leave, 'worker': self.worker,
-		                'year': now().year, 'total_leaves': total_leaves.count(), 'ltr_flag': True,
-		                'employees': employees, 'employee_id': employee_id, 'leave_set': leave_set,}
+		                'total_leaves': total_leaves.count(), 'ltr_flag': True, 'records': records,
+		                'employees': employees, 'employee_id': employee_id, 'leave_set': leave_set, 'year': now().year,}
 
 		flags = {'leaves_pl': 'paid_leave', 'leaves_upl': 'unpaid_leave', 'leaves_ml': 'maternity_leave'}
 		for key, value in flags.items():
@@ -438,6 +440,7 @@ class AccountPaymentView(View):
 		super(AccountPaymentView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
 		self.employee_id = self.kwargs['employee_id']
+		records = employee_records(self.employee_id)
 		self.month, self.year = now().month, now().year
 		self.initial = initial_account_form(self.employee_id)
 		self.worker = get_object_or_404(Employee, pk=self.employee_id)
@@ -454,8 +457,9 @@ class AccountPaymentView(View):
 			self.form = AccountPaymentForm(data=self.request.POST)
 
 		# seting context
-		self.context = {'form': self.form, 'worker': self.worker, 'earlier_date': earlier_date, 'month': self.month,
-		                'employee_id': self.employee_id, 'employees': employees, 'year': self.year, 'ap_flag': True}
+		self.context = {'form': self.form, 'worker': self.worker, 'earlier_date': earlier_date,
+		                'month': self.month, 'employee_id': self.employee_id, 'employees': employees,
+		                'year': self.year, 'ap_flag': True, 'records': records}
 
 		
 	def get(self, request, **kwargs) -> render:

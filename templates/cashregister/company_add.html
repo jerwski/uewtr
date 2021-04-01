@@ -84,32 +84,28 @@
           </div>
 
           <div class="row">
-            <div class="col-12 mb-1 text-center">
+            <div class="col-12 mt-3 text-center">
               {% bootstrap_field form.status label_class='text-light fst-italic fw-bold' %}
             </div>
           </div>
 
           <div class="row">
-            <div class="col text-center">
-              <div class="btn btn-block mb-2">
-                <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
-              </div>
+            <div class="d-grid col mx-auto mt-3">
+              <button type="submit" class="btn btn-outline-success btn-block">Confirm</button>
             </div>
           </div>
         </form>
 
         <hr>
         <div class="row">
-          <div class="col-12 text-center">
-            <div class="btn-group mb-2" role="group">
-              <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
-              <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Dashboard</a>
-              {% if company_id %}
-                <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Add company</a>
-              {% endif %}
-              <a href="{% url 'accountancy:accountancy' %}" class="btn btn-outline-danger">Accountancy</a>
-              <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
-            </div>
+          <div class="btn-group col mx-auto mt-3" role="group">
+            <a href="{% url 'account:exit' %}" class="btn btn-outline-danger">Exit</a>
+            <a href="{% url 'account:dashboard' %}" class="btn btn-outline-dark">Dashboard</a>
+            {% if company_id %}
+              <a href="{% url 'cashregister:add_company' %}" class="btn btn-outline-primary">Add company</a>
+            {% endif %}
+            <a href="{% url 'accountancy:accountancy' %}" class="btn btn-outline-danger">Accountancy</a>
+            <a href="{% url 'cashregister:cash_register' %}" class="btn btn-outline-info">Cash register</a>
           </div>
         </div>
       </div>

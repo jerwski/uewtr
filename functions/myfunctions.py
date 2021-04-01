@@ -67,14 +67,14 @@ def initial_worktime_form(work_hours:int) -> dict:
 	args; 12=>06:00-12:00, 14=>12=06:00-14:00,
 	16=>06:00-16:00, 18=>06:00-18:00, 6=>22:00-06:00
 	'''
-	hours = dict(zip([12, 14, 16, 18, 6], [6, 6, 6, 6, 22]))
+	hours = dict(zip([10, 11, 12, 14, 15, 16, 17, 18, 5, 6], [6, 6, 6, 6, 6, 6, 6, 6, 22, 22]))
 	start, end = now().date(), now().date()
 
 	if start.isoweekday() == 1:
-		if work_hours == 12:
+		if work_hours in [10, 11, 12]:
 			start = start - timedelta(days=2)
 			end = end - timedelta(days=2)
-		elif work_hours == 6:
+		elif work_hours in [5, 6]:
 			start = start - timedelta(days=3)
 			end = end - timedelta(days=2)
 		else:
@@ -82,14 +82,14 @@ def initial_worktime_form(work_hours:int) -> dict:
 			end = end - timedelta(days=3)
 
 	elif start.isoweekday() == 6:
-		if work_hours in [14, 16, 18]:
+		if work_hours in [14, 15, 16, 17, 18]:
 			start = start - timedelta(days=1)
 			end = end - timedelta(days=1)
 		elif work_hours == 6:
 			start = start - timedelta(days=1)
 
 	elif start.isoweekday() == 7:
-		if work_hours in [14, 16, 18]:
+		if work_hours in [14, 15, 16, 17, 18]:
 			start = start - timedelta(days=2)
 			end = end - timedelta(days=2)
 		elif work_hours == 12:
@@ -98,7 +98,7 @@ def initial_worktime_form(work_hours:int) -> dict:
 		else:
 			start = start - timedelta(days=1)
 	else:
-		if work_hours == 6:
+		if work_hours in [5, 6]:
 			start = start - timedelta(days=1)
 			end = end
 		elif work_hours == 12:
