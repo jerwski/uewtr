@@ -36,10 +36,7 @@ class WorkingTimeRecorderView(View):
 	def setup(self, request, **kwargs):
 		super(WorkingTimeRecorderView, self).setup(request, **kwargs)
 		self.request, self.kwargs = request, kwargs
-
-		if 'employee_id' in self.kwargs.keys():
-			self.employee_id = self.kwargs['employee_id']
-
+		self.employee_id = self.kwargs['employee_id']
 		self.worker = get_object_or_404(Employee, pk=self.employee_id)
 		initial = {'worker': self.worker}
 		employees = Employee.objects.filter(employeedata__end_contract__isnull=True, status=True)
