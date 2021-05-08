@@ -112,9 +112,8 @@ def mkfixture(path:Path, backup_models:list=None):
 
 def readfixture(request, root_backup:Path):
 	'''load data from fixtures'''
-	files = deque(file for file in root_backup.iterdir() if file.name.startswith('employee'))
-	files.extend(file for file in root_backup.iterdir() if file.name.startswith('company'))
-	files.extend(file for file in root_backup.iterdir() if not file.name.startswith('employee') and not file.name.startswith('company'))
+	files = deque(file for fk in settings.FIXTURES_KEYS for file in root_backup.iterdir() if file.name.startswith(fk))
+
 	try:
 		for file in files:
 			call_command('loaddata', file)
