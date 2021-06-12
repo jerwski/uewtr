@@ -390,7 +390,7 @@ class MonthlyPayrollPrintView(View):
 
 			return response
 
-		return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
+		return HttpResponseRedirect(reverse('evidence:monthly_payroll_view', args=[month, year]))
 
 
 class SendMonthlyPayrollPdf(View):
@@ -428,7 +428,7 @@ class SendMonthlyPayrollPdf(View):
 		else:
 			messages.error(request, 'FTP connection failure...')
 
-		return HttpResponseRedirect(reverse('evidence:monthly_payroll_view'))
+		return HttpResponseRedirect(reverse('evidence:monthly_payroll_view', args=[month, year]))
 
 
 class AccountPaymentView(View):
