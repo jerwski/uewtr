@@ -48,7 +48,7 @@
           {% bootstrap_field form.notice size='medium' label_class='text-info fw-bold' placeholder='Please indicate the circumstances of the down payment...' %}
           <div class="col">
             <div class="d-grid mx-auto my-3">
-              <button type="submit" class="btn btn-lg btn-outline-success">Confirm the down payment</button>
+              <button type="submit" class="btn btn-lg btn-outline-success" {% if request.method == 'POST' and salary >= advances %}disabled{% endif %}>Confirm the down payment</button>
             </div>
           </div>
         </form>
