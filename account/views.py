@@ -91,7 +91,7 @@ class AdminView(View):
 				context |= ({'nodata': True, 'backup': str(backup), 'created': created})
 				return render(request, '500.html', context)
 
-			if socket.gethostname() == settings.SERIALIZE_HOST:
+			if socket.gethostname() in settings.SERIALIZE_HOST:
 				context.__setitem__('serialize', True)
 
 			if checkWiFi():
