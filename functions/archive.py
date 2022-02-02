@@ -36,12 +36,13 @@ def fcsum(path):
 
 
 def checkWiFi() -> bool:
-	IPaddress = socket. gethostbyname(socket. gethostname())
-
-	if IPaddress == '127.0.0.1':
-		return False
-	else:
+	host, port = settings.EMAIL_HOST, settings.HOST_PORT
+	try:
+		socket.create_connection((host,port))
 		return True
+	except socket.error as er:
+		print(f'Occurred problem with FTP connection: {er}')
+		return False
 
 
 def cmp_fixtures():
